@@ -11,6 +11,10 @@ Bu projenin temel amacı, büyük bir hesaplama yükünün (geniş bir aralıkta
 - **Gantt Şeması ile Görselleştirme:** Her bir thread'in hangi görevi ne kadar sürede tamamladığını anlık olarak gösteren akan renkli zaman çizelgesi.
 - **Performans Kıyaslaması:** 1 Thread (referans) ile çoklu Thread testlerinin sonuçlarını kıyaslayan geçmiş test tablosu.
 
+
+<img width="1898" height="906" alt="image" src="https://github.com/user-attachments/assets/653e90ca-2455-439e-b77b-10da48379b7e" />
+
+
 ## 🛠️ Kurulum ve Çalıştırma
 
 1. Proje dizinine gidin:
