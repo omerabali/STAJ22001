@@ -92,6 +92,7 @@ JavaScript motoru (V8), aynı anda yalnızca bir görevi çalıştırabilir. Fib
 Web Worker, ayrı bir OS thread'inde çalışır. Ana thread ile `postMessage` / `onmessage` API'si aracılığıyla mesaj geçirerek iletişim kurar. DOM'a erişemez ancak yoğun CPU hesaplamalarını ana thread'i engellemeden yapabilir.
 
 ---
+<img width="1918" height="911" alt="image" src="https://github.com/user-attachments/assets/48610160-f2d8-40b4-88e0-980f04dd8039" />
 
 ## 👤 Geliştirici
 
