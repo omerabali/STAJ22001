@@ -4,8 +4,9 @@ dist/
 # generated types
 .astro/
 
-# dependencies
+# dependencies (root + server)
 node_modules/
+server/node_modules/
 
 # logs
 npm-debug.log*
@@ -13,12 +14,18 @@ yarn-debug.log*
 yarn-error.log*
 pnpm-debug.log*
 
-# environment variables
+# environment variables — ASLA commit'leme!
 .env
-.env.production
+.env.*
+!.env.example
+server/.env
+server/.env.*
 
 # macOS-specific files
 .DS_Store
 
 # jetbrains setting folder
 .idea/
+
+# Prisma generated
+server/node_modules/.prisma/
