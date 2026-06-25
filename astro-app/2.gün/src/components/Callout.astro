@@ -1,0 +1,33 @@
+---
+interface Props {
+	type?: 'info' | 'tip';
+}
+
+const { type = 'info' } = Astro.props;
+---
+
+<aside class:list={['callout', type]}>
+	<slot />
+</aside>
+
+<style>
+	.callout {
+		border-radius: 0.75rem;
+		padding: 1rem 1.25rem;
+		margin: 1.5rem 0;
+		font-size: 0.9375rem;
+		line-height: 1.6;
+	}
+
+	.info {
+		background: rgba(56, 189, 248, 0.1);
+		border-left: 4px solid #38bdf8;
+		color: #cbd5e1;
+	}
+
+	.tip {
+		background: rgba(99, 102, 241, 0.1);
+		border-left: 4px solid #818cf8;
+		color: #cbd5e1;
+	}
+</style>

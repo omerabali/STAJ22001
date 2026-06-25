@@ -1,0 +1,35 @@
+---
+import AppLayout from '../layouts/AppLayout.astro';
+---
+
+<AppLayout title="Gun 3 - CV Lens Hazirlik">
+  <section class="hero">
+    <div class="panel">
+      <p class="eyebrow">Gun 3 - Bizim projeye hazirlik</p>
+      <h1>Astro SSR ile mini auth akisi</h1>
+      <p class="lead">
+        Bu uygulama CV Lens'e gecmeden once ihtiyacimiz olan server-side render, API route,
+        React island, form handling ve env mantigini tek pratik akista toplar.
+      </p>
+      <div class="actions">
+        <a class="button primary" href="/login">Demo girise git</a>
+        <a class="button" href="/dashboard">Korumali paneli dene</a>
+      </div>
+    </div>
+
+    <aside class="stack" aria-label="Gun 3 konu ozeti">
+      <div class="metric">
+        <strong>SSR</strong>
+        <span>Sayfalar server'da kosar; cookie kontrolu dashboard render edilmeden yapilir.</span>
+      </div>
+      <div class="metric">
+        <strong>/api</strong>
+        <span>Login, logout ve mevcut kullanici bilgisi endpointlerden yonetilir.</span>
+      </div>
+      <div class="metric">
+        <strong>React</strong>
+        <span>Astro sayfasinin icinde hydrate edilen kucuk bir oturum durum componenti var.</span>
+      </div>
+    </aside>
+  </section>
+</AppLayout>

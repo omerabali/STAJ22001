@@ -1,0 +1,57 @@
+---
+import AppLayout from '../layouts/AppLayout.astro';
+import AuthStatus from '../components/AuthStatus';
+import { readSessionUser, SESSION_COOKIE } from '../lib/auth';
+
+const user = await readSessionUser(Astro.cookies.get(SESSION_COOKIE)?.value);
+
+if (!user) {
+  return Astro.redirect('/login');
+}
+---
+
+<AppLayout title="Panel - CV Lens Hazirlik">
+  <section class="dashboard-grid">
+    <div class="panel">
+      <p class="eyebrow">Korumali SSR sayfa</p>
+      <h1>Merhaba, {user.name}</h1>
+      <p class="lead">
+        Bu sayfa HTML uretilmeden once server tarafinda cookie kontrolu yapar. CV Lens'te
+        aday yukleme, analiz gecmisi ve kullanici panelleri icin ayni model genisletilebilir.
+      </p>
+
+      <div class="pipeline">
+        <div class="pipeline-step">
+          <span class="step-number">1</span>
+          <div>
+            <strong>Formdan kimlik bilgisi al</strong>
+            <p class="muted">Login formu `/api/login` endpointine post edilir.</p>
+          </div>
+        </div>
+        <div class="pipeline-step">
+          <span class="step-number">2</span>
+          <div>
+            <strong>Server'da dogrula</strong>
+            <p class="muted">Endpoint env'den gelen demo kullanici ile eslesme yapar.</p>
+          </div>
+        </div>
+        <div class="pipeline-step">
+          <span class="step-number">3</span>
+          <div>
+            <strong>Cookie ile koru</strong>
+            <p class="muted">Dashboard SSR render oncesi session cookie'sini okur.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <aside class="panel">
+      <h2>React island</h2>
+      <p class="muted">
+        Bu alan Astro sayfasinin icinde React olarak hydrate olur ve API'den oturum bilgisini
+        tarayicida tekrar okur.
+      </p>
+      <AuthStatus client:load />
+    </aside>
+  </section>
+</AppLayout>

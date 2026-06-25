@@ -1,0 +1,28 @@
+---
+title: MDX ile Bileşen Gömme
+description: MDX dosyalarında Astro bileşenlerini Markdown içine yerleştirmek.
+pubDate: 2026-06-22
+category: astro
+---
+
+import Callout from '../../components/Callout.astro';
+
+## Markdown vs MDX
+
+Normal `.md` dosyaları saf Markdown içerir. `.mdx` dosyaları ise Astro bileşenlerini doğrudan içeriğe gömmeni sağlar.
+
+<Callout type="info">
+  Bu kutu bir Astro bileşeni — MDX sayesinde yazı gövdesinin içinde kullanılabiliyor.
+</Callout>
+
+## Ne zaman MDX?
+
+İçerikte özel uyarı kutuları, interaktif demo'lar veya tekrar kullanılabilir UI parçaları gerektiğinde MDX tercih edilir. Sade metin yazıları için `.md` yeterlidir.
+
+<Callout type="tip">
+  Gün 2 projesinde 3 Markdown + 1 MDX yazısı var — ikisinin farkını karşılaştırmak için ideal.
+</Callout>
+
+## Import kuralı
+
+MDX dosyasında bileşen import'u frontmatter bloğunun **altında**, içerikten **önce** yapılır.

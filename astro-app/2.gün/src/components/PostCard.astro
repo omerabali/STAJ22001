@@ -1,0 +1,80 @@
+---
+import type { CollectionEntry } from 'astro:content';
+
+interface Props {
+	post: CollectionEntry<'blog'>;
+}
+
+const { post } = Astro.props;
+const { title, description, pubDate, category } = post.data;
+
+const formattedDate = pubDate.toLocaleDateString('tr-TR', {
+	year: 'numeric',
+	month: 'long',
+	day: 'numeric',
+});
+---
+
+<article class="card">
+	<a href={`/blog/${post.id}`} class="card-link">
+		<span class="badge">{category}</span>
+		<h3 class="card-title">{title}</h3>
+		<p class="card-desc">{description}</p>
+		<time class="date" datetime={pubDate.toISOString()}>{formattedDate}</time>
+	</a>
+</article>
+
+<style>
+	.card {
+		background: rgba(30, 41, 59, 0.8);
+		border: 1px solid rgba(148, 163, 184, 0.15);
+		border-radius: 1rem;
+		transition: transform 0.2s, border-color 0.2s;
+	}
+
+	.card:hover {
+		transform: translateY(-2px);
+		border-color: rgba(56, 189, 248, 0.4);
+	}
+
+	.card-link {
+		display: block;
+		padding: 1.5rem;
+		text-decoration: none;
+		color: inherit;
+	}
+
+	.card-link:hover {
+		text-decoration: none;
+	}
+
+	.badge {
+		display: inline-block;
+		background: rgba(56, 189, 248, 0.15);
+		color: #38bdf8;
+		font-size: 0.75rem;
+		font-weight: 600;
+		padding: 0.25rem 0.75rem;
+		border-radius: 9999px;
+		margin-bottom: 0.75rem;
+		text-transform: capitalize;
+	}
+
+	.card-title {
+		font-size: 1.25rem;
+		color: #f8fafc;
+		margin-bottom: 0.5rem;
+	}
+
+	.card-desc {
+		color: #94a3b8;
+		font-size: 0.9375rem;
+		line-height: 1.5;
+		margin-bottom: 0.75rem;
+	}
+
+	.date {
+		color: #64748b;
+		font-size: 0.8125rem;
+	}
+</style>

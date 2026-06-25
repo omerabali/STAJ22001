@@ -1,0 +1,83 @@
+---
+import BaseLayout from '../../../layouts/BaseLayout.astro';
+import PostCard from '../../../components/PostCard.astro';
+import CategoryFilter from '../../../components/CategoryFilter.astro';
+import { getCollection } from 'astro:content';
+import type { CollectionEntry } from 'astro:content';
+
+export async function getStaticPaths() {
+	const posts = await getCollection('blog', ({ data }) => !data.draft);
+	const categories = [...new Set(posts.map((post) => post.data.category))];
+
+	return categories.map((kategori) => ({
+		params: { kategori },
+		props: {
+			kategori,
+			posts: posts
+				.filter((post) => post.data.category === kategori)
+				.sort((a, b) => b.data.pubDate.valueOf() - a.data.pubDate.valueOf()),
+		},
+	}));
+}
+
+interface Props {
+	kategori: string;
+	posts: CollectionEntry<'blog'>[];
+}
+
+const { kategori, posts } = Astro.props;
+
+const categoryLabels: Record<string, string> = {
+	astro: 'Astro',
+	web: 'Web',
+	javascript: 'JavaScript',
+};
+
+const allCategories = [...new Set(
+	(await getCollection('blog', ({ data }) => !data.draft)).map((post) => post.data.category),
+)];
+---
+
+<BaseLayout title={`${categoryLabels[kategori] ?? kategori} | Blog`}>
+	<section class="blog">
+		<a href="/blog" class="back-link">← Tüm yazılar</a>
+		<h1 class="page-title">{categoryLabels[kategori] ?? kategori}</h1>
+		<p class="page-desc">{posts.length} yazı</p>
+
+		<CategoryFilter categories={allCategories} activeCategory={kategori} />
+
+		<div class="grid">
+			{posts.map((post) => <PostCard post={post} />)}
+		</div>
+	</section>
+</BaseLayout>
+
+<style>
+	.back-link {
+		display: inline-block;
+		color: #94a3b8;
+		font-size: 0.9375rem;
+		margin-bottom: 1rem;
+	}
+
+	.back-link:hover {
+		color: #38bdf8;
+	}
+
+	.page-title {
+		font-size: 2rem;
+		color: #f8fafc;
+		margin-bottom: 0.5rem;
+	}
+
+	.page-desc {
+		color: #94a3b8;
+		margin-bottom: 1.5rem;
+	}
+
+	.grid {
+		display: grid;
+		grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+		gap: 1.25rem;
+	}
+</style>

@@ -1,0 +1,53 @@
+---
+interface Props {
+	baslik: string;
+	aciklama: string;
+	teknoloji: string;
+}
+
+const { baslik, aciklama, teknoloji } = Astro.props;
+---
+
+<article class="card">
+	<span class="badge">{teknoloji}</span>
+	<h3 class="card-title">{baslik}</h3>
+	<p class="card-desc">{aciklama}</p>
+</article>
+
+<style>
+	.card {
+		background: rgba(30, 41, 59, 0.8);
+		border: 1px solid rgba(148, 163, 184, 0.15);
+		border-radius: 1rem;
+		padding: 1.5rem;
+		transition: transform 0.2s, border-color 0.2s;
+	}
+
+	.card:hover {
+		transform: translateY(-2px);
+		border-color: rgba(56, 189, 248, 0.4);
+	}
+
+	.badge {
+		display: inline-block;
+		background: rgba(56, 189, 248, 0.15);
+		color: #38bdf8;
+		font-size: 0.75rem;
+		font-weight: 600;
+		padding: 0.25rem 0.75rem;
+		border-radius: 9999px;
+		margin-bottom: 0.75rem;
+	}
+
+	.card-title {
+		font-size: 1.25rem;
+		color: #f8fafc;
+		margin-bottom: 0.5rem;
+	}
+
+	.card-desc {
+		color: #94a3b8;
+		font-size: 0.9375rem;
+		line-height: 1.5;
+	}
+</style>

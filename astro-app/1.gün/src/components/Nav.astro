@@ -1,0 +1,87 @@
+---
+const navLinks = [
+	{ href: '/', label: 'Ana Sayfa' },
+	{ href: '/hakkimda', label: 'Hakkımda' },
+	{ href: '/projeler', label: 'Projeler' },
+];
+
+const currentPath = Astro.url.pathname;
+---
+
+<nav class="nav">
+	<div class="nav-inner">
+		<a href="/" class="logo">Portfolyo</a>
+		<ul class="nav-links">
+			{
+				navLinks.map(({ href, label }) => (
+					<li>
+						<a href={href} class:list={['nav-link', { active: currentPath === href }]}>
+							{label}
+						</a>
+					</li>
+				))
+			}
+		</ul>
+	</div>
+</nav>
+
+<style>
+	.nav {
+		border-bottom: 1px solid rgba(148, 163, 184, 0.2);
+		background: rgba(15, 23, 42, 0.8);
+		backdrop-filter: blur(8px);
+		position: sticky;
+		top: 0;
+		z-index: 10;
+	}
+
+	.nav-inner {
+		max-width: 960px;
+		margin: 0 auto;
+		padding: 1rem 1.5rem;
+		display: flex;
+		align-items: center;
+		justify-content: space-between;
+		gap: 1rem;
+	}
+
+	.logo {
+		font-weight: 700;
+		font-size: 1.125rem;
+		color: #f8fafc;
+		text-decoration: none;
+	}
+
+	.logo:hover {
+		color: #38bdf8;
+		text-decoration: none;
+	}
+
+	.nav-links {
+		list-style: none;
+		display: flex;
+		gap: 0.5rem;
+		flex-wrap: wrap;
+	}
+
+	.nav-link {
+		display: block;
+		padding: 0.5rem 1rem;
+		border-radius: 0.5rem;
+		color: #94a3b8;
+		text-decoration: none;
+		font-size: 0.9375rem;
+		transition: background 0.2s, color 0.2s;
+	}
+
+	.nav-link:hover {
+		color: #e2e8f0;
+		background: rgba(56, 189, 248, 0.1);
+		text-decoration: none;
+	}
+
+	.nav-link.active {
+		color: #38bdf8;
+		background: rgba(56, 189, 248, 0.15);
+	}
+</style>

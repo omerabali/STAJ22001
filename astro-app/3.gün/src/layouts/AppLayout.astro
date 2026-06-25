@@ -1,0 +1,36 @@
+---
+import '../styles/global.css';
+
+const { title = 'CV Lens Hazirlik' } = Astro.props;
+const appName = import.meta.env.PUBLIC_APP_NAME ?? 'CV Lens Hazirlik';
+---
+
+<html lang="tr">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width" />
+    <meta name="generator" content={Astro.generator} />
+    <title>{title}</title>
+  </head>
+  <body>
+    <div class="page-shell">
+      <header class="topbar">
+        <a class="brand" href="/">
+          <span class="brand-mark">CV</span>
+          <span>{appName}</span>
+        </a>
+        <nav class="nav-links" aria-label="Ana navigasyon">
+          <a href="/">Ozet</a>
+          <a href="/login">Giris</a>
+          <a href="/dashboard">Panel</a>
+          <form action="/api/logout" method="post">
+            <button type="submit">Cikis</button>
+          </form>
+        </nav>
+      </header>
+      <main class="main">
+        <slot />
+      </main>
+    </div>
+  </body>
+</html>

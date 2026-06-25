@@ -1,0 +1,53 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import ProjectCard from '../components/ProjectCard.astro';
+
+const projeler = [
+	{
+		baslik: 'Kişisel Portfolyo',
+		aciklama: 'Üç sayfalık statik site. Layout, navigasyon ve tekrar kullanılabilir kart bileşenleri var.',
+		teknoloji: 'Astro',
+	},
+	{
+		baslik: 'Todo Uygulaması',
+		aciklama: 'Görev ekleme, silme ve tamamlama. Tamamen tarayıcıda çalışıyor, backend yok.',
+		teknoloji: 'HTML/CSS/JS',
+	},
+	{
+		baslik: 'Hesap Makinesi',
+		aciklama: 'Klavye ve tıklama destekli basit bir hesap makinesi arayüzü.',
+		teknoloji: 'JavaScript',
+	},
+];
+---
+
+<BaseLayout title="Projeler | Portfolyo">
+	<section class="projects">
+		<h1 class="page-title">Projelerim</h1>
+		<p class="page-desc">
+			Boş zamanlarda ve öğrenirken yaptığım birkaç küçük iş.
+		</p>
+		<div class="grid">
+			{projeler.map((proje) => <ProjectCard {...proje} />)}
+		</div>
+	</section>
+</BaseLayout>
+
+<style>
+	.page-title {
+		font-size: 2rem;
+		color: #f8fafc;
+		margin-bottom: 0.5rem;
+	}
+
+	.page-desc {
+		color: #94a3b8;
+		margin-bottom: 2rem;
+	}
+
+	.grid {
+		display: grid;
+		grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+		gap: 1.25rem;
+	}
+</style>

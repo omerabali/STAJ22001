@@ -1,0 +1,71 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+---
+
+<BaseLayout title="Ana Sayfa | Portfolyo">
+	<section class="hero">
+		<p class="greeting">Merhaba, ben</p>
+		<h1 class="name">Emre</h1>
+		<p class="subtitle">Web geliştirici · Astro ile denemeler</p>
+		<p class="intro">
+			İnternette düzgün çalışan, sade siteler yapmayı seviyorum.
+			Bu site Astro ile kurduğum küçük bir portfolyo — layout, component ve routing
+			gibi temel parçaları bir araya getirmek için iyi bir başlangıç oldu.
+		</p>
+		<a href="/projeler" class="cta">Projelere göz at</a>
+	</section>
+</BaseLayout>
+
+<style>
+	.hero {
+		text-align: center;
+		padding: 4rem 1rem;
+	}
+
+	.greeting {
+		color: #94a3b8;
+		font-size: 1.125rem;
+		margin-bottom: 0.5rem;
+	}
+
+	.name {
+		font-size: clamp(2.5rem, 6vw, 3.5rem);
+		font-weight: 800;
+		background: linear-gradient(135deg, #38bdf8, #818cf8);
+		-webkit-background-clip: text;
+		-webkit-text-fill-color: transparent;
+		background-clip: text;
+		margin-bottom: 0.75rem;
+	}
+
+	.subtitle {
+		color: #64748b;
+		font-size: 1.125rem;
+		margin-bottom: 1.5rem;
+	}
+
+	.intro {
+		max-width: 540px;
+		margin: 0 auto 2rem;
+		color: #cbd5e1;
+		font-size: 1.0625rem;
+		line-height: 1.7;
+	}
+
+	.cta {
+		display: inline-block;
+		background: linear-gradient(135deg, #0ea5e9, #6366f1);
+		color: #fff;
+		font-weight: 600;
+		padding: 0.875rem 2rem;
+		border-radius: 0.75rem;
+		text-decoration: none;
+		transition: opacity 0.2s, transform 0.2s;
+	}
+
+	.cta:hover {
+		opacity: 0.9;
+		transform: translateY(-1px);
+		text-decoration: none;
+	}
+</style>
