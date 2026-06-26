@@ -4,6 +4,7 @@ import cors from "cors";
 import { PrismaClient } from "@prisma/client";
 import { PrismaPg } from "@prisma/adapter-pg";
 import pg from "pg";
+import authRouter from "./routes/auth.js";
 
 const app = express();
 const pool = new pg.Pool({
@@ -16,6 +17,9 @@ const PORT = process.env.PORT || 5000;
 // Middleware
 app.use(cors());
 app.use(express.json());
+
+// Auth routes
+app.use("/api/auth", authRouter);
 
 // GET / — Ana sayfa karşılama mesajı
 app.get("/", (_req, res) => {
