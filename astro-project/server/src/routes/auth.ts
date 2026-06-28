@@ -48,12 +48,18 @@ router.post("/register", async (req: Request, res: Response): Promise<void> => {
       data: { email, passwordHash },
     });
 
-    // JWT oluştur ve döndür
+    // JWT oluştur ve çereze kaydet
     const token = signToken({ id: user.id, email: user.email, role: user.role });
+
+    res.cookie("token", token, {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === "production",
+      sameSite: "lax",
+      maxAge: 7 * 24 * 60 * 60 * 1000,
+    });
 
     res.status(201).json({
       message: "Kayıt başarılı.",
-      token,
       user: { id: user.id, email: user.email, role: user.role },
     });
   } catch (error) {
@@ -88,12 +94,18 @@ router.post("/login", async (req: Request, res: Response): Promise<void> => {
       return;
     }
 
-    // JWT döndür (payload: id, email, role)
+    // JWT oluştur ve çereze kaydet
     const token = signToken({ id: user.id, email: user.email, role: user.role });
+
+    res.cookie("token", token, {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === "production",
+      sameSite: "lax",
+      maxAge: 7 * 24 * 60 * 60 * 1000,
+    });
 
     res.json({
       message: "Giriş başarılı.",
-      token,
       user: { id: user.id, email: user.email, role: user.role },
     });
   } catch (error) {
@@ -124,6 +136,18 @@ router.get("/me", authMiddleware, async (req: Request, res: Response): Promise<v
     console.error("Me hatası:", error);
     res.status(500).json({ message: "Sunucu hatası." });
   }
+});
+
+// ─────────────────────────────────────────────
+// POST /api/auth/logout
+// ─────────────────────────────────────────────
+router.post("/logout", (req: Request, res: Response): void => {
+  res.clearCookie("token", {
+    httpOnly: true,
+    secure: process.env.NODE_ENV === "production",
+    sameSite: "lax",
+  });
+  res.json({ message: "Çıkış başarılı." });
 });
 
 export default router;
