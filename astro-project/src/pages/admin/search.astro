@@ -1,0 +1,179 @@
+---
+import AdminLayout from '../../layouts/AdminLayout.astro';
+---
+
+<AdminLayout title="Beacon AI - Aday Ara">
+  <!-- Top Header -->
+  <header class="mb-8">
+    <h2 class="font-headline-md text-headline-md font-bold mb-2">Aday Ara</h2>
+    <p class="font-body-md text-body-md text-on-surface-variant">Doğal dil ile aday ara, AI en uygun profilleri sıralar.</p>
+  </header>
+
+  <!-- Search Section -->
+  <div class="bg-surface-container-highest border border-outline-variant rounded-2xl p-6 mb-10">
+    <div class="relative flex items-center mb-6">
+      <span class="material-symbols-outlined absolute left-4 text-on-surface-variant">search</span>
+      <input 
+        type="text" 
+        placeholder="örn: React bilen 3 yıl deneyimli frontend geliştirici" 
+        class="w-full bg-surface-container-lowest border border-outline-variant text-on-surface rounded-xl pl-12 pr-[120px] py-4 focus:border-primary focus:ring-1 focus:ring-primary focus:outline-none font-body-md"
+      />
+      <button class="absolute right-2 bg-[#7c5cfc] hover:bg-[#6b4dec] text-white rounded-lg px-6 py-2.5 font-label-md flex items-center gap-2 transition-colors">
+        <span class="material-symbols-outlined text-sm">auto_awesome</span>
+        Ara
+      </button>
+    </div>
+
+    <!-- Filter Pills -->
+    <div class="flex flex-wrap gap-3">
+      <button class="bg-[#7c5cfc] text-white px-4 py-1.5 rounded-full font-label-sm text-xs transition-colors">Tümü</button>
+      <button class="bg-surface-container-lowest border border-outline-variant text-on-surface-variant hover:text-on-surface px-4 py-1.5 rounded-full font-label-sm text-xs transition-colors">Analiz Hazır</button>
+      <button class="bg-surface-container-lowest border border-outline-variant text-on-surface-variant hover:text-on-surface px-4 py-1.5 rounded-full font-label-sm text-xs transition-colors">İşleniyor</button>
+      <button class="bg-surface-container-lowest border border-outline-variant text-on-surface-variant hover:text-on-surface px-4 py-1.5 rounded-full font-label-sm text-xs transition-colors">Bekliyor</button>
+    </div>
+  </div>
+
+  <!-- Results Header -->
+  <div class="flex justify-between items-center mb-6">
+    <h3 class="font-headline-sm text-headline-sm font-bold text-on-surface">Arama Sonuçları</h3>
+    <span class="text-on-surface-variant font-body-sm text-sm">4 aday bulundu</span>
+  </div>
+
+  <!-- Results Grid -->
+  <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+    
+    <!-- Card 1 -->
+    <div class="bg-[#13132b] border border-[#2a2a4a] rounded-xl p-6 hover:border-primary/50 transition-colors flex flex-col justify-between h-[200px]">
+      <div class="flex justify-between items-start">
+        <div class="flex gap-4">
+          <div class="w-12 h-12 rounded-full bg-primary-container text-on-primary-container flex items-center justify-center font-bold text-lg">AY</div>
+          <div>
+            <h4 class="font-bold text-on-surface">Ahmet Yılmaz</h4>
+            <p class="text-on-surface-variant text-sm mt-0.5">Frontend Geliştirici</p>
+          </div>
+        </div>
+        <div class="flex items-center gap-1 text-green-400 bg-green-400/10 px-2 py-1 rounded font-bold text-xs">
+          <span class="material-symbols-outlined text-[14px]">auto_awesome</span>
+          %91 Uyum
+        </div>
+      </div>
+      
+      <div class="flex gap-2 mt-4">
+        <span class="bg-purple-900/30 text-purple-300 px-3 py-1 rounded-full font-label-md text-[11px]">React</span>
+        <span class="bg-purple-900/30 text-purple-300 px-3 py-1 rounded-full font-label-md text-[11px]">TypeScript</span>
+        <span class="bg-purple-900/30 text-purple-300 px-3 py-1 rounded-full font-label-md text-[11px]">Node.js</span>
+      </div>
+
+      <div class="flex justify-between items-center mt-auto pt-4 border-t border-[#2a2a4a]/50">
+        <div class="flex items-center gap-2 text-on-surface-variant text-xs">
+          <span class="material-symbols-outlined text-[14px]">calendar_today</span>
+          29.06.2026
+        </div>
+        <button class="border border-outline-variant text-on-surface hover:bg-[#1a2340] px-4 py-1.5 rounded-lg text-xs font-semibold transition-colors">
+          Profili Gör
+        </button>
+      </div>
+    </div>
+
+    <!-- Card 2 -->
+    <div class="bg-[#13132b] border border-[#2a2a4a] rounded-xl p-6 hover:border-primary/50 transition-colors flex flex-col justify-between h-[200px]">
+      <div class="flex justify-between items-start">
+        <div class="flex gap-4">
+          <div class="w-12 h-12 rounded-full bg-secondary-container text-on-secondary-container flex items-center justify-center font-bold text-lg">ZK</div>
+          <div>
+            <h4 class="font-bold text-on-surface">Zeynep Kaya</h4>
+            <p class="text-on-surface-variant text-sm mt-0.5">Full Stack Geliştirici</p>
+          </div>
+        </div>
+        <div class="flex items-center gap-1 text-green-400 bg-green-400/10 px-2 py-1 rounded font-bold text-xs">
+          <span class="material-symbols-outlined text-[14px]">auto_awesome</span>
+          %87 Uyum
+        </div>
+      </div>
+      
+      <div class="flex gap-2 mt-4">
+        <span class="bg-purple-900/30 text-purple-300 px-3 py-1 rounded-full font-label-md text-[11px]">Python</span>
+        <span class="bg-purple-900/30 text-purple-300 px-3 py-1 rounded-full font-label-md text-[11px]">Django</span>
+        <span class="bg-purple-900/30 text-purple-300 px-3 py-1 rounded-full font-label-md text-[11px]">PostgreSQL</span>
+      </div>
+
+      <div class="flex justify-between items-center mt-auto pt-4 border-t border-[#2a2a4a]/50">
+        <div class="flex items-center gap-2 text-on-surface-variant text-xs">
+          <span class="material-symbols-outlined text-[14px]">calendar_today</span>
+          28.06.2026
+        </div>
+        <button class="border border-outline-variant text-on-surface hover:bg-[#1a2340] px-4 py-1.5 rounded-lg text-xs font-semibold transition-colors">
+          Profili Gör
+        </button>
+      </div>
+    </div>
+
+    <!-- Card 3 -->
+    <div class="bg-[#13132b] border border-[#2a2a4a] rounded-xl p-6 hover:border-primary/50 transition-colors flex flex-col justify-between h-[200px]">
+      <div class="flex justify-between items-start">
+        <div class="flex gap-4">
+          <div class="w-12 h-12 rounded-full bg-primary-container text-on-primary-container flex items-center justify-center font-bold text-lg">CD</div>
+          <div>
+            <h4 class="font-bold text-on-surface">Can Demir</h4>
+            <p class="text-on-surface-variant text-sm mt-0.5">Backend Geliştirici</p>
+          </div>
+        </div>
+        <div class="flex items-center gap-1 text-green-400 bg-green-400/10 px-2 py-1 rounded font-bold text-xs">
+          <span class="material-symbols-outlined text-[14px]">auto_awesome</span>
+          %84 Uyum
+        </div>
+      </div>
+      
+      <div class="flex gap-2 mt-4">
+        <span class="bg-purple-900/30 text-purple-300 px-3 py-1 rounded-full font-label-md text-[11px]">Node.js</span>
+        <span class="bg-purple-900/30 text-purple-300 px-3 py-1 rounded-full font-label-md text-[11px]">Express</span>
+        <span class="bg-purple-900/30 text-purple-300 px-3 py-1 rounded-full font-label-md text-[11px]">MongoDB</span>
+      </div>
+
+      <div class="flex justify-between items-center mt-auto pt-4 border-t border-[#2a2a4a]/50">
+        <div class="flex items-center gap-2 text-on-surface-variant text-xs">
+          <span class="material-symbols-outlined text-[14px]">calendar_today</span>
+          25.06.2026
+        </div>
+        <button class="border border-outline-variant text-on-surface hover:bg-[#1a2340] px-4 py-1.5 rounded-lg text-xs font-semibold transition-colors">
+          Profili Gör
+        </button>
+      </div>
+    </div>
+
+    <!-- Card 4 -->
+    <div class="bg-[#13132b] border border-[#2a2a4a] rounded-xl p-6 hover:border-primary/50 transition-colors flex flex-col justify-between h-[200px]">
+      <div class="flex justify-between items-start">
+        <div class="flex gap-4">
+          <div class="w-12 h-12 rounded-full bg-secondary-container text-on-secondary-container flex items-center justify-center font-bold text-lg">EŞ</div>
+          <div>
+            <h4 class="font-bold text-on-surface">Elif Şahin</h4>
+            <p class="text-on-surface-variant text-sm mt-0.5">UI/UX Tasarımcı</p>
+          </div>
+        </div>
+        <div class="flex items-center gap-1 text-yellow-400 bg-yellow-400/10 px-2 py-1 rounded font-bold text-xs">
+          <span class="material-symbols-outlined text-[14px]">warning</span>
+          %79 Uyum
+        </div>
+      </div>
+      
+      <div class="flex gap-2 mt-4">
+        <span class="bg-purple-900/30 text-purple-300 px-3 py-1 rounded-full font-label-md text-[11px]">Figma</span>
+        <span class="bg-purple-900/30 text-purple-300 px-3 py-1 rounded-full font-label-md text-[11px]">React</span>
+        <span class="bg-purple-900/30 text-purple-300 px-3 py-1 rounded-full font-label-md text-[11px]">CSS</span>
+      </div>
+
+      <div class="flex justify-between items-center mt-auto pt-4 border-t border-[#2a2a4a]/50">
+        <div class="flex items-center gap-2 text-on-surface-variant text-xs">
+          <span class="material-symbols-outlined text-[14px]">calendar_today</span>
+          20.06.2026
+        </div>
+        <button class="border border-outline-variant text-on-surface hover:bg-[#1a2340] px-4 py-1.5 rounded-lg text-xs font-semibold transition-colors">
+          Profili Gör
+        </button>
+      </div>
+    </div>
+
+  </div>
+
+</AdminLayout>

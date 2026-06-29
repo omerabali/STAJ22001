@@ -1,0 +1,257 @@
+---
+import UserLayout from '../layouts/UserLayout.astro';
+---
+
+<UserLayout title="Beacon AI - Dashboard" headerTitle="Aday Paneli">
+  <!-- Hoş Geldin Banner -->
+  <div class="mb-xl bg-surface-container rounded-xl border border-outline-variant p-lg flex items-center gap-md relative overflow-hidden">
+    <div class="absolute inset-0 bg-gradient-to-r from-primary/5 to-transparent pointer-events-none"></div>
+    <div class="w-12 h-12 rounded-xl bg-primary-container flex items-center justify-center shrink-0 relative z-10">
+      <span class="material-symbols-outlined text-on-primary-container">waving_hand</span>
+    </div>
+    <div class="relative z-10">
+      <p class="text-on-surface-variant text-body-sm">Hoş geldiniz,</p>
+      <h3 class="text-headline-sm font-bold text-on-surface" id="welcome-name">Kullanıcı</h3>
+    </div>
+    <div class="ml-auto relative z-10">
+      <span class="text-label-sm text-on-surface-variant bg-surface-variant px-sm py-xs rounded-md" id="session-date"></span>
+    </div>
+  </div>
+
+  <div id="candidate-view" class="space-y-xl">
+    <div class="grid grid-cols-1 lg:grid-cols-12 gap-lg">
+      
+      <!-- Left side: CV Upload & History -->
+      <div class="lg:col-span-7 space-y-lg">
+        
+        <!-- CV Upload Card -->
+        <div class="bg-surface-container rounded-xl border border-outline-variant p-lg relative overflow-hidden">
+          <div class="absolute inset-0 bg-gradient-to-tr from-primary/5 via-transparent to-transparent pointer-events-none"></div>
+          <h3 class="text-headline-sm font-bold text-on-surface mb-md">Yeni CV Yükle</h3>
+          <p class="text-on-surface-variant text-body-sm mb-lg">CV'nizi PDF formatında yükleyerek yapay zeka ile saniyeler içinde yetenek analizi alabilirsiniz.</p>
+          
+          <div class="border-2 border-dashed border-outline-variant/60 hover:border-primary/85 rounded-xl p-xl flex flex-col items-center justify-center cursor-pointer transition-all bg-surface-container-low/30 hover:bg-primary/5 group" id="drop-zone">
+            <span class="material-symbols-outlined text-[48px] text-outline group-hover:text-primary transition-colors mb-md">cloud_upload</span>
+            <span class="text-body-md font-bold text-on-surface mb-sm text-center">Dosyayı sürükleyip bırakın veya seçin</span>
+            <span class="text-label-sm text-on-surface-variant text-center">Yalnızca PDF formatı desteklenir (Maks: 10MB)</span>
+            <input type="file" id="cv-file-input" accept=".pdf" class="hidden" />
+          </div>
+
+          <div class="mt-md hidden" id="upload-progress-container">
+            <div class="flex justify-between text-label-md font-medium text-on-surface-variant mb-xs">
+              <span id="upload-status-text">Dosya yükleniyor...</span>
+              <span id="upload-percent">0%</span>
+            </div>
+            <div class="w-full bg-surface-variant h-2 rounded-full overflow-hidden">
+              <div class="bg-primary h-full w-0 transition-all duration-300" id="upload-progress-bar"></div>
+            </div>
+          </div>
+        </div>
+
+        <!-- My CV List -->
+        <div class="bg-surface-container rounded-xl border border-outline-variant overflow-hidden" id="my-analyses">
+          <div class="p-lg border-b border-outline-variant bg-surface-container/50">
+            <h3 class="text-headline-sm font-bold text-on-surface">Son Yüklemeler</h3>
+          </div>
+          <div class="overflow-x-auto">
+            <table class="w-full text-left border-collapse">
+              <thead>
+                <tr class="bg-surface-variant/30 text-label-sm text-on-surface-variant border-b border-outline-variant">
+                  <th class="p-md font-medium">Belge Adı</th>
+                  <th class="p-md font-medium">Yükleme Tarihi</th>
+                  <th class="p-md font-medium">Analiz Durumu</th>
+                  <th class="p-md font-medium">Uyum Skoru</th>
+                </tr>
+              </thead>
+              <tbody class="text-body-sm" id="my-cvs-body">
+                <tr class="border-b border-outline-variant/50 hover:bg-surface-variant/40 transition-colors cursor-pointer" onclick="showMockAnalysis()">
+                  <td class="p-md">
+                    <div class="flex items-center gap-sm">
+                      <span class="material-symbols-outlined text-primary">description</span>
+                      <span class="font-medium text-on-surface">Can_Demir_CV.pdf</span>
+                    </div>
+                  </td>
+                  <td class="p-md text-on-surface-variant">29.06.2026</td>
+                  <td class="p-md">
+                    <span class="inline-flex items-center gap-xs px-2 py-1 rounded-full bg-[#112a20] text-[#4ade80] border border-[#14532d] text-label-sm">
+                      <span class="w-1.5 h-1.5 rounded-full bg-[#4ade80]"></span>
+                      Analiz Hazır
+                    </span>
+                  </td>
+                  <td class="p-md">
+                    <span class="font-bold text-primary">%84</span>
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+      </div>
+
+      <!-- Right side: AI Analysis Details -->
+      <div class="lg:col-span-5">
+        <div class="bg-surface-container rounded-xl border border-outline-variant p-lg h-full flex flex-col" id="analysis-detail-card">
+          <div class="text-center py-xl text-on-surface-variant flex flex-col items-center justify-center h-full space-y-md" id="no-analysis-state">
+            <span class="material-symbols-outlined text-[64px] text-outline">analytics</span>
+            <h4 class="text-headline-sm font-bold text-on-surface">Detaylı Analiz Paneli</h4>
+            <p class="text-body-sm text-center max-w-[280px]">Yandaki listeden bir özgeçmiş seçerek veya yeni bir tane yükleyerek yapay zeka analiz raporunu detaylıca görüntüleyebilirsiniz.</p>
+          </div>
+
+          <!-- Active Analysis State (Initially Hidden) -->
+          <div class="hidden space-y-lg h-full flex flex-col" id="active-analysis-state">
+            <div class="flex items-center justify-between pb-md border-b border-outline-variant">
+              <div>
+                <h4 class="text-headline-sm font-bold text-on-surface" id="analysis-cv-name">Can_Demir_CV.pdf</h4>
+                <p class="text-label-md text-on-surface-variant">Yapay Zeka Analiz Raporu</p>
+              </div>
+              <span class="material-symbols-outlined text-[#4ade80] text-3xl">verified</span>
+            </div>
+
+            <!-- Score Visualizer -->
+            <div class="flex items-center gap-lg bg-surface-container-high/40 p-md rounded-xl border border-outline-variant">
+              <div class="relative w-20 h-20 flex items-center justify-center shrink-0">
+                <svg class="w-full h-full transform -rotate-90" viewBox="0 0 36 36">
+                  <path class="text-surface-variant" d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831" fill="none" stroke="currentColor" stroke-width="3.5"></path>
+                  <path class="text-primary" d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831" fill="none" stroke="currentColor" stroke-dasharray="84, 100" stroke-linecap="round" stroke-width="3.5"></path>
+                </svg>
+                <span class="absolute text-headline-sm font-bold text-on-surface">%84</span>
+              </div>
+              <div>
+                <span class="text-label-sm text-primary uppercase font-bold tracking-wider">GENEL UYUM SKORU</span>
+                <h5 class="text-body-md font-bold text-on-surface mt-xs">Kıdemli Backend Geliştirici</h5>
+                <p class="text-label-md text-on-surface-variant">Pozisyon gereksinimleri ile yüksek düzeyde uyum sağlandı.</p>
+              </div>
+            </div>
+
+            <!-- Skill Tags -->
+            <div class="space-y-sm">
+              <span class="text-label-sm text-on-surface-variant font-bold">ÖNE ÇIKAN YETENEKLER</span>
+              <div class="flex flex-wrap gap-xs">
+                <span class="px-sm py-xs bg-primary/10 border border-primary/20 text-primary text-label-sm rounded-md font-semibold">Node.js</span>
+                <span class="px-sm py-xs bg-primary/10 border border-primary/20 text-primary text-label-sm rounded-md font-semibold">PostgreSQL</span>
+                <span class="px-sm py-xs bg-primary/10 border border-primary/20 text-primary text-label-sm rounded-md font-semibold">Docker</span>
+                <span class="px-sm py-xs bg-primary/10 border border-primary/20 text-primary text-label-sm rounded-md font-semibold">TypeScript</span>
+                <span class="px-sm py-xs bg-primary/10 border border-primary/20 text-primary text-label-sm rounded-md font-semibold">Redis</span>
+              </div>
+            </div>
+
+            <!-- Strengths and Weaknesses -->
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-md pt-xs">
+              <div class="bg-success/5 border border-success-container/10 p-md rounded-lg space-y-xs">
+                <span class="text-label-sm text-success font-bold flex items-center gap-xs">
+                  <span class="material-symbols-outlined text-sm">thumb_up</span> GÜÇLÜ YÖNLER
+                </span>
+                <ul class="text-label-md text-on-surface-variant space-y-1 list-disc pl-md">
+                  <li>Güçlü veritabanı optimizasyonu</li>
+                  <li>Dağıtık mimari deneyimi</li>
+                </ul>
+              </div>
+              <div class="bg-error/5 border border-error-container/10 p-md rounded-lg space-y-xs">
+                <span class="text-label-sm text-error font-bold flex items-center gap-xs">
+                  <span class="material-symbols-outlined text-sm">warning</span> GELİŞİM ALANLARI
+                </span>
+                <ul class="text-label-md text-on-surface-variant space-y-1 list-disc pl-md">
+                  <li>Bulut mimarilerinde (AWS/GCP) eksik sertifikasyon</li>
+                </ul>
+              </div>
+            </div>
+
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</UserLayout>
+
+<script is:inline>
+  const dateEl = document.getElementById('session-date');
+  if (dateEl) {
+    dateEl.textContent = new Date().toLocaleDateString('tr-TR', { 
+      weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' 
+    });
+  }
+
+  fetch('/api/auth/me').then(res => res.json()).then(data => {
+    if(data.user) {
+      document.getElementById('welcome-name').textContent = data.user.name || data.user.email.split('@')[0];
+    }
+  }).catch(console.error);
+
+  window.showMockAnalysis = function() {
+    const noState = document.getElementById('no-analysis-state');
+    const activeState = document.getElementById('active-analysis-state');
+    if (noState && activeState) {
+      noState.classList.add('hidden');
+      activeState.classList.remove('hidden');
+    }
+  };
+
+  const dropZone = document.getElementById('drop-zone');
+  const fileInput = document.getElementById('cv-file-input');
+  const progressContainer = document.getElementById('upload-progress-container');
+  const progressBar = document.getElementById('upload-progress-bar');
+  const percentText = document.getElementById('upload-percent');
+  const statusText = document.getElementById('upload-status-text');
+
+  dropZone?.addEventListener('click', () => fileInput?.click());
+  dropZone?.addEventListener('dragover', (e) => { e.preventDefault(); dropZone.classList.add('border-primary', 'bg-primary/5'); });
+  dropZone?.addEventListener('dragleave', () => { dropZone.classList.remove('border-primary', 'bg-primary/5'); });
+  dropZone?.addEventListener('drop', (e) => {
+    e.preventDefault();
+    dropZone.classList.remove('border-primary', 'bg-primary/5');
+    const files = e.dataTransfer?.files;
+    if (files && files.length > 0) handleCVUpload(files[0]);
+  });
+
+  fileInput?.addEventListener('change', () => {
+    if (fileInput.files && fileInput.files.length > 0) handleCVUpload(fileInput.files[0]);
+  });
+
+  function handleCVUpload(file) {
+    if (file.type !== 'application/pdf') {
+      alert('Lütfen sadece PDF dosyası yükleyin.');
+      return;
+    }
+    if (progressContainer && progressBar && percentText && statusText) {
+      progressContainer.classList.remove('hidden');
+      progressBar.style.width = '0%';
+      percentText.textContent = '0%';
+      statusText.textContent = 'CV yükleniyor ve analiz ediliyor...';
+      let percent = 0;
+      const interval = setInterval(() => {
+        percent += 10;
+        progressBar.style.width = `${percent}%`;
+        percentText.textContent = `${percent}%`;
+        if (percent >= 100) {
+          clearInterval(interval);
+          statusText.textContent = 'Analiz başarıyla tamamlandı!';
+          const tbody = document.getElementById('my-cvs-body');
+          if (tbody) {
+            const tr = document.createElement('tr');
+            tr.className = 'border-b border-outline-variant/50 hover:bg-surface-variant/40 transition-colors cursor-pointer';
+            tr.onclick = () => window.showMockAnalysis();
+            tr.innerHTML = `
+              <td class="p-md">
+                <div class="flex items-center gap-sm">
+                  <span class="material-symbols-outlined text-primary">description</span>
+                  <span class="font-medium text-on-surface">${file.name}</span>
+                </div>
+              </td>
+              <td class="p-md text-on-surface-variant">${new Date().toLocaleDateString('tr-TR')}</td>
+              <td class="p-md">
+                <span class="inline-flex items-center gap-xs px-2 py-1 rounded-full bg-[#112a20] text-[#4ade80] border border-[#14532d] text-label-sm">
+                  <span class="w-1.5 h-1.5 rounded-full bg-[#4ade80]"></span> Analiz Hazır
+                </span>
+              </td>
+              <td class="p-md"><span class="font-bold text-primary">%84</span></td>
+            `;
+            tbody.insertBefore(tr, tbody.firstChild);
+          }
+          window.showMockAnalysis();
+        }
+      }, 300);
+    }
+  }
+</script>

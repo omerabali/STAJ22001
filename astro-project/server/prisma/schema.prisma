@@ -16,6 +16,8 @@ model User {
   email        String   @unique
   passwordHash String
   role         Role     @default(CANDIDATE)
+  name         String?
+  avatarUrl    String?
   createdAt    DateTime @default(now())
 
   @@map("users")

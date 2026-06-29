@@ -1,0 +1,185 @@
+---
+import AdminLayout from '../../layouts/AdminLayout.astro';
+---
+
+<AdminLayout title="Beacon AI - Kullanıcı Yönetimi">
+  <style>
+    .card-bg {
+        background-color: #13132b;
+        border: 1px solid #2a2a4a;
+    }
+    .row-hover:hover {
+        background-color: #1a2340;
+        transform: translateY(-1px);
+    }
+    .table-border {
+        border-bottom: 1px solid #2a2a4a;
+    }
+  </style>
+
+  <!-- Top Header -->
+  <header class="mb-8">
+    <h2 class="font-headline-md text-headline-md font-bold mb-2">Kullanıcı Yönetimi</h2>
+    <p class="font-body-md text-body-md text-on-surface-variant">Sistemdeki kullanıcıları listeleyin ve rollerini yönetin.</p>
+  </header>
+
+  <!-- Stats Row -->
+  <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+    <div class="card-bg rounded-lg p-6 flex flex-col">
+      <span class="font-label-md text-label-md text-on-surface-variant mb-2 uppercase">Toplam Kullanıcı</span>
+      <span id="stat-total" class="font-display-lg text-display-lg text-[#7c5cfc]">-</span>
+    </div>
+    <div class="card-bg rounded-lg p-6 flex flex-col">
+      <span class="font-label-md text-label-md text-on-surface-variant mb-2 uppercase">Aday</span>
+      <span id="stat-candidates" class="font-display-lg text-display-lg text-[#7c5cfc]">-</span>
+    </div>
+    <div class="card-bg rounded-lg p-6 flex flex-col">
+      <span class="font-label-md text-label-md text-on-surface-variant mb-2 uppercase">Yönetici</span>
+      <span id="stat-admins" class="font-display-lg text-display-lg text-[#7c5cfc]">-</span>
+    </div>
+  </div>
+
+  <!-- Actions Bar -->
+  <div class="flex justify-between items-center mb-6">
+    <span id="total-text" class="font-body-sm text-body-sm text-on-surface-variant">Yükleniyor...</span>
+    <div class="flex gap-4">
+      <div class="relative">
+        <span class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-on-surface-variant" style="font-size: 20px;">search</span>
+        <input class="bg-surface-container-low border border-[#2a2a4a] text-on-surface rounded-lg pl-10 pr-4 py-2 focus:border-primary focus:ring-1 focus:ring-primary focus:outline-none font-body-sm text-body-sm w-64 transition-all" placeholder="Kullanıcı ara..." type="text"/>
+      </div>
+      <button onclick="fetchUsers()" class="flex items-center gap-2 border border-[#2a2a4a] text-on-surface hover:bg-[#1a2340] px-4 py-2 rounded-lg transition-colors font-label-md text-label-md">
+        <span class="material-symbols-outlined text-sm">refresh</span>
+        Yenile
+      </button>
+    </div>
+  </div>
+
+  <!-- User Table -->
+  <div class="card-bg rounded-lg overflow-hidden">
+    <table class="w-full text-left border-collapse">
+      <thead>
+        <tr class="bg-surface-container-low text-on-surface-variant font-label-md text-label-md uppercase tracking-wider table-border">
+          <th class="p-4 font-semibold">Kullanıcı</th>
+          <th class="p-4 font-semibold">E-posta</th>
+          <th class="p-4 font-semibold">Kayıt Tarihi</th>
+          <th class="p-4 font-semibold">Rol</th>
+          <th class="p-4 font-semibold">Aksiyon</th>
+        </tr>
+      </thead>
+      <tbody id="users-tbody" class="font-body-sm text-body-sm">
+        <tr>
+          <td colspan="5" class="p-8 text-center text-on-surface-variant">Kullanıcılar yükleniyor...</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <script is:inline>
+    // Make these globally accessible
+    window.currentUserId = null;
+
+    async function changeRole(userId, newRole) {
+      if (!confirm(`Kullanıcı rolünü ${newRole} olarak değiştirmek istediğinize emin misiniz?`)) return;
+      
+      try {
+        const res = await fetch(`/api/admin/users/${userId}/role`, {
+          method: 'PUT',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ role: newRole })
+        });
+        
+        const data = await res.json();
+        if (res.ok) {
+          alert('Rol başarıyla güncellendi!');
+          fetchUsers(); // Tabloyu yenile
+        } else {
+          alert('Hata: ' + (data.message || 'Bilinmeyen bir hata oluştu.'));
+        }
+      } catch (err) {
+        alert('Sunucuya bağlanılamadı.');
+      }
+    }
+
+    async function fetchUsers() {
+      const tbody = document.getElementById('users-tbody');
+      tbody.innerHTML = '<tr><td colspan="5" class="p-8 text-center text-on-surface-variant">Kullanıcılar yükleniyor...</td></tr>';
+      
+      try {
+        // Oturum açmış kullanıcının kimliğini öğren (kendi rolünü değiştirememesi için)
+        if (!window.currentUserId) {
+          const meRes = await fetch('/api/auth/me');
+          if (meRes.ok) {
+            const meData = await meRes.json();
+            window.currentUserId = meData.user.id;
+          }
+        }
+
+        const res = await fetch('/api/admin/users');
+        if (res.ok) {
+          const data = await res.json();
+          const users = data.users || [];
+          
+          let candidates = 0;
+          let admins = 0;
+
+          const rowsHTML = users.map((user, index) => {
+            if (user.role === 'ADMIN') admins++;
+            if (user.role === 'CANDIDATE') candidates++;
+
+            const date = new Date(user.createdAt).toLocaleDateString('tr-TR');
+            const initials = (user.name || user.email).substring(0, 2).toUpperCase();
+            
+            // Renk rotasyonu (görsel zenginlik için)
+            const colors = ['bg-primary-container text-on-primary-container', 'bg-secondary-container text-on-secondary-container', 'bg-tertiary-container text-on-tertiary-container'];
+            const colorClass = colors[index % colors.length];
+
+            const isMe = window.currentUserId === user.id;
+
+            return `
+              <tr class="row-hover table-border transition-all duration-200 ${index % 2 !== 0 ? 'bg-surface-container-lowest' : ''}">
+                <td class="p-4">
+                  <div class="flex items-center gap-3">
+                    <div class="w-8 h-8 rounded-full ${colorClass} flex items-center justify-center font-bold text-xs">${initials}</div>
+                    <span class="font-medium">${user.name || 'İsimsiz'}</span>
+                    ${isMe ? '<span class="bg-surface-container-highest text-on-surface px-2 py-0.5 rounded text-xs ml-2">Sen</span>' : ''}
+                  </div>
+                </td>
+                <td class="p-4 text-on-surface-variant">${user.email}</td>
+                <td class="p-4 text-on-surface-variant">${date}</td>
+                <td class="p-4">
+                  ${user.role === 'ADMIN' 
+                    ? '<span class="bg-purple-900/30 text-purple-300 px-2 py-1 rounded font-label-md text-xs">Yönetici</span>' 
+                    : '<span class="bg-blue-900/30 text-blue-300 px-2 py-1 rounded font-label-md text-xs">Aday</span>'}
+                </td>
+                <td class="p-4">
+                  ${!isMe ? `
+                    <button onclick="changeRole('${user.id}', '${user.role === 'ADMIN' ? 'CANDIDATE' : 'ADMIN'}')" class="text-primary hover:text-primary-fixed font-label-md text-xs transition-colors">
+                      ${user.role === 'ADMIN' ? 'Aday Yap' : 'Yönetici Yap'}
+                    </button>
+                  ` : '<span class="text-on-surface-variant text-xs">Yetki değiştirilemez</span>'}
+                </td>
+              </tr>
+            `;
+          }).join('');
+
+          tbody.innerHTML = rowsHTML || '<tr><td colspan="5" class="p-8 text-center text-on-surface-variant">Hiç kullanıcı bulunamadı.</td></tr>';
+          
+          document.getElementById('stat-total').textContent = users.length;
+          document.getElementById('stat-candidates').textContent = candidates;
+          document.getElementById('stat-admins').textContent = admins;
+          document.getElementById('total-text').textContent = `Toplam ${users.length} kullanıcı`;
+
+        } else if (res.status === 401 || res.status === 403) {
+          tbody.innerHTML = '<tr><td colspan="5" class="p-8 text-center text-red-400">Bu sayfayı görüntülemek için Yönetici yetkisine sahip olmalısınız.</td></tr>';
+        } else {
+          tbody.innerHTML = '<tr><td colspan="5" class="p-8 text-center text-red-400">Kullanıcılar yüklenirken bir hata oluştu.</td></tr>';
+        }
+      } catch (err) {
+        tbody.innerHTML = '<tr><td colspan="5" class="p-8 text-center text-red-400">Sunucuya bağlanılamadı.</td></tr>';
+      }
+    }
+
+    // Sayfa yüklendiğinde verileri çek
+    document.addEventListener("DOMContentLoaded", fetchUsers);
+  </script>
+</AdminLayout>

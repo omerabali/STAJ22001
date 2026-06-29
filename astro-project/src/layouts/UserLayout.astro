@@ -1,0 +1,71 @@
+---
+import '../styles/global.css';
+import UserSidebar from '../components/UserSidebar.astro';
+import UserHeader from '../components/UserHeader.astro';
+
+interface Props {
+  title: string;
+  headerTitle: string;
+}
+
+const { title, headerTitle } = Astro.props;
+---
+
+<!doctype html>
+<html lang="tr" class="dark">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="description" content="Beacon Candidate Portal" />
+    <meta name="viewport" content="width=device-width" />
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <title>{title}</title>
+    
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet" />
+  </head>
+  <body class="theme-dashboard bg-background text-on-surface font-body-md antialiased min-h-screen flex selection:bg-primary-container selection:text-on-primary-container">
+    <div id="sidebar-overlay" class="fixed inset-0 bg-black/50 z-40 hidden md:hidden transition-opacity"></div>
+    <UserSidebar />
+    <UserHeader title={headerTitle} />
+    
+    <main class="w-full md:ml-[260px] md:w-[calc(100%-260px)] mt-16 p-4 md:p-lg min-h-[calc(100vh-4rem)] bg-background relative overflow-hidden transition-all duration-300">
+      <slot />
+    </main>
+
+    <script is:inline>
+      // Mobile sidebar toggle
+      document.addEventListener("DOMContentLoaded", () => {
+        const mobileBtn = document.getElementById('mobile-menu-btn');
+        const sidebar = document.getElementById('user-sidebar');
+        const overlay = document.getElementById('sidebar-overlay');
+
+        if (mobileBtn && sidebar && overlay) {
+          mobileBtn.addEventListener('click', () => {
+            sidebar.classList.toggle('-translate-x-full');
+            overlay.classList.toggle('hidden');
+          });
+          overlay.addEventListener('click', () => {
+            sidebar.classList.add('-translate-x-full');
+            overlay.classList.add('hidden');
+          });
+        }
+      });
+      // Automatically protect candidate routes
+      document.addEventListener("DOMContentLoaded", async () => {
+        try {
+          const res = await fetch('/api/auth/me');
+          if (!res.ok) throw new Error("Not logged in");
+          const { user } = await res.json();
+          if (user.role === 'ADMIN') {
+            window.location.href = '/admin/dashboard';
+          }
+        } catch (e) {
+          window.location.href = '/login';
+        }
+      });
+    </script>
+  </body>
+</html>

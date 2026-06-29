@@ -6,6 +6,7 @@ import { PrismaClient } from "@prisma/client";
 import { PrismaPg } from "@prisma/adapter-pg";
 import pg from "pg";
 import authRouter from "./routes/auth.js";
+import adminRouter from "./routes/admin.js";
 
 const app = express();
 const pool = new pg.Pool({
@@ -17,14 +18,17 @@ const PORT = process.env.PORT || 5000;
 
 // Middleware
 app.use(cors({
-  origin: process.env.ASTRO_ORIGIN,
+  origin: process.env.ASTRO_ORIGIN || "http://localhost:4321",
   credentials: true
 }));
 app.use(cookieParser());
-app.use(express.json());
+app.use(express.json({ limit: '5mb' }));
 
 // Auth routes
 app.use("/api/auth", authRouter);
+
+// Admin routes
+app.use("/api/admin", adminRouter);
 
 // GET / — Ana sayfa karşılama mesajı
 app.get("/", (_req, res) => {

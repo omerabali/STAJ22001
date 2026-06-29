@@ -1,0 +1,16 @@
+---
+import UserLayout from '../layouts/UserLayout.astro';
+---
+
+<UserLayout title="Beacon AI - Analiz Sonuçlarım" headerTitle="Analiz Sonuçlarım">
+  <div class="bg-surface-container-lowest border border-outline-variant p-8 rounded-xl flex flex-col items-center justify-center min-h-[300px] relative overflow-hidden group">
+      <div class="absolute inset-0 bg-gradient-to-br from-primary/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-700"></div>
+      <span class="material-symbols-outlined text-6xl text-primary/30 mb-4 group-hover:scale-110 transition-transform duration-500">analytics</span>
+      <p class="text-on-surface-variant font-body-lg text-center max-w-md relative z-10">
+        Bu sayfa şu an yapım aşamasındadır. Daha detaylı grafikler ve analizler ileride buraya eklenecektir.
+      </p>
+      <a href="/dashboard" class="mt-6 border border-primary text-primary hover:bg-primary hover:text-white px-6 py-2 rounded-lg font-label-md transition-all duration-300 relative z-10 active:scale-95">
+        Dashboard'a Dön
+      </a>
+  </div>
+</UserLayout>

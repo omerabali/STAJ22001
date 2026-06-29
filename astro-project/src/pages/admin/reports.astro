@@ -1,0 +1,115 @@
+---
+import AdminLayout from '../../layouts/AdminLayout.astro';
+---
+
+<AdminLayout title="Beacon AI - Raporlar">
+  <!-- Top Header -->
+  <header class="mb-8">
+    <h2 class="font-headline-md text-headline-md font-bold mb-2">Platform Raporları</h2>
+    <p class="font-body-md text-body-md text-on-surface-variant">Sistemin genel performansı ve kullanıcı metriklerine ait analitik veriler.</p>
+  </header>
+
+  <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6">
+    <!-- Chart 1: İşe Alım Oranı -->
+    <div class="bg-surface-container-highest border border-outline-variant p-6 rounded-xl flex flex-col h-[320px]">
+      <h3 class="font-bold text-on-surface mb-6">İşe Alım ve Eşleşme Oranı</h3>
+      
+      <div class="flex-1 flex items-end gap-4 justify-between pt-4">
+        <!-- Mock Bar Chart -->
+        <div class="flex flex-col items-center gap-2 group">
+          <div class="w-12 bg-primary/20 group-hover:bg-primary/40 rounded-t-sm h-[40%] transition-colors relative">
+            <div class="absolute -top-8 left-1/2 -translate-x-1/2 opacity-0 group-hover:opacity-100 text-xs bg-surface text-on-surface px-2 py-1 rounded">40%</div>
+          </div>
+          <span class="text-xs text-on-surface-variant">Oca</span>
+        </div>
+        <div class="flex flex-col items-center gap-2 group">
+          <div class="w-12 bg-primary/30 group-hover:bg-primary/50 rounded-t-sm h-[60%] transition-colors relative">
+             <div class="absolute -top-8 left-1/2 -translate-x-1/2 opacity-0 group-hover:opacity-100 text-xs bg-surface text-on-surface px-2 py-1 rounded">60%</div>
+          </div>
+          <span class="text-xs text-on-surface-variant">Şub</span>
+        </div>
+        <div class="flex flex-col items-center gap-2 group">
+          <div class="w-12 bg-primary/50 group-hover:bg-primary/70 rounded-t-sm h-[50%] transition-colors relative">
+             <div class="absolute -top-8 left-1/2 -translate-x-1/2 opacity-0 group-hover:opacity-100 text-xs bg-surface text-on-surface px-2 py-1 rounded">50%</div>
+          </div>
+          <span class="text-xs text-on-surface-variant">Mar</span>
+        </div>
+        <div class="flex flex-col items-center gap-2 group">
+          <div class="w-12 bg-[#7c5cfc] rounded-t-sm h-[85%] transition-colors relative shadow-[0_0_15px_rgba(124,92,252,0.3)]">
+             <div class="absolute -top-8 left-1/2 -translate-x-1/2 opacity-0 group-hover:opacity-100 text-xs bg-surface text-on-surface px-2 py-1 rounded">85%</div>
+          </div>
+          <span class="text-xs text-on-surface-variant text-primary font-bold">Nis</span>
+        </div>
+        <div class="flex flex-col items-center gap-2 group">
+          <div class="w-12 bg-primary/40 group-hover:bg-primary/60 rounded-t-sm h-[70%] transition-colors relative">
+             <div class="absolute -top-8 left-1/2 -translate-x-1/2 opacity-0 group-hover:opacity-100 text-xs bg-surface text-on-surface px-2 py-1 rounded">70%</div>
+          </div>
+          <span class="text-xs text-on-surface-variant">May</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Chart 2: Popüler Yetenekler -->
+    <div class="bg-surface-container-highest border border-outline-variant p-6 rounded-xl flex flex-col h-[320px]">
+      <h3 class="font-bold text-on-surface mb-6">Aranan Popüler Yetenekler</h3>
+      <div class="flex flex-col gap-5 flex-1 justify-center">
+        <!-- Progress 1 -->
+        <div>
+          <div class="flex justify-between text-xs mb-1">
+            <span class="text-on-surface">React & Next.js</span>
+            <span class="text-on-surface-variant">92%</span>
+          </div>
+          <div class="w-full bg-surface-container-low rounded-full h-2">
+            <div class="bg-[#7c5cfc] h-2 rounded-full" style="width: 92%"></div>
+          </div>
+        </div>
+        <!-- Progress 2 -->
+        <div>
+          <div class="flex justify-between text-xs mb-1">
+            <span class="text-on-surface">Python & Django</span>
+            <span class="text-on-surface-variant">78%</span>
+          </div>
+          <div class="w-full bg-surface-container-low rounded-full h-2">
+            <div class="bg-primary h-2 rounded-full" style="width: 78%"></div>
+          </div>
+        </div>
+        <!-- Progress 3 -->
+        <div>
+          <div class="flex justify-between text-xs mb-1">
+            <span class="text-on-surface">UI/UX Tasarım</span>
+            <span class="text-on-surface-variant">64%</span>
+          </div>
+          <div class="w-full bg-surface-container-low rounded-full h-2">
+            <div class="bg-secondary-fixed-dim h-2 rounded-full" style="width: 64%"></div>
+          </div>
+        </div>
+        <!-- Progress 4 -->
+        <div>
+          <div class="flex justify-between text-xs mb-1">
+            <span class="text-on-surface">Veri Bilimi</span>
+            <span class="text-on-surface-variant">45%</span>
+          </div>
+          <div class="w-full bg-surface-container-low rounded-full h-2">
+            <div class="bg-tertiary h-2 rounded-full" style="width: 45%"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="bg-surface-container-lowest border border-outline-variant rounded-xl p-6 flex flex-col md:flex-row gap-6 items-center justify-between">
+    <div>
+      <h3 class="font-bold text-on-surface text-lg">Tüm Verileri Dışa Aktar</h3>
+      <p class="text-on-surface-variant text-sm mt-1">Platformdaki tüm raporları CSV veya PDF formatında indirebilirsiniz.</p>
+    </div>
+    <div class="flex gap-4">
+      <button class="border border-outline-variant text-on-surface hover:bg-surface-container-highest px-4 py-2 rounded-lg font-label-md transition-colors flex items-center gap-2">
+        <span class="material-symbols-outlined text-sm">download</span> CSV İndir
+      </button>
+      <button class="bg-primary-container hover:bg-primary-fixed text-on-primary-container px-4 py-2 rounded-lg font-label-md transition-colors flex items-center gap-2">
+        <span class="material-symbols-outlined text-sm">picture_as_pdf</span> PDF İndir
+      </button>
+    </div>
+  </div>
+
+</AdminLayout>

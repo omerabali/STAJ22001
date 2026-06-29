@@ -1,0 +1,60 @@
+---
+interface Props {
+  title: string;
+}
+const { title } = Astro.props;
+---
+<header class="fixed top-0 right-0 w-full md:w-[calc(100%-260px)] h-16 bg-surface border-b border-outline-variant flex justify-between items-center px-4 md:px-lg z-40 transition-all duration-300">
+  <div class="flex items-center gap-2">
+    <button id="mobile-menu-btn" class="md:hidden w-10 h-10 rounded-full hover:bg-surface-container-high/50 flex items-center justify-center text-on-surface-variant">
+      <span class="material-symbols-outlined">menu</span>
+    </button>
+    <h2 class="text-headline-md font-bold text-primary truncate max-w-[150px] sm:max-w-xs">{title}</h2>
+  </div>
+  <div class="flex items-center gap-md">
+    <button class="w-10 h-10 rounded-full hover:bg-surface-container-high/50 transition-all flex items-center justify-center text-on-surface-variant">
+      <span class="material-symbols-outlined">notifications</span>
+    </button>
+  <div class="flex items-center gap-4 bg-surface-container-highest px-4 py-2 rounded-xl border border-outline-variant shadow-sm transition-all duration-300 hover:shadow-[0_4px_15px_rgba(124,58,237,0.1)] hover:border-primary/30">
+    <div class="text-right hidden sm:block">
+      <p class="font-label-md text-label-md text-on-surface font-bold" id="header-user-name">Yükleniyor...</p>
+      <p class="font-label-sm text-label-sm text-primary uppercase tracking-wider font-bold">KULLANICI</p>
+    </div>
+    
+    <div id="header-user-avatar" class="w-10 h-10 rounded-full bg-primary-container text-on-primary-container flex items-center justify-center font-bold shadow-[0_0_10px_rgba(124,58,237,0.2)] bg-cover bg-center cursor-pointer hover:ring-2 hover:ring-primary hover:scale-105 transition-all duration-300 overflow-hidden" onclick="window.location.href='/settings'">
+      <span id="user-avatar-initial" class="material-symbols-outlined text-[20px]">person</span>
+    </div>
+  </div>
+  </div>
+</header>
+
+<script is:inline>
+  document.addEventListener("DOMContentLoaded", async () => {
+    try {
+      const res = await fetch('/api/auth/me');
+      if (res.ok) {
+        const data = await res.json();
+        if (data.user) {
+          let displayLabel = data.user.name || data.user.email;
+          if (!data.user.name && data.user.email) {
+            displayLabel = data.user.email.split('@')[0];
+          }
+          const headerNameEl = document.getElementById('header-user-name');
+          if (headerNameEl) headerNameEl.textContent = displayLabel;
+          
+          const avatarContainer = document.getElementById('header-user-avatar');
+          if (avatarContainer) {
+            if (data.user.avatarUrl) {
+              avatarContainer.style.backgroundImage = `url(${data.user.avatarUrl})`;
+              avatarContainer.innerHTML = '';
+            } else {
+              avatarContainer.innerHTML = `<span id="user-avatar-initial" class="font-bold">${displayLabel.charAt(0).toUpperCase()}</span>`;
+            }
+          }
+        }
+      }
+    } catch (err) {
+      console.error(err);
+    }
+  });
+</script>

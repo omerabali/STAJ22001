@@ -42,3 +42,22 @@ export function authMiddleware(
     res.status(401).json({ message: "Yetkisiz: Geçersiz veya süresi dolmuş token." });
   }
 }
+
+export function adminMiddleware(
+  req: Request,
+  res: Response,
+  next: NextFunction
+): void {
+  // Ensure authMiddleware has populated req.user
+  if (!req.user) {
+    res.status(401).json({ message: "Yetkisiz: Kullanıcı bilgisi bulunamadı." });
+    return;
+  }
+
+  if (req.user.role !== "ADMIN") {
+    res.status(403).json({ message: "Yasaklandı: Sadece yöneticiler bu işlemi yapabilir." });
+    return;
+  }
+
+  next();
+}
