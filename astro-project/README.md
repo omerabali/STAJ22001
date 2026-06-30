@@ -29,6 +29,12 @@ Bu proje, frontend tarafında **Astro**, backend tarafında ise **Express.js (Ty
 
 ## 🚀 Kurulum ve Çalıştırma
 
+### 0. Projeyi Klonlama
+```bash
+git clone https://github.com/omerabali/STAJ22001.git
+cd STAJ22001/astro-project
+```
+
 ### 1. Veritabanı ve Çevre Değişkenleri
 Hem kök dizinde hem de `server/` dizininde ilgili veritabanı ayarlarını `.env` dosyaları üzerinden tanımlamanız gerekmektedir. 
 
@@ -42,41 +48,30 @@ Hem kök dizinde hem de `server/` dizininde ilgili veritabanı ayarlarını `.en
     PORT=5000
     DATABASE_URL="postgresql://postgres.<id>:[password]@aws-1-ap-southeast-1.pooler.supabase.com:6543/postgres?pgbouncer=true"
     DIRECT_URL="postgresql://postgres.<id>:[password]@aws-1-ap-southeast-1.pooler.supabase.com:5432/postgres"
-    SUPABASE_URL=https://<your-project-id>.supabase.co
-    SUPABASE_SECRET_KEY=<your-secret-key>
-    SUPABASE_JWKS_URL=https://<your-project-id>.supabase.co/auth/v1/.well-known/jwks.json
+    JWT_SECRET=super_secret_jwt_key_here
     ```
 
 ---
 
-### 2. Frontend'i Çalıştırma (Astro)
-Kök dizinde bağımlılıkları yükleyin ve geliştirici sunucusunu başlatın:
+### 2. Projeyi Tek Komutla Başlatma (Frontend + Backend)
+Kök dizinde bağımlılıkları yükleyin, veritabanını hazırlayın ve her iki sunucuyu da aynı anda çalıştırın:
 
 ```bash
-# Bağımlılıkları yükle
+# Kök dizin ve server bağımlılıklarını yükle
 npm install
+npm run install --prefix server
 
-# Geliştirici sunucusunu çalıştır (varsayılan: http://localhost:4321)
-npm run dev
-```
-
----
-
-### 3. Backend'i Çalıştırma (Express & Prisma)
-`server` klasörüne geçiş yapıp kurulumu yapın:
-
-```bash
+# Prisma modellerini veritabanına uygula ve client'ı üret
 cd server
-
-# Bağımlılıkları yükle
-npm install
-
-# Prisma istemcisini oluştur
+npx prisma db push
 npx prisma generate
+cd ..
 
-# Geliştirici sunucusunu izleme (watch) modunda çalıştır (varsayılan: http://localhost:5000)
-npm run dev
+# Hem Astro hem Express sunucusunu eşzamanlı çalıştırır
+npm run dev:all
 ```
+
+Astro projeniz **http://localhost:4321**, Express backend sunucunuz ise **http://localhost:5000** üzerinde ayağa kalkacaktır.
 
 ---
 
