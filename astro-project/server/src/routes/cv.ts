@@ -98,26 +98,25 @@ router.post("/upload", authMiddleware, (req: Request, res: Response): void => {
 
       const fileUrl = publicUrlData.publicUrl;
 
-      // Save record in the PostgreSQL database using Prisma
-      const analysis = await prisma.analysis.create({
+      // Save records in the PostgreSQL database using Prisma
+      const cv = await prisma.cV.create({
         data: {
           userId: userId,
           fileName: fileName,
           fileUrl: fileUrl,
+        }
+      });
+
+      const analysis = await prisma.cVAnalysis.create({
+        data: {
+          cvId: cv.id,
           status: "PENDING",
-        },
-        select: {
-          id: true,
-          userId: true,
-          fileName: true,
-          fileUrl: true,
-          status: true,
-          createdAt: true,
         }
       });
 
       res.status(201).json({
         message: "CV başarıyla yüklendi, analiz sıraya alındı.",
+        cv,
         analysis,
       });
     } catch (dbError) {
@@ -135,11 +134,40 @@ router.get("/list", authMiddleware, async (req: Request, res: Response): Promise
   }
 
   try {
-    const list = await prisma.analysis.findMany({
+    const list = await prisma.cV.findMany({
       where: { userId: req.user.id },
+      include: {
+        analyses: {
+          orderBy: { createdAt: "desc" },
+        }
+      },
       orderBy: { createdAt: "desc" },
     });
-    res.json({ analyses: list });
+
+    // Generate 1-hour signed URLs for each CV in the private storage
+    const cvsWithSignedUrls = await Promise.all(
+      list.map(async (cv) => {
+        const urlParts = cv.fileUrl.split('/cv-files/');
+        const filePath = urlParts[1];
+
+        if (!filePath) return cv;
+
+        const { data, error } = await supabase.storage
+          .from("cv-files")
+          .createSignedUrl(filePath, 3600); // 1 hour expiration
+
+        if (error) {
+          console.error(`Error generating signed URL for CV ${cv.id}:`, error);
+        }
+
+        return {
+          ...cv,
+          fileUrl: data?.signedUrl || cv.fileUrl
+        };
+      })
+    );
+
+    res.json({ cvs: cvsWithSignedUrls });
   } catch (error) {
     console.error("CV listeleme hatası:", error);
     res.status(500).json({ message: "CV listesi alınamadı." });

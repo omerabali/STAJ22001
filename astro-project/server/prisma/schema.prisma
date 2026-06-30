@@ -22,18 +22,29 @@ model User {
   resetCode    String?
   resetCodeExpires DateTime?
   createdAt    DateTime @default(now())
-  analyses     Analysis[]
+  cvs          CV[]
 
   @@map("users")
 }
 
-model Analysis {
+model CV {
+  id           String       @id @default(uuid())
+  userId       String
+  user         User         @relation(fields: [userId], references: [id], onDelete: Cascade)
+  fileName     String
+  fileUrl      String
+  createdAt    DateTime     @default(now())
+  updatedAt    DateTime     @updatedAt
+  analyses     CVAnalysis[]
+  chunks       CVChunk[]
+
+  @@map("cvs")
+}
+
+model CVAnalysis {
   id            String   @id @default(uuid())
-  userId        String
-  user          User     @relation(fields: [userId], references: [id], onDelete: Cascade)
-  fileName      String
-  fileUrl       String
-  extractedText String?
+  cvId          String
+  cv            CV       @relation(fields: [cvId], references: [id], onDelete: Cascade)
   status        String   @default("PENDING") // PENDING, PROCESSING, COMPLETED, FAILED
   atsScore      Int?
   skills        Json?
@@ -43,5 +54,27 @@ model Analysis {
   createdAt     DateTime @default(now())
   updatedAt     DateTime @updatedAt
 
-  @@map("analyses")
+  @@map("cv_analyses")
+}
+
+model CVChunk {
+  id         String        @id @default(uuid())
+  cvId       String
+  cv         CV            @relation(fields: [cvId], references: [id], onDelete: Cascade)
+  content    String
+  pageIndex  Int?
+  createdAt  DateTime      @default(now())
+  embeddings CVEmbedding[]
+
+  @@map("cv_chunks")
+}
+
+model CVEmbedding {
+  id        String   @id @default(uuid())
+  chunkId   String
+  chunk     CVChunk  @relation(fields: [chunkId], references: [id], onDelete: Cascade)
+  embedding Json
+  createdAt DateTime @default(now())
+
+  @@map("cv_embeddings")
 }
