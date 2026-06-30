@@ -61,7 +61,7 @@ router.get("/users", authMiddleware, adminMiddleware, async (_req: Request, res:
 // Change user role
 router.put("/users/:id/role", authMiddleware, adminMiddleware, async (req: Request, res: Response): Promise<void> => {
   try {
-    const { id } = req.params;
+    const id = req.params.id as string;
     const { role } = req.body;
 
     if (!role || (role !== "ADMIN" && role !== "CANDIDATE")) {

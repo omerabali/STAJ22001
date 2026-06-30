@@ -1,5 +1,5 @@
 import { Router, Request, Response } from "express";
-import { PrismaClient } from "@prisma/client";
+import { PrismaClient, AnalysisStatus } from "@prisma/client";
 import { PrismaPg } from "@prisma/adapter-pg";
 import pg from "pg";
 import multer from "multer";
@@ -7,6 +7,7 @@ import crypto from "crypto";
 import path from "path";
 import { authMiddleware } from "../middleware/auth.js";
 import { supabase } from "../lib/supabase.js";
+import { extractTextFromPDF, chunkTextBySections } from "../utils/parser.js";
 
 const pool = new pg.Pool({
   connectionString: process.env.DATABASE_URL,
@@ -24,21 +25,96 @@ const upload = multer({
     fileSize: 5 * 1024 * 1024, // 5MB limit
   },
   fileFilter: (_req, file, cb) => {
-    const filetypes = /pdf|docx/;
+    const filetypes = /pdf/;
     const extname = filetypes.test(path.extname(file.originalname).toLowerCase());
-    const mimetype = filetypes.test(file.mimetype) || 
-      file.mimetype === "application/vnd.openxmlformats-officedocument.wordprocessingml.document" ||
-      file.mimetype === "application/pdf";
+    const mimetype = file.mimetype === "application/pdf";
 
     if (mimetype && extname) {
       return cb(null, true);
     }
-    cb(new Error("Yalnızca PDF ve DOCX dosyaları yüklenebilir."));
+    cb(new Error("Yalnızca PDF dosyaları yüklenebilir."));
   }
 });
 
 // Single file upload handler
 const uploadMiddleware = upload.single("cv");
+
+// Local keyword extractor to show actual skills from PDF text
+const COMMON_SKILLS = [
+  "JavaScript", "TypeScript", "Node.js", "React", "Vue", "Angular", "Python", 
+  "Java", "C++", "C#", "Go", "Rust", "SQL", "PostgreSQL", "MongoDB", 
+  "Docker", "Kubernetes", "AWS", "Azure", "GCP", "HTML", "CSS", "Git",
+  "Tailwind", "Next.js", "Express", "Prisma", "Supabase", "REST API"
+];
+
+function extractLocalSkills(text: string): string[] {
+  const found: string[] = [];
+  const lowerText = text.toLowerCase();
+  for (const skill of COMMON_SKILLS) {
+    const escaped = skill.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+    const startBoundary = /^\w/.test(skill) ? "\\b" : "";
+    const endBoundary = /\w$/.test(skill) ? "\\b" : "";
+    const regex = new RegExp(startBoundary + escaped + endBoundary, "i");
+    if (regex.test(lowerText)) {
+      found.push(skill);
+    }
+  }
+  return found.slice(0, 6);
+}
+
+// Asynchronous background CV processing pipeline
+async function processCv(cvId: string, analysisId: string, pdfBuffer: Buffer): Promise<void> {
+  try {
+    // 1. Transition status to PROCESSING
+    await prisma.cVAnalysis.update({
+      where: { id: analysisId },
+      data: { status: AnalysisStatus.PROCESSING }
+    });
+
+    // 2. Extract text from PDF buffer
+    console.log(`[Parser] Extracting text from CV: ${cvId}`);
+    const text = await extractTextFromPDF(pdfBuffer);
+
+    // 3. Generate section-based chunks
+    console.log(`[Parser] Generating section-based chunks...`);
+    const chunks = chunkTextBySections(text);
+
+    // 4. Save chunks in the cv_chunks table
+    if (chunks.length > 0) {
+      console.log(`[Parser] Storing ${chunks.length} chunks in PostgreSQL...`);
+      await prisma.cVChunk.createMany({
+        data: chunks.map((chunkContent) => ({
+          cvId: cvId,
+          content: chunkContent,
+          pageIndex: 1,
+        }))
+      });
+    }
+
+    // 5. Extract local skills (REAL extracted skills!)
+    const extractedSkills = extractLocalSkills(text);
+
+    // 6. Transition status to COMPLETED and save skills (atsScore remains null)
+    await prisma.cVAnalysis.update({
+      where: { id: analysisId },
+      data: {
+        status: AnalysisStatus.COMPLETED,
+        skills: extractedSkills
+      }
+    });
+
+    console.log(`[Parser] ✅ Successfully parsed and chunked CV: ${cvId}`);
+
+  } catch (error) {
+    console.error(`[Parser] ❌ Error processing CV ${cvId}:`, error);
+    
+    // Set status to FAILED on error
+    await prisma.cVAnalysis.update({
+      where: { id: analysisId },
+      data: { status: AnalysisStatus.FAILED }
+    }).catch(err => console.error("Error setting status to FAILED:", err));
+  }
+}
 
 // POST /api/cv/upload
 router.post("/upload", authMiddleware, (req: Request, res: Response): void => {
@@ -110,9 +186,12 @@ router.post("/upload", authMiddleware, (req: Request, res: Response): void => {
       const analysis = await prisma.cVAnalysis.create({
         data: {
           cvId: cv.id,
-          status: "PENDING",
+          status: AnalysisStatus.PENDING,
         }
       });
+
+      // Asynchronously trigger parsing in the background
+      processCv(cv.id, analysis.id, req.file.buffer);
 
       res.status(201).json({
         message: "CV başarıyla yüklendi, analiz sıraya alındı.",
@@ -139,6 +218,9 @@ router.get("/list", authMiddleware, async (req: Request, res: Response): Promise
       include: {
         analyses: {
           orderBy: { createdAt: "desc" },
+        },
+        chunks: {
+          orderBy: { createdAt: "asc" }
         }
       },
       orderBy: { createdAt: "desc" },
@@ -171,6 +253,56 @@ router.get("/list", authMiddleware, async (req: Request, res: Response): Promise
   } catch (error) {
     console.error("CV listeleme hatası:", error);
     res.status(500).json({ message: "CV listesi alınamadı." });
+  }
+});
+
+// DELETE /api/cv/:id
+router.delete("/:id", authMiddleware, async (req: Request, res: Response): Promise<void> => {
+  if (!req.user) {
+    res.status(401).json({ message: "Yetkisiz erişim." });
+    return;
+  }
+
+  const id = req.params.id as string;
+
+  try {
+    // 1. Find the CV and ensure it belongs to the logged-in user
+    const cv = await prisma.cV.findFirst({
+      where: {
+        id: id,
+        userId: req.user.id
+      }
+    });
+
+    if (!cv) {
+      res.status(404).json({ message: "CV bulunamadı veya yetkiniz yok." });
+      return;
+    }
+
+    // 2. Extract Supabase Storage file path from fileUrl
+    const urlParts = cv.fileUrl.split('/cv-files/');
+    const filePath = urlParts[1];
+
+    if (filePath) {
+      // Delete file from Supabase Storage
+      const { error: storageError } = await supabase.storage
+        .from("cv-files")
+        .remove([filePath]);
+
+      if (storageError) {
+        console.error(`Supabase Storage dosya silme hatası (CV ID: ${id}):`, storageError);
+      }
+    }
+
+    // 3. Delete from Database (Prisma cascades automatically due to onDelete: Cascade)
+    await prisma.cV.delete({
+      where: { id: id }
+    });
+
+    res.json({ message: "CV başarıyla silindi." });
+  } catch (error) {
+    console.error("CV silme hatası:", error);
+    res.status(500).json({ message: "CV silinemedi." });
   }
 });
 
