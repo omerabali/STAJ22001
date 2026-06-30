@@ -7,6 +7,7 @@ import { PrismaPg } from "@prisma/adapter-pg";
 import pg from "pg";
 import authRouter from "./routes/auth.js";
 import adminRouter from "./routes/admin.js";
+import cvRouter from "./routes/cv.js";
 
 const app = express();
 const pool = new pg.Pool({
@@ -29,6 +30,9 @@ app.use("/api/auth", authRouter);
 
 // Admin routes
 app.use("/api/admin", adminRouter);
+
+// CV routes
+app.use("/api/cv", cvRouter);
 
 // GET / — Ana sayfa karşılama mesajı
 app.get("/", (_req, res) => {
