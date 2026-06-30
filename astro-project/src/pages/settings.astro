@@ -58,11 +58,15 @@ import UserLayout from '../layouts/UserLayout.astro';
             <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
               <div class="space-y-2 group">
                 <label class="text-label-md font-bold text-on-surface transition-colors duration-300 group-focus-within:text-primary">Ad Soyad</label>
-                <input type="text" id="profile-name" placeholder="Adınızı girin" class="w-full bg-white border border-outline-variant text-black rounded-lg px-4 py-3 focus:border-primary focus:ring-2 focus:ring-primary/30 hover:border-outline focus:outline-none font-body-md transition-all duration-300 shadow-sm" />
+                <input type="text" id="profile-name" placeholder="Adınızı girin" class="w-full bg-[#13132b]/50 border border-[#2a2a4a] text-white rounded-lg px-4 py-3 focus:border-[#7c5cfc] focus:ring-1 focus:ring-[#7c5cfc] focus:shadow-[0_0_15px_rgba(124,92,252,0.15)] hover:border-[#7c5cfc]/50 focus:outline-none font-body-md transition-all duration-300 shadow-sm placeholder-[#a3a3c2]/40" />
               </div>
               <div class="space-y-2 group">
                 <label class="text-label-md font-bold text-on-surface transition-colors duration-300 group-focus-within:text-primary">E-posta</label>
-                <input type="email" id="profile-email" placeholder="ornek@email.com" class="w-full bg-white border border-outline-variant text-black rounded-lg px-4 py-3 focus:border-primary focus:ring-2 focus:ring-primary/30 hover:border-outline focus:outline-none font-body-md transition-all duration-300 shadow-sm" />
+                <input type="email" id="profile-email" placeholder="ornek@email.com" class="w-full bg-[#13132b]/50 border border-[#2a2a4a] text-white rounded-lg px-4 py-3 focus:border-[#7c5cfc] focus:ring-1 focus:ring-[#7c5cfc] focus:shadow-[0_0_15px_rgba(124,92,252,0.15)] hover:border-[#7c5cfc]/50 focus:outline-none font-body-md transition-all duration-300 shadow-sm placeholder-[#a3a3c2]/40" />
+              </div>
+              <div class="space-y-2 group">
+                <label class="text-label-md font-bold text-on-surface transition-colors duration-300 group-focus-within:text-primary">Telefon Numarası</label>
+                <input type="tel" id="profile-phone" placeholder="5xxxxxxxxx" class="w-full bg-[#13132b]/50 border border-[#2a2a4a] text-white rounded-lg px-4 py-3 focus:border-[#7c5cfc] focus:ring-1 focus:ring-[#7c5cfc] focus:shadow-[0_0_15px_rgba(124,92,252,0.15)] hover:border-[#7c5cfc]/50 focus:outline-none font-body-md transition-all duration-300 shadow-sm placeholder-[#a3a3c2]/40" />
               </div>
             </div>
 
@@ -90,7 +94,7 @@ import UserLayout from '../layouts/UserLayout.astro';
               <div class="space-y-2 md:col-span-2 group">
                 <label class="text-label-md font-bold text-on-surface transition-colors duration-300 group-focus-within:text-primary">Mevcut Şifre</label>
                 <div class="relative">
-                  <input type="password" id="current-password" autocomplete="new-password" class="w-full bg-white border border-outline-variant text-black rounded-lg px-4 py-3 pr-12 focus:border-primary focus:ring-2 focus:ring-primary/30 hover:border-outline focus:outline-none font-body-md transition-all duration-300 shadow-sm" />
+                  <input type="password" id="current-password" autocomplete="new-password" class="w-full bg-[#13132b]/50 border border-[#2a2a4a] text-white rounded-lg px-4 py-3 pr-12 focus:border-[#7c5cfc] focus:ring-1 focus:ring-[#7c5cfc] focus:shadow-[0_0_15px_rgba(124,92,252,0.15)] hover:border-[#7c5cfc]/50 focus:outline-none font-body-md transition-all duration-300 shadow-sm placeholder-[#a3a3c2]/40" />
                   <button type="button" class="absolute right-3 top-1/2 -translate-y-1/2 text-gray-500 hover:text-primary transition-colors focus:outline-none" onclick="togglePassVisibility('current-password', this)">
                     <span class="material-symbols-outlined text-[20px]">visibility</span>
                   </button>
@@ -99,7 +103,7 @@ import UserLayout from '../layouts/UserLayout.astro';
               <div class="space-y-2 group">
                 <label class="text-label-md font-bold text-on-surface transition-colors duration-300 group-focus-within:text-primary">Yeni Şifre</label>
                 <div class="relative">
-                  <input type="password" id="new-password" autocomplete="new-password" class="w-full bg-white border border-outline-variant text-black rounded-lg px-4 py-3 pr-12 focus:border-primary focus:ring-2 focus:ring-primary/30 hover:border-outline focus:outline-none font-body-md transition-all duration-300 shadow-sm" />
+                  <input type="password" id="new-password" autocomplete="new-password" class="w-full bg-[#13132b]/50 border border-[#2a2a4a] text-white rounded-lg px-4 py-3 pr-12 focus:border-[#7c5cfc] focus:ring-1 focus:ring-[#7c5cfc] focus:shadow-[0_0_15px_rgba(124,92,252,0.15)] hover:border-[#7c5cfc]/50 focus:outline-none font-body-md transition-all duration-300 shadow-sm placeholder-[#a3a3c2]/40" />
                   <button type="button" class="absolute right-3 top-1/2 -translate-y-1/2 text-gray-500 hover:text-primary transition-colors focus:outline-none" onclick="togglePassVisibility('new-password', this)">
                     <span class="material-symbols-outlined text-[20px]">visibility</span>
                   </button>
@@ -108,7 +112,7 @@ import UserLayout from '../layouts/UserLayout.astro';
               <div class="space-y-2 group">
                 <label class="text-label-md font-bold text-on-surface transition-colors duration-300 group-focus-within:text-primary">Yeni Şifre (Onay)</label>
                 <div class="relative">
-                  <input type="password" id="confirm-password" autocomplete="new-password" class="w-full bg-white border border-outline-variant text-black rounded-lg px-4 py-3 pr-12 focus:border-primary focus:ring-2 focus:ring-primary/30 hover:border-outline focus:outline-none font-body-md transition-all duration-300 shadow-sm" />
+                  <input type="password" id="confirm-password" autocomplete="new-password" class="w-full bg-[#13132b]/50 border border-[#2a2a4a] text-white rounded-lg px-4 py-3 pr-12 focus:border-[#7c5cfc] focus:ring-1 focus:ring-[#7c5cfc] focus:shadow-[0_0_15px_rgba(124,92,252,0.15)] hover:border-[#7c5cfc]/50 focus:outline-none font-body-md transition-all duration-300 shadow-sm placeholder-[#a3a3c2]/40" />
                   <button type="button" class="absolute right-3 top-1/2 -translate-y-1/2 text-gray-500 hover:text-primary transition-colors focus:outline-none" onclick="togglePassVisibility('confirm-password', this)">
                     <span class="material-symbols-outlined text-[20px]">visibility</span>
                   </button>
@@ -175,7 +179,7 @@ import UserLayout from '../layouts/UserLayout.astro';
       }, 5000);
     }
 
-    document.addEventListener("DOMContentLoaded", async () => {
+    const initSettings = async () => {
       // Tab switching logic
       const tabs = document.querySelectorAll(".tab-btn");
       const sections = document.querySelectorAll(".settings-section");
@@ -215,10 +219,12 @@ import UserLayout from '../layouts/UserLayout.astro';
           if (data.user) {
             const nameInput = document.getElementById('profile-name');
             const emailInput = document.getElementById('profile-email');
+            const phoneInput = document.getElementById('profile-phone');
             const avatarPreview = document.getElementById('avatar-preview');
             
             if (nameInput) nameInput.value = data.user.name || '';
             if (emailInput) emailInput.value = data.user.email || '';
+            if (phoneInput) phoneInput.value = data.user.phone || '';
             
             if (data.user.avatarUrl && avatarPreview) {
               avatarPreview.style.backgroundImage = `url(${data.user.avatarUrl})`;
@@ -268,8 +274,36 @@ import UserLayout from '../layouts/UserLayout.astro';
           
           const name = document.getElementById('profile-name').value;
           const email = document.getElementById('profile-email').value;
+          const phone = document.getElementById('profile-phone').value;
 
-          const payload = { name, email };
+          // Ad Soyad Kontrolü
+          const nameRegex = /^[a-zA-ZğüşıöçĞÜŞİÖÇ\s]{3,}$/;
+          if (!nameRegex.test(name.trim())) {
+             showStatus('profile-status', "Ad Soyad en az 3 karakter olmalı ve yalnızca harflerden oluşmalıdır.", true);
+             saveProfileBtn.disabled = false;
+             saveProfileBtn.textContent = originalText;
+             return;
+          }
+
+          // E-posta Kontrolü
+          const emailRegex = /^[a-zA-Z0-9._%+-]+@gmail\.com$/;
+          if (!emailRegex.test(email.trim())) {
+             showStatus('profile-status', "Yalnızca @gmail.com uzantılı e-posta adresleri kabul edilmektedir.", true);
+             saveProfileBtn.disabled = false;
+             saveProfileBtn.textContent = originalText;
+             return;
+          }
+
+          // Telefon Kontrolü
+          const phoneRegex = /^5\d{9}$/;
+          if (!phoneRegex.test(phone.trim())) {
+             showStatus('profile-status', "Telefon numarası 10 haneli olmalı ve 5 ile başlamalıdır (Örn: 5xxxxxxxxx).", true);
+             saveProfileBtn.disabled = false;
+             saveProfileBtn.textContent = originalText;
+             return;
+          }
+
+          const payload = { name, email, phone };
           if (currentAvatarBase64) {
             payload.avatarUrl = currentAvatarBase64;
           }
@@ -356,6 +390,12 @@ import UserLayout from '../layouts/UserLayout.astro';
           }
         });
       }
-    });
+    };
+
+    if (document.readyState === "loading") {
+      document.addEventListener("DOMContentLoaded", initSettings);
+    } else {
+      initSettings();
+    }
   </script>
 </UserLayout>

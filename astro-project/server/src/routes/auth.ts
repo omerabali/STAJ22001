@@ -26,20 +26,40 @@ function signToken(payload: { id: string; email: string; role: string }): string
 // ─────────────────────────────────────────────
 router.post("/register", async (req: Request, res: Response): Promise<void> => {
   try {
-    const { email, password } = req.body;
+    const { email, password, phone, name } = req.body;
 
     const trimmedEmail = (email || "").trim().toLowerCase();
     const passwordStr = password || "";
+    const phoneStr = (phone || "").trim();
+    const nameStr = name ? name.trim() : null;
 
-    if (!trimmedEmail || !passwordStr) {
-      res.status(400).json({ message: "Email ve şifre zorunludur." });
+    if (!trimmedEmail || !passwordStr || !phoneStr) {
+      res.status(400).json({ message: "Email, telefon ve şifre zorunludur." });
       return;
     }
 
-    // E-posta format kontrolü
-    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    // Kullanıcı Adı (Ad Soyad) kontrolü
+    if (!nameStr) {
+      res.status(400).json({ message: "Ad Soyad zorunludur." });
+      return;
+    }
+    const nameRegex = /^[a-zA-ZğüşıöçĞÜŞİÖÇ\s]{3,}$/;
+    if (!nameRegex.test(nameStr)) {
+      res.status(400).json({ message: "Ad Soyad en az 3 karakter olmalı ve yalnızca harflerden oluşmalıdır." });
+      return;
+    }
+
+    // E-posta format kontrolü - Yalnızca @gmail.com
+    const emailRegex = /^[a-zA-Z0-9._%+-]+@gmail\.com$/;
     if (!emailRegex.test(trimmedEmail)) {
-      res.status(400).json({ message: "Geçersiz e-posta formatı." });
+      res.status(400).json({ message: "Yalnızca @gmail.com uzantılı e-posta adresleri kabul edilmektedir." });
+      return;
+    }
+
+    // Telefon kontrolü - 10 hane ve 5 ile başlama
+    const phoneRegex = /^5\d{9}$/;
+    if (!phoneRegex.test(phoneStr)) {
+      res.status(400).json({ message: "Telefon numarası 10 haneli olmalı ve 5 ile başlamalıdır (Örn: 5xxxxxxxxx)." });
       return;
     }
 
@@ -55,10 +75,16 @@ router.post("/register", async (req: Request, res: Response): Promise<void> => {
       return;
     }
 
-    // Email zaten kayıtlı mı?
-    const existing = await prisma.user.findUnique({ where: { email: trimmedEmail } });
-    if (existing) {
+    // Email veya Telefon zaten kayıtlı mı?
+    const existingEmail = await prisma.user.findUnique({ where: { email: trimmedEmail } });
+    if (existingEmail) {
       res.status(409).json({ message: "Bu email zaten kayıtlı." });
+      return;
+    }
+    
+    const existingPhone = await prisma.user.findUnique({ where: { phone: phoneStr } });
+    if (existingPhone) {
+      res.status(409).json({ message: "Bu telefon numarası zaten kayıtlı." });
       return;
     }
 
@@ -70,7 +96,7 @@ router.post("/register", async (req: Request, res: Response): Promise<void> => {
 
     // Kullanıcı oluştur
     const user = await prisma.user.create({
-      data: { email: trimmedEmail, passwordHash, role },
+      data: { email: trimmedEmail, phone: phoneStr, name: nameStr, passwordHash, role },
     });
 
     // JWT oluştur ve çereze kaydet
@@ -85,7 +111,7 @@ router.post("/register", async (req: Request, res: Response): Promise<void> => {
 
     res.status(201).json({
       message: "Kayıt başarılı.",
-      user: { id: user.id, email: user.email, role: user.role },
+      user: { id: user.id, email: user.email, name: user.name, phone: user.phone, role: user.role },
     });
   } catch (error) {
     console.error("Register hatası:", error);
@@ -105,6 +131,13 @@ router.post("/login", async (req: Request, res: Response): Promise<void> => {
 
     if (!trimmedEmail || !passwordStr) {
       res.status(400).json({ message: "Email ve şifre zorunludur." });
+      return;
+    }
+
+    // Girişte de @gmail.com kontrolü
+    const emailRegex = /^[a-zA-Z0-9._%+-]+@gmail\.com$/;
+    if (!emailRegex.test(trimmedEmail)) {
+      res.status(400).json({ message: "Lütfen geçerli bir @gmail.com adresi girin." });
       return;
     }
 
@@ -151,7 +184,7 @@ router.get("/me", authMiddleware, async (req: Request, res: Response): Promise<v
 
     const user = await prisma.user.findUnique({
       where: { id: userId },
-      select: { id: true, email: true, role: true, name: true, avatarUrl: true, createdAt: true },
+      select: { id: true, email: true, role: true, name: true, phone: true, avatarUrl: true, createdAt: true },
     });
 
     if (!user) {
@@ -172,16 +205,25 @@ router.get("/me", authMiddleware, async (req: Request, res: Response): Promise<v
 router.put("/profile", authMiddleware, async (req: Request, res: Response): Promise<void> => {
   try {
     const userId = req.user!.id;
-    const { name, email, password, currentPassword, avatarUrl } = req.body;
+    const { name, email, phone, password, currentPassword, avatarUrl } = req.body;
 
     const updateData: any = {};
-    if (name !== undefined) updateData.name = name.trim();
+    
+    if (name !== undefined) {
+      const nameStr = name.trim();
+      const nameRegex = /^[a-zA-ZğüşıöçĞÜŞİÖÇ\s]{3,}$/;
+      if (!nameRegex.test(nameStr)) {
+        res.status(400).json({ message: "Ad Soyad en az 3 karakter olmalı ve yalnızca harflerden oluşmalıdır." });
+        return;
+      }
+      updateData.name = nameStr;
+    }
     
     if (email) {
       const trimmedEmail = email.trim().toLowerCase();
-      const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+      const emailRegex = /^[a-zA-Z0-9._%+-]+@gmail\.com$/;
       if (!emailRegex.test(trimmedEmail)) {
-        res.status(400).json({ message: "Geçersiz e-posta formatı." });
+        res.status(400).json({ message: "Yalnızca @gmail.com uzantılı e-posta adresleri kabul edilmektedir." });
         return;
       }
       const existing = await prisma.user.findUnique({ where: { email: trimmedEmail } });
@@ -190,6 +232,21 @@ router.put("/profile", authMiddleware, async (req: Request, res: Response): Prom
         return;
       }
       updateData.email = trimmedEmail;
+    }
+
+    if (phone) {
+      const phoneStr = phone.trim();
+      const phoneRegex = /^5\d{9}$/;
+      if (!phoneRegex.test(phoneStr)) {
+        res.status(400).json({ message: "Telefon numarası 10 haneli olmalı ve 5 ile başlamalıdır (Örn: 5xxxxxxxxx)." });
+        return;
+      }
+      const existingPhone = await prisma.user.findUnique({ where: { phone: phoneStr } });
+      if (existingPhone && existingPhone.id !== userId) {
+        res.status(409).json({ message: "Bu telefon numarası başka bir kullanıcı tarafından kullanılıyor." });
+        return;
+      }
+      updateData.phone = phoneStr;
     }
 
     if (password) {
@@ -224,7 +281,7 @@ router.put("/profile", authMiddleware, async (req: Request, res: Response): Prom
     const updatedUser = await prisma.user.update({
       where: { id: userId },
       data: updateData,
-      select: { id: true, email: true, role: true, name: true, avatarUrl: true }
+      select: { id: true, email: true, role: true, name: true, phone: true, avatarUrl: true }
     });
 
     const token = signToken({ id: updatedUser.id, email: updatedUser.email, role: updatedUser.role });
@@ -256,6 +313,101 @@ router.post("/logout", (req: Request, res: Response): void => {
     sameSite: "lax",
   });
   res.json({ message: "Çıkış başarılı." });
+});
+
+// ─────────────────────────────────────────────
+// POST /api/auth/forgot-password-code
+// ─────────────────────────────────────────────
+router.post("/forgot-password-code", async (req: Request, res: Response): Promise<void> => {
+  try {
+    const { phone } = req.body;
+    const phoneStr = (phone || "").trim();
+
+    if (!phoneStr) {
+      res.status(400).json({ message: "Telefon numarası zorunludur." });
+      return;
+    }
+
+    const user = await prisma.user.findUnique({ where: { phone: phoneStr } });
+    if (!user) {
+      // Güvenlik: Kullanıcı bulunamadıysa bile hata detayını belli etmemek için "Gönderildi" diyebiliriz.
+      // Ancak UX için şimdilik net hata dönelim.
+      res.status(404).json({ message: "Bu numaraya ait bir kullanıcı bulunamadı." });
+      return;
+    }
+
+    // 6 haneli rastgele kod oluştur
+    const resetCode = Math.floor(100000 + Math.random() * 900000).toString();
+    const resetCodeExpires = new Date(Date.now() + 10 * 60 * 1000); // 10 dakika
+
+    await prisma.user.update({
+      where: { id: user.id },
+      data: { resetCode, resetCodeExpires }
+    });
+
+    // Simüle SMS
+    console.log(`[SMS SİMÜLASYONU] Telefon: ${phoneStr} | Kod: ${resetCode}`);
+
+    res.json({ message: "Doğrulama kodu gönderildi." });
+  } catch (error) {
+    console.error("Forgot password code hatası:", error);
+    res.status(500).json({ message: "Sunucu hatası." });
+  }
+});
+
+// ─────────────────────────────────────────────
+// POST /api/auth/verify-code
+// ─────────────────────────────────────────────
+router.post("/verify-code", async (req: Request, res: Response): Promise<void> => {
+  try {
+    const { phone, code } = req.body;
+    const phoneStr = (phone || "").trim();
+    const codeStr = (code || "").trim();
+
+    if (!phoneStr || !codeStr) {
+      res.status(400).json({ message: "Telefon numarası ve kod zorunludur." });
+      return;
+    }
+
+    const user = await prisma.user.findUnique({ where: { phone: phoneStr } });
+    if (!user) {
+      res.status(404).json({ message: "Kullanıcı bulunamadı." });
+      return;
+    }
+
+    if (user.resetCode !== codeStr) {
+      res.status(401).json({ message: "Geçersiz doğrulama kodu." });
+      return;
+    }
+
+    if (!user.resetCodeExpires || user.resetCodeExpires < new Date()) {
+      res.status(401).json({ message: "Doğrulama kodunun süresi dolmuş." });
+      return;
+    }
+
+    // Kod doğru, kodu temizle ve login ol
+    await prisma.user.update({
+      where: { id: user.id },
+      data: { resetCode: null, resetCodeExpires: null }
+    });
+
+    const token = signToken({ id: user.id, email: user.email, role: user.role });
+
+    res.cookie("token", token, {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === "production",
+      sameSite: "lax",
+      maxAge: 7 * 24 * 60 * 60 * 1000,
+    });
+
+    res.json({
+      message: "Giriş başarılı.",
+      user: { id: user.id, email: user.email, phone: user.phone, role: user.role },
+    });
+  } catch (error) {
+    console.error("Verify code hatası:", error);
+    res.status(500).json({ message: "Sunucu hatası." });
+  }
 });
 
 export default router;

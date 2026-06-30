@@ -21,7 +21,7 @@
 </header>
 
 <script is:inline>
-  document.addEventListener("DOMContentLoaded", async () => {
+  const initAdminHeader = async () => {
     try {
       const res = await fetch('/api/auth/me');
       if (res.ok) {
@@ -48,5 +48,11 @@
     } catch (err) {
       console.error("Header kullanıcı bilgisi alınamadı", err);
     }
-  });
+  };
+
+  if (document.readyState === "loading") {
+    document.addEventListener("DOMContentLoaded", initAdminHeader);
+  } else {
+    initAdminHeader();
+  }
 </script>

@@ -82,6 +82,14 @@ import Layout from '../layouts/Layout.astro';
 								<input class="w-full bg-[#13132b] border border-[#2a2a4a] text-white placeholder-[#a3a3c2] pl-11 pr-4 h-[48px] focus:outline-none focus:border-[#7c5cfc] focus:ring-1 focus:ring-[#7c5cfc] focus:shadow-[0_0_15px_rgba(124,92,252,0.15)] transition-all duration-300" id="email" placeholder="ornek@email.com" type="email" required/>
 							</div>
 						</div>
+						<!-- Phone -->
+						<div class="flex flex-col gap-2">
+							<label class="font-label-md text-on-surface-variant text-sm font-medium" for="phone">Telefon</label>
+							<div class="relative group">
+								<span class="material-symbols-outlined absolute left-4 top-1/2 -translate-y-1/2 text-[#6b6b9a]">call</span>
+								<input class="w-full bg-[#13132b] border border-[#2a2a4a] text-white placeholder-[#a3a3c2] pl-11 pr-4 h-[48px] focus:outline-none focus:border-[#7c5cfc] focus:ring-1 focus:ring-[#7c5cfc] focus:shadow-[0_0_15px_rgba(124,92,252,0.15)] transition-all duration-300" id="phone" placeholder="0555..." type="tel" required/>
+							</div>
+						</div>
 						<!-- Password -->
 						<div class="flex flex-col gap-2">
 							<label class="font-label-md text-on-surface-variant text-sm font-medium" for="password">Şifre</label>
@@ -291,6 +299,10 @@ import Layout from '../layouts/Layout.astro';
 
 		const rawEmail = (document.getElementById('email') as HTMLInputElement).value;
 		const email = rawEmail.trim().toLowerCase();
+		const rawPhone = (document.getElementById('phone') as HTMLInputElement).value;
+		const phone = rawPhone.trim();
+		const rawName = (document.getElementById('fullname') as HTMLInputElement).value;
+		const name = rawName.trim();
 		const password = passwordInput.value;
 		const confirmPassword = confirmPasswordInput.value;
 		const termsChecked = (document.getElementById('terms') as HTMLInputElement).checked;
@@ -299,11 +311,27 @@ import Layout from '../layouts/Layout.astro';
 		errorFeedback.classList.add('hidden');
 		errorFeedback.textContent = '';
 
-		// E-posta regex kontrolü
-		const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+		// Ad Soyad kontrolü
+		const nameRegex = /^[a-zA-ZğüşıöçĞÜŞİÖÇ\s]{3,}$/;
+		if (!nameRegex.test(name)) {
+			errorFeedback.classList.remove('hidden');
+			errorFeedback.textContent = '[Hata]: Ad Soyad en az 3 karakter olmalı ve yalnızca harflerden oluşmalıdır.';
+			return;
+		}
+
+		// E-posta regex kontrolü - Yalnızca @gmail.com
+		const emailRegex = /^[a-zA-Z0-9._%+-]+@gmail\.com$/;
 		if (!emailRegex.test(email)) {
 			errorFeedback.classList.remove('hidden');
-			errorFeedback.textContent = '[Hata]: Geçersiz e-posta formatı.';
+			errorFeedback.textContent = '[Hata]: Yalnızca @gmail.com uzantılı e-posta adresleri kabul edilmektedir.';
+			return;
+		}
+
+		// Telefon kontrolü - 10 hane ve 5 ile başlama
+		const phoneRegex = /^5\d{9}$/;
+		if (!phoneRegex.test(phone)) {
+			errorFeedback.classList.remove('hidden');
+			errorFeedback.textContent = '[Hata]: Telefon numarası 10 haneli olmalı ve 5 ile başlamalıdır (Örn: 5xxxxxxxxx).';
 			return;
 		}
 
@@ -340,7 +368,7 @@ import Layout from '../layouts/Layout.astro';
 				headers: {
 					'Content-Type': 'application/json',
 				},
-				body: JSON.stringify({ email, password }),
+				body: JSON.stringify({ email, phone, name, password }),
 				credentials: 'include'
 			});
 

@@ -53,19 +53,6 @@ const { title, headerTitle } = Astro.props;
           });
         }
       });
-      // Automatically protect candidate routes
-      document.addEventListener("DOMContentLoaded", async () => {
-        try {
-          const res = await fetch('/api/auth/me');
-          if (!res.ok) throw new Error("Not logged in");
-          const { user } = await res.json();
-          if (user.role === 'ADMIN') {
-            window.location.href = '/admin/dashboard';
-          }
-        } catch (e) {
-          window.location.href = '/login';
-        }
-      });
     </script>
   </body>
 </html>

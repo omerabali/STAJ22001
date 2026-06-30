@@ -29,7 +29,7 @@ const { title } = Astro.props;
 </header>
 
 <script is:inline>
-  document.addEventListener("DOMContentLoaded", async () => {
+  const initUserHeader = async () => {
     try {
       const res = await fetch('/api/auth/me');
       if (res.ok) {
@@ -56,5 +56,11 @@ const { title } = Astro.props;
     } catch (err) {
       console.error(err);
     }
-  });
+  };
+
+  if (document.readyState === "loading") {
+    document.addEventListener("DOMContentLoaded", initUserHeader);
+  } else {
+    initUserHeader();
+  }
 </script>

@@ -3,12 +3,16 @@ import { defineConfig } from 'astro/config';
 
 import tailwindcss from '@tailwindcss/vite';
 
+import node from '@astrojs/node';
+
 // https://astro.build/config
 export default defineConfig({
   server: {
     host: true,
     port: 4321,
   },
+  output: 'server',
+
   vite: {
     plugins: [tailwindcss()],
     server: {
@@ -22,4 +26,8 @@ export default defineConfig({
       },
     },
   },
+
+  adapter: node({
+    mode: 'standalone',
+  }),
 });

@@ -124,12 +124,12 @@ import Layout from '../layouts/Layout.astro';
 <form id="login-form" class="space-y-6">
 <div>
 <label class="block text-sm font-medium text-on-surface mb-2" for="email">E-posta</label>
-<input class="w-full bg-transparent border border-surface-variant rounded-lg px-4 py-3 text-white placeholder-on-surface-variant/50 input-glow focus:ring-0" id="email" name="email" placeholder="ornek@email.com" type="email" required>
+<input class="w-full bg-transparent border border-surface-variant rounded-lg px-4 py-3 text-white placeholder-on-surface-variant/50 input-glow focus:ring-0" id="email" name="email" placeholder="ornek@email.com" type="text" required>
 </div>
 <div>
 <div class="flex items-center justify-between mb-2">
 <label class="block text-sm font-medium text-on-surface" for="password">Şifre</label>
-<a class="text-sm text-brand-accent hover:text-white transition-colors" href="/register">Şifremi unuttum</a>
+<a class="text-sm text-brand-accent hover:text-white transition-colors" href="/forgot-password">Şifremi unuttum</a>
 </div>
 <div class="relative">
 <input class="w-full bg-transparent border border-surface-variant rounded-lg px-4 py-3 text-white placeholder-on-surface-variant/50 input-glow focus:ring-0" id="password" name="password" placeholder="••••••••" type="password" required>
@@ -180,6 +180,7 @@ import Layout from '../layouts/Layout.astro';
 
 	form?.addEventListener('submit', async (e) => {
 		e.preventDefault();
+		console.log("Login formu gonderiliyor...");
 		
 		const rawEmail = (document.getElementById('email') as HTMLInputElement).value;
 		const email = rawEmail.trim().toLowerCase();
@@ -187,6 +188,14 @@ import Layout from '../layouts/Layout.astro';
 
 		errorFeedback.classList.add('hidden');
 		errorFeedback.textContent = '';
+
+		// E-posta format kontrolü - Yalnızca @gmail.com
+		const emailRegex = /^[a-zA-Z0-9._%+-]+@gmail\.com$/;
+		if (!emailRegex.test(email)) {
+			errorFeedback.classList.remove('hidden');
+			errorFeedback.textContent = '[Hata]: Lütfen geçerli bir @gmail.com adresi girin.';
+			return;
+		}
 
 		try {
 			// Proxy yönlendirmesi: /api/* → backend :5000 (vite proxy)
@@ -209,7 +218,7 @@ import Layout from '../layouts/Layout.astro';
 			if (data.user && data.user.role === 'ADMIN') {
 				window.location.href = '/admin/dashboard';
 			} else {
-				window.location.href = '/dashboard';
+				window.location.href = '/profile';
 			}
 
 		} catch (error: any) {
