@@ -142,8 +142,9 @@ router.post("/upload", authMiddleware, (req: Request, res: Response): void => {
     }
 
     try {
-      const fileExt = path.extname(req.file.originalname).toLowerCase();
-      const fileName = req.file.originalname;
+      const rawOriginalName = req.file.originalname;
+      const fileName = Buffer.from(rawOriginalName, "latin1").toString("utf8");
+      const fileExt = path.extname(fileName).toLowerCase();
       const userId = req.user.id;
       const fileUuid = crypto.randomUUID();
       const filePath = `cvs/${userId}/${fileUuid}${fileExt}`;

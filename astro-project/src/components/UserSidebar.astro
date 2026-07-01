@@ -1,45 +1,42 @@
 ---
 const currentPath = Astro.url.pathname;
 ---
-<nav id="user-sidebar" class="fixed left-0 top-0 h-full w-[260px] bg-surface-container border-r border-outline-variant flex flex-col z-50 transform -translate-x-full md:translate-x-0 transition-transform duration-300">
-  <div class="p-6 border-b border-outline-variant/30 bg-surface-container-low/30 backdrop-blur-sm relative overflow-hidden">
-    <!-- Subtle glow behind the logo -->
-    <div class="absolute -top-10 -left-10 w-32 h-32 bg-primary/10 rounded-full blur-2xl pointer-events-none"></div>
-    
-    <div class="flex items-center gap-3 relative z-10">
-      <div class="w-10 h-10 rounded-xl bg-gradient-to-tr from-primary to-primary-container flex items-center justify-center shadow-lg shadow-primary/20 shrink-0">
-        <img src="/mixboard.png" alt="Beacon" class="h-6 w-auto object-contain" />
-      </div>
-      <div class="flex flex-col">
-        <h1 class="text-[20px] font-bold text-on-surface leading-tight tracking-tight">Beacon AI</h1>
-        <div class="flex items-center gap-1.5 mt-0.5">
-          <span class="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse"></span>
-          <span class="text-[11px] font-bold tracking-widest text-primary uppercase" id="portal-subtitle">Aday Portalı</span>
-        </div>
-      </div>
+<nav id="user-sidebar" class="fixed left-0 top-0 h-full w-[260px] bg-brand-bg border-r border-brand-border flex flex-col z-50 transform -translate-x-full md:translate-x-0 transition-transform duration-300">
+  <!-- Logo Area -->
+  <div class="h-24 flex items-center px-8 border-b border-brand-border shrink-0">
+    <div class="w-10 h-10 rounded-xl bg-brand-card flex items-center justify-center border border-brand-border shadow-sm mr-3">
+      <i class="fa-solid fa-cube text-brand-accent text-xl"></i>
+    </div>
+    <div>
+      <h1 class="font-bold text-lg leading-tight tracking-wide text-brand-text">Beacon AI</h1>
+      <span class="text-[10px] uppercase tracking-widest text-brand-success font-semibold flex items-center gap-1">
+        <span class="w-1.5 h-1.5 rounded-full bg-brand-success animate-pulse"></span>
+        Aday Portalı
+      </span>
     </div>
   </div>
   
-  <div class="flex-1 overflow-y-auto mt-md flex flex-col gap-xs py-sm">
-    <a class={`px-lg py-md transition-colors flex items-center gap-md ml-1 ${currentPath === '/profile' ? 'text-primary font-bold border-l-4 border-primary bg-secondary-container/10 opacity-90' : 'text-on-surface-variant hover:bg-surface-variant/50'}`} href="/profile">
-      <span class="material-symbols-outlined" style="font-size:20px">cloud_upload</span>
-      CV Yükle & Analiz
+  <!-- Navigation -->
+  <div class="flex-1 overflow-y-auto mt-8 px-4 space-y-2">
+    <a class={`flex items-center px-4 py-3.5 rounded-r-2xl transition-all group relative overflow-hidden ${currentPath === '/profile' ? 'text-brand-text glass-active' : 'text-brand-muted hover:text-brand-text hover:bg-white/5'}`} href="/profile">
+      <i class="fa-solid fa-cloud-arrow-up text-brand-accent w-6 text-center relative z-10"></i>
+      <span class="ml-3 font-semibold relative z-10">CV Yükle & Analiz</span>
     </a>
-    <a class={`px-lg py-md transition-colors flex items-center gap-md ml-1 ${currentPath === '/analyses' ? 'text-primary font-bold border-l-4 border-primary bg-secondary-container/10 opacity-90' : 'text-on-surface-variant hover:bg-surface-variant/50'}`} href="/analyses">
-      <span class="material-symbols-outlined" style="font-size:20px">analytics</span>
-      Analiz Sonuçlarım
+    <a class={`flex items-center px-4 py-3.5 rounded-r-2xl transition-all group relative overflow-hidden ${currentPath === '/analyses' ? 'text-brand-text glass-active' : 'text-brand-muted hover:text-brand-text hover:bg-white/5'}`} href="/analyses">
+      <i class="fa-solid fa-chart-pie w-6 text-center group-hover:text-brand-accent transition-colors relative z-10"></i>
+      <span class="ml-3 font-semibold relative z-10">Analiz Sonuçlarım</span>
     </a>
   </div>
 
-  <div class="flex-col flex gap-xs py-sm border-t border-outline-variant/30 mt-auto">
-    <div class="flex-1"></div>
-    <a class={`px-lg py-md transition-colors flex items-center gap-md ml-1 border-t border-outline-variant/30 pt-md ${currentPath === '/settings' ? 'text-primary font-bold border-l-4 border-primary bg-secondary-container/10' : 'text-on-surface-variant hover:bg-surface-variant/50'}`} href="/settings">
-      <span class="material-symbols-outlined" style="font-size:20px">settings</span>
-      Ayarlar
+  <!-- Bottom Actions -->
+  <div class="px-4 pb-8 space-y-2 mt-auto">
+    <a class={`flex items-center px-4 py-3 rounded-xl transition-all group ${currentPath === '/settings' ? 'text-brand-text glass-active' : 'text-brand-muted hover:text-brand-text hover:bg-white/5'}`} href="/settings">
+      <i class="fa-solid fa-gear w-6 text-center group-hover:text-brand-accent transition-colors"></i>
+      <span class="ml-3 text-sm font-medium">Ayarlar</span>
     </a>
-    <button onclick="handleUserLogout()" class="text-on-surface-variant px-lg py-md hover:bg-error/10 hover:text-error transition-colors flex items-center gap-md ml-1 w-full text-left">
-      <span class="material-symbols-outlined" style="font-size:20px">logout</span>
-      Çıkış Yap
+    <button onclick="handleUserLogout()" class="flex items-center px-4 py-3 text-brand-muted hover:text-brand-danger hover:bg-red-500/10 rounded-xl transition-all group w-full text-left">
+      <i class="fa-solid fa-arrow-right-from-bracket w-6 text-center"></i>
+      <span class="ml-3 text-sm font-medium">Çıkış Yap</span>
     </button>
   </div>
 </nav>

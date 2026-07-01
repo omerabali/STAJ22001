@@ -9,107 +9,237 @@ import AdminLayout from '../../layouts/AdminLayout.astro';
     <p class="font-body-md text-body-md text-on-surface-variant">Sistemin genel performansı ve kullanıcı metriklerine ait analitik veriler.</p>
   </header>
 
+  <!-- Stats Cards Row -->
+  <div class="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">
+    <div class="bg-surface-container-highest border border-outline-variant rounded-xl p-5 flex flex-col">
+      <span class="font-label-md text-label-md text-on-surface-variant mb-2 uppercase text-xs">Toplam Kullanıcı</span>
+      <span id="r-total-users" class="font-display-sm text-[#7c5cfc] font-bold text-3xl">...</span>
+    </div>
+    <div class="bg-surface-container-highest border border-outline-variant rounded-xl p-5 flex flex-col">
+      <span class="font-label-md text-label-md text-on-surface-variant mb-2 uppercase text-xs">Toplam CV</span>
+      <span id="r-total-cvs" class="font-display-sm text-[#7c5cfc] font-bold text-3xl">...</span>
+    </div>
+    <div class="bg-surface-container-highest border border-outline-variant rounded-xl p-5 flex flex-col">
+      <span class="font-label-md text-label-md text-on-surface-variant mb-2 uppercase text-xs">Tamamlanan Analiz</span>
+      <span id="r-completed" class="font-display-sm text-[#7c5cfc] font-bold text-3xl">...</span>
+    </div>
+    <div class="bg-surface-container-highest border border-outline-variant rounded-xl p-5 flex flex-col">
+      <span class="font-label-md text-label-md text-on-surface-variant mb-2 uppercase text-xs">Ort. ATS Skoru</span>
+      <span id="r-avg-score" class="font-display-sm text-[#7c5cfc] font-bold text-3xl">...</span>
+    </div>
+  </div>
+
   <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6">
-    <!-- Chart 1: İşe Alım Oranı -->
-    <div class="bg-surface-container-highest border border-outline-variant p-6 rounded-xl flex flex-col h-[320px]">
-      <h3 class="font-bold text-on-surface mb-6">İşe Alım ve Eşleşme Oranı</h3>
-      
-      <div class="flex-1 flex items-end gap-4 justify-between pt-4">
-        <!-- Mock Bar Chart -->
-        <div class="flex flex-col items-center gap-2 group">
-          <div class="w-12 bg-primary/20 group-hover:bg-primary/40 rounded-t-sm h-[40%] transition-colors relative">
-            <div class="absolute -top-8 left-1/2 -translate-x-1/2 opacity-0 group-hover:opacity-100 text-xs bg-surface text-on-surface px-2 py-1 rounded">40%</div>
+    <!-- Analiz Durumu Dağılımı -->
+    <div class="bg-surface-container-highest border border-outline-variant p-6 rounded-xl flex flex-col">
+      <h3 class="font-bold text-on-surface mb-6">Analiz Durumu Dağılımı</h3>
+      <div class="flex flex-col gap-5 flex-1 justify-center">
+        <div>
+          <div class="flex justify-between text-xs mb-1">
+            <span class="text-on-surface flex items-center gap-1">
+              <span class="w-2 h-2 rounded-full bg-green-400 inline-block"></span>
+              Tamamlandı
+            </span>
+            <span id="bar-completed-label" class="text-on-surface-variant">...</span>
           </div>
-          <span class="text-xs text-on-surface-variant">Oca</span>
+          <div class="w-full bg-surface-container-low rounded-full h-2">
+            <div id="bar-completed" class="bg-green-400 h-2 rounded-full transition-all duration-700" style="width: 0%"></div>
+          </div>
         </div>
-        <div class="flex flex-col items-center gap-2 group">
-          <div class="w-12 bg-primary/30 group-hover:bg-primary/50 rounded-t-sm h-[60%] transition-colors relative">
-             <div class="absolute -top-8 left-1/2 -translate-x-1/2 opacity-0 group-hover:opacity-100 text-xs bg-surface text-on-surface px-2 py-1 rounded">60%</div>
+        <div>
+          <div class="flex justify-between text-xs mb-1">
+            <span class="text-on-surface flex items-center gap-1">
+              <span class="w-2 h-2 rounded-full bg-blue-400 inline-block"></span>
+              İşleniyor
+            </span>
+            <span id="bar-processing-label" class="text-on-surface-variant">...</span>
           </div>
-          <span class="text-xs text-on-surface-variant">Şub</span>
+          <div class="w-full bg-surface-container-low rounded-full h-2">
+            <div id="bar-processing" class="bg-blue-400 h-2 rounded-full transition-all duration-700" style="width: 0%"></div>
+          </div>
         </div>
-        <div class="flex flex-col items-center gap-2 group">
-          <div class="w-12 bg-primary/50 group-hover:bg-primary/70 rounded-t-sm h-[50%] transition-colors relative">
-             <div class="absolute -top-8 left-1/2 -translate-x-1/2 opacity-0 group-hover:opacity-100 text-xs bg-surface text-on-surface px-2 py-1 rounded">50%</div>
+        <div>
+          <div class="flex justify-between text-xs mb-1">
+            <span class="text-on-surface flex items-center gap-1">
+              <span class="w-2 h-2 rounded-full bg-yellow-400 inline-block"></span>
+              Bekliyor
+            </span>
+            <span id="bar-pending-label" class="text-on-surface-variant">...</span>
           </div>
-          <span class="text-xs text-on-surface-variant">Mar</span>
-        </div>
-        <div class="flex flex-col items-center gap-2 group">
-          <div class="w-12 bg-[#7c5cfc] rounded-t-sm h-[85%] transition-colors relative shadow-[0_0_15px_rgba(124,92,252,0.3)]">
-             <div class="absolute -top-8 left-1/2 -translate-x-1/2 opacity-0 group-hover:opacity-100 text-xs bg-surface text-on-surface px-2 py-1 rounded">85%</div>
+          <div class="w-full bg-surface-container-low rounded-full h-2">
+            <div id="bar-pending" class="bg-yellow-400 h-2 rounded-full transition-all duration-700" style="width: 0%"></div>
           </div>
-          <span class="text-xs text-on-surface-variant text-primary font-bold">Nis</span>
-        </div>
-        <div class="flex flex-col items-center gap-2 group">
-          <div class="w-12 bg-primary/40 group-hover:bg-primary/60 rounded-t-sm h-[70%] transition-colors relative">
-             <div class="absolute -top-8 left-1/2 -translate-x-1/2 opacity-0 group-hover:opacity-100 text-xs bg-surface text-on-surface px-2 py-1 rounded">70%</div>
-          </div>
-          <span class="text-xs text-on-surface-variant">May</span>
         </div>
       </div>
     </div>
 
-    <!-- Chart 2: Popüler Yetenekler -->
-    <div class="bg-surface-container-highest border border-outline-variant p-6 rounded-xl flex flex-col h-[320px]">
-      <h3 class="font-bold text-on-surface mb-6">Aranan Popüler Yetenekler</h3>
-      <div class="flex flex-col gap-5 flex-1 justify-center">
-        <!-- Progress 1 -->
-        <div>
-          <div class="flex justify-between text-xs mb-1">
-            <span class="text-on-surface">React & Next.js</span>
-            <span class="text-on-surface-variant">92%</span>
-          </div>
-          <div class="w-full bg-surface-container-low rounded-full h-2">
-            <div class="bg-[#7c5cfc] h-2 rounded-full" style="width: 92%"></div>
-          </div>
-        </div>
-        <!-- Progress 2 -->
-        <div>
-          <div class="flex justify-between text-xs mb-1">
-            <span class="text-on-surface">Python & Django</span>
-            <span class="text-on-surface-variant">78%</span>
-          </div>
-          <div class="w-full bg-surface-container-low rounded-full h-2">
-            <div class="bg-primary h-2 rounded-full" style="width: 78%"></div>
-          </div>
-        </div>
-        <!-- Progress 3 -->
-        <div>
-          <div class="flex justify-between text-xs mb-1">
-            <span class="text-on-surface">UI/UX Tasarım</span>
-            <span class="text-on-surface-variant">64%</span>
-          </div>
-          <div class="w-full bg-surface-container-low rounded-full h-2">
-            <div class="bg-secondary-fixed-dim h-2 rounded-full" style="width: 64%"></div>
-          </div>
-        </div>
-        <!-- Progress 4 -->
-        <div>
-          <div class="flex justify-between text-xs mb-1">
-            <span class="text-on-surface">Veri Bilimi</span>
-            <span class="text-on-surface-variant">45%</span>
-          </div>
-          <div class="w-full bg-surface-container-low rounded-full h-2">
-            <div class="bg-tertiary h-2 rounded-full" style="width: 45%"></div>
-          </div>
-        </div>
+    <!-- Popüler Yetenekler -->
+    <div class="bg-surface-container-highest border border-outline-variant p-6 rounded-xl flex flex-col">
+      <h3 class="font-bold text-on-surface mb-6">Adaylarda En Çok Görülen Yetenekler</h3>
+      <div id="skills-list" class="flex flex-col gap-4 flex-1 justify-center">
+        <div class="animate-pulse bg-surface-container-low rounded h-4 w-full"></div>
+        <div class="animate-pulse bg-surface-container-low rounded h-4 w-4/5"></div>
+        <div class="animate-pulse bg-surface-container-low rounded h-4 w-3/5"></div>
       </div>
     </div>
   </div>
 
+  <!-- Son 7 Gün Kayıt -->
+  <div class="bg-surface-container-highest border border-outline-variant p-6 rounded-xl mb-6">
+    <h3 class="font-bold text-on-surface mb-6">Son 7 Günde Yeni Kayıtlar</h3>
+    <div id="signup-chart" class="flex items-end gap-4 h-[160px] justify-center">
+      <!-- Rendered by JS -->
+    </div>
+    <div id="signup-labels" class="flex gap-4 justify-center mt-2">
+      <!-- Rendered by JS -->
+    </div>
+  </div>
+
+  <!-- Export -->
   <div class="bg-surface-container-lowest border border-outline-variant rounded-xl p-6 flex flex-col md:flex-row gap-6 items-center justify-between">
     <div>
       <h3 class="font-bold text-on-surface text-lg">Tüm Verileri Dışa Aktar</h3>
       <p class="text-on-surface-variant text-sm mt-1">Platformdaki tüm raporları CSV veya PDF formatında indirebilirsiniz.</p>
     </div>
     <div class="flex gap-4">
-      <button class="border border-outline-variant text-on-surface hover:bg-surface-container-highest px-4 py-2 rounded-lg font-label-md transition-colors flex items-center gap-2">
+      <button onclick="exportCSV()" class="border border-outline-variant text-on-surface hover:bg-surface-container-highest px-4 py-2 rounded-lg font-label-md transition-colors flex items-center gap-2">
         <span class="material-symbols-outlined text-sm">download</span> CSV İndir
       </button>
-      <button class="bg-primary-container hover:bg-primary-fixed text-on-primary-container px-4 py-2 rounded-lg font-label-md transition-colors flex items-center gap-2">
+      <button onclick="window.print()" class="bg-primary-container hover:bg-primary-fixed text-on-primary-container px-4 py-2 rounded-lg font-label-md transition-colors flex items-center gap-2">
         <span class="material-symbols-outlined text-sm">picture_as_pdf</span> PDF İndir
       </button>
     </div>
   </div>
 
+  <script is:inline>
+    let reportData = null;
+
+    function pct(val, total) {
+      if (!total) return 0;
+      return Math.round((val / total) * 100);
+    }
+
+    function renderSignupChart(recentSignups) {
+      const chart = document.getElementById('signup-chart');
+      const labels = document.getElementById('signup-labels');
+
+      if (!recentSignups || recentSignups.length === 0) {
+        chart.innerHTML = '<p class="text-on-surface-variant text-sm">Son 7 günde kayıt yok.</p>';
+        return;
+      }
+
+      // Fill missing days
+      const days = [];
+      for (let i = 6; i >= 0; i--) {
+        const d = new Date();
+        d.setDate(d.getDate() - i);
+        const key = d.toISOString().slice(0, 10);
+        const found = recentSignups.find(r => r.day && r.day.slice(0, 10) === key);
+        days.push({ key, label: d.toLocaleDateString('tr-TR', { weekday: 'short' }), count: found ? found.count : 0 });
+      }
+
+      const max = Math.max(...days.map(d => d.count), 1);
+
+      chart.innerHTML = days.map(d => {
+        const h = Math.round((d.count / max) * 140);
+        return `
+          <div class="flex flex-col items-center gap-2 group flex-1">
+            <span class="text-xs text-on-surface-variant opacity-0 group-hover:opacity-100 transition-opacity">${d.count}</span>
+            <div class="w-full rounded-t-sm transition-all duration-700 relative" 
+                 style="height: ${Math.max(h, 4)}px; background: ${d.count > 0 ? '#7c5cfc' : '#2a2a4a'}; opacity: ${d.count > 0 ? 1 : 0.3};">
+            </div>
+          </div>
+        `;
+      }).join('');
+
+      labels.innerHTML = days.map(d =>
+        `<span class="text-xs text-on-surface-variant flex-1 text-center">${d.label}</span>`
+      ).join('');
+    }
+
+    async function loadReports() {
+      try {
+        const res = await fetch('/api/admin/reports/stats');
+        if (!res.ok) {
+          document.getElementById('r-total-users').textContent = 'Hata';
+          return;
+        }
+
+        reportData = await res.json();
+
+        // Stat cards
+        document.getElementById('r-total-users').textContent = reportData.totalUsers ?? '-';
+        document.getElementById('r-total-cvs').textContent = reportData.totalCVs ?? '-';
+        document.getElementById('r-completed').textContent = reportData.completedAnalyses ?? '-';
+        document.getElementById('r-avg-score').textContent = reportData.avgAtsScore !== null ? `%${reportData.avgAtsScore}` : '-';
+
+        // Analysis status bars
+        const total = reportData.totalAnalyses || 0;
+        const cp = pct(reportData.completedAnalyses, total);
+        const pp = pct(reportData.processingAnalyses, total);
+        const ep = pct(reportData.pendingAnalyses, total);
+
+        document.getElementById('bar-completed').style.width = cp + '%';
+        document.getElementById('bar-processing').style.width = pp + '%';
+        document.getElementById('bar-pending').style.width = ep + '%';
+        document.getElementById('bar-completed-label').textContent = `${reportData.completedAnalyses} (${cp}%)`;
+        document.getElementById('bar-processing-label').textContent = `${reportData.processingAnalyses} (${pp}%)`;
+        document.getElementById('bar-pending-label').textContent = `${reportData.pendingAnalyses} (${ep}%)`;
+
+        // Top skills
+        const skillsList = document.getElementById('skills-list');
+        if (reportData.topSkills && reportData.topSkills.length > 0) {
+          const maxCount = reportData.topSkills[0].count;
+          skillsList.innerHTML = reportData.topSkills.map(s => {
+            const w = Math.round((s.count / maxCount) * 100);
+            return `
+              <div>
+                <div class="flex justify-between text-xs mb-1">
+                  <span class="text-on-surface">${s.skill}</span>
+                  <span class="text-on-surface-variant">${s.count} aday</span>
+                </div>
+                <div class="w-full bg-surface-container-low rounded-full h-2">
+                  <div class="bg-[#7c5cfc] h-2 rounded-full transition-all duration-700" style="width: ${w}%"></div>
+                </div>
+              </div>
+            `;
+          }).join('');
+        } else {
+          skillsList.innerHTML = '<p class="text-on-surface-variant text-sm text-center">Henüz tamamlanmış analiz yok.</p>';
+        }
+
+        // Signup chart
+        renderSignupChart(reportData.recentSignups);
+
+      } catch (err) {
+        console.error('Raporlar yüklenemedi:', err);
+      }
+    }
+
+    function exportCSV() {
+      if (!reportData) return alert('Veri henüz yüklenmedi.');
+      const rows = [
+        ['Metrik', 'Değer'],
+        ['Toplam Kullanıcı', reportData.totalUsers],
+        ['Aday', reportData.totalCandidates],
+        ['Yönetici', reportData.totalAdmins],
+        ['Toplam CV', reportData.totalCVs],
+        ['Toplam Analiz', reportData.totalAnalyses],
+        ['Tamamlanan Analiz', reportData.completedAnalyses],
+        ['İşlenen Analiz', reportData.processingAnalyses],
+        ['Bekleyen Analiz', reportData.pendingAnalyses],
+        ['Ortalama ATS Skoru', reportData.avgAtsScore !== null ? `%${reportData.avgAtsScore}` : '-'],
+      ];
+      const csv = rows.map(r => r.join(',')).join('\n');
+      const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = `beacon-rapor-${new Date().toISOString().slice(0,10)}.csv`;
+      a.click();
+      URL.revokeObjectURL(url);
+    }
+
+    document.addEventListener('DOMContentLoaded', loadReports);
+  </script>
 </AdminLayout>

@@ -20,18 +20,19 @@ const { title, headerTitle } = Astro.props;
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
     <title>{title}</title>
     
-    <!-- Google Fonts -->
+    <!-- Google Fonts & Font Awesome Icons -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
     <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet" />
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet"/>
   </head>
   <body class="theme-dashboard bg-background text-on-surface font-body-md antialiased min-h-screen flex selection:bg-primary-container selection:text-on-primary-container">
     <div id="sidebar-overlay" class="fixed inset-0 bg-black/50 z-40 hidden md:hidden transition-opacity"></div>
     <UserSidebar />
     <UserHeader title={headerTitle} />
     
-    <main class="w-full md:ml-[260px] md:w-[calc(100%-260px)] mt-16 p-4 md:p-lg min-h-[calc(100vh-4rem)] bg-background relative overflow-hidden transition-all duration-300">
+    <main class="w-full md:ml-[260px] md:w-[calc(100%-260px)] mt-24 p-4 md:p-lg min-h-[calc(100vh-6rem)] bg-background relative overflow-hidden transition-all duration-300">
       <slot />
     </main>
 

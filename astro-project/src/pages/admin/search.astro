@@ -6,7 +6,7 @@ import AdminLayout from '../../layouts/AdminLayout.astro';
   <!-- Top Header -->
   <header class="mb-8">
     <h2 class="font-headline-md text-headline-md font-bold mb-2">Aday Ara</h2>
-    <p class="font-body-md text-body-md text-on-surface-variant">Doğal dil ile aday ara, AI en uygun profilleri sıralar.</p>
+    <p class="font-body-md text-body-md text-on-surface-variant">Sistemdeki adayları arayın ve filtreleyin.</p>
   </header>
 
   <!-- Search Section -->
@@ -14,166 +14,196 @@ import AdminLayout from '../../layouts/AdminLayout.astro';
     <div class="relative flex items-center mb-6">
       <span class="material-symbols-outlined absolute left-4 text-on-surface-variant">search</span>
       <input 
+        id="search-input"
         type="text" 
-        placeholder="örn: React bilen 3 yıl deneyimli frontend geliştirici" 
+        placeholder="İsim veya e-posta ile ara..." 
         class="w-full bg-surface-container-lowest border border-outline-variant text-on-surface rounded-xl pl-12 pr-[120px] py-4 focus:border-primary focus:ring-1 focus:ring-primary focus:outline-none font-body-md"
       />
-      <button class="absolute right-2 bg-[#7c5cfc] hover:bg-[#6b4dec] text-white rounded-lg px-6 py-2.5 font-label-md flex items-center gap-2 transition-colors">
-        <span class="material-symbols-outlined text-sm">auto_awesome</span>
+      <button id="search-btn" class="absolute right-2 bg-[#7c5cfc] hover:bg-[#6b4dec] text-white rounded-lg px-6 py-2.5 font-label-md flex items-center gap-2 transition-colors">
+        <span class="material-symbols-outlined text-sm">search</span>
         Ara
       </button>
     </div>
 
     <!-- Filter Pills -->
-    <div class="flex flex-wrap gap-3">
-      <button class="bg-[#7c5cfc] text-white px-4 py-1.5 rounded-full font-label-sm text-xs transition-colors">Tümü</button>
-      <button class="bg-surface-container-lowest border border-outline-variant text-on-surface-variant hover:text-on-surface px-4 py-1.5 rounded-full font-label-sm text-xs transition-colors">Analiz Hazır</button>
-      <button class="bg-surface-container-lowest border border-outline-variant text-on-surface-variant hover:text-on-surface px-4 py-1.5 rounded-full font-label-sm text-xs transition-colors">İşleniyor</button>
-      <button class="bg-surface-container-lowest border border-outline-variant text-on-surface-variant hover:text-on-surface px-4 py-1.5 rounded-full font-label-sm text-xs transition-colors">Bekliyor</button>
+    <div class="flex flex-wrap gap-3" id="filter-pills">
+      <button data-filter="all" class="filter-pill active bg-[#7c5cfc] text-white px-4 py-1.5 rounded-full font-label-sm text-xs transition-colors">Tümü</button>
+      <button data-filter="completed" class="filter-pill bg-surface-container-lowest border border-outline-variant text-on-surface-variant hover:text-on-surface px-4 py-1.5 rounded-full font-label-sm text-xs transition-colors">Analiz Hazır</button>
+      <button data-filter="processing" class="filter-pill bg-surface-container-lowest border border-outline-variant text-on-surface-variant hover:text-on-surface px-4 py-1.5 rounded-full font-label-sm text-xs transition-colors">İşleniyor</button>
+      <button data-filter="pending" class="filter-pill bg-surface-container-lowest border border-outline-variant text-on-surface-variant hover:text-on-surface px-4 py-1.5 rounded-full font-label-sm text-xs transition-colors">Bekliyor / CV Yok</button>
     </div>
   </div>
 
   <!-- Results Header -->
   <div class="flex justify-between items-center mb-6">
     <h3 class="font-headline-sm text-headline-sm font-bold text-on-surface">Arama Sonuçları</h3>
-    <span class="text-on-surface-variant font-body-sm text-sm">4 aday bulundu</span>
+    <span id="result-count" class="text-on-surface-variant font-body-sm text-sm">Yükleniyor...</span>
   </div>
 
   <!-- Results Grid -->
-  <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-    
-    <!-- Card 1 -->
-    <div class="bg-[#13132b] border border-[#2a2a4a] rounded-xl p-6 hover:border-primary/50 transition-colors flex flex-col justify-between h-[200px]">
-      <div class="flex justify-between items-start">
-        <div class="flex gap-4">
-          <div class="w-12 h-12 rounded-full bg-primary-container text-on-primary-container flex items-center justify-center font-bold text-lg">AY</div>
-          <div>
-            <h4 class="font-bold text-on-surface">Ahmet Yılmaz</h4>
-            <p class="text-on-surface-variant text-sm mt-0.5">Frontend Geliştirici</p>
-          </div>
-        </div>
-        <div class="flex items-center gap-1 text-green-400 bg-green-400/10 px-2 py-1 rounded font-bold text-xs">
-          <span class="material-symbols-outlined text-[14px]">auto_awesome</span>
-          %91 Uyum
-        </div>
-      </div>
-      
-      <div class="flex gap-2 mt-4">
-        <span class="bg-purple-900/30 text-purple-300 px-3 py-1 rounded-full font-label-md text-[11px]">React</span>
-        <span class="bg-purple-900/30 text-purple-300 px-3 py-1 rounded-full font-label-md text-[11px]">TypeScript</span>
-        <span class="bg-purple-900/30 text-purple-300 px-3 py-1 rounded-full font-label-md text-[11px]">Node.js</span>
-      </div>
-
-      <div class="flex justify-between items-center mt-auto pt-4 border-t border-[#2a2a4a]/50">
-        <div class="flex items-center gap-2 text-on-surface-variant text-xs">
-          <span class="material-symbols-outlined text-[14px]">calendar_today</span>
-          29.06.2026
-        </div>
-        <button class="border border-outline-variant text-on-surface hover:bg-[#1a2340] px-4 py-1.5 rounded-lg text-xs font-semibold transition-colors">
-          Profili Gör
-        </button>
-      </div>
-    </div>
-
-    <!-- Card 2 -->
-    <div class="bg-[#13132b] border border-[#2a2a4a] rounded-xl p-6 hover:border-primary/50 transition-colors flex flex-col justify-between h-[200px]">
-      <div class="flex justify-between items-start">
-        <div class="flex gap-4">
-          <div class="w-12 h-12 rounded-full bg-secondary-container text-on-secondary-container flex items-center justify-center font-bold text-lg">ZK</div>
-          <div>
-            <h4 class="font-bold text-on-surface">Zeynep Kaya</h4>
-            <p class="text-on-surface-variant text-sm mt-0.5">Full Stack Geliştirici</p>
-          </div>
-        </div>
-        <div class="flex items-center gap-1 text-green-400 bg-green-400/10 px-2 py-1 rounded font-bold text-xs">
-          <span class="material-symbols-outlined text-[14px]">auto_awesome</span>
-          %87 Uyum
-        </div>
-      </div>
-      
-      <div class="flex gap-2 mt-4">
-        <span class="bg-purple-900/30 text-purple-300 px-3 py-1 rounded-full font-label-md text-[11px]">Python</span>
-        <span class="bg-purple-900/30 text-purple-300 px-3 py-1 rounded-full font-label-md text-[11px]">Django</span>
-        <span class="bg-purple-900/30 text-purple-300 px-3 py-1 rounded-full font-label-md text-[11px]">PostgreSQL</span>
-      </div>
-
-      <div class="flex justify-between items-center mt-auto pt-4 border-t border-[#2a2a4a]/50">
-        <div class="flex items-center gap-2 text-on-surface-variant text-xs">
-          <span class="material-symbols-outlined text-[14px]">calendar_today</span>
-          28.06.2026
-        </div>
-        <button class="border border-outline-variant text-on-surface hover:bg-[#1a2340] px-4 py-1.5 rounded-lg text-xs font-semibold transition-colors">
-          Profili Gör
-        </button>
-      </div>
-    </div>
-
-    <!-- Card 3 -->
-    <div class="bg-[#13132b] border border-[#2a2a4a] rounded-xl p-6 hover:border-primary/50 transition-colors flex flex-col justify-between h-[200px]">
-      <div class="flex justify-between items-start">
-        <div class="flex gap-4">
-          <div class="w-12 h-12 rounded-full bg-primary-container text-on-primary-container flex items-center justify-center font-bold text-lg">CD</div>
-          <div>
-            <h4 class="font-bold text-on-surface">Can Demir</h4>
-            <p class="text-on-surface-variant text-sm mt-0.5">Backend Geliştirici</p>
-          </div>
-        </div>
-        <div class="flex items-center gap-1 text-green-400 bg-green-400/10 px-2 py-1 rounded font-bold text-xs">
-          <span class="material-symbols-outlined text-[14px]">auto_awesome</span>
-          %84 Uyum
-        </div>
-      </div>
-      
-      <div class="flex gap-2 mt-4">
-        <span class="bg-purple-900/30 text-purple-300 px-3 py-1 rounded-full font-label-md text-[11px]">Node.js</span>
-        <span class="bg-purple-900/30 text-purple-300 px-3 py-1 rounded-full font-label-md text-[11px]">Express</span>
-        <span class="bg-purple-900/30 text-purple-300 px-3 py-1 rounded-full font-label-md text-[11px]">MongoDB</span>
-      </div>
-
-      <div class="flex justify-between items-center mt-auto pt-4 border-t border-[#2a2a4a]/50">
-        <div class="flex items-center gap-2 text-on-surface-variant text-xs">
-          <span class="material-symbols-outlined text-[14px]">calendar_today</span>
-          25.06.2026
-        </div>
-        <button class="border border-outline-variant text-on-surface hover:bg-[#1a2340] px-4 py-1.5 rounded-lg text-xs font-semibold transition-colors">
-          Profili Gör
-        </button>
-      </div>
-    </div>
-
-    <!-- Card 4 -->
-    <div class="bg-[#13132b] border border-[#2a2a4a] rounded-xl p-6 hover:border-primary/50 transition-colors flex flex-col justify-between h-[200px]">
-      <div class="flex justify-between items-start">
-        <div class="flex gap-4">
-          <div class="w-12 h-12 rounded-full bg-secondary-container text-on-secondary-container flex items-center justify-center font-bold text-lg">EŞ</div>
-          <div>
-            <h4 class="font-bold text-on-surface">Elif Şahin</h4>
-            <p class="text-on-surface-variant text-sm mt-0.5">UI/UX Tasarımcı</p>
-          </div>
-        </div>
-        <div class="flex items-center gap-1 text-yellow-400 bg-yellow-400/10 px-2 py-1 rounded font-bold text-xs">
-          <span class="material-symbols-outlined text-[14px]">warning</span>
-          %79 Uyum
-        </div>
-      </div>
-      
-      <div class="flex gap-2 mt-4">
-        <span class="bg-purple-900/30 text-purple-300 px-3 py-1 rounded-full font-label-md text-[11px]">Figma</span>
-        <span class="bg-purple-900/30 text-purple-300 px-3 py-1 rounded-full font-label-md text-[11px]">React</span>
-        <span class="bg-purple-900/30 text-purple-300 px-3 py-1 rounded-full font-label-md text-[11px]">CSS</span>
-      </div>
-
-      <div class="flex justify-between items-center mt-auto pt-4 border-t border-[#2a2a4a]/50">
-        <div class="flex items-center gap-2 text-on-surface-variant text-xs">
-          <span class="material-symbols-outlined text-[14px]">calendar_today</span>
-          20.06.2026
-        </div>
-        <button class="border border-outline-variant text-on-surface hover:bg-[#1a2340] px-4 py-1.5 rounded-lg text-xs font-semibold transition-colors">
-          Profili Gör
-        </button>
-      </div>
-    </div>
-
+  <div id="candidates-grid" class="grid grid-cols-1 md:grid-cols-2 gap-6">
+    <!-- Loading skeleton -->
+    <div class="bg-[#13132b] border border-[#2a2a4a] rounded-xl p-6 animate-pulse h-[200px]"></div>
+    <div class="bg-[#13132b] border border-[#2a2a4a] rounded-xl p-6 animate-pulse h-[200px]"></div>
   </div>
 
+  <style>
+    .filter-pill.active {
+      background-color: #7c5cfc;
+      color: white;
+      border-color: #7c5cfc;
+    }
+    .filter-pill:not(.active) {
+      background-color: transparent;
+    }
+  </style>
+
+  <script is:inline>
+    let currentFilter = 'all';
+    let searchTimeout = null;
+
+    const COLORS = [
+      'bg-primary-container text-on-primary-container',
+      'bg-secondary-container text-on-secondary-container',
+      'bg-tertiary-container text-on-tertiary-container',
+    ];
+
+    function getInitials(name, email) {
+      const src = name || email || '??';
+      return src.substring(0, 2).toUpperCase();
+    }
+
+    function getScoreBadge(status, score) {
+      if (!status) {
+        return '<div class="flex items-center gap-1 text-on-surface-variant bg-surface-container px-2 py-1 rounded text-xs">CV Yok</div>';
+      }
+      if (status === 'COMPLETED' && score !== null) {
+        const color = score >= 80 ? 'text-green-400 bg-green-400/10' : score >= 60 ? 'text-yellow-400 bg-yellow-400/10' : 'text-red-400 bg-red-400/10';
+        const icon = score >= 80 ? 'auto_awesome' : score >= 60 ? 'warning' : 'error';
+        return `<div class="flex items-center gap-1 ${color} px-2 py-1 rounded font-bold text-xs"><span class="material-symbols-outlined text-[14px]">${icon}</span>%${score} ATS</div>`;
+      }
+      if (status === 'PROCESSING') {
+        return '<div class="flex items-center gap-1 text-blue-400 bg-blue-400/10 px-2 py-1 rounded text-xs"><span class="material-symbols-outlined text-[14px] animate-spin">progress_activity</span>İşleniyor</div>';
+      }
+      return '<div class="flex items-center gap-1 text-on-surface-variant bg-surface-container px-2 py-1 rounded text-xs"><span class="material-symbols-outlined text-[14px]">schedule</span>Bekliyor</div>';
+    }
+
+    function renderSkills(skills) {
+      if (!skills || !Array.isArray(skills) || skills.length === 0) {
+        return '<span class="text-on-surface-variant text-xs italic">Henüz analiz yok</span>';
+      }
+      return skills.slice(0, 3).map(s =>
+        `<span class="bg-purple-900/30 text-purple-300 px-3 py-1 rounded-full font-label-md text-[11px]">${s}</span>`
+      ).join('');
+    }
+
+    function renderCandidates(candidates) {
+      const grid = document.getElementById('candidates-grid');
+      const countEl = document.getElementById('result-count');
+
+      if (candidates.length === 0) {
+        grid.innerHTML = `
+          <div class="col-span-2 bg-[#13132b] border border-[#2a2a4a] rounded-xl p-12 flex flex-col items-center justify-center text-center">
+            <span class="material-symbols-outlined text-5xl text-on-surface-variant/30 mb-4">person_search</span>
+            <p class="text-on-surface-variant font-body-md">Hiç aday bulunamadı.</p>
+          </div>`;
+        countEl.textContent = '0 aday bulundu';
+        return;
+      }
+
+      countEl.textContent = `${candidates.length} aday bulundu`;
+
+      grid.innerHTML = candidates.map((c, i) => {
+        const initials = getInitials(c.name, c.email);
+        const colorClass = COLORS[i % COLORS.length];
+        const date = new Date(c.createdAt).toLocaleDateString('tr-TR');
+        const scoreBadge = getScoreBadge(c.analysisStatus, c.atsScore);
+        const skillsHtml = renderSkills(c.skills);
+
+        return `
+          <div class="bg-[#13132b] border border-[#2a2a4a] rounded-xl p-6 hover:border-primary/50 transition-colors flex flex-col justify-between min-h-[200px]">
+            <div class="flex justify-between items-start">
+              <div class="flex gap-4">
+                <div class="w-12 h-12 rounded-full ${colorClass} flex items-center justify-center font-bold text-lg flex-shrink-0">${initials}</div>
+                <div>
+                  <h4 class="font-bold text-on-surface">${c.name || 'İsimsiz'}</h4>
+                  <p class="text-on-surface-variant text-sm mt-0.5">${c.email}</p>
+                  <p class="text-on-surface-variant text-xs mt-0.5">${c.cvCount} CV yüklendi</p>
+                </div>
+              </div>
+              ${scoreBadge}
+            </div>
+            
+            <div class="flex gap-2 mt-4 flex-wrap">
+              ${skillsHtml}
+            </div>
+
+            <div class="flex justify-between items-center mt-auto pt-4 border-t border-[#2a2a4a]/50">
+              <div class="flex items-center gap-2 text-on-surface-variant text-xs">
+                <span class="material-symbols-outlined text-[14px]">calendar_today</span>
+                ${date}
+              </div>
+              <a href="/profile?userId=${c.id}" class="border border-outline-variant text-on-surface hover:bg-[#1a2340] px-4 py-1.5 rounded-lg text-xs font-semibold transition-colors">
+                Profili Gör
+              </a>
+            </div>
+          </div>
+        `;
+      }).join('');
+    }
+
+    async function fetchCandidates() {
+      const search = document.getElementById('search-input').value.trim();
+      const grid = document.getElementById('candidates-grid');
+      const countEl = document.getElementById('result-count');
+
+      grid.innerHTML = `
+        <div class="bg-[#13132b] border border-[#2a2a4a] rounded-xl p-6 animate-pulse h-[200px]"></div>
+        <div class="bg-[#13132b] border border-[#2a2a4a] rounded-xl p-6 animate-pulse h-[200px]"></div>
+      `;
+      countEl.textContent = 'Yükleniyor...';
+
+      try {
+        const params = new URLSearchParams({ filter: currentFilter });
+        if (search) params.set('search', search);
+
+        const res = await fetch(`/api/admin/candidates?${params}`);
+        if (res.ok) {
+          const data = await res.json();
+          renderCandidates(data.candidates || []);
+        } else if (res.status === 401 || res.status === 403) {
+          grid.innerHTML = '<div class="col-span-2 p-8 text-center text-red-400">Bu sayfayı görüntülemek için Yönetici yetkisi gereklidir.</div>';
+        } else {
+          grid.innerHTML = '<div class="col-span-2 p-8 text-center text-red-400">Adaylar yüklenirken bir hata oluştu.</div>';
+        }
+      } catch (err) {
+        grid.innerHTML = '<div class="col-span-2 p-8 text-center text-red-400">Sunucuya bağlanılamadı.</div>';
+      }
+    }
+
+    // Filter pill clicks
+    document.getElementById('filter-pills').addEventListener('click', (e) => {
+      const btn = e.target.closest('[data-filter]');
+      if (!btn) return;
+      currentFilter = btn.dataset.filter;
+      document.querySelectorAll('.filter-pill').forEach(p => p.classList.remove('active'));
+      btn.classList.add('active');
+      fetchCandidates();
+    });
+
+    // Search button
+    document.getElementById('search-btn').addEventListener('click', fetchCandidates);
+
+    // Search on Enter / debounce
+    document.getElementById('search-input').addEventListener('keydown', (e) => {
+      if (e.key === 'Enter') fetchCandidates();
+    });
+    document.getElementById('search-input').addEventListener('input', () => {
+      clearTimeout(searchTimeout);
+      searchTimeout = setTimeout(fetchCandidates, 500);
+    });
+
+    // Initial load
+    document.addEventListener('DOMContentLoaded', fetchCandidates);
+  </script>
 </AdminLayout>

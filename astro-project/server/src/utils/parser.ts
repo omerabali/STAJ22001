@@ -75,6 +75,74 @@ export function chunkTextBySections(text: string): string[] {
       .trim();
   };
 
+  const matchHeading = (line: string): string | null => {
+    const trimmed = line.trim();
+    if (trimmed.length === 0 || trimmed.length > 40) return null;
+    
+    // Header should not end with punctuation like a sentence
+    if (trimmed.endsWith(".") || trimmed.endsWith(",") || trimmed.endsWith(";")) return null;
+    
+    const norm = normalize(trimmed);
+    const wordCount = trimmed.split(/\s+/).length;
+    
+    // We only match short lines (e.g. <= 4 words)
+    if (wordCount > 4) return null;
+
+    const categories = [
+      { key: "deneyim", label: "Deneyimler" },
+      { key: "tecrube", label: "Deneyimler" },
+      { key: "experience", label: "Deneyimler" },
+      { key: "history", label: "Deneyimler" },
+      { key: "staj", label: "Deneyimler" },
+      { key: "employment", label: "Deneyimler" },
+      { key: "career", label: "Deneyimler" },
+      
+      { key: "egitim", label: "Eğitim" },
+      { key: "education", label: "Eğitim" },
+      { key: "academic", label: "Eğitim" },
+      { key: "okul", label: "Eğitim" },
+      { key: "universite", label: "Eğitim" },
+      { key: "lisans", label: "Eğitim" },
+      
+      { key: "yetenek", label: "Yetenekler" },
+      { key: "skills", label: "Yetenekler" },
+      { key: "tools", label: "Yetenekler" },
+      { key: "teknoloji", label: "Yetenekler" },
+      
+      { key: "proje", label: "Projeler" },
+      { key: "projects", label: "Projeler" },
+      
+      { key: "sertifika", label: "Sertifikalar" },
+      { key: "certificate", label: "Sertifikalar" },
+      { key: "kurs", label: "Sertifikalar" },
+      { key: "seminer", label: "Sertifikalar" },
+      
+      { key: "dil", label: "Diller" },
+      { key: "language", label: "Diller" },
+      
+      { key: "hakkimda", label: "Hakkımda" },
+      { key: "ozet", label: "Hakkımda" },
+      { key: "summary", label: "Hakkımda" },
+      { key: "about me", label: "Hakkımda" },
+      { key: "profile", label: "Hakkımda" },
+      { key: "profil", label: "Hakkımda" },
+      
+      { key: "iletisim", label: "İletişim" },
+      { key: "contact", label: "İletişim" },
+      
+      { key: "referans", label: "Referanslar" },
+      { key: "references", label: "Referanslar" }
+    ];
+
+    for (const cat of categories) {
+      if (norm.includes(cat.key)) {
+        return cat.label;
+      }
+    }
+
+    return null;
+  };
+
   const saveCurrentSection = () => {
     if (currentSectionLines.length > 0) {
       const content = currentSectionLines.join("\n").trim();
@@ -93,15 +161,12 @@ export function chunkTextBySections(text: string): string[] {
     const line = rawLine.trim();
     if (line === "") continue;
 
-    // Check if the line matches one of the section headings
-    const isHeading = line.length < 45 && SECTION_HEADINGS.some(heading => {
-      return normalize(line) === normalize(heading);
-    });
+    const matchedTitle = matchHeading(line);
 
-    if (isHeading) {
+    if (matchedTitle) {
       saveCurrentSection();
       // Start new section
-      currentSectionTitle = line;
+      currentSectionTitle = matchedTitle;
       currentSectionLines = [];
     } else {
       currentSectionLines.push(rawLine);

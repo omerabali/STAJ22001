@@ -153,7 +153,7 @@ import AdminLayout from '../../layouts/AdminLayout.astro';
                 </td>
                 <td class="p-4">
                   ${!isMe ? `
-                    <button onclick="changeRole('${user.id}', '${user.role === 'ADMIN' ? 'CANDIDATE' : 'ADMIN'}')" class="text-primary hover:text-primary-fixed font-label-md text-xs transition-colors">
+                    <button onclick="changeRole('${user.id}', '${user.role === 'ADMIN' ? 'CANDIDATE' : 'ADMIN'}')\" class="text-primary hover:text-primary-fixed font-label-md text-xs transition-colors">
                       ${user.role === 'ADMIN' ? 'Aday Yap' : 'Yönetici Yap'}
                     </button>
                   ` : '<span class="text-on-surface-variant text-xs">Yetki değiştirilemez</span>'}

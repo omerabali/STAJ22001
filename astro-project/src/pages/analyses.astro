@@ -3,29 +3,35 @@ import UserLayout from '../layouts/UserLayout.astro';
 ---
 
 <UserLayout title="Beacon AI - Analiz Sonuçlarım" headerTitle="Analiz Sonuçlarım">
-  <div class="grid grid-cols-1 lg:grid-cols-12 gap-lg">
-    
-    <!-- Left side: CV list -->
-    <div class="lg:col-span-7 space-y-lg">
-      <div class="bg-surface-container rounded-xl border border-outline-variant overflow-hidden" id="my-analyses">
-        <div class="p-lg border-b border-outline-variant bg-surface-container/50">
-          <h3 class="text-headline-sm font-bold text-on-surface">Tüm Yüklenen CV'ler</h3>
-          <p class="text-on-surface-variant text-body-sm mt-xs">Sistemdeki tüm özgeçmişlerinizi ve analiz durumlarını buradan yönetebilirsiniz.</p>
+  <div class="flex gap-6 h-full min-h-[600px] flex-col lg:flex-row">
+
+    <!-- ═══════════════════════════════════════
+         LEFT PANEL: Tüm CV Listesi
+    ════════════════════════════════════════ -->
+    <div class="flex flex-col flex-1 min-w-0">
+      <div class="glass-card rounded-2xl flex flex-col overflow-hidden h-full shadow-[0_8px_32px_rgba(0,0,0,0.4)]">
+        <!-- Panel Header -->
+        <div class="p-6 border-b border-brand-border/60 relative overflow-hidden">
+          <div class="absolute inset-0 bg-gradient-to-r from-brand-accent/5 to-transparent pointer-events-none"></div>
+          <h3 class="text-lg font-bold text-brand-text relative z-10">Tüm Yüklenen CV'ler</h3>
+          <p class="text-sm text-brand-muted mt-1 relative z-10">Tüm özgeçmişlerinizi ve analiz durumlarını buradan yönetebilirsiniz.</p>
         </div>
-        <div class="overflow-x-auto">
-          <table class="w-full text-left border-collapse">
-            <thead>
-              <tr class="bg-surface-variant/30 text-label-sm text-on-surface-variant border-b border-outline-variant">
-                <th class="p-md font-medium">Belge Adı</th>
-                <th class="p-md font-medium">Yükleme Tarihi</th>
-                <th class="p-md font-medium">Analiz Durumu</th>
-                <th class="p-md font-medium">Uyum Skoru</th>
-                <th class="p-md font-medium text-right">İşlem</th>
+
+        <!-- Table -->
+        <div class="flex-1 overflow-auto custom-scrollbar p-2">
+          <table class="w-full text-left text-sm text-brand-text border-separate border-spacing-y-1">
+            <thead class="text-xs text-brand-muted uppercase sticky top-0 z-10 backdrop-blur-md">
+              <tr>
+                <th class="px-5 py-3 font-semibold rounded-tl-lg" scope="col">Belge Adı</th>
+                <th class="px-5 py-3 font-semibold text-center" scope="col">Yükleme Tarihi</th>
+                <th class="px-5 py-3 font-semibold text-center" scope="col">Analiz Durumu</th>
+                <th class="px-5 py-3 font-semibold text-center" scope="col">Uyum Skoru</th>
+                <th class="px-5 py-3 font-semibold text-right rounded-tr-lg" scope="col">İşlem</th>
               </tr>
             </thead>
-            <tbody class="text-body-sm" id="my-cvs-body">
+            <tbody id="my-cvs-body">
               <tr>
-                <td colspan="5" class="p-lg text-center text-on-surface-variant">Yüklemeler sorgulanıyor...</td>
+                <td colspan="5" class="px-6 py-8 text-center text-brand-muted">Yüklemeler sorgulanıyor...</td>
               </tr>
             </tbody>
           </table>
@@ -33,31 +39,68 @@ import UserLayout from '../layouts/UserLayout.astro';
       </div>
     </div>
 
-    <!-- Right side: Detail Panel -->
-    <div class="lg:col-span-5">
-      <div class="bg-surface-container rounded-xl border border-outline-variant p-lg h-full flex flex-col min-h-[480px]" id="analysis-detail-card">
-        <div class="text-center py-xl text-on-surface-variant flex flex-col items-center justify-center h-full space-y-md my-auto" id="no-analysis-state">
-          <span class="material-symbols-outlined text-[64px] text-outline">analytics</span>
-          <h4 class="text-headline-sm font-bold text-on-surface">Detaylı Analiz Paneli</h4>
-          <p class="text-body-sm text-center max-w-[280px]">Yandaki listeden bir özgeçmiş seçerek yapay zeka analiz raporunu detaylıca görüntüleyebilirsiniz.</p>
-        </div>
+    <!-- ═══════════════════════════════════════
+         RIGHT PANEL: Detay / Boş Durum
+    ════════════════════════════════════════ -->
+    <div class="w-full lg:w-[480px] xl:w-[540px] flex-shrink-0">
+      <div class="glass-card rounded-2xl h-full flex flex-col shadow-[0_8px_32px_rgba(0,0,0,0.5)] relative overflow-hidden" id="analysis-detail-card">
 
-        <!-- Active Analysis State (Initially Hidden) -->
-        <div class="hidden space-y-lg h-full flex flex-col" id="active-analysis-state">
-          <div class="flex items-center justify-between pb-md border-b border-outline-variant shrink-0">
-            <div>
-              <h4 class="text-headline-sm font-bold text-on-surface truncate max-w-[220px]" id="analysis-cv-name">Özgeçmiş</h4>
-              <p class="text-label-md text-on-surface-variant">Yapay Zeka Analiz Raporu</p>
-            </div>
-            <div id="analysis-status-indicator">
-              <span class="material-symbols-outlined text-[#4ade80] text-3xl">verified</span>
+        <!-- Background accent glow -->
+        <div class="absolute top-0 right-0 w-64 h-64 bg-brand-accent/5 rounded-full blur-3xl pointer-events-none"></div>
+
+        <!-- ─── EMPTY STATE ─── -->
+        <div class="flex flex-col items-center justify-center h-full p-8 relative z-10" id="no-analysis-state">
+          <!-- Atmospheric dot grid -->
+          <div class="absolute inset-0 pointer-events-none opacity-40"
+            style="background-image: radial-gradient(circle at center, rgba(56,189,248,0.04) 1px, transparent 1px); background-size: 22px 22px;">
+          </div>
+
+          <!-- Animated icon cluster -->
+          <div class="w-44 h-44 mb-6 relative flex items-center justify-center animate-float">
+            <div class="absolute w-36 h-36 bg-brand-accent/8 rounded-full blur-2xl mix-blend-screen animate-pulse-slow"></div>
+            <div class="absolute w-40 h-40 border border-brand-accent/8 rounded-full animate-spin-slow"></div>
+            <div class="w-32 h-32 rounded-full border border-brand-accent/20 bg-brand-card/40 flex items-center justify-center relative shadow-[inset_0_0_24px_rgba(56,189,248,0.08)]">
+              <div class="absolute inset-0 rounded-full border border-brand-accent/15 animate-ping opacity-30"></div>
+              <!-- Chart-pie icon like Stitch design -->
+              <i class="fa-solid fa-chart-pie text-brand-accent text-5xl drop-shadow-[0_0_18px_rgba(56,189,248,0.6)]"></i>
             </div>
           </div>
 
-          <div id="analysis-content-area" class="space-y-lg flex flex-col h-full overflow-hidden">
-            <!-- Dynamic Report Content -->
+          <div class="text-center relative z-10 max-w-xs">
+            <h3 class="text-xl font-bold text-brand-text mb-2">Detaylı Analiz Paneli</h3>
+            <p class="text-sm text-brand-muted leading-relaxed">
+              Yandaki listeden bir özgeçmiş seçerek yapay zeka analiz raporunu detaylıca görüntüleyebilirsiniz.
+            </p>
+          </div>
+
+          <!-- Bottom hint bar -->
+          <div class="mt-8 w-full border-t border-brand-border/40 pt-4 flex items-center justify-center gap-2 text-xs text-brand-muted/60 relative z-10">
+            <i class="fa-solid fa-microchip text-brand-accent/50 animate-pulse"></i>
+            <span>Beacon AI sistemi analiz için hazır bekliyor.</span>
           </div>
         </div>
+
+        <!-- ─── ACTIVE ANALYSIS STATE ─── -->
+        <div class="hidden flex-col h-full relative z-10" id="active-analysis-state">
+
+          <!-- Panel Header -->
+          <div class="p-6 border-b border-brand-border/60 flex items-start justify-between">
+            <div class="min-w-0 flex-1">
+              <h3 class="text-lg font-extrabold text-brand-text truncate tracking-tight max-w-[280px]" id="analysis-cv-name">Özgeçmiş</h3>
+              <p class="text-xs text-brand-accent/80 font-medium mt-0.5">Yapay Zeka Analiz Raporu</p>
+            </div>
+            <div id="analysis-status-indicator" class="shrink-0 ml-3">
+              <span class="material-symbols-outlined text-brand-success text-3xl">verified</span>
+            </div>
+          </div>
+
+          <!-- Scrollable Content -->
+          <div class="flex-1 overflow-y-auto custom-scrollbar p-6 flex flex-col gap-6" id="analysis-content-area">
+            <!-- Dynamic content injected here -->
+          </div>
+
+          </div>
+
       </div>
     </div>
 
@@ -69,24 +112,19 @@ import UserLayout from '../layouts/UserLayout.astro';
 
     // Delete CV handler
     window.deleteCV = async function(cvId) {
-      if (!confirm('Bu özgeçmişi ve tüm ilişkili verileri silmek istediğinize emin misiniz?')) {
-        return;
-      }
+      if (!confirm('Bu özgeçmişi ve tüm ilişkili verileri silmek istediğinize emin misiniz?')) return;
       try {
-        const res = await fetch(`/api/cv/${cvId}`, {
-          method: 'DELETE'
-        });
+        const res = await fetch(`/api/cv/${cvId}`, { method: 'DELETE' });
         if (!res.ok) {
           const err = await res.json();
           throw new Error(err.message || 'Silme işlemi başarısız.');
         }
-        
         if (selectedCvId === cvId) {
           selectedCvId = null;
           document.getElementById('no-analysis-state').classList.remove('hidden');
+          document.getElementById('active-analysis-state').classList.remove('flex');
           document.getElementById('active-analysis-state').classList.add('hidden');
         }
-        
         await loadCVList();
       } catch (err) {
         console.error(err);
@@ -105,7 +143,7 @@ import UserLayout from '../layouts/UserLayout.astro';
         if (!data.cvs || data.cvs.length === 0) {
           tbody.innerHTML = `
             <tr>
-              <td colspan="5" class="p-lg text-center text-on-surface-variant">Henüz yüklenmiş bir CV bulunamadı.</td>
+              <td colspan="5" class="px-6 py-10 text-center text-brand-muted">Henüz yüklenmiş bir CV bulunamadı.</td>
             </tr>
           `;
           return;
@@ -114,97 +152,95 @@ import UserLayout from '../layouts/UserLayout.astro';
         tbody.innerHTML = '';
         let hasPendingOrProcessing = false;
 
-        // Scan all CVs for pending status to control polling
         data.cvs.forEach(cv => {
           const latestAnalysis = cv.analyses && cv.analyses[0];
           const status = latestAnalysis ? latestAnalysis.status : 'PENDING';
-          if (status === 'PENDING' || status === 'PROCESSING') {
-            hasPendingOrProcessing = true;
-          }
-        });
-
-        // Display ALL CVs in the list (no slice limit!)
-        data.cvs.forEach(cv => {
-          const latestAnalysis = cv.analyses && cv.analyses[0];
-          const status = latestAnalysis ? latestAnalysis.status : 'PENDING';
+          if (status === 'PENDING' || status === 'PROCESSING') hasPendingOrProcessing = true;
           const dateStr = new Date(cv.createdAt).toLocaleDateString('tr-TR');
-          
+
+          // Status badge
           let statusBadge = '';
           if (status === 'PENDING') {
-            statusBadge = `
-              <span class="inline-flex items-center gap-xs px-2 py-1 rounded-full bg-surface-container-high text-on-surface-variant border border-outline-variant text-label-sm">
-                <span class="w-1.5 h-1.5 rounded-full bg-outline-variant animate-pulse"></span> Sırada
-              </span>
-            `;
+            statusBadge = `<span class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-semibold bg-yellow-500/10 text-yellow-400 border border-yellow-500/20"><span class="w-1.5 h-1.5 rounded-full bg-yellow-400 animate-pulse"></span>Sırada</span>`;
           } else if (status === 'PROCESSING') {
-            statusBadge = `
-              <span class="inline-flex items-center gap-xs px-2 py-1 rounded-full bg-primary/10 text-primary border border-primary/20 text-label-sm">
-                <span class="w-1.5 h-1.5 rounded-full bg-primary animate-ping"></span> İşleniyor...
-              </span>
-            `;
+            statusBadge = `<span class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-semibold bg-brand-accent/10 text-brand-accent border border-brand-accent/20"><span class="w-1.5 h-1.5 rounded-full bg-brand-accent animate-spin"></span>İşleniyor...</span>`;
           } else if (status === 'COMPLETED') {
-            statusBadge = `
-              <span class="inline-flex items-center gap-xs px-2 py-1 rounded-full bg-[#112a20] text-[#4ade80] border border-[#14532d] text-label-sm">
-                <span class="w-1.5 h-1.5 rounded-full bg-[#4ade80]"></span> Hazır
-              </span>
-            `;
+            statusBadge = `<span class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-semibold bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 shadow-[0_0_10px_rgba(52,211,153,0.1)]"><span class="w-1.5 h-1.5 rounded-full bg-emerald-400 shadow-[0_0_5px_rgba(52,211,153,0.8)]"></span>Hazır</span>`;
           } else {
-            statusBadge = `
-              <span class="inline-flex items-center gap-xs px-2 py-1 rounded-full bg-error/10 text-error border border-error/20 text-label-sm">
-                <span class="w-1.5 h-1.5 rounded-full bg-error"></span> Hata
-              </span>
-            `;
+            statusBadge = `<span class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-semibold bg-red-500/10 text-red-400 border border-red-500/20 shadow-[0_0_10px_rgba(239,68,68,0.1)]"><span class="w-1.5 h-1.5 rounded-full bg-red-400"></span>Hata</span>`;
           }
 
-          const scoreStr = latestAnalysis && latestAnalysis.atsScore !== null ? `%${latestAnalysis.atsScore}` : '-';
+          // Score column
+          let scoreCell = '';
+          if (latestAnalysis && latestAnalysis.atsScore !== null) {
+            const pct = latestAnalysis.atsScore;
+            scoreCell = `
+              <div class="relative inline-flex items-center justify-center w-12 h-12">
+                <svg class="w-full h-full transform -rotate-90" viewBox="0 0 36 36">
+                  <path class="text-brand-border" d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831" fill="none" stroke="currentColor" stroke-width="3"></path>
+                  <path class="text-brand-accent drop-shadow-[0_0_4px_rgba(56,189,248,0.8)]" d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831" fill="none" stroke="currentColor" stroke-dasharray="${pct}, 100" stroke-width="3"></path>
+                </svg>
+                <div class="absolute flex flex-col items-center justify-center text-brand-accent font-mono text-xs font-bold">
+                  ${pct}<span class="text-[8px] -mt-1 opacity-70">%</span>
+                </div>
+              </div>`;
+          } else {
+            scoreCell = `<span class="text-brand-muted font-mono text-sm">—</span>`;
+          }
 
+          const isSelected = selectedCvId === cv.id;
           const tr = document.createElement('tr');
-          tr.className = `border-b border-outline-variant/50 hover:bg-surface-variant/40 transition-colors cursor-pointer ${selectedCvId === cv.id ? 'bg-surface-variant/30' : ''}`;
+          tr.className = `group rounded-xl cursor-pointer transition-all duration-200 ${
+            isSelected
+              ? 'bg-brand-accent/10 shadow-[inset_0_0_0_1px_rgba(56,189,248,0.3)]'
+              : 'hover:bg-white/[0.03]'
+          }`;
+
           tr.onclick = () => {
             selectedCvId = cv.id;
-            const rows = tbody.querySelectorAll('tr');
-            rows.forEach(r => r.classList.remove('bg-surface-variant/30'));
-            tr.classList.add('bg-surface-variant/30');
+            // Update row highlights
+            document.querySelectorAll('#my-cvs-body tr').forEach(r => {
+              r.classList.remove('bg-brand-accent/10', 'shadow-[inset_0_0_0_1px_rgba(56,189,248,0.3)]');
+              r.classList.add('hover:bg-white/[0.03]');
+            });
+            tr.classList.add('bg-brand-accent/10', 'shadow-[inset_0_0_0_1px_rgba(56,189,248,0.3)]');
+            tr.classList.remove('hover:bg-white/[0.03]');
             showAnalysisDetails(cv, latestAnalysis);
           };
 
           tr.innerHTML = `
-            <td class="p-md">
-              <div class="flex items-center gap-sm">
-                <span class="material-symbols-outlined text-primary">description</span>
-                <span class="font-medium text-on-surface truncate max-w-[180px]">${cv.fileName}</span>
+            <td class="px-5 py-4 rounded-l-xl">
+              <div class="flex items-center gap-3 overflow-hidden">
+                <div class="w-8 h-8 rounded-lg bg-brand-accent/10 flex items-center justify-center border border-brand-accent/20 group-hover:border-brand-accent/40 transition-colors shrink-0">
+                  <i class="fa-regular fa-file-lines text-brand-accent"></i>
+                </div>
+                <span class="font-semibold text-brand-text truncate max-w-[180px] group-hover:text-white transition-colors">${cv.fileName}</span>
               </div>
             </td>
-            <td class="p-md text-on-surface-variant">${dateStr}</td>
-            <td class="p-md">${statusBadge}</td>
-            <td class="p-md"><span class="font-bold text-primary">${scoreStr}</span></td>
-            <td class="p-md text-right" onclick="event.stopPropagation();">
-              <button class="text-error hover:bg-error/10 p-xs rounded-md transition-colors inline-flex items-center justify-center" onclick="deleteCV('${cv.id}')" title="Sil">
-                <span class="material-symbols-outlined text-body-lg">delete</span>
+            <td class="px-5 py-4 text-center text-brand-muted font-mono text-xs">${dateStr}</td>
+            <td class="px-5 py-4 text-center">${statusBadge}</td>
+            <td class="px-5 py-4 text-center">${scoreCell}</td>
+            <td class="px-5 py-4 text-right rounded-r-xl" onclick="event.stopPropagation();">
+              <button
+                class="text-brand-muted hover:text-red-400 hover:bg-red-500/10 p-2 rounded-lg transition-all duration-300"
+                onclick="deleteCV('${cv.id}')"
+                title="Sil">
+                <i class="fa-regular fa-trash-can"></i>
               </button>
             </td>
           `;
           tbody.appendChild(tr);
 
-          // Keep updating selected analysis details in real-time
-          if (selectedCvId === cv.id) {
-            showAnalysisDetails(cv, latestAnalysis);
-          }
+          if (selectedCvId === cv.id) showAnalysisDetails(cv, latestAnalysis);
         });
 
-        // Poll every 3 seconds if status is changing
         if (hasPendingOrProcessing) {
-          if (!activeInterval) {
-            activeInterval = setInterval(loadCVList, 3000);
-          }
+          if (!activeInterval) activeInterval = setInterval(loadCVList, 3000);
         } else {
-          if (activeInterval) {
-            clearInterval(activeInterval);
-            activeInterval = null;
-          }
+          if (activeInterval) { clearInterval(activeInterval); activeInterval = null; }
         }
       } catch (err) {
-        console.error("CV yükleme geçmişi alınamadı:", err);
+        console.error('CV yükleme geçmişi alınamadı:', err);
       }
     }
 
@@ -215,6 +251,7 @@ import UserLayout from '../layouts/UserLayout.astro';
 
       noState.classList.add('hidden');
       activeState.classList.remove('hidden');
+      activeState.classList.add('flex');
 
       document.getElementById('analysis-cv-name').textContent = cv.fileName;
 
@@ -222,155 +259,144 @@ import UserLayout from '../layouts/UserLayout.astro';
       const contentArea = document.getElementById('analysis-content-area');
 
       if (!analysis) return;
-
       const status = analysis.status;
 
       if (status === 'COMPLETED') {
-        statusIndicator.innerHTML = `<span class="material-symbols-outlined text-[#4ade80] text-3xl">verified</span>`;
-        contentArea.classList.remove('hidden');
+        statusIndicator.innerHTML = `<span class="material-symbols-outlined text-emerald-400 text-3xl drop-shadow-[0_0_8px_rgba(52,211,153,0.7)]">verified</span>`;
 
         if (analysis.atsScore === null) {
-          // Day 13 completed state: text chunks successfully generated but AI scoring is not done
-          const chunkHtml = cv.chunks && cv.chunks.length > 0 
-            ? cv.chunks.map((chunk, idx) => {
-                const firstLineBreak = chunk.content.indexOf('\n');
-                const header = firstLineBreak !== -1 ? chunk.content.substring(0, firstLineBreak) : `PARÇA #${idx + 1}`;
-                const body = firstLineBreak !== -1 ? chunk.content.substring(firstLineBreak + 1) : chunk.content;
-                const wordCount = body.split(/\s+/).filter(w => w.length > 0).length;
+          // Day 13: chunks + skills, no score yet
+          const skillsHtml = Array.isArray(analysis.skills) && analysis.skills.length > 0
+            ? analysis.skills.map(s => `
+                <span class="px-3 py-1.5 rounded-lg text-xs font-semibold bg-brand-accent/10 text-brand-accent border border-brand-accent/20 shadow-[0_2px_10px_rgba(56,189,248,0.1)] hover:bg-brand-accent/20 hover:border-brand-accent/40 transition-all cursor-default">${s}</span>
+              `).join('')
+            : `<span class="text-xs text-brand-muted">Yetenek kelimeleri çıkarılamadı.</span>`;
 
+          const chunkHtml = cv.chunks && cv.chunks.length > 0
+            ? cv.chunks.map((chunk, idx) => {
+                const firstLB = chunk.content.indexOf('\n');
+                const header = firstLB !== -1 ? chunk.content.substring(0, firstLB) : `PARÇA #${idx + 1}`;
+                const body = firstLB !== -1 ? chunk.content.substring(firstLB + 1) : chunk.content;
+                const wordCount = body.split(/\s+/).filter(w => w.length > 0).length;
+                const isFirst = idx === 0;
                 return `
-                  <div class="bg-surface-container-low border border-outline-variant/60 p-md rounded-lg space-y-xs text-left">
-                    <div class="flex justify-between text-label-sm font-bold text-primary">
-                      <span>${header}</span>
-                      <span class="text-on-surface-variant">${wordCount} kelime</span>
+                  <div class="${isFirst
+                    ? 'bg-brand-bg/60 border border-brand-accent/40 rounded-xl overflow-hidden shadow-[0_0_20px_rgba(56,189,248,0.15),inset_0_2px_10px_rgba(0,0,0,0.5)] relative'
+                    : 'bg-brand-bg/30 border border-brand-border/30 rounded-xl overflow-hidden hover:border-brand-border/60 transition-colors duration-300'
+                  }">
+                    ${isFirst ? '<div class="absolute left-0 top-0 bottom-0 w-1 bg-brand-accent shadow-[0_0_10px_rgba(56,189,248,0.8)]"></div>' : ''}
+                    <div class="px-4 py-2 border-b border-brand-border/30 flex justify-between items-center ${isFirst ? 'pl-5' : ''}">
+                      <span class="text-xs font-bold ${isFirst ? 'text-brand-accent' : 'text-brand-muted'} tracking-wide">${header}</span>
+                      <span class="text-[10px] font-semibold ${isFirst ? 'text-brand-accent/70 bg-brand-accent/10' : 'text-brand-muted/60 bg-white/5'} px-2 py-0.5 rounded-md">${wordCount} kelime</span>
                     </div>
-                    <p class="text-body-sm text-on-surface whitespace-pre-wrap select-all font-mono leading-relaxed max-h-[120px] overflow-y-auto pr-xs mt-xs">
+                    <div class="p-4 text-xs text-brand-muted font-mono whitespace-pre-wrap leading-relaxed max-h-28 overflow-hidden relative ${isFirst ? 'pl-5' : ''}">
                       ${body}
-                    </p>
+                      <div class="absolute bottom-0 left-0 right-0 h-8 bg-gradient-to-t from-brand-card/90 to-transparent pointer-events-none"></div>
+                    </div>
                   </div>
                 `;
               }).join('')
-            : `<p class="text-body-sm text-on-surface-variant text-center py-md">Metin parçaları veritabanında bulunamadı.</p>`;
-
-          const skillsHtml = Array.isArray(analysis.skills) && analysis.skills.length > 0
-            ? analysis.skills.map(s => `<span class="px-sm py-xs bg-primary/10 border border-primary/20 text-primary text-label-sm rounded-md font-semibold">${s}</span>`).join('')
-            : `<span class="text-label-sm text-on-surface-variant">Yetenek kelimeleri çıkarılamadı.</span>`;
+            : `<p class="text-xs text-brand-muted text-center py-6">Metin parçaları veritabanında bulunamadı.</p>`;
 
           contentArea.innerHTML = `
-            <div class="space-y-md flex flex-col h-full overflow-hidden">
-              <!-- Skills Container -->
-              <div class="space-y-xs shrink-0">
-                <span class="text-label-sm text-on-surface-variant font-bold">ÖZGEÇMİŞTEN ÇIKARILAN YETENEKLER</span>
-                <div class="flex flex-wrap gap-xs pt-xs">
-                  ${skillsHtml}
-                </div>
+            <div class="space-y-3">
+              <h4 class="text-[10px] font-extrabold text-brand-muted uppercase tracking-widest flex items-center gap-2">
+                <i class="fa-solid fa-layer-group text-brand-accent"></i> Özgeçmişten Çıkarılan Yetenekler
+              </h4>
+              <div class="flex flex-wrap gap-2 p-4 bg-brand-bg/30 rounded-xl border border-brand-border/20 shadow-inner">
+                ${skillsHtml}
               </div>
-
-              <!-- Chunks Container -->
-              <div class="space-y-xs flex-1 flex flex-col overflow-hidden">
-                <span class="text-label-sm text-on-surface-variant font-bold">BÖLÜMLERE GÖRE PARÇALAMA (CHUNKS)</span>
-                <div class="space-y-sm overflow-y-auto flex-1 pr-xs mt-xs" style="max-height: 280px;">
-                  ${chunkHtml}
-                </div>
-              </div>
-
-              <div class="bg-surface-container-high/40 p-sm rounded-lg text-center border border-outline-variant shrink-0">
-                <p class="text-label-sm text-on-surface-variant">
-                  <b>Gün 13 Tamamlandı:</b> CV bölümlere göre parçalandı ve yetenekler tarandı. Yarın (Gün 14) bu veriler Gemini AI analizine aktarılacaktır!
-                </p>
+            </div>
+            <div class="flex flex-col gap-3 flex-1">
+              <h4 class="text-[10px] font-extrabold text-brand-muted uppercase tracking-widest flex items-center gap-2">
+                <i class="fa-solid fa-puzzle-piece text-brand-accent"></i> Bölümlere Göre Parçalama (Chunks)
+              </h4>
+              <div class="space-y-3 overflow-y-auto custom-scrollbar flex-1 pr-1" style="max-height: 340px;">
+                ${chunkHtml}
               </div>
             </div>
           `;
+
+
+
         } else {
-          // Standard full AI report (for Day 14)
-          // Reset markup to initial structure to show scores
+          // Full AI report (Day 14+)
+          const pct = analysis.atsScore;
+          const skillsHtml = Array.isArray(analysis.skills) && analysis.skills.length > 0
+            ? analysis.skills.map(s => `<span class="px-3 py-1.5 rounded-lg text-xs font-semibold bg-brand-accent/10 text-brand-accent border border-brand-accent/20 hover:bg-brand-accent/20 transition-all cursor-default">${s}</span>`).join('')
+            : `<span class="text-xs text-brand-muted">Yetenek kelimeleri çıkarılamadı.</span>`;
+          const strengthsHtml = Array.isArray(analysis.strengths) && analysis.strengths.length > 0
+            ? analysis.strengths.map(st => `<li>${st}</li>`).join('') : '<li>Veri yok.</li>';
+          const weaknessesHtml = Array.isArray(analysis.weaknesses) && analysis.weaknesses.length > 0
+            ? analysis.weaknesses.map(w => `<li>${w}</li>`).join('') : '<li>Veri yok.</li>';
+
           contentArea.innerHTML = `
-            <div class="flex items-center gap-lg bg-surface-container-high/40 p-md rounded-xl border border-outline-variant shrink-0">
+            <!-- Score Ring -->
+            <div class="flex items-center gap-5 bg-brand-bg/40 p-5 rounded-2xl border border-brand-border/40 shrink-0">
               <div class="relative w-20 h-20 flex items-center justify-center shrink-0">
                 <svg class="w-full h-full transform -rotate-90" viewBox="0 0 36 36">
-                  <path class="text-surface-variant" d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831" fill="none" stroke="currentColor" stroke-width="3.5"></path>
-                  <path class="text-primary" d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831" fill="none" stroke="currentColor" stroke-dasharray="${analysis.atsScore}, 100" stroke-linecap="round" stroke-width="3.5"></path>
+                  <path class="text-brand-border" d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831" fill="none" stroke="currentColor" stroke-width="3"></path>
+                  <path class="text-brand-accent" d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831" fill="none" stroke="currentColor" stroke-dasharray="${pct}, 100" stroke-linecap="round" stroke-width="3"></path>
                 </svg>
-                <span class="absolute text-headline-sm font-bold text-on-surface">%${analysis.atsScore}</span>
+                <span class="absolute text-lg font-bold text-brand-text">%${pct}</span>
               </div>
               <div>
-                <span class="text-label-sm text-primary uppercase font-bold tracking-wider">GENEL UYUM SKORU</span>
-                <h5 class="text-body-md font-bold text-on-surface mt-xs" id="analysis-role">Özgeçmiş Analizi</h5>
-                <p class="text-label-sm text-on-surface-variant mt-2">Yapay zeka uyumluluk skoru hesaplandı.</p>
+                <span class="text-[10px] text-brand-accent font-bold tracking-widest uppercase">Genel Uyum Skoru</span>
+                <h5 class="text-base font-bold text-brand-text mt-1">${analysis.role || 'Özgeçmiş Analizi'}</h5>
+                <p class="text-xs text-brand-muted mt-0.5">Yapay zeka uyumluluk skoru hesaplandı.</p>
               </div>
             </div>
-            
-            <div class="space-y-sm overflow-y-auto flex-1 pr-xs" style="max-height: 380px;">
-              <div class="space-y-xs">
-                <span class="text-label-sm text-on-surface-variant font-bold">ÖNE ÇIKAN YETENEKLER</span>
-                <div class="flex flex-wrap gap-xs pt-xs" id="analysis-skills">
-                  ${Array.isArray(analysis.skills) ? analysis.skills.map(s => `<span class="px-sm py-xs bg-primary/10 text-primary text-label-sm rounded-md font-semibold border border-primary/20">${s}</span>`).join('') : ''}
-                </div>
+            <!-- Skills -->
+            <div class="space-y-2">
+              <h4 class="text-[10px] font-bold text-brand-muted tracking-widest uppercase flex items-center gap-2">
+                <i class="fa-solid fa-layer-group text-brand-accent"></i> Öne Çıkan Yetenekler
+              </h4>
+              <div class="flex flex-wrap gap-2 pt-1">${skillsHtml}</div>
+            </div>
+            <!-- Strengths / Weaknesses -->
+            <div class="space-y-3">
+              <div class="bg-emerald-500/5 border border-emerald-500/15 p-4 rounded-2xl space-y-2">
+                <span class="text-xs text-emerald-400 font-bold flex items-center gap-1.5"><i class="fa-regular fa-thumbs-up"></i> Güçlü Yönler</span>
+                <ul class="text-xs text-brand-muted space-y-1 list-disc pl-4">${strengthsHtml}</ul>
               </div>
-
-              <div class="grid grid-cols-1 md:grid-cols-2 gap-md pt-md">
-                <div class="bg-success-container/10 border border-success-container/30 p-md rounded-xl space-y-sm">
-                  <div class="flex items-center gap-xs text-[#4ade80]">
-                    <span class="material-symbols-outlined text-body-lg">thumb_up</span>
-                    <span class="text-label-sm font-bold">GÜÇLÜ YÖNLER</span>
-                  </div>
-                  <ul class="text-body-sm text-on-surface space-y-xs list-disc pl-sm" id="analysis-strengths">
-                    ${Array.isArray(analysis.strengths) ? analysis.strengths.map(s => `<li>${s}</li>`).join('') : ''}
-                  </ul>
-                </div>
-
-                <div class="bg-error-container/10 border border-error-container/30 p-md rounded-xl space-y-sm">
-                  <div class="flex items-center gap-xs text-[#f87171]">
-                    <span class="material-symbols-outlined text-body-lg">warning</span>
-                    <span class="text-label-sm font-bold font-semibold">GELİŞİM ALANLARI</span>
-                  </div>
-                  <ul class="text-body-sm text-on-surface space-y-xs list-disc pl-sm" id="analysis-weaknesses">
-                    ${Array.isArray(analysis.weaknesses) ? analysis.weaknesses.map(w => `<li>${w}</li>`).join('') : ''}
-                  </ul>
-                </div>
+              <div class="bg-red-500/5 border border-red-500/15 p-4 rounded-2xl space-y-2">
+                <span class="text-xs text-red-400 font-bold flex items-center gap-1.5"><i class="fa-solid fa-triangle-exclamation"></i> Gelişim Alanları</span>
+                <ul class="text-xs text-brand-muted space-y-1 list-disc pl-4">${weaknessesHtml}</ul>
               </div>
             </div>
           `;
+          footerBar.classList.add('hidden');
         }
+
       } else if (status === 'PENDING') {
-        statusIndicator.innerHTML = `
-          <span class="inline-flex items-center gap-xs px-3 py-1 rounded-full bg-surface-container-high text-on-surface-variant border border-outline-variant text-label-md">
-            <span class="w-2 h-2 rounded-full bg-outline-variant animate-pulse"></span> Analiz Sırada
-          </span>
-        `;
+        statusIndicator.innerHTML = `<i class="fa-regular fa-clock text-brand-muted text-3xl animate-pulse"></i>`;
         contentArea.innerHTML = `
-          <div class="text-center py-xl text-on-surface-variant flex flex-col items-center justify-center h-full space-y-md my-auto">
-            <span class="material-symbols-outlined text-[64px] text-outline animate-spin">sync</span>
-            <h4 class="text-headline-sm font-bold text-on-surface">Analiz Sırada Bekliyor</h4>
-            <p class="text-body-sm text-center max-w-[280px]">Özgeçmişiniz sisteme başarıyla yüklendi. Arka planda analiz sırasına alındı. Lütfen bekleyin.</p>
-          </div>
-        `;
+          <div class="flex flex-col items-center justify-center flex-1 text-center py-10 space-y-4">
+            <i class="fa-regular fa-clock text-5xl text-brand-muted animate-pulse mb-2"></i>
+            <h4 class="text-base font-bold text-brand-text">İşlem Sırasında</h4>
+            <p class="text-sm text-brand-muted max-w-[240px]">CV dosyası sunucuya ulaştı, metin çıkarma sırasının kendisine gelmesi bekleniyor.</p>
+          </div>`;
+
       } else if (status === 'PROCESSING') {
-        statusIndicator.innerHTML = `
-          <span class="inline-flex items-center gap-xs px-3 py-1 rounded-full bg-primary/10 text-primary border border-primary/20 text-label-md">
-            <span class="w-2 h-2 rounded-full bg-primary animate-ping"></span> Analiz Yapılıyor
-          </span>
-        `;
+        statusIndicator.innerHTML = `<i class="fa-solid fa-circle-notch text-brand-accent text-3xl animate-spin"></i>`;
         contentArea.innerHTML = `
-          <div class="text-center py-xl text-on-surface-variant flex flex-col items-center justify-center h-full space-y-md my-auto">
-            <span class="material-symbols-outlined text-[64px] text-primary animate-bounce">description</span>
-            <h4 class="text-headline-sm font-bold text-on-surface">Özgeçmişiniz İşleniyor</h4>
-            <p class="text-body-sm text-center max-w-[280px]">PDF belgesindeki metinler ayıklanıyor ve semantik arama parçaları oluşturuluyor. Lütfen bekleyin.</p>
-          </div>
-        `;
+          <div class="flex flex-col items-center justify-center flex-1 text-center py-10 space-y-4">
+            <i class="fa-solid fa-circle-notch text-5xl text-brand-accent animate-spin mb-2"></i>
+            <h4 class="text-base font-bold text-brand-text">Metin Çıkarılıyor...</h4>
+            <p class="text-sm text-brand-muted max-w-[240px]">Özgeçmiş PDF belgesinden metinler ayıklanıyor ve semantik arama chunk'larına bölünüyor.</p>
+          </div>`;
+
       } else {
-        statusIndicator.innerHTML = `<span class="material-symbols-outlined text-error text-3xl">error</span>`;
+        statusIndicator.innerHTML = `<i class="fa-solid fa-circle-exclamation text-red-400 text-3xl"></i>`;
         contentArea.innerHTML = `
-          <div class="text-center py-xl text-error flex flex-col items-center justify-center h-full space-y-md my-auto">
-            <span class="material-symbols-outlined text-[64px]">warning</span>
-            <h4 class="text-headline-sm font-bold">Ayrıştırma Hatası</h4>
-            <p class="text-body-sm text-center max-w-[280px]">PDF belgesi parse edilirken sunucu hatası oluştu. Lütfen dosyanın şifreli veya bozuk olmadığından emin olun.</p>
-          </div>
-        `;
+          <div class="flex flex-col items-center justify-center flex-1 text-center py-10 space-y-4">
+            <i class="fa-solid fa-circle-exclamation text-5xl text-red-400 mb-2"></i>
+            <h4 class="text-base font-bold text-brand-text">Ayrıştırma Hatası</h4>
+            <p class="text-sm text-brand-muted max-w-[240px]">PDF belgesi parse edilirken sunucu hatası oluştu. Dosyanın şifreli veya bozuk olmadığından emin olun.</p>
+          </div>`;
       }
     }
 
-    // Load initial list on mount
     loadCVList();
   </script>
 </UserLayout>

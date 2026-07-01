@@ -1,5 +1,5 @@
 import { Router, Request, Response } from "express";
-import { PrismaClient } from "@prisma/client";
+import { PrismaClient, Prisma } from "@prisma/client";
 import { PrismaPg } from "@prisma/adapter-pg";
 import pg from "pg";
 import { authMiddleware, adminMiddleware } from "../middleware/auth.js";
@@ -93,4 +93,175 @@ router.put("/users/:id/role", authMiddleware, adminMiddleware, async (req: Reque
   }
 });
 
+// Get all candidates with CV & analysis info
+router.get("/candidates", authMiddleware, adminMiddleware, async (req: Request, res: Response) => {
+  try {
+    const search = (req.query.search as string) || "";
+    const filter = (req.query.filter as string) || "all"; // all | completed | processing | pending
+
+    const users = await prisma.user.findMany({
+      where: {
+        role: "CANDIDATE",
+        ...(search
+          ? {
+              OR: [
+                { name: { contains: search, mode: "insensitive" } },
+                { email: { contains: search, mode: "insensitive" } },
+              ],
+            }
+          : {}),
+      },
+      select: {
+        id: true,
+        email: true,
+        name: true,
+        avatarUrl: true,
+        createdAt: true,
+        cvs: {
+          select: {
+            id: true,
+            fileName: true,
+            createdAt: true,
+            analyses: {
+              select: {
+                id: true,
+                status: true,
+                atsScore: true,
+                skills: true,
+                createdAt: true,
+              },
+              orderBy: { createdAt: "desc" },
+              take: 1,
+            },
+          },
+          orderBy: { createdAt: "desc" },
+          take: 1,
+        },
+      },
+      orderBy: { createdAt: "desc" },
+    });
+
+    // Flatten and enrich
+    const candidates = users.map((u) => {
+      const latestCv = u.cvs[0] || null;
+      const latestAnalysis = latestCv?.analyses[0] || null;
+      return {
+        id: u.id,
+        name: u.name,
+        email: u.email,
+        avatarUrl: u.avatarUrl,
+        createdAt: u.createdAt,
+        cvCount: u.cvs.length,
+        latestCvName: latestCv?.fileName || null,
+        analysisStatus: latestAnalysis?.status || null,
+        atsScore: latestAnalysis?.atsScore || null,
+        skills: latestAnalysis?.skills || [],
+      };
+    });
+
+    // Apply filter
+    const filtered =
+      filter === "all"
+        ? candidates
+        : candidates.filter((c) => {
+            if (filter === "completed") return c.analysisStatus === "COMPLETED";
+            if (filter === "processing") return c.analysisStatus === "PROCESSING";
+            if (filter === "pending") return c.analysisStatus === "PENDING" || !c.analysisStatus;
+            return true;
+          });
+
+    res.json({ candidates: filtered, total: filtered.length });
+  } catch (error) {
+    console.error("Adaylar listelenirken hata:", error);
+    res.status(500).json({ message: "Sunucu hatası." });
+  }
+});
+
+// Get platform report statistics
+router.get("/reports/stats", authMiddleware, adminMiddleware, async (_req: Request, res: Response) => {
+  try {
+    const [
+      totalUsers,
+      totalCandidates,
+      totalAdmins,
+      totalCVs,
+      totalAnalyses,
+      completedAnalyses,
+      pendingAnalyses,
+      processingAnalyses,
+      avgScoreResult,
+      recentUsers,
+    ] = await Promise.all([
+      prisma.user.count(),
+      prisma.user.count({ where: { role: "CANDIDATE" } }),
+      prisma.user.count({ where: { role: "ADMIN" } }),
+      prisma.cV.count(),
+      prisma.cVAnalysis.count(),
+      prisma.cVAnalysis.count({ where: { status: "COMPLETED" } }),
+      prisma.cVAnalysis.count({ where: { status: "PENDING" } }),
+      prisma.cVAnalysis.count({ where: { status: "PROCESSING" } }),
+      prisma.cVAnalysis.aggregate({
+        _avg: { atsScore: true },
+        where: { status: "COMPLETED", atsScore: { not: null } },
+      }),
+      // Last 7 days new user signups (grouped by day)
+      prisma.$queryRaw<{ day: string; count: bigint }[]>`
+        SELECT DATE_TRUNC('day', "createdAt") AS day, COUNT(*) AS count
+        FROM users
+        WHERE "createdAt" >= NOW() - INTERVAL '7 days'
+        GROUP BY day
+        ORDER BY day ASC
+      `,
+    ]);
+
+    // Top skills from all completed analyses
+    const completedWithSkills = await prisma.cVAnalysis.findMany({
+      where: { status: "COMPLETED", skills: { not: Prisma.DbNull } },
+      select: { skills: true },
+      take: 200,
+    });
+
+    const skillCount: Record<string, number> = {};
+    for (const a of completedWithSkills) {
+      const skills = a.skills as string[] | null;
+      if (Array.isArray(skills)) {
+        for (const s of skills) {
+          const key = String(s).trim();
+          if (key) skillCount[key] = (skillCount[key] || 0) + 1;
+        }
+      }
+    }
+
+    const topSkills = Object.entries(skillCount)
+      .sort((a, b) => b[1] - a[1])
+      .slice(0, 8)
+      .map(([skill, count]) => ({ skill, count }));
+
+    const recentSignups = recentUsers.map((r) => ({
+      day: r.day,
+      count: Number(r.count),
+    }));
+
+    res.json({
+      totalUsers,
+      totalCandidates,
+      totalAdmins,
+      totalCVs,
+      totalAnalyses,
+      completedAnalyses,
+      pendingAnalyses,
+      processingAnalyses,
+      avgAtsScore: avgScoreResult._avg.atsScore
+        ? Math.round(Number(avgScoreResult._avg.atsScore))
+        : null,
+      topSkills,
+      recentSignups,
+    });
+  } catch (error) {
+    console.error("Rapor istatistikleri alınırken hata:", error);
+    res.status(500).json({ message: "Sunucu hatası." });
+  }
+});
+
 export default router;
+

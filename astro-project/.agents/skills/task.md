@@ -1,0 +1,31 @@
+- [x] Backend Dependencies Installation (`pdf-parse`, `@types/pdf-parse`)
+- [x] Database Schema Refinements (`schema.prisma`)
+  - [x] Add `AnalysisStatus` enum
+  - [x] Update `CVAnalysis` model to use `AnalysisStatus` enum
+  - [x] Run `npx prisma db push --accept-data-loss`
+  - [x] Run `npx prisma generate`
+- [x] Implement Parser & Chunking Utils (`server/src/utils/parser.ts`)
+  - [x] Implement PDF text extraction function using `pdf-parse`
+  - [x] Implement word-based sliding window chunking algorithm
+- [x] Update Express CV Router (`server/src/routes/cv.ts`)
+  - [x] Restrict Multer to PDF only (no DOCX)
+  - [x] Write asynchronous background `processCv` pipeline (PENDING -> PROCESSING -> COMPLETED/FAILED)
+  - [x] Add `processCv` background trigger in `/upload` endpoint
+- [x] Testing and Validation
+  - [x] Run parser & chunking integration test
+  - [x] Clean up temporary files
+- [x] Fetch Stitch Screen Specifications
+  - [x] Query Stitch project screens list
+  - [x] Retrieve HTML specifications for empty candidate state
+  - [x] Retrieve HTML specifications for premium analysis state
+- [x] Configure Build-time Tailwind Theme Variable Mappings (`src/styles/global.css`)
+  - [x] Add extended theme variables (brand-bg, brand-card, etc.) to `@theme` block
+  - [x] Add class mappings and keyframes for glassmorphism and glow animations
+- [x] Implement High-Fidelity UI Layouts
+  - [x] Incorporate visual components into `UserSidebar.astro`
+  - [x] Incorporate date and profile components into `UserHeader.astro`
+  - [x] Set main content margins in `UserLayout.astro`
+  - [x] Update empty & active states in `profile.astro`
+  - [x] Update empty & active states in `analyses.astro`
+- [x] Validate Astro App Builds
+  - [x] Execute `npm run build` with zero compiler/Vite bundle failures

@@ -40,6 +40,19 @@
    --color-obsidian-text: var(--obsidian-text);
   --color-obsidian-accent: var(--obsidian-accent);
   --color-brand-accent: var(--brand-accent);
+  
+  /* Brand Theme Colors for Stitch Screens */
+  --color-brand-bg: #0F172A;
+  --color-brand-card: #1E293B;
+  --color-brand-border: #334155;
+  --color-brand-accent: #38BDF8;
+  --color-brand-accent-hover: #0284C7;
+  --color-brand-text: #F8FAFC;
+  --color-brand-muted: #94A3B8;
+  --color-brand-success: #4ADE80;
+  --color-brand-success-bg: rgba(74, 222, 128, 0.1);
+  --color-brand-warning: #FBBF24;
+  --color-brand-danger: #EF4444;
 
   /* Spacings */
   --spacing-gutter: 24px;
@@ -763,3 +776,69 @@ input:-webkit-autofill:active {
 .gap-3xl { gap: 64px; }
 .mb-3xl { margin-bottom: 64px; }
 .mt-3xl { margin-top: 64px; }
+
+/* Stitch custom utilities */
+.glass-active {
+  background: linear-gradient(90deg, rgba(56, 189, 248, 0.25) 0%, rgba(56, 189, 248, 0) 100%);
+  border-left: 3px solid #38BDF8;
+  box-shadow: -5px 0 15px rgba(56, 189, 248, 0.4);
+  backdrop-filter: blur(8px);
+}
+
+.dropzone-glow {
+  border: 2px dashed #334155;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+.dropzone-glow:hover {
+  border-color: #38BDF8;
+  border-style: solid;
+  transform: scale(1.02);
+  box-shadow: 0 0 20px rgba(56, 189, 248, 0.6);
+}
+
+/* Custom scrollbar for table container */
+.custom-scrollbar::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+.custom-scrollbar::-webkit-scrollbar-track {
+  background: #0F172A; 
+}
+.custom-scrollbar::-webkit-scrollbar-thumb {
+  background: #334155; 
+  border-radius: 10px;
+}
+.custom-scrollbar::-webkit-scrollbar-thumb:hover {
+  background: #94A3B8; 
+}
+
+.table-row-hover {
+    transition: all 0.2s ease;
+}
+.table-row-hover:hover {
+    transform: scale(1.01);
+    background-color: rgba(255, 255, 255, 0.08);
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+}
+
+@keyframes float {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-8px); }
+}
+@keyframes pulse-slow {
+  0%, 100% { opacity: 0.2; transform: scale(1); }
+  50% { opacity: 0.4; transform: scale(1.05); }
+}
+@keyframes spin-slow {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+.animate-float {
+  animation: float 4s ease-in-out infinite;
+}
+.animate-pulse-slow {
+  animation: pulse-slow 3s ease-in-out infinite;
+}
+.animate-spin-slow {
+  animation: spin-slow 20s linear infinite;
+}
