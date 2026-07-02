@@ -488,12 +488,65 @@ import AdminLayout from '../../layouts/AdminLayout.astro';
     const clearBtn = document.getElementById('clear-done-btn');
     const uploadAllBtn = document.getElementById('bulk-upload-btn');
 
-    // Build candidate option HTML (reused in each row)
-    function buildOptions() {
-      let opts = '<option value="">Admin (kendi hesabıma)</option>';
+    // ── Akıllı dosya adı → aday eşleştirme ──
+    function parseNameFromFilename(filename) {
+      // Remove extension
+      let name = filename.replace(/\.[^.]+$/, '');
+      // Remove common CV keywords (TR + EN)
+      name = name.replace(/\b(cv|resume|ozgecmis|özgec&#51;mis|portfolio|staj|intern|application|basvuru|2024|2025|2026|final|v\d+|\d+)\b/gi, '');
+      // Replace separators with space
+      name = name.replace(/[_\-\.]+/g, ' ').trim();
+      // Collapse multiple spaces
+      name = name.replace(/\s+/g, ' ').trim();
+      return name.length >= 2 ? name : null;
+    }
+
+    function normalize(str) {
+      return (str || '')
+        .toLowerCase()
+        .replace(/ı/g, 'i').replace(/ş/g,'s').replace(/ç/g,'c').replace(/ö/g,'o').replace(/ü/g,'u').replace(/ğ/g,'g')
+        .replace(/[^a-z0-9 ]/g, '')
+        .trim();
+    }
+
+    function findBestMatch(parsedName) {
+      if (!parsedName || !allCandidates.length) return null;
+      const normParsed = normalize(parsedName);
+      const parsedTokens = normParsed.split(' ').filter(t => t.length > 1);
+      if (!parsedTokens.length) return null;
+
+      let best = null;
+      let bestScore = 0;
+
+      allCandidates.forEach(cand => {
+        const normName = normalize(cand.name || cand.email.split('@')[0]);
+        const nameTokens = normName.split(' ');
+
+        // Count how many parsed tokens appear in the candidate name
+        const matchedTokens = parsedTokens.filter(pt =>
+          nameTokens.some(nt => nt.includes(pt) || pt.includes(nt))
+        );
+        const score = matchedTokens.length / Math.max(parsedTokens.length, nameTokens.length);
+
+        // Also check full string containment
+        const containsScore = normName.includes(normParsed) || normParsed.includes(normName) ? 0.9 : 0;
+        const finalScore = Math.max(score, containsScore);
+
+        if (finalScore > bestScore) {
+          bestScore = finalScore;
+          best = { candidate: cand, score: finalScore };
+        }
+      });
+
+      return bestScore >= 0.6 ? best : null;
+    }
+
+    // Build candidate option HTML
+    function buildOptions(preSelectedId = '') {
+      let opts = `<option value=""${!preSelectedId ? ' selected' : ''}>Admin (kendi hesabıma)</option>`;
       allCandidates.forEach(c => {
-        const label = c.name ? `${c.name} — ${c.email}` : c.email;
-        opts += `<option value="${c.id}">${label}</option>`;
+        const label = c.name ? `${c.name} \u2014 ${c.email}` : c.email;
+        opts += `<option value="${c.id}"${c.id === preSelectedId ? ' selected' : ''}>${label}</option>`;
       });
       return opts;
     }
@@ -512,26 +565,49 @@ import AdminLayout from '../../layouts/AdminLayout.astro';
       Array.from(files).forEach(file => {
         if (!validateFile(file)) return;
 
+        // Smart match
+        const parsedName = parseNameFromFilename(file.name);
+        const match = findBestMatch(parsedName);
+        const matchedId = match ? match.candidate.id : '';
+        const matchedName = match ? (match.candidate.name || match.candidate.email) : '';
+        const confidence = match ? Math.round(match.score * 100) : 0;
+
+        // Badge HTML
+        const badgeHtml = match
+          ? `<span class="match-badge inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-emerald-50 border border-emerald-200 text-[9px] font-bold text-emerald-700">
+               <span class="material-symbols-outlined text-[10px]">auto_awesome</span>
+               Önerilen · ${confidence}%
+             </span>`
+          : `<span class="match-badge inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-amber-50 border border-amber-200 text-[9px] font-bold text-amber-700">
+               <span class="material-symbols-outlined text-[10px]">help</span>
+               Manuel Seç
+             </span>`;
+
         const item = document.createElement('div');
         item.className = 'bulk-item bg-[#faf9f5] border border-[#ddd9d3] rounded-[10px] overflow-hidden';
-        item.dataset.state = 'queued'; // queued | uploading | done
+        item.dataset.state = 'queued';
         item.innerHTML = `
           <!-- File info row -->
-          <div class="flex items-center gap-2 px-3 pt-3 pb-2">
+          <div class="flex items-center gap-2 px-3 pt-3 pb-1.5">
             <span class="material-symbols-outlined text-red-500 text-[16px] shrink-0">picture_as_pdf</span>
             <span class="text-[11px] font-bold text-[#1b1c1a] truncate flex-1">${file.name}</span>
-            <button class="remove-btn w-5 h-5 rounded-full flex items-center justify-center text-[#8a8580] hover:text-rose-600 hover:bg-rose-50 transition-colors shrink-0" title="Kuyruğtan çıkar">
+            ${badgeHtml}
+            <button class="remove-btn w-5 h-5 rounded-full flex items-center justify-center text-[#8a8580] hover:text-rose-600 hover:bg-rose-50 transition-colors shrink-0 ml-1" title="Kuyruktan \u00e7\u0131kar">
               <span class="material-symbols-outlined text-[14px]">close</span>
             </button>
           </div>
           <!-- Candidate dropdown -->
           <div class="px-3 pb-2">
             <div class="relative">
-              <select class="row-candidate w-full appearance-none bg-white border border-[#ddd9d3] rounded-[7px] px-3 py-2 pr-8 text-[11px] font-medium text-[#1b1c1a] focus:outline-none focus:border-[#14422f] cursor-pointer">
-                ${buildOptions()}
+              <select class="row-candidate w-full appearance-none rounded-[7px] px-3 py-2 pr-8 text-[11px] font-medium focus:outline-none focus:border-[#14422f] cursor-pointer transition-all
+                ${match
+                  ? 'bg-emerald-50 border border-emerald-200 text-emerald-800'
+                  : 'bg-white border border-amber-300 text-[#1b1c1a]'}">
+                ${buildOptions(matchedId)}
               </select>
               <span class="material-symbols-outlined absolute right-2.5 top-1/2 -translate-y-1/2 text-[#8a8580] text-[14px] pointer-events-none">expand_more</span>
             </div>
+            ${match ? `<p class="text-[9px] text-emerald-600 font-medium mt-0.5 px-1">&#8599; "${parsedName}" \u2192 ${matchedName}</p>` : '<p class="text-[9px] text-amber-600 font-medium mt-0.5 px-1">Dosya ad\u0131ndan e\u015fle\u015fme bulunamad\u0131 \u2014 l\u00fctfen elle se\u00e7in</p>'}
           </div>
           <!-- Progress (hidden until upload starts) -->
           <div class="progress-area hidden px-3 pb-3">
