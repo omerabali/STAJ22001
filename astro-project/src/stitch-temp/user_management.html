@@ -1,0 +1,342 @@
+<!DOCTYPE html>
+
+<html class="light" lang="tr"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Kullanıcı Yönetimi - Beacon Admin</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;600&amp;family=Manrope:wght@600;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        "on-secondary": "#ffffff",
+                        "inverse-primary": "#a1d1b7",
+                        "outline-variant": "#c0c9c2",
+                        "secondary-container": "#fdad67",
+                        "tertiary-fixed": "#e3e2df",
+                        "surface-bright": "#fdf8f5",
+                        "on-tertiary-fixed-variant": "#464744",
+                        "on-tertiary-fixed": "#1b1c1a",
+                        "on-primary-fixed": "#002114",
+                        "on-error": "#ffffff",
+                        "tertiary": "#3a3b39",
+                        "on-surface": "#1c1b19",
+                        "on-secondary-fixed-variant": "#6d3a00",
+                        "inverse-on-surface": "#f5f0ec",
+                        "background": "#fdf8f5",
+                        "on-background": "#1c1b19",
+                        "on-secondary-fixed": "#2e1500",
+                        "primary-container": "#2d5a45",
+                        "on-secondary-container": "#763f00",
+                        "tertiary-container": "#51524f",
+                        "surface-container-low": "#f7f3ef",
+                        "surface-variant": "#e6e2de",
+                        "on-primary-fixed-variant": "#224f3b",
+                        "primary": "#14422f",
+                        "on-error-container": "#93000a",
+                        "surface-container": "#f2ede9",
+                        "secondary-fixed": "#ffdcc2",
+                        "on-primary-container": "#9fcfb5",
+                        "secondary-fixed-dim": "#ffb77b",
+                        "outline": "#717973",
+                        "surface-dim": "#ded9d6",
+                        "surface-container-highest": "#e6e2de",
+                        "on-tertiary-container": "#c5c5c1",
+                        "on-primary": "#ffffff",
+                        "error": "#ba1a1a",
+                        "primary-fixed": "#bceed2",
+                        "on-surface-variant": "#414943",
+                        "surface-tint": "#3a6751",
+                        "surface-container-high": "#ece7e4",
+                        "on-tertiary": "#ffffff",
+                        "error-container": "#ffdad6",
+                        "secondary": "#8c4f10",
+                        "surface-container-lowest": "#ffffff",
+                        "surface": "#fdf8f5",
+                        "tertiary-fixed-dim": "#c7c7c3",
+                        "primary-fixed-dim": "#a1d1b7",
+                        "inverse-surface": "#32302e"
+                    },
+                    borderRadius: {
+                        DEFAULT: "0.25rem",
+                        lg: "0.5rem",
+                        xl: "0.75rem",
+                        full: "9999px"
+                    },
+                    spacing: {
+                        unit: "4px",
+                        sm: "8px",
+                        lg: "24px",
+                        xs: "4px",
+                        xl: "48px",
+                        md: "16px",
+                        gutter: "24px",
+                        "container-max": "1200px"
+                    },
+                    fontFamily: {
+                        "display-lg": ["Manrope"],
+                        "headline-sm": ["Manrope"],
+                        "headline-md": ["Manrope"],
+                        "body-md": ["IBM Plex Sans"],
+                        "label-md": ["IBM Plex Sans"],
+                        "body-lg": ["IBM Plex Sans"],
+                        "display-lg-mobile": ["Manrope"],
+                        "body-sm": ["IBM Plex Sans"]
+                    },
+                    fontSize: {
+                        "display-lg": ["48px", { lineHeight: "56px", letterSpacing: "-0.02em", fontWeight: "700" }],
+                        "headline-sm": ["20px", { lineHeight: "28px", fontWeight: "600" }],
+                        "headline-md": ["24px", { lineHeight: "32px", fontWeight: "600" }],
+                        "body-md": ["16px", { lineHeight: "24px", fontWeight: "400" }],
+                        "label-md": ["12px", { lineHeight: "16px", letterSpacing: "0.05em", fontWeight: "600" }],
+                        "body-lg": ["18px", { lineHeight: "28px", fontWeight: "400" }],
+                        "display-lg-mobile": ["32px", { lineHeight: "40px", letterSpacing: "-0.01em", fontWeight: "700" }],
+                        "body-sm": ["14px", { lineHeight: "20px", fontWeight: "400" }]
+                    }
+                }
+            }
+        };
+    </script>
+<style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+        .material-symbols-outlined[data-weight="fill"] {
+            font-variation-settings: 'FILL' 1;
+        }
+    </style>
+</head>
+<body class="bg-background text-on-background font-body-md min-h-screen flex">
+<!-- SideNavBar (Admin) -->
+<aside class="w-[240px] h-screen sticky top-0 left-0 bg-surface dark:bg-surface border-r border-outline-variant dark:border-outline flex flex-col py-lg px-md z-10 hidden md:flex">
+<!-- Header -->
+<div class="mb-xl flex items-center space-x-sm px-sm">
+<div class="w-10 h-10 rounded bg-primary-container text-on-primary flex items-center justify-center font-display-lg font-bold text-headline-sm">
+                B
+            </div>
+<div>
+<h1 class="font-display-lg text-headline-md font-bold text-primary dark:text-primary-fixed leading-tight">Beacon</h1>
+<p class="font-body-sm text-on-surface-variant dark:text-on-surface-variant">Admin Panel</p>
+</div>
+</div>
+<!-- Navigation Tabs -->
+<nav class="flex-1 space-y-sm">
+<a class="flex items-center px-sm py-sm rounded-lg hover:bg-surface-container-highest dark:hover:bg-surface-container-high transition-colors text-on-surface-variant dark:text-on-surface-variant opacity-80 duration-150" href="#">
+<span class="material-symbols-outlined mr-md">dashboard</span>
+<span class="font-label-md text-label-md">Dashboard</span>
+</a>
+<a class="flex items-center px-sm py-sm rounded-lg hover:bg-surface-container-highest dark:hover:bg-surface-container-high transition-colors text-on-surface-variant dark:text-on-surface-variant opacity-80 duration-150" href="#">
+<span class="material-symbols-outlined mr-md">search</span>
+<span class="font-label-md text-label-md">Aday Ara</span>
+</a>
+<a class="flex items-center px-sm py-sm rounded-lg hover:bg-surface-container-highest dark:hover:bg-surface-container-high transition-colors text-on-surface-variant dark:text-on-surface-variant opacity-80 duration-150" href="#">
+<span class="material-symbols-outlined mr-md">upload_file</span>
+<span class="font-label-md text-label-md">CV Yükle</span>
+</a>
+<a class="flex items-center px-sm py-sm rounded-lg text-primary dark:text-primary-fixed font-bold border-r-4 border-primary dark:border-primary-fixed bg-surface-container-low opacity-80 duration-150" href="#">
+<span class="material-symbols-outlined mr-md" data-weight="fill">group</span>
+<span class="font-label-md text-label-md">Kullanıcı Yönetimi</span>
+</a>
+<a class="flex items-center px-sm py-sm rounded-lg hover:bg-surface-container-highest dark:hover:bg-surface-container-high transition-colors text-on-surface-variant dark:text-on-surface-variant opacity-80 duration-150" href="#">
+<span class="material-symbols-outlined mr-md">settings</span>
+<span class="font-label-md text-label-md">Sistem Ayarları</span>
+</a>
+<a class="flex items-center px-sm py-sm rounded-lg hover:bg-surface-container-highest dark:hover:bg-surface-container-high transition-colors text-on-surface-variant dark:text-on-surface-variant opacity-80 duration-150" href="#">
+<span class="material-symbols-outlined mr-md">assessment</span>
+<span class="font-label-md text-label-md">Raporlar</span>
+</a>
+</nav>
+<!-- Footer Tabs -->
+<div class="mt-auto space-y-sm pt-md border-t border-outline-variant dark:border-outline">
+<a class="flex items-center px-sm py-sm rounded-lg hover:bg-surface-container-highest dark:hover:bg-surface-container-high transition-colors text-on-surface-variant dark:text-on-surface-variant opacity-80 duration-150" href="#">
+<span class="material-symbols-outlined mr-md">account_circle</span>
+<span class="font-label-md text-label-md">Profil</span>
+</a>
+<a class="flex items-center px-sm py-sm rounded-lg hover:bg-surface-container-highest dark:hover:bg-surface-container-high transition-colors text-on-surface-variant dark:text-on-surface-variant opacity-80 duration-150" href="#">
+<span class="material-symbols-outlined mr-md">logout</span>
+<span class="font-label-md text-label-md">Çıkış Yap</span>
+</a>
+</div>
+</aside>
+<!-- Main Content Canvas -->
+<main class="flex-1 flex flex-col bg-background relative z-0">
+<!-- Top Bar -->
+<header class="h-[72px] bg-surface border-b border-outline-variant flex items-center justify-between px-lg z-20">
+<div class="flex items-center">
+<span class="font-body-sm text-on-surface-variant">Toplam 24 kullanıcı</span>
+</div>
+<div class="flex items-center space-x-md">
+<div class="relative">
+<span class="material-symbols-outlined absolute left-sm top-1/2 transform -translate-y-1/2 text-on-surface-variant">search</span>
+<input class="pl-xl pr-md py-sm rounded border border-outline-variant bg-surface focus:border-primary focus:ring-1 focus:ring-primary focus:outline-none font-body-sm text-on-surface placeholder:text-on-surface-variant w-64 transition-shadow" placeholder="Kullanıcı ara..." type="text"/>
+</div>
+<button class="flex items-center space-x-xs px-md py-sm rounded border border-outline-variant bg-surface text-on-surface hover:bg-surface-container-lowest hover:shadow-sm transition-all">
+<span class="material-symbols-outlined text-[18px]">refresh</span>
+<span class="font-label-md text-label-md">Yenile</span>
+</button>
+</div>
+</header>
+<!-- Page Content Scrollable Area -->
+<div class="flex-1 overflow-y-auto p-xl">
+<!-- Header Section -->
+<div class="mb-xl">
+<h2 class="font-display-lg text-display-lg text-on-surface mb-xs">Kullanıcı Yönetimi</h2>
+<p class="font-body-md text-on-surface-variant">Sistemdeki kullanıcıları yönetin.</p>
+</div>
+<!-- Stats Row -->
+<div class="grid grid-cols-1 md:grid-cols-3 gap-lg mb-xl">
+<!-- Stat Card 1 -->
+<div class="bg-surface border border-outline-variant rounded p-lg hover:shadow-[0_4px_12px_rgba(0,0,0,0.08)] hover:-translate-y-[2px] transition-all duration-200">
+<p class="font-label-md text-label-md text-on-surface-variant mb-sm uppercase tracking-wider">Toplam Kullanıcı</p>
+<p class="font-display-lg text-display-lg text-primary-container">24</p>
+</div>
+<!-- Stat Card 2 -->
+<div class="bg-surface border border-outline-variant rounded p-lg hover:shadow-[0_4px_12px_rgba(0,0,0,0.08)] hover:-translate-y-[2px] transition-all duration-200">
+<p class="font-label-md text-label-md text-on-surface-variant mb-sm uppercase tracking-wider">Aday</p>
+<p class="font-display-lg text-display-lg text-on-surface">22</p>
+</div>
+<!-- Stat Card 3 -->
+<div class="bg-surface border border-outline-variant rounded p-lg hover:shadow-[0_4px_12px_rgba(0,0,0,0.08)] hover:-translate-y-[2px] transition-all duration-200">
+<p class="font-label-md text-label-md text-on-surface-variant mb-sm uppercase tracking-wider">Yönetici</p>
+<p class="font-display-lg text-display-lg text-on-surface">2</p>
+</div>
+</div>
+<!-- User Table Section -->
+<div class="bg-surface border border-outline-variant rounded overflow-hidden shadow-sm">
+<table class="w-full text-left font-body-md text-body-md border-collapse">
+<thead class="bg-surface-container-low border-b border-outline-variant">
+<tr>
+<th class="py-md px-lg font-label-md text-label-md text-on-surface-variant uppercase">Kullanıcı</th>
+<th class="py-md px-lg font-label-md text-label-md text-on-surface-variant uppercase">E-posta</th>
+<th class="py-md px-lg font-label-md text-label-md text-on-surface-variant uppercase">Kayıt Tarihi</th>
+<th class="py-md px-lg font-label-md text-label-md text-on-surface-variant uppercase">Rol</th>
+<th class="py-md px-lg font-label-md text-label-md text-on-surface-variant uppercase">Durum</th>
+<th class="py-md px-lg font-label-md text-label-md text-on-surface-variant uppercase text-right">Aksiyon</th>
+</tr>
+</thead>
+<tbody class="divide-y divide-outline-variant">
+<!-- Row 1 -->
+<tr class="bg-surface hover:bg-surface-container transition-colors group">
+<td class="py-md px-lg">
+<div class="flex items-center space-x-md">
+<div class="w-10 h-10 rounded-full bg-surface-variant text-on-surface-variant flex items-center justify-center font-headline-sm">AY</div>
+<span class="font-headline-sm text-headline-sm text-on-surface">Ahmet Yılmaz</span>
+</div>
+</td>
+<td class="py-md px-lg text-on-surface-variant">ahmet@email.com</td>
+<td class="py-md px-lg text-on-surface-variant">29.06.2026</td>
+<td class="py-md px-lg">
+<span class="inline-flex items-center px-2 py-1 rounded bg-surface-variant text-on-surface-variant font-label-md text-[10px] uppercase">Aday</span>
+</td>
+<td class="py-md px-lg">
+<span class="inline-flex items-center px-2 py-1 rounded bg-primary-fixed-dim/20 text-primary-container font-label-md text-[10px] uppercase font-semibold">Aktif</span>
+</td>
+<td class="py-md px-lg text-right">
+<button class="px-sm py-xs border border-outline-variant rounded bg-surface text-on-surface font-label-md text-label-md hover:bg-surface-container-lowest transition-colors opacity-0 group-hover:opacity-100 focus:opacity-100">Yönetici Yap</button>
+</td>
+</tr>
+<!-- Row 2 -->
+<tr class="bg-surface-bright hover:bg-surface-container transition-colors group">
+<td class="py-md px-lg">
+<div class="flex items-center space-x-md">
+<div class="w-10 h-10 rounded-full bg-surface-variant text-on-surface-variant flex items-center justify-center font-headline-sm">ZK</div>
+<span class="font-headline-sm text-headline-sm text-on-surface">Zeynep Kaya</span>
+</div>
+</td>
+<td class="py-md px-lg text-on-surface-variant">zeynep@email.com</td>
+<td class="py-md px-lg text-on-surface-variant">28.06.2026</td>
+<td class="py-md px-lg">
+<span class="inline-flex items-center px-2 py-1 rounded bg-surface-variant text-on-surface-variant font-label-md text-[10px] uppercase">Aday</span>
+</td>
+<td class="py-md px-lg">
+<span class="inline-flex items-center px-2 py-1 rounded bg-primary-fixed-dim/20 text-primary-container font-label-md text-[10px] uppercase font-semibold">Aktif</span>
+</td>
+<td class="py-md px-lg text-right">
+<button class="px-sm py-xs border border-outline-variant rounded bg-surface text-on-surface font-label-md text-label-md hover:bg-surface-container-lowest transition-colors opacity-0 group-hover:opacity-100 focus:opacity-100">Yönetici Yap</button>
+</td>
+</tr>
+<!-- Row 3 -->
+<tr class="bg-surface hover:bg-surface-container transition-colors group">
+<td class="py-md px-lg">
+<div class="flex items-center space-x-md">
+<div class="w-10 h-10 rounded-full bg-primary-container text-on-primary flex items-center justify-center font-headline-sm">AT</div>
+<span class="font-headline-sm text-headline-sm text-on-surface">Admin Test</span>
+</div>
+</td>
+<td class="py-md px-lg text-on-surface-variant">admin@test.com</td>
+<td class="py-md px-lg text-on-surface-variant">27.06.2026</td>
+<td class="py-md px-lg">
+<span class="inline-flex items-center px-2 py-1 rounded bg-primary-container text-on-primary font-label-md text-[10px] uppercase">Yönetici</span>
+</td>
+<td class="py-md px-lg">
+<span class="inline-flex items-center px-2 py-1 rounded bg-primary-fixed-dim/20 text-primary-container font-label-md text-[10px] uppercase font-semibold">Aktif</span>
+</td>
+<td class="py-md px-lg text-right">
+<span class="font-label-md text-on-surface-variant italic">Sen</span>
+</td>
+</tr>
+<!-- Row 4 -->
+<tr class="bg-surface-bright hover:bg-surface-container transition-colors group">
+<td class="py-md px-lg">
+<div class="flex items-center space-x-md">
+<div class="w-10 h-10 rounded-full bg-surface-variant text-on-surface-variant flex items-center justify-center font-headline-sm">CD</div>
+<span class="font-headline-sm text-headline-sm text-on-surface">Can Demir</span>
+</div>
+</td>
+<td class="py-md px-lg text-on-surface-variant">can@email.com</td>
+<td class="py-md px-lg text-on-surface-variant">26.06.2026</td>
+<td class="py-md px-lg">
+<span class="inline-flex items-center px-2 py-1 rounded bg-surface-variant text-on-surface-variant font-label-md text-[10px] uppercase">Aday</span>
+</td>
+<td class="py-md px-lg">
+<span class="inline-flex items-center px-2 py-1 rounded bg-primary-fixed-dim/20 text-primary-container font-label-md text-[10px] uppercase font-semibold">Aktif</span>
+</td>
+<td class="py-md px-lg text-right">
+<button class="px-sm py-xs border border-outline-variant rounded bg-surface text-on-surface font-label-md text-label-md hover:bg-surface-container-lowest transition-colors opacity-0 group-hover:opacity-100 focus:opacity-100">Yönetici Yap</button>
+</td>
+</tr>
+<!-- Row 5 -->
+<tr class="bg-surface hover:bg-surface-container transition-colors group">
+<td class="py-md px-lg">
+<div class="flex items-center space-x-md">
+<div class="w-10 h-10 rounded-full bg-surface-variant text-on-surface-variant flex items-center justify-center font-headline-sm">EŞ</div>
+<span class="font-headline-sm text-headline-sm text-on-surface">Elif Şahin</span>
+</div>
+</td>
+<td class="py-md px-lg text-on-surface-variant">elif@email.com</td>
+<td class="py-md px-lg text-on-surface-variant">25.06.2026</td>
+<td class="py-md px-lg">
+<span class="inline-flex items-center px-2 py-1 rounded bg-surface-variant text-on-surface-variant font-label-md text-[10px] uppercase">Aday</span>
+</td>
+<td class="py-md px-lg">
+<span class="inline-flex items-center px-2 py-1 rounded bg-outline-variant text-on-surface-variant font-label-md text-[10px] uppercase font-semibold">Pasif</span>
+</td>
+<td class="py-md px-lg text-right">
+<button class="px-sm py-xs border border-outline-variant rounded bg-surface text-on-surface font-label-md text-label-md hover:bg-surface-container-lowest transition-colors opacity-0 group-hover:opacity-100 focus:opacity-100">Yönetici Yap</button>
+</td>
+</tr>
+</tbody>
+</table>
+<!-- Pagination -->
+<div class="bg-surface border-t border-outline-variant px-lg py-md flex items-center justify-between">
+<button class="font-body-sm text-on-surface-variant hover:text-on-surface transition-colors flex items-center" disabled="">
+<span class="mr-xs">←</span> Önceki
+                    </button>
+<div class="flex items-center space-x-sm">
+<button class="w-8 h-8 rounded bg-primary-container text-on-primary font-label-md flex items-center justify-center">1</button>
+<button class="w-8 h-8 rounded hover:bg-surface-container text-on-surface font-label-md flex items-center justify-center transition-colors">2</button>
+<button class="w-8 h-8 rounded hover:bg-surface-container text-on-surface font-label-md flex items-center justify-center transition-colors">3</button>
+</div>
+<button class="font-body-sm text-on-surface hover:text-primary-container transition-colors flex items-center">
+                        Sonraki <span class="ml-xs">→</span>
+</button>
+</div>
+</div>
+</div>
+</main>
+</body></html>

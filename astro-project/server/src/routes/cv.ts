@@ -151,7 +151,13 @@ router.post("/upload", authMiddleware, (req: Request, res: Response): void => {
       const rawOriginalName = req.file.originalname;
       const fileName = Buffer.from(rawOriginalName, "latin1").toString("utf8");
       const fileExt = path.extname(fileName).toLowerCase();
-      const userId = req.user.id;
+      
+      // If admin, allow uploading on behalf of another candidate
+      let userId = req.user.id;
+      if (req.user.role === "ADMIN" && req.body.targetUserId) {
+        userId = req.body.targetUserId;
+      }
+      
       const fileUuid = crypto.randomUUID();
       const filePath = `cvs/${userId}/${fileUuid}${fileExt}`;
 
@@ -250,13 +256,16 @@ router.get("/list", authMiddleware, async (req: Request, res: Response): Promise
 
   try {
     const list = await prisma.cV.findMany({
-      where: { userId: req.user.id },
+      where: req.user.role === "ADMIN" ? {} : { userId: req.user.id },
       include: {
         analyses: {
           orderBy: { createdAt: "desc" },
         },
-        chunks: {
-          orderBy: { createdAt: "asc" }
+        user: {
+          select: {
+            name: true,
+            email: true,
+          }
         }
       },
       orderBy: { createdAt: "desc" },
@@ -302,12 +311,11 @@ router.delete("/:id", authMiddleware, async (req: Request, res: Response): Promi
   const id = req.params.id as string;
 
   try {
-    // 1. Find the CV and ensure it belongs to the logged-in user
+    // 1. Find the CV and ensure it belongs to the logged-in user (or user is admin)
     const cv = await prisma.cV.findFirst({
-      where: {
-        id: id,
-        userId: req.user.id
-      }
+      where: req.user.role === "ADMIN"
+        ? { id: id }
+        : { id: id, userId: req.user.id }
     });
 
     if (!cv) {

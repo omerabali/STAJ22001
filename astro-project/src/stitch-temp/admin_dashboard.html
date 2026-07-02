@@ -1,0 +1,448 @@
+<!DOCTYPE html>
+
+<html class="light" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Beacon Dashboard</title>
+<link href="https://fonts.googleapis.com" rel="preconnect"/>
+<link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600&amp;family=Manrope:wght@600;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<script id="tailwind-config">
+        tailwind.config = {
+          darkMode: "class",
+          theme: {
+            extend: {
+              "colors": {
+                      "surface-container-low": "#f7f3ef",
+                      "error-container": "#ffdad6",
+                      "surface-container-high": "#ece7e4",
+                      "surface-variant": "#e6e2de",
+                      "on-primary-fixed": "#002114",
+                      "surface": "#fdf8f5",
+                      "outline": "#717973",
+                      "surface-container-highest": "#e6e2de",
+                      "on-primary": "#ffffff",
+                      "error": "#ba1a1a",
+                      "on-secondary-fixed-variant": "#6d3a00",
+                      "inverse-surface": "#32302e",
+                      "on-primary-fixed-variant": "#224f3b",
+                      "inverse-primary": "#a1d1b7",
+                      "secondary-fixed-dim": "#ffb77b",
+                      "on-tertiary": "#ffffff",
+                      "surface-container-lowest": "#ffffff",
+                      "surface-dim": "#ded9d6",
+                      "surface-bright": "#fdf8f5",
+                      "secondary": "#8c4f10",
+                      "on-secondary-container": "#763f00",
+                      "on-tertiary-fixed-variant": "#494641",
+                      "tertiary-fixed": "#e8e2db",
+                      "on-primary-container": "#9fcfb5",
+                      "tertiary": "#3d3a35",
+                      "background": "#fdf8f5",
+                      "inverse-on-surface": "#f5f0ec",
+                      "on-error": "#ffffff",
+                      "on-error-container": "#93000a",
+                      "primary-fixed-dim": "#a1d1b7",
+                      "on-background": "#1c1b19",
+                      "on-tertiary-container": "#c9c4bd",
+                      "tertiary-fixed-dim": "#cbc6bf",
+                      "secondary-container": "#fdad67",
+                      "primary-container": "#2d5a45",
+                      "tertiary-container": "#54514c",
+                      "surface-tint": "#3a6751",
+                      "on-tertiary-fixed": "#1d1b17",
+                      "surface-container": "#f2ede9",
+                      "secondary-fixed": "#ffdcc2",
+                      "on-surface": "#1c1b19",
+                      "on-surface-variant": "#414943",
+                      "on-secondary": "#ffffff",
+                      "outline-variant": "#c0c9c2",
+                      "primary-fixed": "#bceed2",
+                      "primary": "#14422f",
+                      "on-secondary-fixed": "#2e1500"
+              },
+              "borderRadius": {
+                      "DEFAULT": "0.25rem",
+                      "lg": "0.5rem",
+                      "xl": "0.75rem",
+                      "full": "9999px"
+              },
+              "spacing": {
+                      "gutter": "24px",
+                      "margin-desktop": "48px",
+                      "margin-mobile": "16px",
+                      "md": "16px",
+                      "sm": "8px",
+                      "base": "4px",
+                      "2xl": "80px",
+                      "xl": "48px",
+                      "xs": "4px",
+                      "lg": "24px",
+                      "max-width": "1280px"
+              },
+              "fontFamily": {
+                      "label-sm": [
+                              "IBM Plex Sans"
+                      ],
+                      "headline-lg": [
+                              "Manrope"
+                      ],
+                      "headline-md": [
+                              "Manrope"
+                      ],
+                      "body-md": [
+                              "IBM Plex Sans"
+                      ],
+                      "display-lg-mobile": [
+                              "Manrope"
+                      ],
+                      "display-lg": [
+                              "Manrope"
+                      ],
+                      "label-md": [
+                              "IBM Plex Sans"
+                      ],
+                      "body-sm": [
+                              "IBM Plex Sans"
+                      ],
+                      "body-lg": [
+                              "IBM Plex Sans"
+                      ],
+                      "headline-sm": [
+                              "Manrope"
+                      ]
+              },
+              "fontSize": {
+                      "label-sm": [
+                              "12px",
+                              {
+                                      "lineHeight": "14px",
+                                      "fontWeight": "600"
+                              }
+                      ],
+                      "headline-lg": [
+                              "32px",
+                              {
+                                      "lineHeight": "40px",
+                                      "letterSpacing": "-0.01em",
+                                      "fontWeight": "600"
+                              }
+                      ],
+                      "headline-md": [
+                              "24px",
+                              {
+                                      "lineHeight": "32px",
+                                      "fontWeight": "600"
+                              }
+                      ],
+                      "body-md": [
+                              "16px",
+                              {
+                                      "lineHeight": "24px",
+                                      "fontWeight": "400"
+                              }
+                      ],
+                      "display-lg-mobile": [
+                              "32px",
+                              {
+                                      "lineHeight": "40px",
+                                      "letterSpacing": "-0.02em",
+                                      "fontWeight": "700"
+                              }
+                      ],
+                      "display-lg": [
+                              "48px",
+                              {
+                                      "lineHeight": "56px",
+                                      "letterSpacing": "-0.02em",
+                                      "fontWeight": "700"
+                              }
+                      ],
+                      "label-md": [
+                              "14px",
+                              {
+                                      "lineHeight": "16px",
+                                      "letterSpacing": "0.01em",
+                                      "fontWeight": "500"
+                              }
+                      ],
+                      "body-sm": [
+                              "14px",
+                              {
+                                      "lineHeight": "20px",
+                                      "fontWeight": "400"
+                              }
+                      ],
+                      "body-lg": [
+                              "18px",
+                              {
+                                      "lineHeight": "28px",
+                                      "fontWeight": "400"
+                              }
+                      ],
+                      "headline-sm": [
+                              "20px",
+                              {
+                                      "lineHeight": "28px",
+                                      "fontWeight": "600"
+                              }
+                      ]
+              }
+      },
+          },
+        }
+      </script>
+<style>
+        .material-symbols-outlined {
+          font-variation-settings:
+          'FILL' 0,
+          'wght' 400,
+          'GRAD' 0,
+          'opsz' 24
+        }
+    </style>
+</head>
+<body class="bg-[#F5F4F0] text-on-surface font-body-md min-h-screen flex antialiased">
+<!-- SideNavBar -->
+<nav class="hidden md:flex w-[240px] h-screen sticky left-0 top-0 bg-surface-container-low border-r border-outline-variant flex-col p-lg justify-between">
+<div class="flex flex-col gap-8">
+<div class="flex flex-col gap-1">
+<span class="font-headline-md text-headline-md text-on-surface tracking-tight">Beacon</span>
+<span class="font-label-sm text-label-sm text-on-surface-variant">Career Platform</span>
+</div>
+<ul class="flex flex-col gap-2">
+<!-- Active Item: Dashboard -->
+<li>
+<a class="flex items-center gap-3 px-4 py-3 text-primary bg-white rounded-lg shadow-sm font-label-md text-label-md font-bold scale-[0.99] transition-transform" href="#">
+<span class="material-symbols-outlined text-xl">dashboard</span>
+                        Dashboard
+                    </a>
+</li>
+<!-- Inactive Items -->
+<li>
+<a class="flex items-center gap-3 px-4 py-3 text-on-surface-variant hover:text-primary hover:bg-surface-container-high transition-all duration-200 rounded-lg font-label-md text-label-md" href="#">
+<span class="material-symbols-outlined text-xl">search</span>
+                        Aday Ara
+                    </a>
+</li>
+<li>
+<a class="flex items-center gap-3 px-4 py-3 text-on-surface-variant hover:text-primary hover:bg-surface-container-high transition-all duration-200 rounded-lg font-label-md text-label-md" href="#">
+<span class="material-symbols-outlined text-xl">cloud_upload</span>
+                        CV Yükle
+                    </a>
+</li>
+<li>
+<a class="flex items-center gap-3 px-4 py-3 text-on-surface-variant hover:text-primary hover:bg-surface-container-high transition-all duration-200 rounded-lg font-label-md text-label-md" href="#">
+<span class="material-symbols-outlined text-xl">group</span>
+                        Kullanıcı Yönetimi
+                    </a>
+</li>
+<li>
+<a class="flex items-center gap-3 px-4 py-3 text-on-surface-variant hover:text-primary hover:bg-surface-container-high transition-all duration-200 rounded-lg font-label-md text-label-md" href="#">
+<span class="material-symbols-outlined text-xl">settings</span>
+                        Sistem Ayarları
+                    </a>
+</li>
+<li>
+<a class="flex items-center gap-3 px-4 py-3 text-on-surface-variant hover:text-primary hover:bg-surface-container-high transition-all duration-200 rounded-lg font-label-md text-label-md" href="#">
+<span class="material-symbols-outlined text-xl">assessment</span>
+                        Raporlar
+                    </a>
+</li>
+</ul>
+</div>
+<div class="mt-auto pt-6 border-t border-outline-variant/30">
+<a class="flex items-center gap-3 px-2 py-2 text-on-surface-variant hover:text-primary transition-colors rounded-lg font-label-md text-label-md" href="#">
+<div class="w-8 h-8 rounded-full bg-surface-variant overflow-hidden flex-shrink-0">
+<img alt="Beacon Platform Logo" class="w-full h-full object-cover" data-alt="A small circular profile picture of a professional woman with dark hair in a well-lit office setting. The lighting is soft and natural, casting a warm glow suitable for a professional corporate application avatar. The color palette is neutral with soft tones, reflecting a clean, modern aesthetic." src="https://lh3.googleusercontent.com/aida-public/AB6AXuBcal4mUjnRfQop7f8PBa45tp9JG1yIXPP2cllVjp4RwnXwvW2qG19abMCUAXPaoKFSJqU3U3h88sE0b4h2LOC9ME0VPBz_9IJEHsyDEc3hLFAyL_cbuRICmb3JL-EjRdFEJkVt_PP1sPp_tU20cRjb7ewx38qtnhddJcMzKxlVPJbMRZY1NUpD6w4EBCWgkqfRmviuefxfQitYuC6MG5UHUwLlNBy1EwnCsO5AEUH02cwc8dQ9GqoyC2zSg28ue0BdU7gUby-TneJc"/>
+</div>
+<span>Profilim</span>
+</a>
+</div>
+</nav>
+<!-- Main Content Canvas -->
+<main class="flex-1 flex flex-col min-w-0 pb-12">
+<!-- TopAppBar (Mobile Only) -->
+<header class="flex md:hidden items-center justify-between px-lg w-full h-16 bg-surface border-b border-outline-variant sticky top-0 z-10">
+<span class="font-headline-sm text-headline-sm text-primary tracking-tight">Beacon</span>
+<div class="flex items-center gap-4">
+<button class="text-on-surface-variant hover:bg-surface-variant/50 p-2 rounded-full transition-colors cursor-pointer active:opacity-80">
+<span class="material-symbols-outlined">notifications</span>
+</button>
+<button class="text-on-surface-variant hover:bg-surface-variant/50 p-2 rounded-full transition-colors cursor-pointer active:opacity-80">
+<span class="material-symbols-outlined">help_outline</span>
+</button>
+<div class="w-8 h-8 rounded-full bg-surface-variant overflow-hidden">
+<img alt="User profile" class="w-full h-full object-cover" data-alt="A small circular profile picture of a professional woman with dark hair in a well-lit office setting. The lighting is soft and natural, casting a warm glow suitable for a professional corporate application avatar. The color palette is neutral with soft tones, reflecting a clean, modern aesthetic." src="https://lh3.googleusercontent.com/aida-public/AB6AXuDykncz8OovfT2I-F37ljUPzV9Ow_peMiudYd-ICxFyrfbqAWR1pbJ1_ARYwEBg3GoguuyXl83ksvbkvnyrkEF61amKf2ma3Lab_A6Ext074AQx7VYBxG031o_I9VUOoFP_yJ-mDS9VmhPx_9ImQviFNb2chVE0nsQo2WrcqMreoSoZyKWsJGPqHPu1ZJjXzZan4Ku8yYvhT2AOGKPfqBJ7oZ6Utng1mpAqNLgRcby0JKIiGCTvaBn1pZXKQwhAXnCQEOMa08amkWBb"/>
+</div>
+</div>
+</header>
+<!-- Page Header -->
+<div class="px-gutter pt-xl pb-8 md:pt-12 max-w-[1280px] w-full mx-auto">
+<div class="flex items-center justify-between">
+<div>
+<h1 class="font-headline-lg text-headline-lg text-on-surface mb-2">Dashboard</h1>
+<p class="font-body-md text-body-md text-on-surface-variant">Genel bakış ve sistem istatistikleri.</p>
+</div>
+<div class="hidden md:flex gap-3">
+<button class="flex items-center gap-2 bg-transparent border border-primary text-primary px-4 py-2 rounded-lg font-label-md text-label-md hover:bg-surface-container-high transition-colors">
+<span class="material-symbols-outlined text-sm">download</span>
+                        Rapor İndir
+                    </button>
+</div>
+</div>
+</div>
+<!-- Dashboard Content Grid -->
+<div class="px-gutter max-w-[1280px] w-full mx-auto flex flex-col gap-xl">
+<!-- Stat Cards Row -->
+<div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+<!-- Stat Card 1 (Active/Highlighted) -->
+<div class="bg-white rounded-[10px] p-6 shadow-[0_4px_12px_rgba(0,0,0,0.08)] border border-[#DDD9D3] border-l-[3px] border-l-primary hover:bg-[#EDECEA] hover:shadow-[0_8px_24px_rgba(0,0,0,0.12)] transition-all duration-300 relative overflow-hidden group cursor-pointer">
+<div class="flex justify-between items-start mb-4">
+<div class="flex flex-col">
+<span class="font-label-md text-label-md text-on-surface-variant mb-1">Aktif Adaylar</span>
+<span class="font-display-lg text-display-lg text-on-surface font-light tracking-tight group-hover:text-primary transition-colors">1,248</span>
+</div>
+<div class="w-10 h-10 rounded-full bg-primary-container/20 flex items-center justify-center text-primary">
+<span class="material-symbols-outlined">person_search</span>
+</div>
+</div>
+<div class="flex items-center gap-2 mt-4">
+<span class="flex items-center text-primary font-label-sm text-label-sm bg-primary-container/10 px-2 py-0.5 rounded">
+<span class="material-symbols-outlined text-[14px] mr-1">trending_up</span>
+                            +12%
+                        </span>
+<span class="font-body-sm text-body-sm text-on-surface-variant">geçen haftaya göre</span>
+</div>
+</div>
+<!-- Stat Card 2 -->
+<div class="bg-white rounded-[10px] p-6 shadow-[0_4px_12px_rgba(0,0,0,0.08)] border border-[#DDD9D3] hover:bg-[#EDECEA] hover:shadow-[0_8px_24px_rgba(0,0,0,0.12)] transition-all duration-300 relative overflow-hidden cursor-pointer">
+<div class="flex justify-between items-start mb-4">
+<div class="flex flex-col">
+<span class="font-label-md text-label-md text-on-surface-variant mb-1">Toplam Yöneticiler</span>
+<span class="font-display-lg text-display-lg text-on-surface font-light tracking-tight">42</span>
+</div>
+<div class="w-10 h-10 rounded-full bg-surface-container-high flex items-center justify-center text-on-surface-variant">
+<span class="material-symbols-outlined">badge</span>
+</div>
+</div>
+<div class="flex items-center gap-2 mt-4">
+<span class="font-body-sm text-body-sm text-on-surface-variant">Sistemde kayıtlı</span>
+</div>
+</div>
+<!-- Stat Card 3 -->
+<div class="bg-white rounded-[10px] p-6 shadow-[0_4px_12px_rgba(0,0,0,0.08)] border border-[#DDD9D3] hover:bg-[#EDECEA] hover:shadow-[0_8px_24px_rgba(0,0,0,0.12)] transition-all duration-300 relative overflow-hidden cursor-pointer">
+<div class="flex justify-between items-start mb-4">
+<div class="flex flex-col">
+<span class="font-label-md text-label-md text-on-surface-variant mb-1">Bugün Kayıtlar</span>
+<span class="font-display-lg text-display-lg text-on-surface font-light tracking-tight">18</span>
+</div>
+<div class="w-10 h-10 rounded-full bg-surface-container-high flex items-center justify-center text-on-surface-variant">
+<span class="material-symbols-outlined">how_to_reg</span>
+</div>
+</div>
+<div class="flex items-center gap-2 mt-4">
+<span class="flex items-center text-primary font-label-sm text-label-sm bg-primary-container/10 px-2 py-0.5 rounded">
+<span class="material-symbols-outlined text-[14px] mr-1">trending_up</span>
+                             +4
+                        </span>
+<span class="font-body-sm text-body-sm text-on-surface-variant">düne göre</span>
+</div>
+</div>
+</div>
+<!-- Bento Grid Section -->
+<div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+<!-- Large Chart Card -->
+<div class="lg:col-span-2 bg-white rounded-[10px] p-lg shadow-[0_4px_12px_rgba(0,0,0,0.08)] border border-[#DDD9D3] flex flex-col">
+<div class="flex justify-between items-center mb-6">
+<h2 class="font-headline-sm text-headline-sm text-on-surface">Aktivite Özeti</h2>
+<button class="text-on-surface-variant hover:text-primary transition-colors">
+<span class="material-symbols-outlined">more_vert</span>
+</button>
+</div>
+<div class="flex-1 bg-surface-container-low rounded-lg border border-outline-variant/50 min-h-[300px] flex items-center justify-center relative overflow-hidden">
+<!-- Abstract Chart Representation -->
+<div class="absolute bottom-0 left-0 w-full h-[60%] flex items-end px-4 gap-2 opacity-40">
+<div class="w-full bg-primary/20 h-[30%] rounded-t-sm"></div>
+<div class="w-full bg-primary/30 h-[50%] rounded-t-sm"></div>
+<div class="w-full bg-primary/20 h-[40%] rounded-t-sm"></div>
+<div class="w-full bg-primary/50 h-[70%] rounded-t-sm"></div>
+<div class="w-full bg-primary/40 h-[60%] rounded-t-sm"></div>
+<div class="w-full bg-primary/80 h-[90%] rounded-t-sm"></div>
+<div class="w-full bg-primary h-[85%] rounded-t-sm"></div>
+</div>
+<span class="font-body-sm text-body-sm text-on-surface-variant relative z-10 bg-white/80 px-4 py-2 rounded-full backdrop-blur-sm shadow-sm">Grafik Verisi Yükleniyor...</span>
+</div>
+</div>
+<!-- Recent Activity Feed -->
+<div class="bg-white rounded-[10px] p-lg shadow-[0_4px_12px_rgba(0,0,0,0.08)] border border-[#DDD9D3] flex flex-col h-[400px]">
+<div class="flex justify-between items-center mb-6">
+<h2 class="font-headline-sm text-headline-sm text-on-surface">Son İşlemler</h2>
+</div>
+<div class="flex-1 overflow-y-auto pr-2">
+<div class="flex flex-col gap-4 relative">
+<!-- Timeline Line -->
+<div class="absolute left-4 top-2 bottom-2 w-px bg-outline-variant/30 -z-10"></div>
+<!-- Activity Item -->
+<div class="flex gap-4 items-start group">
+<div class="w-8 h-8 rounded-full bg-surface flex items-center justify-center border border-outline-variant mt-1 group-hover:border-primary transition-colors bg-white">
+<span class="material-symbols-outlined text-[16px] text-on-surface-variant group-hover:text-primary">upload_file</span>
+</div>
+<div class="flex flex-col">
+<span class="font-label-md text-label-md text-on-surface">Yeni CV Yüklendi</span>
+<span class="font-body-sm text-body-sm text-on-surface-variant">Ayşe Yılmaz tarafından</span>
+<span class="font-label-sm text-label-sm text-outline mt-1">10 dk önce</span>
+</div>
+</div>
+<!-- Activity Item -->
+<div class="flex gap-4 items-start group">
+<div class="w-8 h-8 rounded-full bg-surface flex items-center justify-center border border-outline-variant mt-1 group-hover:border-primary transition-colors bg-white">
+<span class="material-symbols-outlined text-[16px] text-on-surface-variant group-hover:text-primary">person_add</span>
+</div>
+<div class="flex flex-col">
+<span class="font-label-md text-label-md text-on-surface">Yeni Kullanıcı Kaydı</span>
+<span class="font-body-sm text-body-sm text-on-surface-variant">Mehmet Demir sisteme eklendi</span>
+<span class="font-label-sm text-label-sm text-outline mt-1">1 saat önce</span>
+</div>
+</div>
+<!-- Activity Item -->
+<div class="flex gap-4 items-start group">
+<div class="w-8 h-8 rounded-full bg-surface flex items-center justify-center border border-outline-variant mt-1 group-hover:border-primary transition-colors bg-white">
+<span class="material-symbols-outlined text-[16px] text-on-surface-variant group-hover:text-primary">settings</span>
+</div>
+<div class="flex flex-col">
+<span class="font-label-md text-label-md text-on-surface">Sistem Ayarları Güncellendi</span>
+<span class="font-body-sm text-body-sm text-on-surface-variant">Admin tarafından yetkiler değiştirildi</span>
+<span class="font-label-sm text-label-sm text-outline mt-1">Dün, 14:30</span>
+</div>
+</div>
+</div>
+</div>
+<button class="mt-4 w-full py-2 border border-[#DDD9D3] rounded-lg font-label-md text-label-md text-on-surface-variant hover:bg-surface-container-high transition-colors">Tümünü Gör</button>
+</div>
+</div>
+</div>
+</main>
+<!-- BottomNavBar (Mobile Only - Simplified for brevity as per instructions, usually rendered if destination) -->
+<nav class="md:hidden fixed bottom-0 left-0 w-full bg-surface border-t border-outline-variant/30 flex justify-around items-center h-16 z-20 pb-safe">
+<a class="flex flex-col items-center justify-center w-full h-full text-primary" href="#">
+<span class="material-symbols-outlined text-2xl mb-1" style="font-variation-settings: 'FILL' 1;">dashboard</span>
+<span class="font-label-sm text-[10px] leading-none">Dashboard</span>
+</a>
+<a class="flex flex-col items-center justify-center w-full h-full text-on-surface-variant hover:text-primary" href="#">
+<span class="material-symbols-outlined text-2xl mb-1">search</span>
+<span class="font-label-sm text-[10px] leading-none">Ara</span>
+</a>
+<a class="flex flex-col items-center justify-center w-full h-full text-on-surface-variant hover:text-primary" href="#">
+<span class="material-symbols-outlined text-2xl mb-1">cloud_upload</span>
+<span class="font-label-sm text-[10px] leading-none">Yükle</span>
+</a>
+<a class="flex flex-col items-center justify-center w-full h-full text-on-surface-variant hover:text-primary" href="#">
+<span class="material-symbols-outlined text-2xl mb-1">menu</span>
+<span class="font-label-sm text-[10px] leading-none">Menü</span>
+</a>
+</nav>
+</body></html>

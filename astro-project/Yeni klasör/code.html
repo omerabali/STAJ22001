@@ -1,0 +1,240 @@
+<!DOCTYPE html>
+
+<html class="light" lang="tr"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Beacon - Giriş</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&amp;family=IBM+Plex+Sans:wght@500;600&amp;family=Manrope:wght@600;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    "colors": {
+                        "tertiary-fixed": "#ffdad9",
+                        "inverse-primary": "#a1d1b7",
+                        "secondary-container": "#fdad67",
+                        "secondary-fixed-dim": "#ffb77b",
+                        "inverse-on-surface": "#f5f0ec",
+                        "surface-container-low": "#f7f3ef",
+                        "secondary-fixed": "#ffdcc2",
+                        "secondary": "#8c4f10",
+                        "surface-container-lowest": "#ffffff",
+                        "on-secondary-fixed-variant": "#6d3a00",
+                        "on-primary-fixed": "#002114",
+                        "tertiary-fixed-dim": "#fab5b5",
+                        "on-error": "#ffffff",
+                        "tertiary-container": "#764344",
+                        "on-tertiary-container": "#f8b3b3",
+                        "on-primary": "#ffffff",
+                        "on-tertiary": "#ffffff",
+                        "outline-variant": "#c0c9c2",
+                        "on-secondary-container": "#763f00",
+                        "surface-dim": "#ded9d6",
+                        "inverse-surface": "#32302e",
+                        "on-error-container": "#93000a",
+                        "error": "#ba1a1a",
+                        "primary-fixed-dim": "#a1d1b7",
+                        "on-background": "#1c1b19",
+                        "on-secondary-fixed": "#2e1500",
+                        "surface-container-high": "#ece7e4",
+                        "on-surface-variant": "#414943",
+                        "surface-container": "#f2ede9",
+                        "on-surface": "#1c1b19",
+                        "on-primary-container": "#9fcfb5",
+                        "primary-container": "#2d5a45",
+                        "on-tertiary-fixed": "#350f11",
+                        "on-tertiary-fixed-variant": "#6a393a",
+                        "surface-variant": "#e6e2de",
+                        "primary-fixed": "#bceed2",
+                        "outline": "#717973",
+                        "error-container": "#ffdad6",
+                        "primary": "#14422f",
+                        "tertiary": "#5b2d2e",
+                        "surface-container-highest": "#e6e2de",
+                        "surface-bright": "#fdf8f5",
+                        "surface-tint": "#3a6751",
+                        "surface": "#fdf8f5",
+                        "on-primary-fixed-variant": "#224f3b",
+                        "on-secondary": "#ffffff",
+                        "background": "#fdf8f5"
+                    },
+                    "borderRadius": {
+                        "DEFAULT": "0.125rem",
+                        "lg": "0.25rem",
+                        "xl": "0.5rem",
+                        "full": "0.75rem"
+                    },
+                    "spacing": {
+                        "xs": "4px",
+                        "base": "8px",
+                        "lg": "48px",
+                        "gutter": "24px",
+                        "sm": "12px",
+                        "margin-desktop": "64px",
+                        "md": "24px",
+                        "xl": "80px",
+                        "margin-mobile": "20px",
+                        "split-sidebar": "400px"
+                    },
+                    "fontFamily": {
+                        "body-md": ["Inter"],
+                        "label-caps": ["IBM Plex Sans"],
+                        "display-lg-mobile": ["Manrope"],
+                        "button": ["IBM Plex Sans"],
+                        "headline-sm": ["Manrope"],
+                        "body-lg": ["Inter"],
+                        "headline-md": ["Manrope"],
+                        "display-lg": ["Manrope"],
+                        "body-sm": ["Inter"]
+                    },
+                    "fontSize": {
+                        "body-md": ["16px", { "lineHeight": "24px", "fontWeight": "400" }],
+                        "label-caps": ["12px", { "lineHeight": "16px", "letterSpacing": "0.08em", "fontWeight": "500" }],
+                        "display-lg-mobile": ["32px", { "lineHeight": "40px", "letterSpacing": "-0.01em", "fontWeight": "700" }],
+                        "button": ["14px", { "lineHeight": "16px", "letterSpacing": "0.05em", "fontWeight": "600" }],
+                        "headline-sm": ["18px", { "lineHeight": "24px", "fontWeight": "600" }],
+                        "body-lg": ["18px", { "lineHeight": "28px", "fontWeight": "400" }],
+                        "headline-md": ["24px", { "lineHeight": "32px", "fontWeight": "600" }],
+                        "display-lg": ["48px", { "lineHeight": "56px", "letterSpacing": "-0.02em", "fontWeight": "700" }],
+                        "body-sm": ["14px", { "lineHeight": "20px", "fontWeight": "400" }]
+                    }
+                }
+            }
+        }
+    </script>
+<style>
+        @keyframes float {
+            0% { transform: translateY(0px); }
+            50% { transform: translateY(-15px); }
+            100% { transform: translateY(0px); }
+        }
+        @keyframes float-alt {
+            0% { transform: translateY(0px) translateX(0px); }
+            50% { transform: translateY(-10px) translateX(5px); }
+            100% { transform: translateY(0px) translateX(0px); }
+        }
+        .animate-float { animation: float 6s ease-in-out infinite; }
+        .animate-float-delayed { animation: float-alt 7s ease-in-out infinite 2s; }
+        .animate-float-slow { animation: float 9s ease-in-out infinite 1s; }
+        .animate-float-slower { animation: float-alt 11s ease-in-out infinite 3s; }
+    </style>
+</head>
+<body class="bg-surface-container-lowest text-on-surface antialiased min-h-screen flex flex-col md:flex-row font-body-md selection:bg-primary-container selection:text-on-primary">
+<div class="relative hidden md:flex flex-col justify-center w-1/2 bg-surface-container-low p-margin-desktop overflow-hidden border-r border-surface-dim">
+<div class="absolute inset-0 opacity-[0.03] pointer-events-none" style="background-image: radial-gradient(#1c1b19 1px, transparent 1px); background-size: 24px 24px;"></div>
+<!-- Floating Background Cards -->
+<div class="absolute inset-0 z-0 overflow-hidden pointer-events-none opacity-60">
+<!-- Card 1 -->
+<div class="absolute top-32 right-12 w-64 bg-surface-container-lowest/90 backdrop-blur-md border border-surface-dim/60 rounded-xl p-4 shadow-[0_4px_24px_rgb(0,0,0,0.04)] animate-float">
+<div class="flex items-center gap-3">
+<div class="w-10 h-10 rounded-full bg-surface-variant/80"></div>
+<div class="flex-1 space-y-2">
+<div class="h-2 w-3/4 bg-surface-variant/80 rounded-full"></div>
+<div class="h-2 w-1/2 bg-surface-variant/80 rounded-full"></div>
+</div>
+<span class="material-symbols-outlined text-primary-container text-[18px]">check</span>
+</div>
+</div>
+<!-- Card 2 -->
+<div class="absolute bottom-48 -left-8 w-72 bg-surface-container-lowest/90 backdrop-blur-md border border-surface-dim/60 rounded-xl p-4 shadow-[0_4px_24px_rgb(0,0,0,0.04)] animate-float-delayed">
+<div class="flex items-center gap-3">
+<div class="w-10 h-10 rounded-full bg-surface-variant/80"></div>
+<div class="flex-1 space-y-2">
+<div class="h-2 w-full bg-surface-variant/80 rounded-full"></div>
+<div class="h-2 w-2/3 bg-surface-variant/80 rounded-full"></div>
+</div>
+<span class="material-symbols-outlined text-primary-container text-[18px]">check</span>
+</div>
+</div>
+<!-- Card 3 -->
+<div class="absolute bottom-24 right-24 w-56 bg-surface-container-lowest/90 backdrop-blur-md border border-surface-dim/60 rounded-xl p-4 shadow-[0_4px_24px_rgb(0,0,0,0.04)] animate-float-slow">
+<div class="flex items-center gap-3">
+<div class="w-8 h-8 rounded-full bg-surface-variant/80"></div>
+<div class="flex-1 space-y-2">
+<div class="h-2 w-4/5 bg-surface-variant/80 rounded-full"></div>
+<div class="h-2 w-1/2 bg-surface-variant/80 rounded-full"></div>
+</div>
+<span class="material-symbols-outlined text-primary-container text-[18px]">check</span>
+</div>
+</div>
+<!-- Card 4 -->
+<div class="absolute top-1/2 right-10 w-60 bg-surface-container-lowest/90 backdrop-blur-md border border-surface-dim/60 rounded-xl p-4 shadow-[0_4px_24px_rgb(0,0,0,0.04)] animate-float-slower">
+<div class="flex items-center gap-3">
+<div class="w-10 h-10 rounded-full bg-surface-variant/80"></div>
+<div class="flex-1 space-y-2">
+<div class="h-2 w-full bg-surface-variant/80 rounded-full"></div>
+<div class="h-2 w-3/4 bg-surface-variant/80 rounded-full"></div>
+</div>
+<span class="material-symbols-outlined text-primary-container text-[18px]">check</span>
+</div>
+</div>
+</div>
+<div class="absolute top-margin-desktop left-margin-desktop z-10">
+<h1 class="font-headline-md text-headline-md text-on-surface flex items-baseline">
+            Beacon<span class="w-2 h-2 rounded-full bg-primary-container ml-1"></span>
+</h1>
+</div>
+<div class="max-w-lg z-10 relative">
+<h2 class="font-display-lg text-display-lg text-on-surface mb-md drop-shadow-sm">Profesyonel profilleri anlamanın daha iyi bir yolu.</h2>
+<p class="font-body-lg text-body-lg text-on-surface-variant mb-lg">CV'ni yükle, güçlü ve zayıf yönlerini keşfet, kariyerinde doğru yönü bul.</p>
+<ul class="space-y-sm">
+<li class="flex items-center gap-sm">
+<span class="material-symbols-outlined text-primary-container" style="font-variation-settings: 'FILL' 1;">check_circle</span>
+<span class="font-body-md text-body-md text-on-surface-variant">Saniyeler içinde CV analizi</span>
+</li>
+<li class="flex items-center gap-sm">
+<span class="material-symbols-outlined text-primary-container" style="font-variation-settings: 'FILL' 1;">check_circle</span>
+<span class="font-body-md text-body-md text-on-surface-variant">Güçlü ve zayıf yön tespiti</span>
+</li>
+<li class="flex items-center gap-sm">
+<span class="material-symbols-outlined text-primary-container" style="font-variation-settings: 'FILL' 1;">check_circle</span>
+<span class="font-body-md text-body-md text-on-surface-variant">Kişisel gelişim önerileri</span>
+</li>
+</ul>
+</div>
+</div>
+<div class="flex-1 flex flex-col justify-center items-center p-gutter bg-surface-container-lowest">
+<div class="w-full max-w-[420px]">
+<div class="mb-lg text-center md:text-left">
+<div class="font-label-caps text-label-caps text-outline uppercase tracking-widest mb-xs">BEACON</div>
+<h3 class="font-headline-md text-[28px] leading-[36px] font-bold text-on-surface mb-xs">Tekrar hoş geldin</h3>
+<p class="font-body-md text-body-md text-on-surface-variant">Hesabına giriş yap</p>
+</div>
+<div class="bg-surface-container-lowest p-8 rounded-[16px] shadow-[0_8px_30px_rgb(0,0,0,0.06)] border border-surface-dim/30">
+<form action="#" class="space-y-6" method="POST">
+<div>
+<label class="block font-label-caps text-label-caps text-on-surface-variant mb-2" for="email">E-posta</label>
+<input class="w-full h-12 px-4 bg-surface-bright border border-outline-variant rounded-[10px] text-on-surface focus:outline-none focus:border-primary-container focus:ring-4 focus:ring-primary-container/10 transition-all font-body-sm shadow-sm" id="email" name="email" placeholder="ornek@email.com" required="" type="email"/>
+</div>
+<div>
+<div class="flex justify-between items-center mb-2">
+<label class="block font-label-caps text-label-caps text-on-surface-variant" for="password">Şifre</label>
+<a class="font-body-sm text-body-sm text-primary-container hover:text-primary transition-colors hover:underline" href="#">Şifremi unuttum</a>
+</div>
+<div class="relative">
+<input class="w-full h-12 px-4 bg-surface-bright border border-outline-variant rounded-[10px] text-on-surface focus:outline-none focus:border-primary-container focus:ring-4 focus:ring-primary-container/10 transition-all font-body-sm pr-11 shadow-sm" id="password" name="password" placeholder="••••••••" required="" type="password"/>
+<button class="absolute inset-y-0 right-0 pr-3 flex items-center text-outline hover:text-on-surface transition-colors focus:outline-none" type="button">
+<span class="material-symbols-outlined text-[20px]">visibility</span>
+</button>
+</div>
+</div>
+<button class="w-full h-12 bg-primary-container text-on-primary font-button text-button rounded-[10px] shadow-[0_4px_14px_rgba(45,90,69,0.3)] hover:shadow-[0_6px_20px_rgba(45,90,69,0.4)] hover:bg-on-primary-fixed-variant transform hover:-translate-y-0.5 transition-all duration-200 flex items-center justify-center mt-2" type="submit">
+                    Giriş Yap
+                </button>
+</form>
+<div class="mt-8 pt-6 border-t border-surface-dim/60 text-center">
+<p class="font-body-sm text-body-sm text-on-surface-variant">
+                    Hesabın yok mu? <a class="text-primary-container font-semibold hover:text-primary transition-colors hover:underline" href="#">Kayıt ol</a>
+</p>
+<div class="mt-6 flex items-center justify-center gap-1.5 text-outline font-body-sm text-[12px] opacity-80">
+<span class="material-symbols-outlined text-[14px]">lock</span>
+<span>Verileriniz uçtan uca şifrelenmektedir.</span>
+</div>
+</div>
+</div>
+</div>
+</div>
+</body></html>
