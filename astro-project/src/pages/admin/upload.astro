@@ -17,35 +17,57 @@ import AdminLayout from '../../layouts/AdminLayout.astro';
 
       <!-- Candidate Selector -->
       <div class="bg-white border border-[#ddd9d3] rounded-[12px] shadow-sm overflow-hidden">
-        <div class="px-5 py-4 border-b border-[#ddd9d3] flex items-center gap-2.5">
-          <div class="w-8 h-8 rounded-[8px] bg-[#14422f]/10 flex items-center justify-center shrink-0">
-            <span class="material-symbols-outlined text-[#14422f] text-[18px]">person_search</span>
-          </div>
-          <div>
-            <p class="text-xs font-bold text-[#1b1c1a] leading-tight">Aday Seç</p>
-            <p class="text-[10px] text-[#8a8580] font-medium">CV kime yüklensin?</p>
+
+        <!-- Gradient header -->
+        <div class="relative px-5 py-5 overflow-hidden" style="background: linear-gradient(135deg, #14422f 0%, #1e5c42 100%);">
+          <div class="absolute inset-0 opacity-10" style="background-image: radial-gradient(circle at 80% 50%, #fff 1px, transparent 1px); background-size: 20px 20px;"></div>
+          <div class="relative flex items-center gap-3">
+            <div class="w-9 h-9 rounded-[10px] bg-white/15 flex items-center justify-center shrink-0 border border-white/20">
+              <span class="material-symbols-outlined text-white text-[20px]">person_search</span>
+            </div>
+            <div>
+              <p class="text-sm font-black text-white leading-tight">Aday Seç</p>
+              <p class="text-[11px] text-white/70 font-medium mt-0.5">CV hangi kullanıcıya yüklensin?</p>
+            </div>
           </div>
         </div>
-        <div class="px-4 py-4 space-y-3">
+
+        <!-- Dropdown + preview -->
+        <div class="p-4 space-y-3">
+
+          <!-- Select -->
           <div class="relative">
-            <select
-              id="admin-candidate-select"
-              class="w-full appearance-none bg-[#faf9f5] border border-[#ddd9d3] rounded-[8px] px-4 py-2.5 pr-10 text-sm font-medium text-[#1b1c1a] focus:outline-none focus:border-[#14422f] cursor-pointer"
-            >
-              <option value="">Kendi hesabıma yükle (Admin)</option>
-            </select>
-            <span class="material-symbols-outlined absolute right-3 top-1/2 -translate-y-1/2 text-[#8a8580] text-[18px] pointer-events-none">expand_more</span>
-          </div>
-          <div id="selected-user-card" class="flex items-center gap-3 bg-[#f5f4f0] border border-[#ddd9d3] rounded-[10px] px-3 py-2.5">
-            <div id="selected-user-avatar" class="w-8 h-8 rounded-full bg-[#14422f] flex items-center justify-center shrink-0">
-              <span class="material-symbols-outlined text-white text-[15px]">admin_panel_settings</span>
+            <label class="block text-[10px] font-bold text-[#8a8580] uppercase tracking-widest mb-1.5">Kullanıcı</label>
+            <div class="relative">
+              <select
+                id="admin-candidate-select"
+                class="w-full appearance-none bg-[#faf9f5] border border-[#ddd9d3] rounded-[10px] px-4 py-3 pr-10 text-[13px] font-semibold text-[#1b1c1a] focus:outline-none focus:ring-2 focus:ring-[#14422f]/20 focus:border-[#14422f] cursor-pointer transition-all"
+              >
+                <option value="">Kendi hesabıma yükle (Admin)</option>
+              </select>
+              <span class="material-symbols-outlined absolute right-3 top-1/2 -translate-y-1/2 text-[#8a8580] text-[20px] pointer-events-none">unfold_more</span>
             </div>
-            <div class="min-w-0">
-              <p class="text-xs font-bold text-[#1b1c1a] truncate" id="selected-user-name">Admin (Ben)</p>
-              <p class="text-[10px] text-[#8a8580] font-medium truncate" id="selected-user-email">Kendi hesabıma yükleniyor</p>
-            </div>
-            <span class="material-symbols-outlined text-emerald-600 text-[18px] ml-auto shrink-0">check_circle</span>
           </div>
+
+          <!-- Selected user preview card -->
+          <div class="relative overflow-hidden rounded-[10px] border border-[#14422f]/20 bg-gradient-to-r from-[#14422f]/[0.05] to-transparent">
+            <div class="absolute left-0 top-0 bottom-0 w-[3px] bg-[#14422f] rounded-l-[10px]"></div>
+            <div class="flex items-center gap-3 px-4 py-3">
+              <div id="selected-user-avatar"
+                class="w-10 h-10 rounded-full bg-[#14422f] flex items-center justify-center shrink-0 shadow-sm border-2 border-white">
+                <span class="material-symbols-outlined text-white text-[17px]">admin_panel_settings</span>
+              </div>
+              <div class="min-w-0 flex-1">
+                <p class="text-[13px] font-bold text-[#1b1c1a] truncate" id="selected-user-name">Admin (Ben)</p>
+                <p class="text-[11px] text-[#8a8580] font-medium truncate" id="selected-user-email">Kendi hesabıma yükleniyor</p>
+              </div>
+              <div class="shrink-0 flex flex-col items-center gap-0.5">
+                <span class="material-symbols-outlined text-emerald-500 text-[22px]">check_circle</span>
+                <span class="text-[9px] font-bold text-emerald-600 uppercase tracking-wide">Seçili</span>
+              </div>
+            </div>
+          </div>
+
         </div>
       </div>
 
