@@ -13,61 +13,52 @@ import AdminLayout from '../../layouts/AdminLayout.astro';
   <div class="grid grid-cols-1 xl:grid-cols-[360px_1fr] gap-6 items-start">
 
     <!-- ─── LEFT COLUMN ─────────────────────────────────────────────── -->
-    <div class="flex flex-col gap-4">
+    <div class="flex flex-col gap-3">
 
       <!-- Candidate Selector -->
       <div class="bg-white border border-[#ddd9d3] rounded-[12px] shadow-sm overflow-hidden">
-
-        <!-- Gradient header -->
-        <div class="relative px-5 py-5 overflow-hidden" style="background: linear-gradient(135deg, #14422f 0%, #1e5c42 100%);">
-          <div class="absolute inset-0 opacity-10" style="background-image: radial-gradient(circle at 80% 50%, #fff 1px, transparent 1px); background-size: 20px 20px;"></div>
-          <div class="relative flex items-center gap-3">
-            <div class="w-9 h-9 rounded-[10px] bg-white/15 flex items-center justify-center shrink-0 border border-white/20">
-              <span class="material-symbols-outlined text-white text-[20px]">person_search</span>
+        <!-- Compact gradient header -->
+        <div class="relative px-4 py-3.5 overflow-hidden" style="background: linear-gradient(135deg, #14422f 0%, #1e5c42 100%);">
+          <div class="absolute inset-0 opacity-[0.07]" style="background-image: radial-gradient(circle at 70% 50%, #fff 1px, transparent 1px); background-size: 16px 16px;"></div>
+          <div class="relative flex items-center gap-2.5">
+            <div class="w-7 h-7 rounded-[8px] bg-white/15 flex items-center justify-center shrink-0 border border-white/20">
+              <span class="material-symbols-outlined text-white text-[16px]">person_search</span>
             </div>
             <div>
-              <p class="text-sm font-black text-white leading-tight">Aday Seç</p>
-              <p class="text-[11px] text-white/70 font-medium mt-0.5">CV hangi kullanıcıya yüklensin?</p>
+              <p class="text-[13px] font-black text-white leading-tight">Aday Seç</p>
+              <p class="text-[10px] text-white/60 font-medium">CV kime yüklensin?</p>
             </div>
           </div>
         </div>
 
-        <!-- Dropdown + preview -->
-        <div class="p-4 space-y-3">
-
-          <!-- Select -->
-          <div class="relative">
-            <label class="block text-[10px] font-bold text-[#8a8580] uppercase tracking-widest mb-1.5">Kullanıcı</label>
+        <!-- Body -->
+        <div class="p-3 space-y-2">
+          <!-- Label + dropdown -->
+          <div>
+            <p class="text-[9px] font-bold text-[#8a8580] uppercase tracking-widest mb-1">KULLANICI</p>
             <div class="relative">
               <select
                 id="admin-candidate-select"
-                class="w-full appearance-none bg-[#faf9f5] border border-[#ddd9d3] rounded-[10px] px-4 py-3 pr-10 text-[13px] font-semibold text-[#1b1c1a] focus:outline-none focus:ring-2 focus:ring-[#14422f]/20 focus:border-[#14422f] cursor-pointer transition-all"
+                class="w-full appearance-none bg-[#faf9f5] border border-[#ddd9d3] rounded-[8px] px-3 py-2 pr-9 text-[12px] font-semibold text-[#1b1c1a] focus:outline-none focus:ring-2 focus:ring-[#14422f]/20 focus:border-[#14422f] cursor-pointer transition-all"
               >
                 <option value="">Kendi hesabıma yükle (Admin)</option>
               </select>
-              <span class="material-symbols-outlined absolute right-3 top-1/2 -translate-y-1/2 text-[#8a8580] text-[20px] pointer-events-none">unfold_more</span>
+              <span class="material-symbols-outlined absolute right-2.5 top-1/2 -translate-y-1/2 text-[#8a8580] text-[17px] pointer-events-none">expand_more</span>
             </div>
           </div>
 
-          <!-- Selected user preview card -->
-          <div class="relative overflow-hidden rounded-[10px] border border-[#14422f]/20 bg-gradient-to-r from-[#14422f]/[0.05] to-transparent">
-            <div class="absolute left-0 top-0 bottom-0 w-[3px] bg-[#14422f] rounded-l-[10px]"></div>
-            <div class="flex items-center gap-3 px-4 py-3">
-              <div id="selected-user-avatar"
-                class="w-10 h-10 rounded-full bg-[#14422f] flex items-center justify-center shrink-0 shadow-sm border-2 border-white">
-                <span class="material-symbols-outlined text-white text-[17px]">admin_panel_settings</span>
-              </div>
-              <div class="min-w-0 flex-1">
-                <p class="text-[13px] font-bold text-[#1b1c1a] truncate" id="selected-user-name">Admin (Ben)</p>
-                <p class="text-[11px] text-[#8a8580] font-medium truncate" id="selected-user-email">Kendi hesabıma yükleniyor</p>
-              </div>
-              <div class="shrink-0 flex flex-col items-center gap-0.5">
-                <span class="material-symbols-outlined text-emerald-500 text-[22px]">check_circle</span>
-                <span class="text-[9px] font-bold text-emerald-600 uppercase tracking-wide">Seçili</span>
-              </div>
+          <!-- Selected user row -->
+          <div class="flex items-center gap-2.5 bg-[#f5f4f0] border border-[#ddd9d3] rounded-[8px] px-2.5 py-2">
+            <div id="selected-user-avatar"
+              class="w-8 h-8 rounded-full bg-[#14422f] flex items-center justify-center shrink-0 border-2 border-white shadow-sm">
+              <span class="material-symbols-outlined text-white text-[14px]">admin_panel_settings</span>
             </div>
+            <div class="min-w-0 flex-1">
+              <p class="text-[12px] font-bold text-[#1b1c1a] truncate leading-tight" id="selected-user-name">Admin (Ben)</p>
+              <p class="text-[10px] text-[#8a8580] font-medium truncate" id="selected-user-email">Kendi hesabıma yükleniyor</p>
+            </div>
+            <span class="material-symbols-outlined text-emerald-500 text-[20px] shrink-0">check_circle</span>
           </div>
-
         </div>
       </div>
 
@@ -78,92 +69,88 @@ import AdminLayout from '../../layouts/AdminLayout.astro';
         <div class="flex border-b border-[#ddd9d3]">
           <button
             id="tab-single"
-            class="upload-tab flex-1 flex items-center justify-center gap-2 px-4 py-3.5 text-xs font-bold transition-all border-b-2 border-[#14422f] text-[#14422f] bg-[#14422f]/[0.03]"
+            class="upload-tab flex-1 flex items-center justify-center gap-1.5 px-3 py-3 text-[11px] font-bold transition-all border-b-2 border-[#14422f] text-[#14422f] bg-[#14422f]/[0.03]"
             data-tab="single"
           >
-            <span class="material-symbols-outlined text-[16px]">upload_file</span>
+            <span class="material-symbols-outlined text-[15px]">upload_file</span>
             Tekli Yükleme
           </button>
           <button
             id="tab-bulk"
-            class="upload-tab flex-1 flex items-center justify-center gap-2 px-4 py-3.5 text-xs font-bold transition-all border-b-2 border-transparent text-[#8a8580] hover:text-[#1b1c1a] hover:bg-[#f5f4f0]"
+            class="upload-tab flex-1 flex items-center justify-center gap-1.5 px-3 py-3 text-[11px] font-bold transition-all border-b-2 border-transparent text-[#8a8580] hover:text-[#1b1c1a] hover:bg-[#f5f4f0]"
             data-tab="bulk"
           >
-            <span class="material-symbols-outlined text-[16px]">folder_open</span>
+            <span class="material-symbols-outlined text-[15px]">folder_open</span>
             Toplu Yükleme
           </button>
         </div>
 
         <!-- ── TAB: Tekli Yükleme ── -->
-        <div id="panel-single" class="p-4">
+        <div id="panel-single" class="p-3">
           <div
             id="drop-zone-single"
-            class="border-2 border-dashed border-[#ddd9d3] rounded-[10px] p-8 flex flex-col items-center justify-center cursor-pointer hover:border-[#14422f]/40 hover:bg-[#14422f]/[0.02] transition-all duration-200"
+            class="border-2 border-dashed border-[#ddd9d3] rounded-[10px] py-6 px-4 flex flex-col items-center justify-center cursor-pointer hover:border-[#14422f]/40 hover:bg-[#14422f]/[0.02] transition-all duration-200 group"
           >
-            <div class="w-12 h-12 rounded-full bg-[#14422f]/8 flex items-center justify-center mb-3 border border-[#14422f]/15">
-              <span class="material-symbols-outlined text-[#14422f] text-2xl">upload_file</span>
+            <div class="w-10 h-10 rounded-full bg-[#14422f]/8 flex items-center justify-center mb-2.5 border border-[#14422f]/15 group-hover:bg-[#14422f]/[0.12] transition-colors">
+              <span class="material-symbols-outlined text-[#14422f] text-[22px]">upload_file</span>
             </div>
-            <p class="text-sm font-bold text-[#1b1c1a] mb-1 text-center">Dosyayı buraya sürükle</p>
-            <p class="text-[11px] text-[#8a8580] font-medium text-center mb-4">Tek PDF · Maks 5MB</p>
-            <button class="bg-[#14422f] text-white text-xs font-bold px-5 py-2.5 rounded-[8px] hover:opacity-90 transition-opacity">
+            <p class="text-[12px] font-bold text-[#1b1c1a] mb-0.5 text-center">Dosyayı Buraya Sürükleyin</p>
+            <p class="text-[10px] text-[#8a8580] font-medium text-center mb-3">Tek PDF · Maks 5MB</p>
+            <button class="bg-[#14422f] text-white text-[11px] font-bold px-4 py-2 rounded-[7px] hover:opacity-90 transition-opacity">
               Dosya Seç
             </button>
             <input type="file" id="cv-file-single" accept=".pdf" class="hidden" />
           </div>
 
           <!-- Single progress -->
-          <div id="single-progress-wrap" class="hidden mt-3 bg-[#faf9f5] border border-[#ddd9d3] rounded-[8px] p-3">
-            <div class="flex items-center justify-between gap-2 mb-2">
-              <div class="flex items-center gap-2 min-w-0">
-                <span class="material-symbols-outlined text-red-500 text-[16px] shrink-0">picture_as_pdf</span>
+          <div id="single-progress-wrap" class="hidden mt-2.5 bg-[#faf9f5] border border-[#ddd9d3] rounded-[8px] p-2.5">
+            <div class="flex items-center justify-between gap-2 mb-1.5">
+              <div class="flex items-center gap-1.5 min-w-0">
+                <span class="material-symbols-outlined text-red-500 text-[15px] shrink-0">picture_as_pdf</span>
                 <span id="single-file-name" class="text-[11px] font-bold text-[#1b1c1a] truncate">—</span>
               </div>
               <span id="single-pct" class="text-[11px] font-mono text-[#8a8580] shrink-0">0%</span>
             </div>
-            <div class="w-full bg-white border border-[#ddd9d3] h-1.5 rounded-full overflow-hidden">
+            <div class="w-full bg-white border border-[#ddd9d3] h-1 rounded-full overflow-hidden">
               <div id="single-bar" class="h-full w-0 bg-[#14422f] transition-all duration-150 rounded-full"></div>
             </div>
-            <p id="single-msg" class="text-[10px] text-[#8a8580] font-medium mt-1.5">Yükleniyor...</p>
+            <p id="single-msg" class="text-[10px] text-[#8a8580] font-medium mt-1">Yükleniyor...</p>
           </div>
         </div>
 
         <!-- ── TAB: Toplu Yükleme ── -->
-        <div id="panel-bulk" class="p-4 hidden">
+        <div id="panel-bulk" class="p-3 hidden">
 
           <!-- Drop zone -->
           <div
             id="drop-zone-bulk"
-            class="border-2 border-dashed border-[#ddd9d3] rounded-[10px] p-6 flex flex-col items-center justify-center cursor-pointer hover:border-[#14422f]/40 hover:bg-[#14422f]/[0.02] transition-all duration-200"
+            class="border-2 border-dashed border-[#ddd9d3] rounded-[10px] py-5 px-4 flex flex-col items-center justify-center cursor-pointer hover:border-[#14422f]/40 hover:bg-[#14422f]/[0.02] transition-all duration-200 group"
           >
-            <div class="w-10 h-10 rounded-full bg-[#14422f]/8 flex items-center justify-center mb-3 border border-[#14422f]/15">
-              <span class="material-symbols-outlined text-[#14422f] text-xl">folder_open</span>
+            <div class="w-9 h-9 rounded-full bg-[#14422f]/8 flex items-center justify-center mb-2 border border-[#14422f]/15 group-hover:bg-[#14422f]/[0.12] transition-colors">
+              <span class="material-symbols-outlined text-[#14422f] text-[19px]">folder_open</span>
             </div>
-            <p class="text-sm font-bold text-[#1b1c1a] mb-1 text-center">Birden fazla dosya seç</p>
-            <p class="text-[11px] text-[#8a8580] font-medium text-center mb-3">Her dosya ayrı bir adaya ait · PDF · Maks 5MB</p>
-            <button class="bg-[#14422f] text-white text-xs font-bold px-5 py-2.5 rounded-[8px] hover:opacity-90 transition-opacity">
+            <p class="text-[12px] font-bold text-[#1b1c1a] mb-0.5 text-center">Birden fazla dosya seç</p>
+            <p class="text-[10px] text-[#8a8580] font-medium text-center mb-3">Her dosya ayrı bir adaya ait · PDF · Maks 5MB</p>
+            <button class="bg-[#14422f] text-white text-[11px] font-bold px-4 py-2 rounded-[7px] hover:opacity-90 transition-opacity">
               Dosyaları Seç
             </button>
             <input type="file" id="cv-file-bulk" accept=".pdf" class="hidden" multiple />
           </div>
 
-          <!-- Queue: each row has its own candidate dropdown -->
-          <div id="bulk-queue-wrap" class="hidden mt-4">
+          <!-- Queue -->
+          <div id="bulk-queue-wrap" class="hidden mt-3">
             <div class="flex items-center justify-between mb-2">
-              <p class="text-[10px] font-bold text-[#8a8580] tracking-widest uppercase">Yükleme Kuyruğu</p>
+              <p class="text-[9px] font-bold text-[#8a8580] tracking-widest uppercase">YÜKLEME KUYRUĞU</p>
               <button id="clear-done-btn" class="text-[10px] font-bold text-[#8a8580] hover:text-rose-600 transition-colors hidden">
-                Bittileri Temizle
+                Temizle
               </button>
             </div>
-
-            <!-- File rows -->
             <div id="bulk-progress-list" class="space-y-2 mb-3"></div>
-
-            <!-- Upload all button -->
             <button
               id="bulk-upload-btn"
-              class="w-full bg-[#14422f] text-white text-xs font-bold py-2.5 rounded-[8px] hover:opacity-90 transition-opacity flex items-center justify-center gap-2"
+              class="w-full bg-[#14422f] text-white text-[11px] font-bold py-2.5 rounded-[8px] hover:opacity-90 transition-opacity flex items-center justify-center gap-2"
             >
-              <span class="material-symbols-outlined text-[16px]">cloud_upload</span>
+              <span class="material-symbols-outlined text-[15px]">cloud_upload</span>
               Tümünü Yükle
             </button>
           </div>
