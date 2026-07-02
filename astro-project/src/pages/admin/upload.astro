@@ -27,49 +27,29 @@ import AdminLayout from '../../layouts/AdminLayout.astro';
           </div>
         </div>
 
-        <!-- Search box -->
-        <div class="px-4 pt-3 pb-1">
+        <div class="px-4 py-4 space-y-3">
+          <!-- Dropdown -->
           <div class="relative">
-            <span class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-[#8a8580] text-[16px] pointer-events-none">search</span>
-            <input
-              type="text"
-              id="candidate-search"
-              placeholder="İsim veya e-posta ara..."
-              class="w-full bg-[#faf9f5] border border-[#ddd9d3] rounded-[8px] pl-9 pr-3 py-2 text-sm focus:outline-none focus:border-[#14422f] font-medium text-[#1b1c1a] placeholder:text-[#8a8580]"
-            />
+            <select
+              id="admin-candidate-select"
+              class="w-full appearance-none bg-[#faf9f5] border border-[#ddd9d3] rounded-[8px] px-4 py-2.5 pr-10 text-sm font-medium text-[#1b1c1a] focus:outline-none focus:border-[#14422f] cursor-pointer"
+            >
+              <option value="">Kendi hesabıma yükle (Admin)</option>
+            </select>
+            <span class="material-symbols-outlined absolute right-3 top-1/2 -translate-y-1/2 text-[#8a8580] text-[18px] pointer-events-none">expand_more</span>
           </div>
-        </div>
 
-        <!-- Candidate list -->
-        <div class="px-4 pb-3 max-h-[220px] overflow-y-auto custom-scrollbar mt-2 space-y-1" id="candidate-list">
-          <!-- "Admin (self)" option always first -->
-          <button
-            data-id=""
-            data-name="Kendi hesabıma yükle (Admin)"
-            class="candidate-item w-full flex items-center gap-3 px-3 py-2.5 rounded-[8px] text-left transition-colors bg-[#14422f]/8 border border-[#14422f]/20 selected"
-          >
-            <div class="w-7 h-7 rounded-full bg-[#14422f] flex items-center justify-center shrink-0">
-              <span class="material-symbols-outlined text-white text-[14px]">admin_panel_settings</span>
+          <!-- Selected user card -->
+          <div id="selected-user-card" class="flex items-center gap-3 bg-[#f5f4f0] border border-[#ddd9d3] rounded-[10px] px-3 py-2.5">
+            <div id="selected-user-avatar" class="w-8 h-8 rounded-full bg-[#14422f] flex items-center justify-center shrink-0">
+              <span class="material-symbols-outlined text-white text-[15px]">admin_panel_settings</span>
             </div>
             <div class="min-w-0">
-              <p class="text-xs font-bold text-[#14422f] truncate">Admin (Ben)</p>
-              <p class="text-[10px] text-[#14422f]/70 font-medium truncate">Kendi hesabıma yükle</p>
+              <p class="text-xs font-bold text-[#1b1c1a] truncate" id="selected-user-name">Admin (Ben)</p>
+              <p class="text-[10px] text-[#8a8580] font-medium truncate" id="selected-user-email">Kendi hesabıma yükleniyor</p>
             </div>
-            <span class="material-symbols-outlined text-[#14422f] text-[16px] ml-auto shrink-0 check-icon">check_circle</span>
-          </button>
-          <!-- Dynamic candidates loaded here -->
-          <div id="candidate-list-dynamic" class="space-y-1"></div>
-          <div id="candidate-list-loading" class="py-4 text-center text-[10px] text-[#8a8580] font-medium">Adaylar yükleniyor...</div>
-        </div>
-
-        <!-- Selected badge -->
-        <div class="px-4 pb-4 pt-0">
-          <div class="bg-[#f5f4f0] border border-[#ddd9d3] rounded-[8px] px-3 py-2 flex items-center gap-2">
-            <span class="material-symbols-outlined text-[#14422f] text-[16px]">how_to_reg</span>
-            <span class="text-xs font-bold text-[#1b1c1a] truncate" id="selected-candidate-label">Admin (Ben)</span>
+            <span class="material-symbols-outlined text-emerald-600 text-[18px] ml-auto shrink-0">check_circle</span>
           </div>
-          <!-- Hidden input for actual value -->
-          <input type="hidden" id="admin-candidate-select" value="" />
         </div>
       </div>
 
@@ -156,83 +136,48 @@ import AdminLayout from '../../layouts/AdminLayout.astro';
   let allCandidates = [];
 
   // ─── Candidate Selection ───────────────────────────────────────────
-  function renderCandidateList(filter) {
-    const container = document.getElementById('candidate-list-dynamic');
-    if (!container) return;
-
-    const filtered = filter
-      ? allCandidates.filter(c => {
-          const name = (c.name || '').toLowerCase();
-          const email = (c.email || '').toLowerCase();
-          return name.includes(filter) || email.includes(filter);
-        })
-      : allCandidates;
-
-    container.innerHTML = '';
-    filtered.forEach(cand => {
-      const label = cand.name ? `${cand.name}` : cand.email;
-      const sub = cand.name ? cand.email : '';
-      const initials = label.slice(0, 2).toUpperCase();
-      const btn = document.createElement('button');
-      btn.dataset.id = cand.id;
-      btn.dataset.name = label;
-      btn.className = 'candidate-item w-full flex items-center gap-3 px-3 py-2.5 rounded-[8px] text-left transition-colors hover:bg-[#f5f4f0] border border-transparent';
-      btn.innerHTML = `
-        <div class="w-7 h-7 rounded-full bg-[#ddd9d3] flex items-center justify-center shrink-0 text-[10px] font-bold text-[#1b1c1a]">${initials}</div>
-        <div class="min-w-0">
-          <p class="text-xs font-bold text-[#1b1c1a] truncate">${label}</p>
-          ${sub ? `<p class="text-[10px] text-[#8a8580] font-medium truncate">${sub}</p>` : ''}
-        </div>
-        <span class="material-symbols-outlined text-[#14422f] text-[16px] ml-auto shrink-0 check-icon hidden">check_circle</span>
-      `;
-      btn.addEventListener('click', () => selectCandidate(cand.id, label));
-      container.appendChild(btn);
-    });
-  }
-
   async function loadCandidates() {
-    const loading = document.getElementById('candidate-list-loading');
+    const select = document.getElementById('admin-candidate-select');
+    if (!select) return;
     try {
       const res = await fetch('/api/admin/candidates');
       if (!res.ok) throw new Error();
       const data = await res.json();
       allCandidates = data.candidates || [];
-      if (loading) loading.style.display = 'none';
-      renderCandidateList('');
-    } catch {
-      if (loading) loading.textContent = 'Adaylar yüklenemedi.';
+      allCandidates.forEach(c => {
+        const opt = document.createElement('option');
+        opt.value = c.id;
+        opt.textContent = c.name ? `${c.name} — ${c.email}` : c.email;
+        select.appendChild(opt);
+      });
+    } catch {}
+  }
+
+  function updateSelectedCard() {
+    const select = document.getElementById('admin-candidate-select');
+    const avatar = document.getElementById('selected-user-avatar');
+    const nameEl = document.getElementById('selected-user-name');
+    const emailEl = document.getElementById('selected-user-email');
+    if (!select) return;
+
+    const val = select.value;
+    if (!val) {
+      // Admin self
+      if (avatar) avatar.innerHTML = '<span class="material-symbols-outlined text-white text-[15px]">admin_panel_settings</span>';
+      if (nameEl) nameEl.textContent = 'Admin (Ben)';
+      if (emailEl) emailEl.textContent = 'Kendi hesabıma yükleniyor';
+      return;
     }
+
+    const cand = allCandidates.find(c => c.id === val);
+    if (!cand) return;
+    const initials = ((cand.name || cand.email) || '?').slice(0, 2).toUpperCase();
+    if (avatar) avatar.innerHTML = `<span class="text-xs font-black text-white">${initials}</span>`;
+    if (nameEl) nameEl.textContent = cand.name || cand.email;
+    if (emailEl) emailEl.textContent = cand.name ? cand.email : '';
   }
 
-  function selectCandidate(id, name) {
-    // Update hidden input
-    const input = document.getElementById('admin-candidate-select');
-    if (input) input.value = id;
-
-    // Update label
-    const label = document.getElementById('selected-candidate-label');
-    if (label) label.textContent = name || 'Admin (Ben)';
-
-    // Highlight selection
-    document.querySelectorAll('.candidate-item').forEach(btn => {
-      const isSelected = btn.dataset.id === id;
-      btn.classList.toggle('bg-[#14422f]/8', isSelected);
-      btn.classList.toggle('border-[#14422f]/20', isSelected);
-      btn.classList.toggle('selected', isSelected);
-      const icon = btn.querySelector('.check-icon');
-      if (icon) icon.classList.toggle('hidden', !isSelected);
-    });
-  }
-
-  // Search filter
-  document.getElementById('candidate-search')?.addEventListener('input', (e) => {
-    renderCandidateList(e.target.value.toLowerCase().trim());
-  });
-
-  // Admin self option
-  document.querySelector('.candidate-item[data-id=""]')?.addEventListener('click', () => {
-    selectCandidate('', 'Admin (Ben)');
-  });
+  document.getElementById('admin-candidate-select')?.addEventListener('change', updateSelectedCard);
 
   // ─── Delete CV ────────────────────────────────────────────────────
   window.deleteCV = async function(cvId) {
