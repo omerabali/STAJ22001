@@ -257,9 +257,9 @@ import UserLayout from '../layouts/UserLayout.astro';
 
           const chunkHtml = cv.chunks && cv.chunks.length > 0
             ? cv.chunks.map((chunk, idx) => {
-                const firstLB = chunk.content.indexOf('\n');
-                const header = firstLB !== -1 ? chunk.content.substring(0, firstLB) : `PARÇA #${idx + 1}`;
-                const body = firstLB !== -1 ? chunk.content.substring(firstLB + 1) : chunk.content;
+                const firstLB = chunk.chunkText.indexOf('\n');
+                const header = firstLB !== -1 ? chunk.chunkText.substring(0, firstLB) : `PARÇA #${idx + 1}`;
+                const body = firstLB !== -1 ? chunk.chunkText.substring(firstLB + 1) : chunk.chunkText;
                 const wordCount = body.split(/\s+/).filter(w => w.length > 0).length;
                 return `
                   <div class="bg-[#faf9f5] border border-[#ddd9d3] rounded-[10px] p-5 hover:bg-[#f5f4f0] transition-all text-left">

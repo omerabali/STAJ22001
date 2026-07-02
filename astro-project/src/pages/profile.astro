@@ -336,9 +336,9 @@ import UserLayout from '../layouts/UserLayout.astro';
         // Day 13 completed state: text chunks successfully generated but AI scoring is not done
         const chunkHtml = cv.chunks && cv.chunks.length > 0 
           ? cv.chunks.map((chunk, idx) => {
-              const firstLineBreak = chunk.content.indexOf('\n');
-              const header = firstLineBreak !== -1 ? chunk.content.substring(0, firstLineBreak) : `PARÇA #${idx + 1}`;
-              const body = firstLineBreak !== -1 ? chunk.content.substring(firstLineBreak + 1) : chunk.content;
+              const firstLineBreak = chunk.chunkText.indexOf('\n');
+              const header = firstLineBreak !== -1 ? chunk.chunkText.substring(0, firstLineBreak) : `PARÇA #${idx + 1}`;
+              const body = firstLineBreak !== -1 ? chunk.chunkText.substring(firstLineBreak + 1) : chunk.chunkText;
               const wordCount = body.split(/\s+/).filter(w => w.length > 0).length;
 
               return `

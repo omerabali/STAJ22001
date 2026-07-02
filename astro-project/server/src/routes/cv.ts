@@ -75,6 +75,12 @@ async function processCv(cvId: string, analysisId: string, pdfBuffer: Buffer): P
     console.log(`[Parser] Extracting text from CV: ${cvId}`);
     const text = await extractTextFromPDF(pdfBuffer);
 
+    // Save extracted text in rawText column of CV
+    await prisma.cV.update({
+      where: { id: cvId },
+      data: { rawText: text }
+    });
+
     // 3. Generate section-based chunks
     console.log(`[Parser] Generating section-based chunks...`);
     const chunks = chunkTextBySections(text);
@@ -83,10 +89,10 @@ async function processCv(cvId: string, analysisId: string, pdfBuffer: Buffer): P
     if (chunks.length > 0) {
       console.log(`[Parser] Storing ${chunks.length} chunks in PostgreSQL...`);
       await prisma.cVChunk.createMany({
-        data: chunks.map((chunkContent) => ({
+        data: chunks.map((chunkContent, index) => ({
           cvId: cvId,
-          content: chunkContent,
-          pageIndex: 1,
+          chunkText: chunkContent,
+          chunkIndex: index + 1,
         }))
       });
     }
@@ -149,10 +155,38 @@ router.post("/upload", authMiddleware, (req: Request, res: Response): void => {
       const fileUuid = crypto.randomUUID();
       const filePath = `cvs/${userId}/${fileUuid}${fileExt}`;
 
+      const fileBuffer = req.file.buffer;
+      const fileHash = crypto.createHash("sha256").update(fileBuffer).digest("hex");
+
+      // Check if a CV with this hash already exists for this user
+      const existingCv = await prisma.cV.findFirst({
+        where: {
+          userId: userId,
+          hash: fileHash,
+        },
+        include: {
+          analyses: {
+            orderBy: { createdAt: "desc" },
+          },
+        },
+      });
+
+      if (existingCv) {
+        console.log(`[Upload] Duplicate CV found for user ${userId} with hash ${fileHash}`);
+        const latestAnalysis = existingCv.analyses && existingCv.analyses[0];
+        
+        res.status(200).json({
+          message: "Bu CV daha önce yüklendi. Mevcut analiz sonucu getiriliyor.",
+          cv: existingCv,
+          analysis: latestAnalysis,
+        });
+        return;
+      }
+
       // Upload file to Supabase Storage
       const { data, error } = await supabase.storage
         .from("cv-files")
-        .upload(filePath, req.file.buffer, {
+        .upload(filePath, fileBuffer, {
           contentType: req.file.mimetype,
           upsert: true,
         });
@@ -181,6 +215,7 @@ router.post("/upload", authMiddleware, (req: Request, res: Response): void => {
           userId: userId,
           fileName: fileName,
           fileUrl: fileUrl,
+          hash: fileHash,
         }
       });
 
@@ -192,7 +227,7 @@ router.post("/upload", authMiddleware, (req: Request, res: Response): void => {
       });
 
       // Asynchronously trigger parsing in the background
-      processCv(cv.id, analysis.id, req.file.buffer);
+      processCv(cv.id, analysis.id, fileBuffer);
 
       res.status(201).json({
         message: "CV başarıyla yüklendi, analiz sıraya alındı.",

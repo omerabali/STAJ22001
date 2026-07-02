@@ -33,6 +33,8 @@ model CV {
   user         User         @relation(fields: [userId], references: [id], onDelete: Cascade)
   fileName     String
   fileUrl      String
+  rawText      String?
+  hash         String?
   createdAt    DateTime     @default(now())
   updatedAt    DateTime     @updatedAt
   analyses     CVAnalysis[]
@@ -68,8 +70,8 @@ model CVChunk {
   id         String        @id @default(uuid())
   cvId       String
   cv         CV            @relation(fields: [cvId], references: [id], onDelete: Cascade)
-  content    String
-  pageIndex  Int?
+  chunkText  String
+  chunkIndex Int
   createdAt  DateTime      @default(now())
   embeddings CVEmbedding[]
 
