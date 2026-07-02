@@ -334,69 +334,57 @@ import UserLayout from '../layouts/UserLayout.astro';
 
       if (analysis.atsScore === null) {
         // Day 13 completed state: text chunks successfully generated but AI scoring is not done
-        const chunkHtml = cv.chunks && cv.chunks.length > 0 
-          ? cv.chunks.map((chunk, idx) => {
-              const firstLineBreak = chunk.chunkText.indexOf('\n');
-              const header = firstLineBreak !== -1 ? chunk.chunkText.substring(0, firstLineBreak) : `PARÇA #${idx + 1}`;
-              const body = firstLineBreak !== -1 ? chunk.chunkText.substring(firstLineBreak + 1) : chunk.chunkText;
-              const wordCount = body.split(/\s+/).filter(w => w.length > 0).length;
-
-              return `
-                <div class="group bg-[#faf9f5] rounded-[10px] border-l-4 border-[#14422f] p-5 border border-[#ddd9d3] hover:bg-[#f5f4f0] transition-all text-left">
-                  <div class="flex justify-between items-start mb-2">
-                    <div>
-                      <span class="text-[10px] font-bold text-[#14422f] uppercase tracking-wider">${header}</span>
-                    </div>
-                    <span class="text-[10px] font-mono text-[#8a8580] bg-white border border-[#ddd9d3] px-2 py-1 rounded">${wordCount} kelime</span>
-                  </div>
-                  <p class="text-xs text-[#1b1c1a] leading-relaxed font-sans whitespace-pre-wrap select-all max-h-[120px] overflow-y-auto pr-2 mt-2">
-                    ${body}
-                  </p>
-                </div>
-              `;
-            }).join('')
-          : `<p class="text-xs text-[#8a8580] text-center py-4">Metin parçaları veritabanında bulunamadı.</p>`;
-
+        // cv.chunks removed from list — fetch separately
         const skillsHtml = Array.isArray(analysis.skills) && analysis.skills.length > 0
-          ? analysis.skills.map(s => `
-              <span class="px-3 py-1.5 rounded-full bg-white border border-[#ddd9d3] text-[#14422f] text-xs font-semibold shadow-sm cursor-default">
-                ${s}
-              </span>
-            `).join('')
+          ? analysis.skills.map(s => `<span class="px-3 py-1.5 rounded-full bg-white border border-[#ddd9d3] text-[#14422f] text-xs font-semibold shadow-sm cursor-default">${s}</span>`).join('')
           : `<span class="text-xs text-[#8a8580]">Yetenek kelimeleri çıkarılamadı.</span>`;
 
         contentArea.innerHTML = `
           <div class="space-y-4 flex flex-col h-full overflow-hidden">
-            <!-- Skills Container -->
             <div class="space-y-2 shrink-0">
               <h4 class="text-[10px] font-bold text-[#8a8580] tracking-widest uppercase px-1">ÖZGEÇMİŞTEN ÇIKARILAN YETENEKLER</h4>
-              <div class="flex flex-wrap gap-2 pt-1">
-                ${skillsHtml}
-              </div>
+              <div class="flex flex-wrap gap-2 pt-1">${skillsHtml}</div>
             </div>
-
-            <!-- Chunks Container -->
             <div class="space-y-2 flex-1 flex flex-col overflow-hidden">
               <h4 class="text-[10px] font-bold text-[#8a8580] tracking-widest uppercase px-1">BÖLÜMLERE GÖRE PARÇALAMA (CHUNKS)</h4>
-              <div class="space-y-4 overflow-y-auto flex-1 pr-2 custom-scrollbar mt-1" style="max-height: 280px;">
-                ${chunkHtml}
-              </div>
-            </div>
-
-            <!-- Floating Status Bar -->
-            <div class="mt-auto p-4 rounded-[10px] bg-[#faf9f5] border border-[#ddd9d3] shadow-sm relative overflow-hidden shrink-0">
-              <div class="absolute top-0 left-0 w-1 h-full bg-[#14422f]"></div>
-              <div class="flex gap-3 items-start">
-                <div class="mt-0.5">
-                  <span class="material-symbols-outlined text-[#14422f] text-sm">info</span>
-                </div>
-                <p class="text-[10px] text-[#1b1c1a]/80 leading-relaxed text-left">
-                  <span class="font-bold text-[#14422f]">Sistem:</span> CV bölümlere ayrıldı. Yapay zeka <span class="italic font-bold text-[#14422f]">Gemini AI</span> derin analiz raporu hazırlandı.
-                </p>
-              </div>
+              <div class="flex-1 overflow-y-auto pr-1 custom-scrollbar space-y-3" id="profile-chunk-area"><p class="text-xs text-[#8a8580] text-center py-4 animate-pulse">Parçalar yükleniyor...</p></div>
             </div>
           </div>
         `;
+
+        // Fetch chunks async
+        fetch(`/api/cv/${cv.id}/chunks`)
+          .then(r => r.json())
+          .then(d => {
+            const chunks = d.chunks || [];
+            const area = document.getElementById('profile-chunk-area');
+            if (!area) return;
+            if (chunks.length === 0) {
+              area.innerHTML = `<p class="text-xs text-[#8a8580] text-center py-4">Metin parçaları henüz oluşturulmadı.</p>`;
+              return;
+            }
+            area.innerHTML = chunks.map((chunk, idx) => {
+              const firstBreak = chunk.chunkText.indexOf('\n');
+              const header = firstBreak !== -1 ? chunk.chunkText.substring(0, firstBreak) : `PARÇA #${idx + 1}`;
+              const body = firstBreak !== -1 ? chunk.chunkText.substring(firstBreak + 1) : chunk.chunkText;
+              const wordCount = body.split(/\s+/).filter(w => w.length > 0).length;
+              return `
+                <div class="group bg-[#faf9f5] rounded-[10px] border-l-4 border-[#14422f] p-5 border border-[#ddd9d3] hover:bg-[#f5f4f0] transition-all text-left">
+                  <div class="flex justify-between items-start mb-2">
+                    <span class="text-[10px] font-bold text-[#14422f] uppercase tracking-wider">${header}</span>
+                    <span class="text-[10px] font-mono text-[#8a8580] bg-white border border-[#ddd9d3] px-2 py-1 rounded">${wordCount} kelime</span>
+                  </div>
+                  <p class="text-xs text-[#1b1c1a] leading-relaxed font-sans whitespace-pre-wrap select-all max-h-[120px] overflow-y-auto pr-2 mt-2">${body}</p>
+                </div>
+              `;
+            }).join('');
+          })
+          .catch(() => {
+            const area = document.getElementById('profile-chunk-area');
+            if (area) area.innerHTML = `<p class="text-xs text-rose-600 text-center py-4">Parçalar yüklenirken hata oluştu.</p>`;
+          });
+
+        return; // early return — HTML already set above
       } else {
         const strengthsHtml = Array.isArray(analysis.strengths) && analysis.strengths.length > 0
           ? analysis.strengths.map(st => `<li>${st}</li>`).join('')
@@ -544,55 +532,63 @@ import UserLayout from '../layouts/UserLayout.astro';
       alert('Lütfen sadece PDF dosyası yükleyin.');
       return;
     }
-    
     if (file.size > 5 * 1024 * 1024) {
       alert('Maksimum dosya boyutu limitini (5MB) aştınız.');
       return;
     }
-    
-    if (progressContainer && progressBar && percentText && statusText) {
-      progressContainer.classList.remove('hidden');
-      progressBar.style.width = '0%';
-      percentText.textContent = '0%';
-      progressBar.style.backgroundColor = '#14422f';
-      statusText.textContent = 'Dosya sunucuya gönderiliyor...';
-      
-      const formData = new FormData();
-      formData.append('cv', file);
-      
-      try {
-        const res = await fetch('/api/cv/upload', {
-          method: 'POST',
-          body: formData
-        });
-        
-        if (!res.ok) {
-          const errData = await res.json();
-          throw new Error(errData.message || 'Yükleme başarısız.');
-        }
-        
-        const data = await res.json();
+
+    if (!progressContainer || !progressBar || !percentText || !statusText) return;
+
+    progressContainer.classList.remove('hidden');
+    progressBar.style.width = '0%';
+    progressBar.style.backgroundColor = '#14422f';
+    percentText.textContent = '0%';
+    statusText.textContent = 'Dosya sunucuya gönderiliyor...';
+
+    const formData = new FormData();
+    formData.append('cv', file);
+
+    const xhr = new XMLHttpRequest();
+
+    xhr.upload.addEventListener('progress', e => {
+      if (!e.lengthComputable) return;
+      const p = Math.round((e.loaded / e.total) * 100);
+      progressBar.style.width = p + '%';
+      percentText.textContent = p + '%';
+      if (p === 100) statusText.textContent = 'Sunucuda işleniyor...';
+    });
+
+    xhr.addEventListener('load', () => {
+      if (xhr.status >= 200 && xhr.status < 300) {
+        const data = JSON.parse(xhr.responseText);
         progressBar.style.width = '100%';
         percentText.textContent = '100%';
         statusText.textContent = 'CV başarıyla yüklendi, analiz sıraya alındı!';
-        
-        // Invalidate query caches on upload
+
+        // Invalidate SWR cache so list refreshes immediately
         if (window.__swrCache) {
           window.__swrCache.invalidate('user-cvs');
           window.__swrCache.invalidate('user-analyses');
         }
-        
-        // Refresh list
-        selectedCvId = data.cv.id;
-        await loadCVList();
-        
-      } catch (err) {
-        console.error(err);
-        statusText.textContent = `Hata: ${err.message}`;
+        selectedCvId = data.cv?.id || null;
+        loadCVList();
+      } else {
+        let msg = 'Yükleme başarısız.';
+        try { msg = JSON.parse(xhr.responseText).message || msg; } catch {}
+        statusText.textContent = 'Hata: ' + msg;
         progressBar.style.width = '100%';
-        progressBar.style.backgroundColor = 'rgba(255, 0, 0, 0.6)';
+        progressBar.style.backgroundColor = 'rgba(220,38,38,0.6)';
       }
-    }
+    });
+
+    xhr.addEventListener('error', () => {
+      statusText.textContent = 'Ağ hatası oluştu.';
+      progressBar.style.backgroundColor = 'rgba(220,38,38,0.6)';
+      progressBar.style.width = '100%';
+    });
+
+    xhr.open('POST', '/api/cv/upload');
+    xhr.send(formData);
   }
 
   function initProfilePage() {
