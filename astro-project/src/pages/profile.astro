@@ -2,73 +2,74 @@
 import UserLayout from '../layouts/UserLayout.astro';
 ---
 
-<UserLayout title="Beacon AI - Dashboard" headerTitle="Aday Paneli">
-  <!-- Hoş Geldin Banner -->
-  <div class="mb-xl glass-card rounded-2xl p-6 flex items-center relative overflow-hidden">
-    <div class="absolute inset-0 bg-gradient-to-r from-brand-accent/5 to-transparent pointer-events-none"></div>
+<UserLayout title="Beacon - CV Yükle & Analiz" headerTitle="Aday Paneli">
+  <!-- Welcome Banner -->
+  <div class="mb-8 bg-white border border-[#ddd9d3] rounded-[10px] p-6 flex items-center shadow-sm relative overflow-hidden">
     <div class="flex items-center gap-4 relative z-10">
-      <div class="w-12 h-12 rounded-xl bg-brand-accent/15 flex items-center justify-center shrink-0 border border-brand-accent/30">
-        <span class="material-symbols-outlined text-brand-accent">waving_hand</span>
+      <div class="w-12 h-12 rounded-[10px] bg-[#14422f]/10 flex items-center justify-center shrink-0 border border-[#14422f]/20">
+        <span class="material-symbols-outlined text-[#14422f]">waving_hand</span>
       </div>
       <div>
-        <p class="text-brand-muted text-body-sm">Hoş geldiniz,</p>
-        <h3 class="text-headline-sm font-bold text-brand-text" id="welcome-name">Kullanıcı</h3>
+        <p class="text-[#8a8580] text-xs font-medium">Hoş geldiniz,</p>
+        <h3 class="text-xl font-bold text-[#1b1c1a]" id="welcome-name">Kullanıcı</h3>
       </div>
     </div>
   </div>
 
-  <div id="candidate-view" class="space-y-xl">
-    <div class="grid grid-cols-1 lg:grid-cols-12 gap-gutter">
+  <div id="candidate-view" class="space-y-8">
+    <div class="flex flex-col lg:flex-row gap-6 items-start">
       
       <!-- Left side: CV Upload & History -->
-      <div class="lg:col-span-7 flex flex-col gap-lg">
+      <div class="flex-1 min-w-0 flex flex-col gap-6 w-full">
         
         <!-- CV Upload Card -->
-        <div class="glass-card rounded-2xl p-6 flex flex-col relative overflow-hidden">
-          <h3 class="text-xl font-semibold text-brand-text mb-2">Yeni CV Yükle</h3>
-          <p class="text-brand-muted text-sm mb-6">CV'nizi PDF formatında yükleyerek yapay zeka ile saniyeler içinde yetenek analizi alabilirsiniz.</p>
+        <div class="bg-white border border-[#ddd9d3] rounded-[10px] p-6 flex flex-col shadow-sm">
+          <h3 class="text-xl font-bold text-[#1b1c1a] mb-2">Yeni CV Yükle</h3>
+          <p class="text-[#8a8580] text-sm mb-6 font-medium">Özgeçmişinizi PDF formatında yükleyerek yapay zeka ile saniyeler içinde yetenek analizi alabilirsiniz.</p>
           
           <!-- Dropzone -->
-          <div class="dropzone-glow bg-brand-bg/50 rounded-2xl p-12 flex flex-col items-center justify-center cursor-pointer group relative overflow-hidden animate-fade-in" id="drop-zone">
-            <div class="absolute inset-0 bg-brand-accent/5 opacity-0 group-hover:opacity-100 transition-opacity blur-xl"></div>
-            <div class="upload-icon w-20 h-20 mb-5 rounded-full bg-brand-card border border-brand-border flex items-center justify-center group-hover:bg-brand-accent/10 group-hover:text-brand-accent group-hover:border-brand-accent/30 transition-all duration-300">
-              <i class="fa-solid fa-cloud-arrow-up text-3xl text-brand-muted group-hover:text-brand-accent"></i>
+          <div class="border-dashed border-2 border-[#ddd9d3] bg-[#faf9f5] rounded-[10px] p-12 flex flex-col items-center justify-center cursor-pointer hover:bg-[#faf9f5]/80 hover:border-[#14422f]/50 transition-all duration-200" id="drop-zone">
+            <div class="w-16 h-16 mb-4 rounded-full bg-white border border-[#ddd9d3] flex items-center justify-center text-[#8a8580] transition-colors duration-200">
+              <span class="material-symbols-outlined text-3xl">upload_file</span>
             </div>
-            <h4 class="text-brand-text font-semibold mb-2 text-lg text-center">Dosyayı sürükleyip bırakın veya seçin</h4>
-            <p class="text-brand-muted text-sm text-center">Yalnızca PDF formatı desteklenir (Maks: 5MB)</p>
+            <h4 class="text-[#1b1c1a] font-bold mb-1 text-md text-center">Dosyayı sürükleyip bırakın veya seçin</h4>
+            <p class="text-[#8a8580] text-xs text-center font-medium">Yalnızca PDF formatı desteklenir (Maks: 5MB)</p>
+            <button class="bg-[#14422f] hover:bg-[#0f3223] text-white rounded-[8px] px-6 py-2.5 font-label-md transition-colors mt-4">
+              Dosya Seç
+            </button>
             <input type="file" id="cv-file-input" accept=".pdf" class="hidden" />
           </div>
 
-          <div class="mt-md hidden" id="upload-progress-container">
-            <div class="flex justify-between text-label-md font-medium text-brand-muted mb-xs">
+          <div class="mt-4 hidden" id="upload-progress-container">
+            <div class="flex justify-between text-xs font-semibold text-[#8a8580] mb-2">
               <span id="upload-status-text">Dosya yükleniyor...</span>
               <span id="upload-percent">0%</span>
             </div>
-            <div class="w-full bg-brand-border h-2 rounded-full overflow-hidden">
-              <div class="bg-brand-accent h-full w-0 transition-all duration-300" id="upload-progress-bar"></div>
+            <div class="w-full bg-[#f5f4f0] h-2 rounded-full overflow-hidden border border-[#ddd9d3]">
+              <div class="bg-[#14422f] h-full w-0 transition-all duration-200" id="upload-progress-bar"></div>
             </div>
           </div>
         </div>
 
         <!-- My CV List -->
-        <div class="glass-card rounded-2xl flex-1 flex flex-col overflow-hidden" id="my-analyses">
-          <div class="p-6 border-b border-brand-border">
-            <h3 class="text-xl font-semibold text-brand-text">Son Yüklemeler</h3>
+        <div class="bg-white border border-[#ddd9d3] rounded-[10px] flex-1 flex flex-col overflow-hidden shadow-sm" id="my-analyses">
+          <div class="p-6 border-b border-[#ddd9d3]">
+            <h3 class="text-xl font-bold text-[#1b1c1a]">Son Yüklemeler</h3>
           </div>
           <div class="overflow-x-auto custom-scrollbar">
             <table class="w-full text-left text-sm whitespace-nowrap">
-              <thead class="text-xs text-brand-muted uppercase bg-brand-bg/80 border-y border-brand-border">
+              <thead class="text-xs text-[#8a8580] uppercase bg-[#f5f4f0] border-b border-[#ddd9d3]">
                 <tr>
-                  <th class="px-6 py-4 font-semibold rounded-tl-xl" scope="col">Belge Adı</th>
+                  <th class="px-6 py-4 font-semibold" scope="col">Belge Adı</th>
                   <th class="px-6 py-4 font-semibold" scope="col">Yükleme Tarihi</th>
                   <th class="px-6 py-4 font-semibold" scope="col">Analiz Durumu</th>
                   <th class="px-6 py-4 font-semibold text-center" scope="col">Uyum Skoru</th>
-                  <th class="px-6 py-4 font-semibold text-right rounded-tr-xl" scope="col">İşlem</th>
+                  <th class="px-6 py-4 font-semibold text-right" scope="col">İşlem</th>
                 </tr>
               </thead>
-              <tbody class="divide-y divide-brand-border/50 text-brand-text" id="my-cvs-body">
+              <tbody class="divide-y divide-[#ddd9d3] text-[#1b1c1a]" id="profile-cvs-body">
                 <tr>
-                  <td colspan="5" class="px-6 py-4 text-center text-brand-muted">Yüklemeler sorgulanıyor...</td>
+                  <td colspan="5" class="px-6 py-8 text-center text-[#8a8580] font-medium">Yüklemeler sorgulanıyor...</td>
                 </tr>
               </tbody>
             </table>
@@ -78,56 +79,41 @@ import UserLayout from '../layouts/UserLayout.astro';
       </div>
 
       <!-- Right side: AI Analysis Details -->
-      <div class="lg:col-span-5">
-        <div class="glass-card rounded-2xl h-full flex flex-col p-8 relative overflow-hidden min-h-[480px] lg:min-h-[580px]" id="analysis-detail-card">
-          <!-- Background Glow Decoration -->
-          <div class="absolute top-0 right-0 -mr-16 -mt-16 w-64 h-64 bg-brand-accent/5 rounded-full blur-3xl pointer-events-none"></div>
-
+      <div class="analysis-panel-right">
+        <div class="bg-white border border-[#ddd9d3] rounded-[10px] min-h-[480px] lg:min-h-[580px] flex flex-col p-6 shadow-sm" id="analysis-detail-card">
+          
           <!-- Empty State (Initially Visible) -->
-          <div class="text-center py-12 text-brand-muted flex flex-col items-center justify-center h-full space-y-6 my-auto relative z-10" id="no-analysis-state">
-            <!-- Atmospheric Background Grid -->
-            <div class="absolute inset-0 pointer-events-none" style="background-image: radial-gradient(circle at center, rgba(56,189,248,0.03) 1px, transparent 1px); background-size: 24px 24px;"></div>
-            
-            <div class="w-48 h-48 mb-6 relative flex items-center justify-center animate-float">
-              <!-- Glow backdrops -->
-              <div class="absolute w-40 h-40 bg-brand-accent/10 rounded-full blur-2xl mix-blend-screen animate-pulse-slow"></div>
-              <div class="absolute w-44 h-44 border border-brand-accent/5 rounded-full animate-spin-slow"></div>
-              
-              <!-- Outer glowing ring -->
-              <div class="w-36 h-36 rounded-full border border-brand-accent/20 bg-brand-card/50 flex items-center justify-center relative shadow-[inset_0_0_20px_rgba(56,189,248,0.1)]">
-                <!-- Ping ring -->
-                <div class="absolute inset-0 rounded-full border border-brand-accent/20 animate-ping opacity-40"></div>
-                <!-- Magic sparkles icon -->
-                <i class="fa-solid fa-wand-magic-sparkles text-brand-accent text-5xl drop-shadow-[0_0_15px_rgba(56,189,248,0.6)]"></i>
-              </div>
+          <div class="text-center py-12 text-[#8a8580] flex flex-col items-center justify-center h-full space-y-6 my-auto" id="no-analysis-state">
+            <div class="w-24 h-24 rounded-full border border-[#ddd9d3] bg-[#faf9f5] flex items-center justify-center relative shadow-sm">
+              <span class="material-symbols-outlined text-4xl text-[#14422f]">auto_awesome</span>
             </div>
-            <div class="text-center relative z-10 max-w-sm px-6">
-              <h3 class="text-2xl font-bold text-brand-text mb-3">Analiz İçin Hazır</h3>
-              <p class="text-sm text-brand-muted text-center leading-relaxed">Sol panelden bir özgeçmiş seçerek veya yeni bir dosya yükleyerek yapay zeka analizini anında başlatabilirsiniz.</p>
+            <div class="text-center w-full max-w-[320px] px-4 mx-auto">
+              <h3 class="text-lg font-bold text-[#1b1c1a] mb-2">Analiz İçin Hazır</h3>
+              <p class="text-xs text-[#8a8580] leading-relaxed font-medium">Sol panelden bir özgeçmiş seçerek veya yeni bir dosya yükleyerek yapay zeka analizini anında başlatabilirsiniz.</p>
             </div>
           </div>
 
           <!-- Active Analysis State (Initially Hidden) -->
-          <div class="hidden space-y-lg h-full flex flex-col relative z-10" id="active-analysis-state">
-            <div class="flex items-center justify-between pb-md border-b border-brand-border shrink-0">
+          <div class="hidden space-y-6 h-full flex flex-col" id="active-analysis-state">
+            <div class="flex items-center justify-between pb-4 border-b border-[#ddd9d3] shrink-0">
               <div class="flex items-center gap-3">
-                <div class="w-10 h-10 rounded-lg bg-brand-danger/10 flex items-center justify-center border border-brand-danger/20">
-                  <i class="fa-solid fa-file-pdf text-brand-danger text-xl"></i>
+                <div class="w-10 h-10 rounded-[8px] bg-red-50 flex items-center justify-center border border-red-200">
+                  <span class="material-symbols-outlined text-red-600">description</span>
                 </div>
                 <div class="flex-1 min-w-0">
-                  <h3 class="text-lg font-bold text-brand-text truncate leading-tight max-w-[180px]" id="analysis-cv-name">Özgeçmiş</h3>
-                  <div class="flex items-center gap-2 mt-0.5">
-                    <span class="w-1.5 h-1.5 rounded-full bg-brand-accent animate-pulse" id="analysis-dot"></span>
-                    <span class="text-[10px] text-brand-accent font-bold tracking-widest uppercase">Yapay Zeka Analiz Raporu</span>
+                  <h3 class="text-md font-bold text-[#1b1c1a] truncate leading-tight max-w-[180px]" id="analysis-cv-name">Özgeçmiş</h3>
+                  <div class="flex items-center gap-1.5 mt-1">
+                    <span class="w-1.5 h-1.5 rounded-full bg-[#14422f] animate-pulse" id="analysis-dot"></span>
+                    <span class="text-[10px] text-[#14422f] font-bold uppercase tracking-wider font-mono">Yapay Zeka Raporu</span>
                   </div>
                 </div>
               </div>
               <div id="analysis-status-indicator">
-                <span class="material-symbols-outlined text-brand-success text-3xl">verified</span>
+                <span class="material-symbols-outlined text-emerald-600 text-3xl">verified</span>
               </div>
             </div>
 
-            <div id="analysis-content-area" class="space-y-lg flex flex-col h-full overflow-hidden">
+            <div id="analysis-content-area" class="space-y-6 flex flex-col h-full overflow-hidden">
               <!-- Dynamic content will be injected by JS -->
             </div>
           </div>
@@ -139,22 +125,30 @@ import UserLayout from '../layouts/UserLayout.astro';
 </UserLayout>
 
 <script is:inline>
+{
   let activeInterval = null;
   let selectedCvId = null;
 
-  const dateEl = document.getElementById('session-date');
-  if (dateEl) {
-    dateEl.textContent = new Date().toLocaleDateString('tr-TR', { 
-      weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' 
-    });
-  }
+  // Load active user session via SWR Cache
+  async function loadUserSession() {
+    const fetcher = async () => {
+      const res = await fetch('/api/auth/me');
+      if (!res.ok) throw new Error("Fetch user profile error");
+      return res.json();
+    };
 
-  // Load active user session
-  fetch('/api/auth/me').then(res => res.json()).then(data => {
-    if(data.user) {
-      document.getElementById('welcome-name').textContent = data.user.name || data.user.email.split('@')[0];
+    const render = (data) => {
+      if (data.user) {
+        document.getElementById('welcome-name').textContent = data.user.name || data.user.email.split('@')[0];
+      }
+    };
+
+    if (window.__swrCache) {
+      window.__swrCache.query('user-profile', fetcher, render, 30000);
+    } else {
+      fetcher().then(render).catch(console.error);
     }
-  }).catch(console.error);
+  }
 
   // Delete CV handler
   window.deleteCV = async function(cvId) {
@@ -176,6 +170,12 @@ import UserLayout from '../layouts/UserLayout.astro';
         document.getElementById('active-analysis-state').classList.add('hidden');
       }
       
+      // Invalidate query caches on delete
+      if (window.__swrCache) {
+        window.__swrCache.invalidate('user-cvs');
+        window.__swrCache.invalidate('user-analyses');
+      }
+      
       await loadCVList();
     } catch (err) {
       console.error(err);
@@ -185,17 +185,20 @@ import UserLayout from '../layouts/UserLayout.astro';
 
   // Load CV List and poll if PENDING/PROCESSING status is active
   async function loadCVList() {
-    try {
+    const fetcher = async () => {
       const res = await fetch('/api/cv/list');
-      if (!res.ok) return;
-      const data = await res.json();
-      const tbody = document.getElementById('my-cvs-body');
+      if (!res.ok) throw new Error("Fetch CV list error");
+      return res.json();
+    };
+
+    const render = (data) => {
+      const tbody = document.getElementById('profile-cvs-body');
       if (!tbody) return;
 
       if (!data.cvs || data.cvs.length === 0) {
         tbody.innerHTML = `
           <tr>
-            <td colspan="5" class="p-lg text-center text-on-surface-variant">Henüz CV yüklemediniz. Aşağıdan yeni bir dosya seçebilirsiniz.</td>
+            <td colspan="5" class="px-6 py-8 text-center text-[#8a8580] font-medium">Henüz CV yüklemediniz. Yukarıdan yeni bir dosya seçebilirsiniz.</td>
           </tr>
         `;
         return;
@@ -219,62 +222,62 @@ import UserLayout from '../layouts/UserLayout.astro';
       cvsToShow.forEach(cv => {
         const latestAnalysis = cv.analyses && cv.analyses[0];
         const status = latestAnalysis ? latestAnalysis.status : 'PENDING';
-        const dateStr = new Date(cv.createdAt).toLocaleDateString('tr-TR');
+        const dateStr = new Date(cv.createdAt).toLocaleDateString('tr-TR', { day: 'numeric', month: 'short', year: 'numeric' });
         
         let statusBadge = '';
         if (status === 'PENDING') {
           statusBadge = `
-            <span class="inline-flex items-center gap-2 px-3 py-1.5 rounded-full text-xs font-semibold bg-brand-warning/10 text-brand-warning border border-brand-warning/20">
-              <span class="w-2 h-2 rounded-full bg-brand-warning animate-pulse"></span> Sırada
+            <span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-[6px] text-xs font-semibold bg-amber-50 text-amber-700 border border-amber-200">
+              <span class="w-1.5 h-1.5 rounded-full bg-amber-600 animate-pulse"></span> Sırada
             </span>
           `;
         } else if (status === 'PROCESSING') {
           statusBadge = `
-            <span class="inline-flex items-center gap-2 px-3 py-1.5 rounded-full text-xs font-semibold bg-brand-accent/10 text-brand-accent border border-brand-accent/20">
-              <span class="w-2 h-2 rounded-full bg-brand-accent animate-spin"></span> İşleniyor...
+            <span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-[6px] text-xs font-semibold bg-blue-50 text-blue-700 border border-blue-200">
+              <span class="w-1.5 h-1.5 rounded-full bg-blue-600 animate-spin"></span> İşleniyor
             </span>
           `;
         } else if (status === 'COMPLETED') {
           statusBadge = `
-            <span class="inline-flex items-center gap-2 px-3 py-1.5 rounded-full text-xs font-semibold bg-brand-successBg text-brand-success border border-brand-success/20 shadow-[0_0_10px_rgba(74,222,128,0.2)]">
-              <span class="w-2 h-2 rounded-full bg-brand-success"></span> Hazır
+            <span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-[6px] text-xs font-semibold bg-emerald-50 text-emerald-700 border border-emerald-200">
+              <span class="w-1.5 h-1.5 rounded-full bg-emerald-600"></span> Hazır
             </span>
           `;
         } else {
           statusBadge = `
-            <span class="inline-flex items-center gap-2 px-3 py-1.5 rounded-full text-xs font-semibold bg-brand-danger/10 text-brand-danger border border-brand-danger/20">
-              <span class="w-2 h-2 rounded-full bg-brand-danger"></span> Hata
+            <span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-[6px] text-xs font-semibold bg-rose-50 text-rose-700 border border-rose-200">
+              <span class="w-1.5 h-1.5 rounded-full bg-rose-600"></span> Hata
             </span>
           `;
         }
 
         const scoreStr = latestAnalysis && latestAnalysis.atsScore !== null 
-          ? `<span class="font-bold text-brand-success">%${latestAnalysis.atsScore}</span>` 
-          : `<span class="text-brand-muted">-</span>`;
+          ? `<span class="font-bold text-emerald-700">%${latestAnalysis.atsScore} Uyum</span>` 
+          : `<span class="text-[#8a8580]">-</span>`;
 
         const tr = document.createElement('tr');
-        tr.className = `table-row-hover group cursor-pointer ${selectedCvId === cv.id ? 'bg-white/8' : ''}`;
+        tr.className = `hover:bg-[#f5f4f0]/60 transition-all group cursor-pointer ${selectedCvId === cv.id ? 'bg-[#f5f4f0]' : ''}`;
         tr.onclick = () => {
           selectedCvId = cv.id;
           const rows = tbody.querySelectorAll('tr');
-          rows.forEach(r => r.classList.remove('bg-white/8'));
-          tr.classList.add('bg-white/8');
+          rows.forEach(r => r.classList.remove('bg-[#f5f4f0]'));
+          tr.classList.add('bg-[#f5f4f0]');
           showAnalysisDetails(cv, latestAnalysis);
         };
 
         tr.innerHTML = `
           <td class="px-6 py-5">
-            <div class="flex items-center gap-4">
-              <i class="fa-regular fa-file-pdf text-brand-danger text-xl"></i>
-              <span class="font-medium text-brand-text truncate max-w-[200px]">${cv.fileName}</span>
+            <div class="flex items-center gap-3">
+              <span class="material-symbols-outlined text-red-600 text-[20px] shrink-0">picture_as_pdf</span>
+              <span class="font-bold text-[#1b1c1a] truncate max-w-[200px] text-sm">${cv.fileName}</span>
             </div>
           </td>
-          <td class="px-6 py-5 text-brand-muted">${dateStr}</td>
+          <td class="px-6 py-5 text-[#8a8580] font-medium text-xs">${dateStr}</td>
           <td class="px-6 py-5">${statusBadge}</td>
-          <td class="px-6 py-5 text-center">${scoreStr}</td>
+          <td class="px-6 py-5 text-center text-xs font-bold">${scoreStr}</td>
           <td class="px-6 py-5 text-right" onclick="event.stopPropagation();">
-            <button class="text-brand-muted hover:text-brand-danger p-2 rounded-lg hover:bg-brand-bg transition-colors" onclick="deleteCV('${cv.id}')" title="Sil">
-              <i class="fa-regular fa-trash-can text-lg"></i>
+            <button class="text-[#8a8580] hover:text-red-600 p-1.5 rounded-lg hover:bg-red-50 transition-colors animate-pulse-hover" onclick="deleteCV('${cv.id}')" title="Sil">
+              <span class="material-symbols-outlined text-[18px]">delete</span>
             </button>
           </td>
         `;
@@ -297,8 +300,14 @@ import UserLayout from '../layouts/UserLayout.astro';
           activeInterval = null;
         }
       }
-    } catch (err) {
-      console.error("CV yükleme geçmişi alınamadı:", err);
+    };
+
+    const staleTime = activeInterval ? 0 : 30000;
+
+    if (window.__swrCache) {
+      window.__swrCache.query('user-cvs', fetcher, render, staleTime);
+    } else {
+      fetcher().then(render).catch(err => console.error("CV List load failed:", err));
     }
   }
 
@@ -320,79 +329,81 @@ import UserLayout from '../layouts/UserLayout.astro';
     const status = analysis.status;
 
     if (status === 'COMPLETED') {
-      statusIndicator.innerHTML = `<span class="material-symbols-outlined text-brand-success text-3xl">verified</span>`;
+      statusIndicator.innerHTML = `<span class="material-symbols-outlined text-emerald-600 text-3xl">verified</span>`;
       contentArea.classList.remove('hidden');
 
       if (analysis.atsScore === null) {
         // Day 13 completed state: text chunks successfully generated but AI scoring is not done
         const chunkHtml = cv.chunks && cv.chunks.length > 0 
           ? cv.chunks.map((chunk, idx) => {
-              // Separate section header from content (content starts with [SECTION_NAME]\n)
               const firstLineBreak = chunk.content.indexOf('\n');
               const header = firstLineBreak !== -1 ? chunk.content.substring(0, firstLineBreak) : `PARÇA #${idx + 1}`;
               const body = firstLineBreak !== -1 ? chunk.content.substring(firstLineBreak + 1) : chunk.content;
               const wordCount = body.split(/\s+/).filter(w => w.length > 0).length;
 
               return `
-                <div class="group bg-brand-bg/40 rounded-xl border-l-4 border-brand-accent p-5 hover:bg-brand-bg/60 transition-all text-left">
+                <div class="group bg-[#faf9f5] rounded-[10px] border-l-4 border-[#14422f] p-5 border border-[#ddd9d3] hover:bg-[#f5f4f0] transition-all text-left">
                   <div class="flex justify-between items-start mb-2">
                     <div>
-                      <span class="text-[10px] font-bold text-brand-accent uppercase tracking-tighter">${header}</span>
+                      <span class="text-[10px] font-bold text-[#14422f] uppercase tracking-wider">${header}</span>
                     </div>
-                    <span class="text-[10px] font-mono text-brand-muted bg-brand-bg px-2 py-1 rounded">${wordCount} kelime</span>
+                    <span class="text-[10px] font-mono text-[#8a8580] bg-white border border-[#ddd9d3] px-2 py-1 rounded">${wordCount} kelime</span>
                   </div>
-                  <p class="text-xs text-brand-muted leading-relaxed font-sans whitespace-pre-wrap select-all max-h-[120px] overflow-y-auto pr-xs mt-xs">
+                  <p class="text-xs text-[#1b1c1a] leading-relaxed font-sans whitespace-pre-wrap select-all max-h-[120px] overflow-y-auto pr-2 mt-2">
                     ${body}
                   </p>
                 </div>
               `;
             }).join('')
-          : `<p class="text-xs text-brand-muted text-center py-md">Metin parçaları veritabanında bulunamadı.</p>`;
+          : `<p class="text-xs text-[#8a8580] text-center py-4">Metin parçaları veritabanında bulunamadı.</p>`;
 
         const skillsHtml = Array.isArray(analysis.skills) && analysis.skills.length > 0
           ? analysis.skills.map(s => `
-              <span class="px-3 py-1.5 rounded-full bg-white/5 border border-white/10 text-brand-accent text-xs font-semibold shadow-sm transform hover:scale-105 transition-transform cursor-default">
+              <span class="px-3 py-1.5 rounded-full bg-white border border-[#ddd9d3] text-[#14422f] text-xs font-semibold shadow-sm cursor-default">
                 ${s}
               </span>
             `).join('')
-          : `<span class="text-xs text-brand-muted">Yetenek kelimeleri çıkarılamadı.</span>`;
+          : `<span class="text-xs text-[#8a8580]">Yetenek kelimeleri çıkarılamadı.</span>`;
 
         contentArea.innerHTML = `
-          <div class="space-y-md flex flex-col h-full overflow-hidden">
+          <div class="space-y-4 flex flex-col h-full overflow-hidden">
             <!-- Skills Container -->
-            <div class="space-y-sm shrink-0">
-              <h4 class="text-[10px] font-bold text-brand-muted tracking-widest uppercase px-1">ÖZGEÇMİŞTEN ÇIKARILAN YETENEKLER</h4>
-              <div class="flex flex-wrap gap-2 pt-xs">
+            <div class="space-y-2 shrink-0">
+              <h4 class="text-[10px] font-bold text-[#8a8580] tracking-widest uppercase px-1">ÖZGEÇMİŞTEN ÇIKARILAN YETENEKLER</h4>
+              <div class="flex flex-wrap gap-2 pt-1">
                 ${skillsHtml}
               </div>
             </div>
 
             <!-- Chunks Container -->
-            <div class="space-y-sm flex-1 flex flex-col overflow-hidden">
-              <h4 class="text-[10px] font-bold text-brand-muted tracking-widest uppercase px-1">BÖLÜMLERE GÖRE PARÇALAMA (CHUNKS)</h4>
-              <div class="space-y-4 overflow-y-auto flex-1 pr-xs custom-scrollbar mt-xs" style="max-height: 280px;">
+            <div class="space-y-2 flex-1 flex flex-col overflow-hidden">
+              <h4 class="text-[10px] font-bold text-[#8a8580] tracking-widest uppercase px-1">BÖLÜMLERE GÖRE PARÇALAMA (CHUNKS)</h4>
+              <div class="space-y-4 overflow-y-auto flex-1 pr-2 custom-scrollbar mt-1" style="max-height: 280px;">
                 ${chunkHtml}
               </div>
             </div>
 
             <!-- Floating Status Bar -->
-            <div class="mt-auto p-4 rounded-2xl bg-white/5 border border-white/10 shadow-xl relative overflow-hidden shrink-0">
-              <div class="absolute top-0 left-0 w-1 h-full bg-brand-accent"></div>
+            <div class="mt-auto p-4 rounded-[10px] bg-[#faf9f5] border border-[#ddd9d3] shadow-sm relative overflow-hidden shrink-0">
+              <div class="absolute top-0 left-0 w-1 h-full bg-[#14422f]"></div>
               <div class="flex gap-3 items-start">
                 <div class="mt-0.5">
-                  <i class="fa-solid fa-wand-magic-sparkles text-brand-accent text-sm"></i>
+                  <span class="material-symbols-outlined text-[#14422f] text-sm">info</span>
                 </div>
-                <p class="text-[10px] text-brand-text/80 leading-relaxed text-left">
-                  <span class="font-bold text-brand-accent">Gün 13:</span> CV bölümlere ayrıldı. Yarın veriler <span class="italic font-bold text-brand-accent">Gemini AI</span> derin analizine aktarılacaktır.
+                <p class="text-[10px] text-[#1b1c1a]/80 leading-relaxed text-left">
+                  <span class="font-bold text-[#14422f]">Sistem:</span> CV bölümlere ayrıldı. Yapay zeka <span class="italic font-bold text-[#14422f]">Gemini AI</span> derin analiz raporu hazırlandı.
                 </p>
               </div>
             </div>
           </div>
         `;
       } else {
-        // Standard full AI report (for Day 14)
         const strengthsHtml = Array.isArray(analysis.strengths) && analysis.strengths.length > 0
           ? analysis.strengths.map(st => `<li>${st}</li>`).join('')
+          : '<li>Analiz başarısız veya veri yok.</li>';
+
+        const suggestionsHtml = Array.isArray(analysis.suggestions) && analysis.suggestions.length > 0
+          ? analysis.suggestions.map(sg => `<li>${sg}</li>`).join('')
           : '<li>Analiz başarısız veya veri yok.</li>';
 
         const weaknessesHtml = Array.isArray(analysis.weaknesses) && analysis.weaknesses.length > 0
@@ -401,54 +412,62 @@ import UserLayout from '../layouts/UserLayout.astro';
 
         const skillsHtml = Array.isArray(analysis.skills) && analysis.skills.length > 0
           ? analysis.skills.map(s => `
-              <span class="px-3 py-1.5 rounded-full bg-brand-accent/10 border border-brand-accent/20 text-brand-accent text-xs font-semibold shadow-sm transform hover:scale-105 transition-transform cursor-default">
+              <span class="px-3 py-1.5 rounded-full bg-[#14422f]/10 border border-[#14422f]/20 text-[#14422f] text-xs font-semibold shadow-sm cursor-default">
                 ${s}
               </span>
             `).join('')
-          : `<span class="text-xs text-brand-muted">Yetenek kelimeleri çıkarılamadı.</span>`;
+          : `<span class="text-xs text-[#8a8580]">Yetenek kelimeleri çıkarılamadı.</span>`;
 
         contentArea.innerHTML = `
-          <div class="space-y-lg flex flex-col h-full overflow-y-auto pr-xs custom-scrollbar">
+          <div class="space-y-6 flex flex-col h-full overflow-y-auto pr-2 custom-scrollbar">
             <!-- Score Card -->
-            <div class="flex items-center gap-lg bg-brand-card/50 p-5 rounded-2xl border border-brand-border shrink-0 text-left">
+            <div class="flex items-center gap-6 bg-[#faf9f5] p-5 rounded-[10px] border border-[#ddd9d3] shrink-0 text-left">
               <div class="relative w-20 h-20 flex items-center justify-center shrink-0">
                 <svg class="w-full h-full transform -rotate-90" viewBox="0 0 36 36">
-                  <path class="text-brand-border" d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831" fill="none" stroke="currentColor" stroke-width="3"></path>
-                  <path class="text-brand-success" d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831" fill="none" stroke="currentColor" stroke-dasharray="${analysis.atsScore}, 100" stroke-linecap="round" stroke-width="3"></path>
+                  <path class="text-[#ddd9d3]" d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831" fill="none" stroke="currentColor" stroke-width="3"></path>
+                  <path class="text-emerald-600" d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831" fill="none" stroke="currentColor" stroke-dasharray="${analysis.atsScore}, 100" stroke-linecap="round" stroke-width="3"></path>
                 </svg>
-                <span class="absolute text-headline-sm font-bold text-brand-text">%${analysis.atsScore}</span>
+                <span class="absolute text-lg font-bold text-[#1b1c1a]">%${analysis.atsScore}</span>
               </div>
               <div>
-                <span class="text-label-sm text-brand-accent uppercase font-bold tracking-wider">GENEL UYUM SKORU</span>
-                <h5 class="text-body-md font-bold text-brand-text mt-xs">${analysis.role || 'Özgeçmiş Analizi'}</h5>
-                <p class="text-label-md text-brand-muted mt-0.5">Yapay zeka uyumluluk skoru hesaplandı.</p>
+                <span class="text-[10px] text-[#14422f] uppercase font-bold tracking-widest">GENEL UYUM SKORU</span>
+                <h5 class="text-md font-bold text-[#1b1c1a] mt-1">${analysis.role || 'Özgeçmiş Analizi'}</h5>
+                <p class="text-xs text-[#8a8580] mt-0.5">Yapay zeka uyumluluk skoru hesaplandı.</p>
               </div>
             </div>
 
             <!-- Skills cloud -->
-            <div class="space-y-sm shrink-0 text-left">
-              <h4 class="text-[10px] font-bold text-brand-muted tracking-widest uppercase px-1">ÖNE ÇIKAN YETENEKLER</h4>
-              <div class="flex flex-wrap gap-2 pt-xs">
+            <div class="space-y-2 shrink-0 text-left">
+              <h4 class="text-[10px] font-bold text-[#8a8580] tracking-widest uppercase px-1">ÖNE ÇIKAN YETENEKLER</h4>
+              <div class="flex flex-wrap gap-2 pt-1">
                 ${skillsHtml}
               </div>
             </div>
 
-            <!-- Strengths and Weaknesses -->
-            <div class="grid grid-cols-1 gap-md pt-xs shrink-0">
-              <div class="bg-brand-success/5 border border-brand-success/15 p-5 rounded-2xl space-y-2 text-left">
-                <span class="text-label-sm text-brand-success font-bold flex items-center gap-xs">
-                  <i class="fa-regular fa-thumbs-up text-sm mr-1"></i> GÜÇLÜ YÖNLER
+            <!-- Strengths, Suggestions and Weaknesses -->
+            <div class="grid grid-cols-1 gap-4 pt-1 shrink-0">
+              <div class="bg-emerald-50 border border-emerald-200 p-5 rounded-[10px] space-y-2 text-left">
+                <span class="text-xs text-emerald-800 font-bold flex items-center gap-1">
+                  <span class="material-symbols-outlined text-sm">thumb_up</span> GÜÇLÜ YÖNLER
                 </span>
-                <ul class="text-xs text-brand-muted space-y-1.5 list-disc pl-md">
+                <ul class="list-disc pl-5 text-xs text-[#1b1c1a]/90 space-y-1.5 leading-relaxed">
                   ${strengthsHtml}
                 </ul>
               </div>
-              
-              <div class="bg-brand-danger/5 border border-brand-danger/15 p-5 rounded-2xl space-y-2 text-left">
-                <span class="text-label-sm text-brand-danger font-bold flex items-center gap-xs">
-                  <i class="fa-solid fa-triangle-exclamation text-sm mr-1"></i> GELİŞİM ALANLARI
+
+                <span class="text-xs text-amber-800 font-bold flex items-center gap-1">
+                  <span class="material-symbols-outlined text-sm">trending_up</span> GELİŞİM ALANLARI
                 </span>
-                <ul class="text-xs text-brand-muted space-y-1.5 list-disc pl-md">
+                <ul class="text-xs text-amber-700 space-y-1.5 list-disc pl-4">
+                  ${suggestionsHtml}
+                </ul>
+              </div>
+              
+              <div class="bg-rose-50 border border-rose-200 p-5 rounded-[10px] space-y-2 text-left">
+                <span class="text-xs text-rose-800 font-bold flex items-center gap-1">
+                  <span class="material-symbols-outlined text-sm">warning</span> EKSİKLER
+                </span>
+                <ul class="text-xs text-rose-700 space-y-1.5 list-disc pl-4">
                   ${weaknessesHtml}
                 </ul>
               </div>
@@ -457,30 +476,42 @@ import UserLayout from '../layouts/UserLayout.astro';
         `;
       }
     } else if (status === 'PROCESSING') {
-      statusIndicator.innerHTML = `<i class="fa-solid fa-circle-notch text-brand-accent text-3xl animate-spin"></i>`;
+      statusIndicator.innerHTML = `<span class="material-symbols-outlined text-blue-600 text-3xl animate-spin">progress_activity</span>`;
       contentArea.innerHTML = `
-        <div class="text-center py-xl text-brand-muted flex flex-col items-center justify-center h-full space-y-md my-auto">
-          <i class="fa-solid fa-circle-notch text-[64px] text-brand-accent animate-spin mb-4"></i>
-          <h4 class="text-headline-sm font-bold text-brand-text">Metin Çıkarılıyor...</h4>
-          <p class="text-body-sm text-center max-w-[280px]">Özgeçmiş PDF belgesinden metinler ayıklanıyor ve semantik arama chunk'larına bölünüyor.</p>
+        <div class="text-center py-12 text-[#8a8580] flex flex-col items-center justify-center h-full space-y-6 my-auto">
+          <div class="w-24 h-24 rounded-full border border-[#ddd9d3] bg-[#faf9f5] flex items-center justify-center shadow-sm">
+            <span class="material-symbols-outlined text-5xl text-blue-600 animate-spin">progress_activity</span>
+          </div>
+          <div class="text-center max-w-sm px-4">
+            <h3 class="text-lg font-bold text-[#1b1c1a] mb-2">Metin Çıkarılıyor...</h3>
+            <p class="text-xs text-[#8a8580] leading-relaxed font-medium">Özgeçmiş PDF belgesinden metinler ayıklanıyor ve semantik arama chunk'larına bölünüyor.</p>
+          </div>
         </div>
       `;
     } else if (status === 'PENDING') {
-      statusIndicator.innerHTML = `<i class="fa-regular fa-clock text-brand-muted text-3xl animate-pulse"></i>`;
+      statusIndicator.innerHTML = `<span class="material-symbols-outlined text-[#8a8580] text-3xl animate-pulse">schedule</span>`;
       contentArea.innerHTML = `
-        <div class="text-center py-xl text-brand-muted flex flex-col items-center justify-center h-full space-y-md my-auto">
-          <i class="fa-regular fa-clock text-[64px] text-brand-muted animate-pulse mb-4"></i>
-          <h4 class="text-headline-sm font-bold text-brand-text">İşlem Sırasında</h4>
-          <p class="text-body-sm text-center max-w-[280px]">CV dosyası sunucuya ulaştı, metin çıkarma sırasının kendisine gelmesi bekleniyor.</p>
+        <div class="text-center py-12 text-[#8a8580] flex flex-col items-center justify-center h-full space-y-6 my-auto">
+          <div class="w-24 h-24 rounded-full border border-[#ddd9d3] bg-[#faf9f5] flex items-center justify-center shadow-sm">
+            <span class="material-symbols-outlined text-5xl text-[#8a8580] animate-pulse">schedule</span>
+          </div>
+          <div class="text-center max-w-sm px-4">
+            <h3 class="text-lg font-bold text-[#1b1c1a] mb-2">İşlem Sırasında</h3>
+            <p class="text-xs text-[#8a8580] leading-relaxed font-medium">CV dosyası sunucuya ulaştı, metin çıkarma sırasının kendisine gelmesi bekleniyor.</p>
+          </div>
         </div>
       `;
     } else {
-      statusIndicator.innerHTML = `<i class="fa-solid fa-circle-exclamation text-brand-danger text-3xl"></i>`;
+      statusIndicator.innerHTML = `<span class="material-symbols-outlined text-rose-600 text-3xl">error</span>`;
       contentArea.innerHTML = `
-        <div class="text-center py-xl text-brand-danger flex flex-col items-center justify-center h-full space-y-md my-auto">
-          <i class="fa-solid fa-circle-exclamation text-[64px] mb-4"></i>
-          <h4 class="text-headline-sm font-bold text-brand-text">Ayrıştırma Hatası</h4>
-          <p class="text-body-sm text-center max-w-[280px]">PDF belgesi parse edilirken sunucu hatası oluştu. Lütfen dosyanın şifreli veya bozuk olmadığından emin olun.</p>
+        <div class="text-center py-12 text-[#8a8580] flex flex-col items-center justify-center h-full space-y-6 my-auto">
+          <div class="w-24 h-24 rounded-full border border-rose-200 bg-rose-50 flex items-center justify-center shadow-sm">
+            <span class="material-symbols-outlined text-5xl text-rose-600">error</span>
+          </div>
+          <div class="text-center max-w-sm px-4">
+            <h3 class="text-lg font-bold text-rose-600 mb-2">Ayrıştırma Hatası</h3>
+            <p class="text-xs text-[#8a8580] leading-relaxed font-medium">PDF belgesi parse edilirken sunucu hatası oluştu. Lütfen dosyanın şifreli veya bozuk olmadığından emin olun.</p>
+          </div>
         </div>
       `;
     }
@@ -495,11 +526,11 @@ import UserLayout from '../layouts/UserLayout.astro';
   const statusText = document.getElementById('upload-status-text');
 
   dropZone?.addEventListener('click', () => fileInput?.click());
-  dropZone?.addEventListener('dragover', (e) => { e.preventDefault(); dropZone.classList.add('border-brand-accent', 'bg-brand-accent/5'); });
-  dropZone?.addEventListener('dragleave', () => { dropZone.classList.remove('border-brand-accent', 'bg-brand-accent/5'); });
+  dropZone?.addEventListener('dragover', (e) => { e.preventDefault(); dropZone.classList.add('border-[#14422f]/50', 'bg-[#14422f]/5'); });
+  dropZone?.addEventListener('dragleave', () => { dropZone.classList.remove('border-[#14422f]/50', 'bg-[#14422f]/5'); });
   dropZone?.addEventListener('drop', (e) => {
     e.preventDefault();
-    dropZone.classList.remove('border-brand-accent', 'bg-brand-accent/5');
+    dropZone.classList.remove('border-[#14422f]/50', 'bg-[#14422f]/5');
     const files = e.dataTransfer?.files;
     if (files && files.length > 0) handleCVUpload(files[0]);
   });
@@ -523,7 +554,7 @@ import UserLayout from '../layouts/UserLayout.astro';
       progressContainer.classList.remove('hidden');
       progressBar.style.width = '0%';
       percentText.textContent = '0%';
-      progressBar.style.backgroundColor = 'var(--md-sys-color-primary)';
+      progressBar.style.backgroundColor = '#14422f';
       statusText.textContent = 'Dosya sunucuya gönderiliyor...';
       
       const formData = new FormData();
@@ -545,6 +576,12 @@ import UserLayout from '../layouts/UserLayout.astro';
         percentText.textContent = '100%';
         statusText.textContent = 'CV başarıyla yüklendi, analiz sıraya alındı!';
         
+        // Invalidate query caches on upload
+        if (window.__swrCache) {
+          window.__swrCache.invalidate('user-cvs');
+          window.__swrCache.invalidate('user-analyses');
+        }
+        
         // Refresh list
         selectedCvId = data.cv.id;
         await loadCVList();
@@ -558,6 +595,19 @@ import UserLayout from '../layouts/UserLayout.astro';
     }
   }
 
-  // Load the initial list on mount
-  loadCVList();
+  function initProfilePage() {
+    const listBody = document.getElementById('profile-cvs-body');
+    if (listBody && !listBody.dataset.initialized) {
+      listBody.dataset.initialized = "true";
+      loadUserSession();
+      loadCVList();
+    }
+  }
+
+  document.addEventListener('astro:page-load', initProfilePage);
+
+  if (document.readyState === 'complete' || document.readyState === 'interactive') {
+    initProfilePage();
+  }
+}
 </script>

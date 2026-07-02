@@ -2,314 +2,307 @@
 import Layout from '../layouts/Layout.astro';
 ---
 
-<Layout title="Beacon • CV'nin Gerçek Potansiyelini Keşfet" bodyClass="theme-landing font-body-md text-body-md bg-background text-on-surface">
-	<!-- Navigation -->
-	<nav class="fixed top-0 w-full z-50 border-b border-outline-variant glass">
-		<div class="flex justify-between items-center h-16 px-margin-mobile md:px-margin-desktop max-w-container-max mx-auto w-full">
-			<div class="font-headline-md text-headline-md font-bold text-on-surface flex items-center gap-2">
-				<img src="/mixboard.png" alt="Beacon Logo" class="h-8 w-auto object-contain" />
-				Beacon <span class="text-[#7c5cfc]">•</span>
-			</div>
-			<div class="hidden md:flex items-center gap-8">
-				<a class="text-on-surface-variant font-label-md hover:text-primary transition-colors" href="#">Özellikler</a>
-				<a class="text-on-surface-variant font-label-md hover:text-primary transition-colors" href="#">Nasıl Çalışır</a>
-				<a class="text-on-surface-variant font-label-md hover:text-primary transition-colors" href="#">SSS</a>
-			</div>
-			<div class="flex items-center gap-4">
-				<a class="text-on-surface-variant font-label-md hover:text-primary transition-colors" href="/login">Giriş Yap</a>
-				<a class="bg-[#7c5cfc] text-white px-6 py-2 rounded-lg font-label-md hover:bg-opacity-90 transition-all active:scale-95" href="/login">Başla</a>
-			</div>
-		</div>
-	</nav>
-	
-	<main class="relative pt-32">
-		<!-- Hero Section -->
-		<section class="max-w-container-max mx-auto px-margin-mobile md:px-margin-desktop grid md:grid-cols-2 gap-16 items-center mb-32">
-			<div class="space-y-8">
-				<div class="inline-block px-4 py-1 rounded-full border border-[#7c5cfc]/30 bg-[#7c5cfc]/10 text-[#7c5cfc] font-label-sm tracking-wider uppercase">
-					AI DESTEKLİ CV ANALİZİ
-				</div>
-				<h1 class="font-headline-lg-mobile md:font-headline-lg text-headline-lg-mobile md:text-headline-lg leading-tight text-on-surface font-bold">
-					CV'nin gerçek <span class="text-[#7c5cfc]">potansiyelini</span> keşfet.
-				</h1>
-				<p class="text-on-surface-variant text-body-lg max-w-lg">
-					CV'ni yükle, yapay zeka güçlü yönlerini, zayıf yönlerini ve gelişim önerilerini saniyeler içinde analiz etsin.
-				</p>
-				<div class="flex flex-col sm:flex-row items-start sm:items-center gap-6">
-					<a class="bg-[#7c5cfc] text-white px-8 py-4 rounded-xl font-label-md text-lg hover:shadow-[0_0_20px_rgba(124,92,252,0.4)] transition-all active:scale-95 flex items-center gap-2" href="/login">
-						Ücretsiz Analiz Et
-						<span class="material-symbols-outlined">arrow_forward</span>
-					</a>
-				</div>
-				<div class="flex flex-wrap gap-4">
-					<span class="flex items-center gap-2 px-3 py-1.5 rounded-full bg-surface border border-outline-variant text-on-surface-variant text-sm">
-						✓ Ücretsiz
-					</span>
-					<span class="flex items-center gap-2 px-3 py-1.5 rounded-full bg-surface border border-outline-variant text-on-surface-variant text-sm">
-						⚡ Saniyeler içinde
-					</span>
-					<span class="flex items-center gap-2 px-3 py-1.5 rounded-full bg-surface border border-outline-variant text-on-surface-variant text-sm">
-						🔒 Güvenli
-					</span>
-				</div>
-			</div>
-			<div class="relative group">
-				<div class="absolute -inset-1 bg-gradient-to-r from-[#7c5cfc] to-primary rounded-2xl blur opacity-25 group-hover:opacity-40 transition duration-1000"></div>
-				<div class="relative bg-surface border border-outline-variant rounded-2xl overflow-hidden purple-glow shadow-2xl">
-					<img alt="Beacon CV Analysis Dashboard" class="w-full h-full object-cover" src="https://lh3.googleusercontent.com/aida-public/AB6AXuAWVya-BHTtzPF3Zwi5kZSYEoT_IssSAKeapkd2-ZKQhFplq-m9PLl6W4NkzhQwn5yXQzSK5yIfnQvkBIi17Lq_TWlQ4kdGZGjtDHzqSxai-vmuSOKTDAHNdHhU8kMoNo4KngGZu8hWqX3uPbkCI1mbELyP1Hv2Own5MAohqWv07bKLZiBQBssre3p3E-zmaR5G6ktBSlVisUO9M4zL8GsEwNRLcilGIW-6GnQgQoQnlX_q1SzGXWL2qoe1QuFxiJa6GIVm44cgHed5"/>
-				</div>
-			</div>
-		</section>
+<Layout title="Beacon • CV'nin Gerçek Potansiyelini Keşfet">
+<!-- 1. NAVBAR (Fixed) -->
+<nav class="fixed top-0 w-full z-50 bg-surface border-b border-outline-variant transition-all duration-200">
+<div class="flex justify-between items-center h-[72px] px-margin-mobile md:px-margin-desktop max-w-max-width mx-auto">
+<a href="/" class="flex items-center gap-3">
+  <img src="/mixboard-image.png" alt="Beacon Logo" class="h-9 w-auto object-contain" />
+  <span class="font-headline-md text-headline-md font-bold text-on-surface">Beacon</span>
+</a>
+<div class="hidden md:flex items-center gap-8">
+<a class="font-body-sm text-body-sm font-semibold text-primary border-b-2 border-primary pb-1 transition-colors duration-200" href="/login">Özellikler</a>
+<a class="font-body-sm text-body-sm font-semibold text-on-surface-variant hover:text-primary transition-colors duration-200" href="/login">Nasıl Çalışır</a>
+<a class="font-body-sm text-body-sm font-semibold text-on-surface-variant hover:text-primary transition-colors duration-200" href="/login">SSS</a>
+</div>
+<div class="flex items-center gap-4">
+<a href="/login" class="hidden md:block font-body-sm text-body-sm font-semibold text-on-surface hover:text-primary transition-colors duration-200">Giriş Yap</a>
+<a href="/register" class="bg-primary-container text-white px-6 py-3 rounded-lg font-display text-body-sm font-semibold hover:opacity-90 transition-opacity">Başla</a>
+</div>
+</div>
+</nav>
+<!-- 2. HERO -->
+<section class="pt-32 pb-24 px-margin-mobile md:px-margin-desktop max-w-max-width mx-auto text-center flex flex-col items-center">
+<span class="font-label-md text-label-md text-primary-container tracking-wider uppercase mb-6 inline-block bg-white px-3 py-1 rounded-full border border-outline-variant">AI DESTEKLİ CV ANALİZİ</span>
+<h1 class="font-display text-display text-on-surface mb-6 max-w-3xl leading-tight">CV'nin gerçek potansiyelini keşfet.</h1>
+<p class="font-body-lg text-body-lg text-on-surface-variant mb-10 max-w-2xl mx-auto">CV'ni yükle, yapay zeka güçlü yönlerini, zayıf yönlerini ve gelişim önerilerini saniyeler içinde analiz etsin.</p>
+<a href="/register" class="bg-primary-container text-white px-8 py-4 rounded-lg font-display text-body-md font-semibold hover:opacity-90 transition-opacity mb-8 h-[52px] flex items-center justify-center">Ücretsiz Analiz Et</a>
+<div class="flex flex-wrap justify-center gap-4 md:gap-8 mb-16">
+<div class="flex items-center gap-2 bg-white px-4 py-2 rounded-full border border-outline-variant shadow-sm">
+<span class="material-symbols-outlined text-primary-container text-sm">check</span>
+<span class="font-label-md text-label-md text-on-surface">Ücretsiz</span>
+</div>
+<div class="flex items-center gap-2 bg-white px-4 py-2 rounded-full border border-outline-variant shadow-sm">
+<span class="material-symbols-outlined text-secondary text-sm">bolt</span>
+<span class="font-label-md text-label-md text-on-surface">Saniyeler içinde</span>
+</div>
+<div class="flex items-center gap-2 bg-white px-4 py-2 rounded-full border border-outline-variant shadow-sm">
+<span class="material-symbols-outlined text-primary-container text-sm">lock</span>
+<span class="font-label-md text-label-md text-on-surface">Güvenli</span>
+</div>
+</div>
 
-		<!-- Problem Section -->
-		<section class="py-24 bg-surface-container-lowest/50">
-			<div class="max-w-container-max mx-auto px-margin-mobile md:px-margin-desktop">
-				<h2 class="font-headline-lg text-headline-lg text-center mb-16 text-on-surface font-bold">CV'n yeterince iyi mi?</h2>
-				<div class="grid md:grid-cols-3 gap-8">
-					<div class="p-8 rounded-xl border border-outline-variant bg-surface card-hover group">
-						<div class="text-[#7c5cfc] font-bold text-4xl mb-6 opacity-40 group-hover:opacity-100 transition-opacity">01</div>
-						<h3 class="font-headline-md text-headline-md text-on-surface font-semibold mb-4">Görünürlük Sorunu</h3>
-						<p class="text-on-surface-variant">ATS sistemleri CV'ni doğru okuyamıyor olabilir. Yapay zeka ile uyumluluğunu test et.</p>
-					</div>
-					<div class="p-8 rounded-xl border border-outline-variant bg-surface card-hover group">
-						<div class="text-[#7c5cfc] font-bold text-4xl mb-6 opacity-40 group-hover:opacity-100 transition-opacity">02</div>
-						<h3 class="font-headline-md text-headline-md text-on-surface font-semibold mb-4">İşe Alım Beklentileri</h3>
-						<p class="text-on-surface-variant">İş verenlerin ne aradığını bilmiyorsun. Beacon ile modern standartlara uygun bir CV hazırla.</p>
-					</div>
-					<div class="p-8 rounded-xl border border-outline-variant bg-surface card-hover group">
-						<div class="text-[#7c5cfc] font-bold text-4xl mb-6 opacity-40 group-hover:opacity-100 transition-opacity">03</div>
-						<h3 class="font-headline-md text-headline-md text-on-surface font-semibold mb-4">Geri Bildirim Eksikliği</h3>
-						<p class="text-on-surface-variant">Reddedilen başvuruların nedenini asla öğrenemiyorsun. Biz sana tam olarak neyi geliştirmen gerektiğini söylüyoruz.</p>
-					</div>
-				</div>
-			</div>
-		</section>
+</section>
+<!-- 3. PROBLEM SECTION -->
+<section class="bg-surface-container-lowest py-24 px-margin-mobile md:px-margin-desktop">
+<div class="max-w-max-width mx-auto">
+<h2 class="font-headline-lg text-headline-lg text-on-surface mb-12 text-center">CV'n yeterince iyi mi?</h2>
+<div class="grid md:grid-cols-3 gap-8">
+<div class="bg-surface p-8 rounded-xl border-l-[3px] border-primary-container shadow-sm hover:shadow-md transition-shadow">
+<h3 class="font-headline-sm text-headline-sm text-on-surface mb-4">01 Görünmez kalan yetenekler</h3>
+<p class="font-body-sm text-body-sm text-on-surface-variant">Standart şablonlar, gerçek potansiyelinizi ve benzersiz becerilerinizi yeterince öne çıkaramayabilir.</p>
+</div>
+<div class="bg-surface p-8 rounded-xl border-l-[3px] border-primary-container shadow-sm hover:shadow-md transition-shadow">
+<h3 class="font-headline-sm text-headline-sm text-on-surface mb-4">02 İşe alımcılar ne istiyor?</h3>
+<p class="font-body-sm text-body-sm text-on-surface-variant">Sektör trendleri hızla değişiyor. CV'niz güncel gereksinimleri ve anahtar kelimeleri karşılıyor mu?</p>
+</div>
+<div class="bg-surface p-8 rounded-xl border-l-[3px] border-primary-container shadow-sm hover:shadow-md transition-shadow">
+<h3 class="font-headline-sm text-headline-sm text-on-surface mb-4">03 Geri bildirim yok</h3>
+<p class="font-body-sm text-body-sm text-on-surface-variant">Başvurularınızdan neden yanıt alamadığınızı anlamak için objektif ve anında bir değerlendirmeye ihtiyacınız var.</p>
+</div>
+</div>
+</div>
+</section>
+<!-- 4. SOLUTION SECTION -->
+<section class="py-24 px-margin-mobile md:px-margin-desktop bg-surface">
+<div class="max-w-max-width mx-auto">
+<div class="text-center mb-16">
+<span class="font-label-md text-label-md text-primary-container tracking-wider uppercase mb-4 inline-block">ÇÖZÜM</span>
+<h2 class="font-headline-lg text-headline-lg text-on-surface">Beacon CV'ni anlayan bir asistan.</h2>
+</div>
+<div class="space-y-24">
+<!-- Block 1 -->
+<div class="flex flex-col md:flex-row items-center gap-12">
+<div class="flex-1 md:pr-12">
+<h3 class="font-headline-md text-headline-md text-on-surface mb-4">Anında Analiz</h3>
+<p class="font-body-md text-body-md text-on-surface-variant">Yapay zeka motorumuz CV'nizi saniyeler içinde tarar ve derinlemesine bir analiz raporu sunar. Beklemek yok, anında sonuç.</p>
+</div>
+<div class="flex-1 w-full">
+<img alt="Anında Analiz" class="w-full aspect-video md:aspect-[4/3] object-cover rounded-xl shadow-md border border-outline-variant" src="https://lh3.googleusercontent.com/aida/AP1WRLs4-LeZi60cjZhN6_3aqfifupcVu1rvdez586xxayLcosjhdYahD08yxwcfAMw3iS2MrZkoi9xXofav0Uy2Fsvn4ato7_SFi0iJ2BZknDo8YfzYm0Bz7Guc0HG5UDPGQJqO8mEIPS5SSoN3oFye7j9nMUdc6Fq6lyDBiuXxWtqdK5kLC_JS-_GTYbFcqGjo09-4KwsL55JIWum0xJzrFkeWxTyZoTEj6D0P_XKDLcqbwSsxgEFwYty3esu0">
+</div>
+</div>
+<!-- Block 2 -->
+<div class="flex flex-col md:flex-row-reverse items-center gap-12">
+<div class="flex-1 md:pl-12">
+<h3 class="font-headline-md text-headline-md text-on-surface mb-4">Güçlü ve Zayıf Yönler</h3>
+<p class="font-body-md text-body-md text-on-surface-variant">Hangi konularda öne çıktığınızı ve hangi alanlarda eksik olduğunuzu net bir şekilde görün. Rakiplerinizin bir adım önüne geçin.</p>
+</div>
+<div class="flex-1 w-full">
+<img alt="Güçlü ve Zayıf Yönler" class="w-full aspect-video md:aspect-[4/3] object-cover rounded-xl shadow-md border border-outline-variant" src="https://lh3.googleusercontent.com/aida/AP1WRLsspW7GAYdA-trt9gOFAxKVm8pYHyu65M8cEDZ_-8tRebKrQEvyqijx-peo6GFdOwO6FKII5sr9sUvsD6hYq76Vbbke_9tsd1AxWKzpqedvjMeW9p_K1MPYbbJTEeezA9ExDYJ9a05QlEUuag39soleGpxn9RCMg-pLiH5Q_tMMKga3uLe81-fjPSfIzMp30_A_0kvGmWRmkv5UWdHWH21oXOb2pAA_WUbkOL9vtml8IeGDIVSv4cqz7gzb">
+</div>
+</div>
+<!-- Block 3 -->
+<div class="flex flex-col md:flex-row items-center gap-12">
+<div class="flex-1 md:pr-12">
+<h3 class="font-headline-md text-headline-md text-on-surface mb-4">Kişisel Gelişim Önerileri</h3>
+<p class="font-body-md text-body-md text-on-surface-variant">Sadece eleştirmez, yol gösteririz. Eksik yönlerinizi nasıl geliştirebileceğinize dair kişiselleştirilmiş, eyleme geçirilebilir tavsiyeler alın.</p>
+</div>
+<div class="flex-1 w-full">
+<img alt="Kişisel Gelişim Önerileri" class="w-full aspect-video md:aspect-[4/3] object-cover rounded-xl shadow-md border border-outline-variant" src="https://lh3.googleusercontent.com/aida/AP1WRLvyJDWF0_vI8dpL9WO4jA7xMqIkhRB_NF121WEKlqxxFmUtJgqzNAoVw2WJNPJRVHae5q65-IKR0kOLpHYQcGvtLIuD5JxhX3IF-n57RZceg6epEF_ePotbapO6lJmoyNjMK9BqvBa7j-uY1y-lBEeTzBI63kUXbsmcF_4TGzlzhTRz7vPcdW8Ycdd7CCcTa9eZdKvyfRJVgbnhQ9MvrwzUAKY5y_8B4al8FxVI6ef5AzZPB1RCDc8GaMX3">
+</div>
+</div>
+</div>
+</div>
+</section>
+<!-- 5. HOW IT WORKS -->
+<section class="bg-surface-container-lowest py-24 px-margin-mobile md:px-margin-desktop relative overflow-hidden">
+<div class="max-w-max-width mx-auto relative z-10">
+<h2 class="font-headline-lg text-headline-lg text-on-surface mb-16 text-center">3 adımda CV analizin hazır.</h2>
+<div class="flex flex-col md:flex-row justify-between items-center relative">
+<!-- Connecting Line for Desktop -->
 
-		<!-- Team Photo Section Break -->
-		<section class="relative h-[600px] w-full overflow-hidden">
-			<img alt="Beacon Ekibi" class="w-full h-full object-cover opacity-60" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBFzjwMg3vwbzuKGc7ZMhu-vz6_C8puKQBgECBCRWhQLI8Kv28IOv-IZMGsvVaNCUi2RAiasSLdnb-oe_wMLDSkHNP5AYAPkhiU6aqLAp844qzQ3dYZ14qtndvDGXQvIYq3IPhhhmkmNdmz3NHo7FR8h_FTeVab8vs1u46Th3wiG8jal1XjEFdBsCjSaaEVdcJw0OXHoNjDko0loQLD6II9XXa-Ai9mBx4QRyf0Q1OPJ7vEj3CO0yOy7hbJDpH9GhzRk0cJ3ZT2As42"/>
-			<div class="absolute inset-0 bg-gradient-to-b from-background via-transparent to-background"></div>
-			<div class="absolute inset-0 flex items-center justify-center text-center px-4">
-				<div class="max-w-2xl">
-					<h2 class="font-headline-lg text-headline-lg-mobile md:text-headline-lg text-on-surface font-bold mb-6">İnsan Odaklı Teknoloji</h2>
-					<p class="text-body-lg text-on-surface">Algoritmalarımızın arkasında, kariyer yolculuğunu kolaylaştırmak isteyen tutkulu bir ekip var.</p>
-				</div>
-			</div>
-		</section>
-
-		<!-- Solution Section -->
-		<section class="py-32">
-			<div class="max-w-container-max mx-auto px-margin-mobile md:px-margin-desktop space-y-32">
-				<h2 class="font-headline-lg text-headline-lg text-center text-on-surface font-bold">Beacon CV'ni anlayan bir asistan.</h2>
-				
-				<!-- Solution 1: Analysis -->
-				<div class="flex flex-col md:flex-row items-center gap-20">
-					<div class="w-full md:w-1/2">
-						<div class="p-1 bg-gradient-to-br from-[#7c5cfc]/50 to-transparent rounded-2xl shadow-2xl">
-							<div class="bg-surface rounded-2xl aspect-[4/3] overflow-hidden relative border border-outline-variant">
-								<img alt="Hands typing on keyboard" class="w-full h-full object-cover" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBvkfhAZMk_gPyOGBp5hvmoMYxJxhNpu6KBFzAYLqAIFnz271m8wivRDdAPk2MdEKz7yHYU5NaEepsGNXd4dMYUOk0XyEOieLpdx0Gr4Msq-KuS-Z3M0sCzCBbLqjEj0Doz72--B4SDY14YR-UqGcSi72LtkKVmeRcGrnDSYLXC4dcswIXSzdufvU2FqN3A_7CFWnAG2hBDV_qwsCyqDmCqQmuWmj9s3n7hMRwh1W4RG8dwABAfA85PhKntlzIDTHqVzvCNdyAQJXS_"/>
-							</div>
-						</div>
-					</div>
-					<div class="w-full md:w-1/2 space-y-6">
-						<h3 class="font-headline-lg-mobile md:font-headline-md text-primary font-semibold">Anında Analiz</h3>
-						<p class="text-body-lg text-on-surface-variant">Sadece saniyeler içinde CV'ndeki tüm eksikleri, imla hatalarını ve yapısal bozuklukları tespit ediyoruz. Beklemek yok, karmaşa yok.</p>
-					</div>
-				</div>
-
-				<!-- Solution 2: Strengths -->
-				<div class="flex flex-col md:flex-row-reverse items-center gap-20">
-					<div class="w-full md:w-1/2">
-						<div class="p-1 bg-gradient-to-bl from-[#7c5cfc]/50 to-transparent rounded-2xl shadow-2xl">
-							<div class="bg-surface rounded-2xl aspect-[4/3] overflow-hidden border border-outline-variant">
-								<img alt="Tablet with skill radar chart" class="w-full h-full object-cover" src="https://lh3.googleusercontent.com/aida-public/AB6AXuB87jrVBc4yZS605Av8iNNluPTboUkH2o8K1RQkb3PgDRMr9MCAlTKCLCrfLxoTKNdNioEBzMfa7Q92fW04ZYyNz70hcKvnNcSP8Pqai2vbcM-qzY1QLb7neJf1k_IRVN6uFWeB5gKh9YQs69vaZpSd__segFOrG_4InG-0MjJHe6mMiSdxUf9KIOXwcixM2n6oMiC2se2feKw5S8arH4k1Vua8LCJuXYX3XdgO_PjAdTUNVQBBcQKPa5dFnzqXcgZOMjV58XXIi5wz"/>
-							</div>
-						</div>
-					</div>
-					<div class="w-full md:w-1/2 space-y-6 text-left">
-						<h3 class="font-headline-lg-mobile md:font-headline-md text-primary font-semibold">Güçlü ve Zayıf Yönler</h3>
-						<p class="text-body-lg text-on-surface-variant">Hangi yeteneklerinin parladığını, hangilerinin ise gölgede kaldığını görselleştiriyoruz. Kariyer hikayeni verilerle güçlendir.</p>
-					</div>
-				</div>
-
-				<!-- Solution 3: Suggestions -->
-				<div class="flex flex-col md:flex-row items-center gap-20">
-					<div class="w-full md:w-1/2">
-						<div class="p-1 bg-gradient-to-tr from-[#7c5cfc]/50 to-transparent rounded-2xl shadow-2xl">
-							<div class="bg-surface rounded-2xl aspect-[4/3] overflow-hidden border border-outline-variant">
-								<img alt="Professional young professional" class="w-full h-full object-cover" src="https://lh3.googleusercontent.com/aida-public/AB6AXuD14_GKvriqH7zLnTnyBakcq-B8N4Syu6DT_CDxcWPN2BrB5S9IsN2X99xbwAS-l4dJ3lk6FYRnKVKJPbRnUZ8px7UeP29WOWd1JEczf1sEvfGesJ3OFJ102NS0vCNJg26nYr6UBTQSe8G4CNwk48nInDovMdtBNxxfSJEvRyIj-8CGQtlpEKcTcma6gwbAZhzPrunhMt7f7CSzAafutZE_Tc_YCC2mklJpVSTL0WfII7uC6ob4W6eiYXqbkWNlEGqk6hAbzcIV-ksd"/>
-							</div>
-						</div>
-					</div>
-					<div class="w-full md:w-1/2 space-y-6">
-						<h3 class="font-headline-lg-mobile md:font-headline-md text-primary font-semibold">Kişisel Gelişim Önerileri</h3>
-						<p class="text-body-lg text-on-surface-variant">Sadece eleştirmiyoruz. Eksik olan sertifikaları, kullanman gereken anahtar kelimeleri ve CV'ni nasıl bir üst seviyeye taşıyacağını adım adım gösteriyoruz.</p>
-					</div>
-				</div>
-			</div>
-		</section>
-
-		<!-- How It Works -->
-		<section class="py-24 bg-surface-container-low">
-			<div class="max-w-container-max mx-auto px-margin-mobile md:px-margin-desktop">
-				<h2 class="font-headline-lg text-headline-lg text-center mb-16 text-on-surface font-bold">3 adımda CV analizin hazır.</h2>
-				<div class="grid md:grid-cols-3 gap-12 relative">
-					<div class="absolute top-12 left-0 w-full h-px bg-outline-variant hidden md:block z-0"></div>
-					<div class="relative z-10 text-center space-y-6">
-						<div class="w-16 h-16 bg-[#7c5cfc] text-white rounded-full flex items-center justify-center mx-auto text-xl font-bold border-4 border-background">1</div>
-						<h3 class="font-headline-md text-headline-md font-semibold text-on-surface">Yükle</h3>
-						<p class="text-on-surface-variant">PDF veya Word formatındaki CV'ni sisteme sürükle.</p>
-					</div>
-					<div class="relative z-10 text-center space-y-6">
-						<div class="w-16 h-16 bg-[#7c5cfc] text-white rounded-full flex items-center justify-center mx-auto text-xl font-bold border-4 border-background">2</div>
-						<h3 class="font-headline-md text-headline-md font-semibold text-on-surface">Analiz</h3>
-						<p class="text-on-surface-variant">Yapay zekamız CV'ni saniyeler içinde tarasın.</p>
-					</div>
-					<div class="relative z-10 text-center space-y-6">
-						<div class="w-16 h-16 bg-[#7c5cfc] text-white rounded-full flex items-center justify-center mx-auto text-xl font-bold border-4 border-background">3</div>
-						<h3 class="font-headline-md text-headline-md font-semibold text-on-surface">Sonuçları Gör</h3>
-						<p class="text-on-surface-variant">Kapsamlı raporuna ulaş ve hemen düzenlemeye başla.</p>
-					</div>
-				</div>
-			</div>
-		</section>
-
-		<!-- FAQ -->
-		<section class="py-32 max-w-3xl mx-auto px-margin-mobile">
-			<h2 class="font-headline-lg text-headline-lg text-center mb-16 text-on-surface font-bold">Sıkça Sorulan Sorular</h2>
-			<div class="space-y-4">
-				<details class="group bg-surface border border-outline-variant rounded-xl overflow-hidden">
-					<summary class="flex justify-between items-center p-6 cursor-pointer hover:bg-surface-container transition-colors">
-						<span class="font-headline-md text-lg text-on-surface font-semibold">Hizmet gerçekten ücretsiz mi?</span>
-						<span class="material-symbols-outlined text-on-surface group-open:rotate-180 transition-transform">expand_more</span>
-					</summary>
-					<div class="p-6 pt-0 text-on-surface-variant">
-						Evet, temel CV analizi tamamen ücretsizdir. Daha derinlemesine analiz ve mülakat koçluğu gibi özellikler için Premium paketimiz mevcuttur.
-					</div>
-				</details>
-				<details class="group bg-surface border border-outline-variant rounded-xl overflow-hidden">
-					<summary class="flex justify-between items-center p-6 cursor-pointer hover:bg-surface-container transition-colors">
-						<span class="font-headline-md text-lg text-on-surface font-semibold">Hangi dosya formatlarını destekliyorsunuz?</span>
-						<span class="material-symbols-outlined text-on-surface group-open:rotate-180 transition-transform">expand_more</span>
-					</summary>
-					<div class="p-6 pt-0 text-on-surface-variant">
-						PDF (.pdf), Microsoft Word (.doc, .docx) ve düz metin (.txt) dosyalarını destekliyoruz. En iyi sonuç için PDF kullanmanızı öneririz.
-					</div>
-				</details>
-				<details class="group bg-surface border border-outline-variant rounded-xl overflow-hidden">
-					<summary class="flex justify-between items-center p-6 cursor-pointer hover:bg-surface-container transition-colors">
-						<span class="font-headline-md text-lg text-on-surface font-semibold">Verilerim güvende mi?</span>
-						<span class="material-symbols-outlined text-on-surface group-open:rotate-180 transition-transform">expand_more</span>
-					</summary>
-					<div class="p-6 pt-0 text-on-surface-variant">
-						Kesinlikle. Verileriniz endüstri standardı şifreleme yöntemleriyle korunur ve asla üçüncü şahıslarla paylaşılmaz.
-					</div>
-				</details>
-			</div>
-		</section>
-
-		<!-- Final CTA -->
-		<section class="py-32 bg-gradient-to-t from-[#7c5cfc]/10 to-transparent">
-			<div class="max-w-container-max mx-auto px-margin-mobile text-center">
-				<h2 class="font-headline-lg-mobile md:font-headline-lg mb-6 text-on-surface font-bold">CV'nin potansiyelini keşfetmeye hazır mısın?</h2>
-				<p class="text-body-lg text-on-surface-variant mb-10">Ücretsiz hesap oluştur, CV'ni analiz et ve hayalindeki işe bir adım daha yaklaş.</p>
-				<a class="inline-flex items-center gap-3 bg-[#7c5cfc] text-white px-10 py-5 rounded-2xl font-bold text-xl hover:scale-105 transition-transform active:scale-95 shadow-lg shadow-[#7c5cfc]/20" href="/login">
-					Hemen Başla
-					<span class="material-symbols-outlined">rocket_launch</span>
-				</a>
-			</div>
-		</section>
-	</main>
-
-	<!-- Footer -->
-	<footer class="border-t border-outline-variant py-24 bg-background">
-		<div class="max-w-container-max mx-auto px-margin-mobile md:px-margin-desktop">
-			<div class="grid grid-cols-1 md:grid-cols-4 gap-12 mb-20">
-				<!-- Brand Column -->
-				<div class="space-y-6">
-					<div class="font-headline-md text-headline-md font-bold text-on-surface flex items-center gap-2">
-						<img src="/mixboard.png" alt="Beacon Logo" class="h-8 w-auto object-contain" />
-						Beacon <span class="text-[#7c5cfc]">•</span>
-					</div>
-					<p class="text-on-surface-variant text-sm leading-relaxed max-w-xs">
-						CV'lerin gerçek potansiyelini yapay zeka ile ortaya çıkarıyoruz. Kariyer yolculuğunuzda size rehberlik eden modern asistanınız.
-					</p>
-				</div>
-				<!-- Product Column -->
-				<div class="space-y-6">
-					<h4 class="sc-header text-primary font-bold text-sm">Ürün</h4>
-					<ul class="space-y-4 text-on-surface-variant text-sm font-label-md">
-						<li><a class="hover:text-primary transition-colors" href="#">Özellikler</a></li>
-						<li><a class="hover:text-primary transition-colors" href="#">Nasıl Çalışır</a></li>
-						<li><a class="hover:text-primary transition-colors" href="#">Fiyatlandırma</a></li>
-						<li><a class="hover:text-primary transition-colors" href="#">Geliştirici API</a></li>
-					</ul>
-				</div>
-				<!-- Resources Column -->
-				<div class="space-y-6">
-					<h4 class="sc-header text-primary font-bold text-sm">Kaynaklar</h4>
-					<ul class="space-y-4 text-on-surface-variant text-sm font-label-md">
-						<li><a class="hover:text-primary transition-colors" href="#">Blog</a></li>
-						<li><a class="hover:text-primary transition-colors" href="#">SSS</a></li>
-						<li><a class="hover:text-primary transition-colors" href="#">Kariyer Rehberi</a></li>
-						<li><a class="hover:text-primary transition-colors" href="#">Topluluk</a></li>
-					</ul>
-				</div>
-				<!-- Legal Column -->
-				<div class="space-y-6">
-					<h4 class="sc-header text-primary font-bold text-sm">Yasal</h4>
-					<ul class="space-y-4 text-on-surface-variant text-sm font-label-md">
-						<li><a class="hover:text-primary transition-colors" href="#">Gizlilik Politikası</a></li>
-						<li><a class="hover:text-primary transition-colors" href="#">Kullanım Koşulları</a></li>
-						<li><a class="hover:text-primary transition-colors" href="#">Çerez Tercihleri</a></li>
-					</ul>
-				</div>
-			</div>
-			<!-- Bottom Bar -->
-			<div class="pt-12 border-t border-outline-variant flex flex-col md:flex-row justify-between items-center gap-6">
-				<div class="text-on-surface-variant font-label-sm">
-					&copy; 2026 Beacon. Tüm hakları saklıdır.
-				</div>
-				<div class="flex items-center gap-6">
-					<a class="text-on-surface-variant hover:text-primary transition-all hover:scale-110" href="#">
-						<svg class="w-5 h-5 fill-current" viewbox="0 0 24 24"><path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"></path></svg>
-					</a>
-					<a class="text-on-surface-variant hover:text-primary transition-all hover:scale-110" href="#">
-						<svg class="w-5 h-5 fill-current" viewbox="0 0 24 24"><path d="M19 0h-14c-2.761 0-5 2.239-5 5v14c0 2.761 2.239 5 5 5h14c2.762 0 5-2.239 5-5v-14c0-2.761-2.238-5-5-5zm-11 19h-3v-11h3v11zm-1.5-12.268c-.966 0-1.75-.79-1.75-1.764s.784-1.764 1.75-1.764 1.75.79 1.75 1.764-.783 1.764-1.75 1.764zm13.5 12.268h-3v-5.604c0-3.368-4-3.113-4 0v5.604h-3v-11h3v1.765c1.396-2.586 7-2.777 7 2.476v6.759z"></path></svg>
-					</a>
-					<a class="text-on-surface-variant hover:text-primary transition-all hover:scale-110" href="#">
-						<svg class="w-5 h-5 fill-current" viewbox="0 0 24 24"><path d="M12 .297c-6.63 0-12 5.373-12 12 0 5.303 3.438 9.8 8.205 11.385.6.113.82-.258.82-.577 0-.285-.01-1.04-.015-2.04-3.338.724-4.042-1.61-4.042-1.61C4.422 18.07 3.633 17.7 3.633 17.7c-1.087-.744.084-.729.084-.729 1.205.084 1.838 1.236 1.838 1.236 1.07 1.835 2.809 1.305 3.495.998.108-.776.417-1.305.76-1.605-2.665-.3-5.466-1.332-5.466-5.93 0-1.31.465-2.38 1.235-3.22-.135-.303-.54-1.523.105-3.176 0 0 1.005-.322 3.3 1.23.96-.267 1.98-.399 3-.405 1.02.006 2.04.138 3 .405 2.28-1.552 3.285-1.23 3.285-1.23.645 1.653.24 2.873.12 3.176.765.84 1.23 1.91 1.23 3.22 0 4.61-2.805 5.625-5.475 5.92.42.36.81 1.096.81 2.22 0 1.606-.015 2.896-.015 3.286 0 .315.21.69.825.57C20.565 22.092 24 17.592 24 12.297c0-6.627-5.373-12-12-12"></path></svg>
-					</a>
-				</div>
-			</div>
-		</div>
-	</footer>
+<div class="flex flex-col items-center text-center w-full md:w-1/3 mb-12 md:mb-0 bg-surface-container-lowest p-4">
+<div class="w-16 h-16 rounded-full bg-primary-container text-white flex items-center justify-center font-headline-md text-headline-md mb-6 shadow-md z-10">1</div>
+<h3 class="font-headline-sm text-headline-sm text-on-surface mb-2">CV'ni Yükle</h3>
+<p class="font-body-sm text-body-sm text-on-surface-variant">PDF veya Word formatındaki özgeçmişinizi sisteme yükleyin.</p>
+</div>
+<div class="flex flex-col items-center text-center w-full md:w-1/3 mb-12 md:mb-0 bg-surface-container-lowest p-4">
+<div class="w-16 h-16 rounded-full bg-primary-container text-white flex items-center justify-center font-headline-md text-headline-md mb-6 shadow-md z-10">2</div>
+<h3 class="font-headline-sm text-headline-sm text-on-surface mb-2">AI Analiz Etsin</h3>
+<p class="font-body-sm text-body-sm text-on-surface-variant">Gelişmiş algoritmalarımız saniyeler içinde verilerinizi işler.</p>
+</div>
+<div class="flex flex-col items-center text-center w-full md:w-1/3 bg-surface-container-lowest p-4">
+<div class="w-16 h-16 rounded-full bg-primary-container text-white flex items-center justify-center font-headline-md text-headline-md mb-6 shadow-md z-10">3</div>
+<h3 class="font-headline-sm text-headline-sm text-on-surface mb-2">Sonuçları Gör</h3>
+<p class="font-body-sm text-body-sm text-on-surface-variant">Detaylı raporunuzu inceleyin ve hemen aksiyon alın.</p>
+</div>
+</div>
+</div>
+</section>
+<!-- 6. FEATURES -->
+<section class="py-24 px-margin-mobile md:px-margin-desktop bg-surface">
+<div class="max-w-max-width mx-auto">
+<h2 class="font-headline-lg text-headline-lg text-on-surface mb-12 text-center">CV analizinin ötesinde.</h2>
+<div class="grid md:grid-cols-3 gap-8">
+<div class="bg-white p-8 rounded-xl border border-outline-variant shadow-sm hover:shadow-md transition-shadow flex flex-col items-start">
+<div class="p-3 bg-surface rounded-lg mb-6">
+<span class="material-symbols-outlined text-primary-container">troubleshoot</span>
+</div>
+<h3 class="font-headline-sm text-headline-sm text-on-surface mb-2">Detaylı Analiz</h3>
+<p class="font-body-sm text-body-sm text-on-surface-variant">Sadece anahtar kelimeleri değil, deneyiminizin bağlamını ve derinliğini de değerlendiririz.</p>
+</div>
+<div class="bg-white p-8 rounded-xl border border-outline-variant shadow-sm hover:shadow-md transition-shadow flex flex-col items-start">
+<div class="p-3 bg-surface rounded-lg mb-6">
+<span class="material-symbols-outlined text-primary-container">fitness_center</span>
+</div>
+<h3 class="font-headline-sm text-headline-sm text-on-surface mb-2">Güçlü Yönler</h3>
+<p class="font-body-sm text-body-sm text-on-surface-variant">Sizi diğer adaylardan ayıran benzersiz becerilerinizi belirler ve vurgular.</p>
+</div>
+<div class="bg-white p-8 rounded-xl border border-outline-variant shadow-sm hover:shadow-md transition-shadow flex flex-col items-start">
+<div class="p-3 bg-surface rounded-lg mb-6">
+<span class="material-symbols-outlined text-primary-container">trending_up</span>
+</div>
+<h3 class="font-headline-sm text-headline-sm text-on-surface mb-2">Gelişim Alanları</h3>
+<p class="font-body-sm text-body-sm text-on-surface-variant">Kariyer hedeflerinize ulaşmanız için aşmanız gereken engelleri dürüstçe gösterir.</p>
+</div>
+</div>
+</div>
+</section>
+<!-- 7. TESTIMONIALS -->
+<section class="bg-surface-container-lowest py-24 px-margin-mobile md:px-margin-desktop">
+<div class="max-w-max-width mx-auto">
+<h2 class="font-headline-lg text-headline-lg text-on-surface mb-12 text-center">Adaylar ne diyor?</h2>
+<div class="grid md:grid-cols-3 gap-8">
+<div class="bg-surface p-8 rounded-xl border border-outline-variant shadow-sm flex flex-col">
+<div class="flex text-secondary mb-4">
+<span class="material-symbols-outlined" style="font-variation-settings: &quot;FILL&quot; 1;">star</span>
+<span class="material-symbols-outlined" style="font-variation-settings: &quot;FILL&quot; 1;">star</span>
+<span class="material-symbols-outlined" style="font-variation-settings: &quot;FILL&quot; 1;">star</span>
+<span class="material-symbols-outlined" style="font-variation-settings: &quot;FILL&quot; 1;">star</span>
+<span class="material-symbols-outlined" style="font-variation-settings: &quot;FILL&quot; 1;">star</span>
+</div>
+<p class="font-body-md text-body-md text-on-surface-variant mb-8 flex-grow">"Beacon sayesinde CV'mdeki ufak ama kritik hataları fark ettim. Düzeltmeleri yaptıktan sonra ilk hafta içinde 3 mülakat daveti aldım. Kesinlikle tavsiye ederim."</p>
+<div class="flex items-center gap-4">
+<div class="w-10 h-10 rounded-full bg-primary-container text-white flex items-center justify-center font-label-md text-label-md">AK</div>
+<span class="font-headline-sm text-body-md font-semibold text-on-surface">Ayşe K.</span>
+</div>
+</div>
+<div class="bg-surface p-8 rounded-xl border border-outline-variant shadow-sm flex flex-col">
+<div class="flex text-secondary mb-4">
+<span class="material-symbols-outlined" style="font-variation-settings: &quot;FILL&quot; 1;">star</span>
+<span class="material-symbols-outlined" style="font-variation-settings: &quot;FILL&quot; 1;">star</span>
+<span class="material-symbols-outlined" style="font-variation-settings: &quot;FILL&quot; 1;">star</span>
+<span class="material-symbols-outlined" style="font-variation-settings: &quot;FILL&quot; 1;">star</span>
+<span class="material-symbols-outlined" style="font-variation-settings: &quot;FILL&quot; 1;">star</span>
+</div>
+<p class="font-body-md text-body-md text-on-surface-variant mb-8 flex-grow">"Yazılım alanında iş arıyordum ama CV'm çok standarttı. Analiz raporu bana yeteneklerimi nasıl daha teknik bir dille ifade edebileceğimi gösterdi."</p>
+<div class="flex items-center gap-4">
+<div class="w-10 h-10 rounded-full bg-primary-container text-white flex items-center justify-center font-label-md text-label-md">MT</div>
+<span class="font-headline-sm text-body-md font-semibold text-on-surface">Mert T.</span>
+</div>
+</div>
+<div class="bg-surface p-8 rounded-xl border border-outline-variant shadow-sm flex flex-col">
+<div class="flex text-secondary mb-4">
+<span class="material-symbols-outlined" style="font-variation-settings: &quot;FILL&quot; 1;">star</span>
+<span class="material-symbols-outlined" style="font-variation-settings: &quot;FILL&quot; 1;">star</span>
+<span class="material-symbols-outlined" style="font-variation-settings: &quot;FILL&quot; 1;">star</span>
+<span class="material-symbols-outlined" style="font-variation-settings: &quot;FILL&quot; 1;">star</span>
+<span class="material-symbols-outlined">star_half</span>
+</div>
+<p class="font-body-md text-body-md text-on-surface-variant mb-8 flex-grow">"Gelişim önerileri kısmı harika. Sadece 'bu eksik' demiyor, 'şunu öğrenmelisin' diyerek somut bir hedef koyuyor önünüze."</p>
+<div class="flex items-center gap-4">
+<div class="w-10 h-10 rounded-full bg-primary-container text-white flex items-center justify-center font-label-md text-label-md">SA</div>
+<span class="font-headline-sm text-body-md font-semibold text-on-surface">Selin A.</span>
+</div>
+</div>
+</div>
+</div>
+</section>
+<!-- 8. FAQ -->
+<section class="py-24 px-margin-mobile md:px-margin-desktop bg-surface">
+<div class="max-w-3xl mx-auto">
+<h2 class="font-headline-lg text-headline-lg text-on-surface mb-12 text-center">Sık sorulan sorular.</h2>
+<div class="space-y-4">
+<details class="group bg-white rounded-xl border border-outline-variant shadow-sm [&amp;_summary::-webkit-details-marker]:hidden">
+<summary class="flex items-center justify-between p-6 cursor-pointer font-headline-sm text-headline-sm text-on-surface">
+<span class="">Beacon ücretsiz mi?</span>
+<span class="material-symbols-outlined text-primary-container transition group-open:rotate-180">add</span>
+</summary>
+<div class="px-6 pb-6 font-body-md text-body-md text-on-surface-variant">
+                        Evet, temel CV analiz hizmetimiz tamamen ücretsizdir.
+                    </div>
+</details>
+<details class="group bg-white rounded-xl border border-outline-variant shadow-sm [&amp;_summary::-webkit-details-marker]:hidden">
+<summary class="flex items-center justify-between p-6 cursor-pointer font-headline-sm text-headline-sm text-on-surface">
+<span class="">Hangi formatlar destekleniyor?</span>
+<span class="material-symbols-outlined text-primary-container transition group-open:rotate-180">add</span>
+</summary>
+<div class="px-6 pb-6 font-body-md text-body-md text-on-surface-variant">
+                        Şu anda PDF ve DOCX (Microsoft Word) formatlarını destekliyoruz.
+                    </div>
+</details>
+<details class="group bg-white rounded-xl border border-outline-variant shadow-sm [&amp;_summary::-webkit-details-marker]:hidden">
+<summary class="flex items-center justify-between p-6 cursor-pointer font-headline-sm text-headline-sm text-on-surface">
+<span class="">Analiz ne kadar sürer?</span>
+<span class="material-symbols-outlined text-primary-container transition group-open:rotate-180">add</span>
+</summary>
+<div class="px-6 pb-6 font-body-md text-body-md text-on-surface-variant">
+                        Analiz genellikle saniyeler içinde tamamlanır ve sonuçlar anında ekranda gösterilir.
+                    </div>
+</details>
+<details class="group bg-white rounded-xl border border-outline-variant shadow-sm [&amp;_summary::-webkit-details-marker]:hidden">
+<summary class="flex items-center justify-between p-6 cursor-pointer font-headline-sm text-headline-sm text-on-surface">
+<span class="">Verilerim güvende mi?</span>
+<span class="material-symbols-outlined text-primary-container transition group-open:rotate-180">add</span>
+</summary>
+<div class="px-6 pb-6 font-body-md text-body-md text-on-surface-variant">
+                        Veri gizliliğiniz önceliğimizdir. Yüklediğiniz CV'ler şifrelenerek korunur ve izniniz olmadan üçüncü partilerle paylaşılmaz.
+                    </div>
+</details>
+<details class="group bg-white rounded-xl border border-outline-variant shadow-sm [&amp;_summary::-webkit-details-marker]:hidden">
+<summary class="flex items-center justify-between p-6 cursor-pointer font-headline-sm text-headline-sm text-on-surface">
+<span class="">Kaç CV yükleyebilirim?</span>
+<span class="material-symbols-outlined text-primary-container transition group-open:rotate-180">add</span>
+</summary>
+<div class="px-6 pb-6 font-body-md text-body-md text-on-surface-variant">
+                        Ücretsiz hesapla ayda 5 farklı CV analizi yapabilirsiniz.
+                    </div>
+</details>
+</div>
+</div>
+</section>
+<!-- 9. FINAL CTA -->
+<section class="bg-primary-container py-24 px-margin-mobile md:px-margin-desktop text-center">
+<div class="max-w-4xl mx-auto">
+<h2 class="font-display text-headline-lg md:text-display text-white mb-8">CV'nin potansiyelini keşfetmeye hazır mısın?</h2>
+<a href="/register" class="bg-white text-primary-container px-8 py-4 rounded-lg font-display text-body-md font-semibold hover:bg-surface transition-colors shadow-lg h-[52px] inline-flex items-center justify-center">Hemen Başla</a>
+</div>
+</section>
+<!-- 10. FOOTER -->
+<footer class="w-full border-t border-white/10" style="background-color: #1a1918;">
+  <div class="max-w-max-width mx-auto px-margin-mobile md:px-margin-desktop py-xl">
+    <div class="grid grid-cols-2 md:grid-cols-4 gap-12 mb-16 max-w-4xl mx-auto">
+        <div class="flex flex-col gap-4">
+            <h4 class="font-bold text-white text-xs uppercase tracking-wider mb-2">Ürün</h4>
+            <a class="text-sm hover:text-white transition-colors duration-200" style="color: rgba(255,255,255,0.6);" href="/login">Özellikler</a>
+            <a class="text-sm hover:text-white transition-colors duration-200" style="color: rgba(255,255,255,0.6);" href="/login">Nasıl Çalışır</a>
+            <a class="text-sm hover:text-white transition-colors duration-200" style="color: rgba(255,255,255,0.6);" href="/login">SSS</a>
+            <a class="text-sm hover:text-white transition-colors duration-200" style="color: rgba(255,255,255,0.6);" href="/login">Fiyatlandırma</a>
+        </div>
+        <div class="flex flex-col gap-4">
+            <h4 class="font-bold text-white text-xs uppercase tracking-wider mb-2">Kaynaklar</h4>
+            <a class="text-sm hover:text-white transition-colors duration-200" style="color: rgba(255,255,255,0.6);" href="/login">Blog</a>
+            <a class="text-sm hover:text-white transition-colors duration-200" style="color: rgba(255,255,255,0.6);" href="/login">SSS</a>
+            <a class="text-sm hover:text-white transition-colors duration-200" style="color: rgba(255,255,255,0.6);" href="/login">Kariyer Rehberi</a>
+            <a class="text-sm hover:text-white transition-colors duration-200" style="color: rgba(255,255,255,0.6);" href="/login">Topluluk</a>
+        </div>
+        <div class="flex flex-col gap-4">
+            <h4 class="font-bold text-white text-xs uppercase tracking-wider mb-2">Kurumsal</h4>
+            <a class="text-sm hover:text-white transition-colors duration-200" style="color: rgba(255,255,255,0.6);" href="/login">Hakkımızda</a>
+            <a class="text-sm hover:text-white transition-colors duration-200" style="color: rgba(255,255,255,0.6);" href="/login">Ekibimiz</a>
+            <a class="text-sm hover:text-white transition-colors duration-200" style="color: rgba(255,255,255,0.6);" href="/login">Kariyer</a>
+            <a class="text-sm hover:text-white transition-colors duration-200" style="color: rgba(255,255,255,0.6);" href="/login">İletişim</a>
+        </div>
+        <div class="flex flex-col gap-4">
+            <h4 class="font-bold text-white text-xs uppercase tracking-wider mb-2">Yasal</h4>
+            <a class="text-sm hover:text-white transition-colors duration-200" style="color: rgba(255,255,255,0.6);" href="/login">Gizlilik Politikası</a>
+            <a class="text-sm hover:text-white transition-colors duration-200" style="color: rgba(255,255,255,0.6);" href="/login">Kullanım Koşulları</a>
+            <a class="text-sm hover:text-white transition-colors duration-200" style="color: rgba(255,255,255,0.6);" href="/login">Çerez Politikası</a>
+        </div>
+    </div>
+    <div class="pt-8 border-t text-center" style="border-color: rgba(255,255,255,0.1);">
+        <p class="text-sm" style="color: rgba(255,255,255,0.4);">© 2025 Beacon. Tüm hakları saklıdır.</p>
+    </div>
+  </div>
+</footer>
 </Layout>
-
-<script>
-    document.querySelectorAll('a[href^="#"]').forEach(anchor => {
-        anchor.addEventListener('click', function (e) {
-            e.preventDefault();
-            const href = this.getAttribute('href');
-            if (href) {
-                const target = document.querySelector(href);
-                if (target) {
-                    target.scrollIntoView({
-                        behavior: 'smooth'
-                    });
-                }
-            }
-        });
-    });
-</script>
-
-<style>
-    .glass { backdrop-filter: blur(12px); background: rgba(13, 13, 26, 0.7); }
-    .purple-glow { box-shadow: 0 0 60px -15px rgba(124, 92, 252, 0.4); }
-    .card-hover:hover { border-color: #7c5cfc; transform: translateY(-2px); transition: all 0.3s ease; }
-    .material-symbols-outlined { font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24; }
-    ::-webkit-scrollbar { width: 6px; }
-    ::-webkit-scrollbar-track { background: #0d0d1a; }
-    ::-webkit-scrollbar-thumb { background: #2a2a4a; border-radius: 10px; }
-    .sc-header { font-variant: small-caps; letter-spacing: 0.1em; }
-</style>

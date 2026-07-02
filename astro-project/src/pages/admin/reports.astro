@@ -2,112 +2,141 @@
 import AdminLayout from '../../layouts/AdminLayout.astro';
 ---
 
-<AdminLayout title="Beacon AI - Raporlar">
-  <!-- Top Header -->
-  <header class="mb-8">
-    <h2 class="font-headline-md text-headline-md font-bold mb-2">Platform Raporları</h2>
-    <p class="font-body-md text-body-md text-on-surface-variant">Sistemin genel performansı ve kullanıcı metriklerine ait analitik veriler.</p>
+<AdminLayout title="Beacon - Raporlar">
+  <!-- Header -->
+  <header class="sticky top-0 z-40 bg-[#faf9f5]/80 backdrop-blur-md border-b border-[#ddd9d3] -mx-8 px-8 py-6 mb-8 flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
+    <div>
+      <h2 class="font-headline-xl text-headline-xl font-bold text-[#1b1c1a] tracking-tight text-3xl">Raporlar</h2>
+      <p class="font-body-sm text-sm text-[#8a8580] mt-1 font-medium">Platform analitik ve performans raporları.</p>
+    </div>
+    <div class="flex items-center gap-4 w-full md:w-auto">
+      <div class="flex items-center gap-1 p-1 bg-[#f5f4f0] border border-[#ddd9d3] rounded-lg text-xs font-semibold">
+        <button class="px-3 py-1.5 rounded-md bg-white shadow-sm border border-[#ddd9d3] text-[#14422f]" id="filter-week">Bu Hafta</button>
+        <button class="px-3 py-1.5 rounded-md text-[#8a8580] hover:text-[#1b1c1a] transition-colors" id="filter-month">Bu Ay</button>
+        <button class="px-3 py-1.5 rounded-md text-[#8a8580] hover:text-[#1b1c1a] transition-colors" id="filter-all">Tüm Zamanlar</button>
+      </div>
+      <button onclick="exportCSV()" class="flex items-center gap-2 px-4 py-2 rounded-[8px] bg-[#B87333] hover:opacity-90 text-white font-semibold text-sm transition-opacity shrink-0 shadow-sm">
+        <span class="material-symbols-outlined text-[18px]">download</span>
+        Rapor İndir
+      </button>
+    </div>
   </header>
 
-  <!-- Stats Cards Row -->
-  <div class="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">
-    <div class="bg-surface-container-highest border border-outline-variant rounded-xl p-5 flex flex-col">
-      <span class="font-label-md text-label-md text-on-surface-variant mb-2 uppercase text-xs">Toplam Kullanıcı</span>
-      <span id="r-total-users" class="font-display-sm text-[#7c5cfc] font-bold text-3xl">...</span>
+  <!-- Canvas -->
+  <div class="space-y-8">
+    <!-- Stats Row -->
+    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+      <div class="bg-white border border-[#DDD9D3] rounded-[10px] p-6 shadow-sm relative overflow-hidden">
+        <h3 class="font-label-sm text-xs font-bold text-[#8a8580] uppercase tracking-wider mb-2">Toplam CV</h3>
+        <div class="font-display-lg text-4xl font-bold text-[#14422f]" id="r-total-cvs">...</div>
+      </div>
+      <div class="bg-white border border-[#DDD9D3] border-l-[3px] border-l-[#3D7A3B] rounded-[10px] p-6 shadow-sm relative overflow-hidden">
+        <h3 class="font-label-sm text-xs font-bold text-[#8a8580] uppercase tracking-wider mb-2">Analiz Tamamlanan</h3>
+        <div class="font-display-lg text-4xl font-bold text-[#1b1c1a]" id="r-completed">...</div>
+      </div>
+      <div class="bg-white border border-[#DDD9D3] rounded-[10px] p-6 shadow-sm relative overflow-hidden">
+        <h3 class="font-label-sm text-xs font-bold text-[#8a8580] uppercase tracking-wider mb-2">Ortalama Uyum Skoru</h3>
+        <div class="font-display-lg text-4xl font-bold text-[#1b1c1a]" id="r-avg-score">...</div>
+      </div>
+      <div class="bg-white border border-[#DDD9D3] rounded-[10px] p-6 shadow-sm relative overflow-hidden">
+        <h3 class="font-label-sm text-xs font-bold text-[#8a8580] uppercase tracking-wider mb-2">Bu Hafta Yüklenen</h3>
+        <div class="font-display-lg text-4xl font-bold text-[#1b1c1a]" id="r-weekly-uploads">...</div>
+      </div>
     </div>
-    <div class="bg-surface-container-highest border border-outline-variant rounded-xl p-5 flex flex-col">
-      <span class="font-label-md text-label-md text-on-surface-variant mb-2 uppercase text-xs">Toplam CV</span>
-      <span id="r-total-cvs" class="font-display-sm text-[#7c5cfc] font-bold text-3xl">...</span>
-    </div>
-    <div class="bg-surface-container-highest border border-outline-variant rounded-xl p-5 flex flex-col">
-      <span class="font-label-md text-label-md text-on-surface-variant mb-2 uppercase text-xs">Tamamlanan Analiz</span>
-      <span id="r-completed" class="font-display-sm text-[#7c5cfc] font-bold text-3xl">...</span>
-    </div>
-    <div class="bg-surface-container-highest border border-outline-variant rounded-xl p-5 flex flex-col">
-      <span class="font-label-md text-label-md text-on-surface-variant mb-2 uppercase text-xs">Ort. ATS Skoru</span>
-      <span id="r-avg-score" class="font-display-sm text-[#7c5cfc] font-bold text-3xl">...</span>
-    </div>
-  </div>
 
-  <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6">
-    <!-- Analiz Durumu Dağılımı -->
-    <div class="bg-surface-container-highest border border-outline-variant p-6 rounded-xl flex flex-col">
-      <h3 class="font-bold text-on-surface mb-6">Analiz Durumu Dağılımı</h3>
-      <div class="flex flex-col gap-5 flex-1 justify-center">
-        <div>
-          <div class="flex justify-between text-xs mb-1">
-            <span class="text-on-surface flex items-center gap-1">
-              <span class="w-2 h-2 rounded-full bg-green-400 inline-block"></span>
-              Tamamlandı
-            </span>
-            <span id="bar-completed-label" class="text-on-surface-variant">...</span>
+    <!-- Charts Section -->
+    <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+      <!-- Bar Chart Card -->
+      <div class="bg-white border border-[#DDD9D3] rounded-[10px] p-6 shadow-sm h-[360px] flex flex-col justify-between">
+        <h3 class="font-headline-md text-md font-bold text-[#1b1c1a] mb-2">Haftalık CV Yükleme</h3>
+        
+        <div class="flex-1 relative flex items-end justify-between px-6 pb-6 pt-6 min-h-[180px]">
+          <!-- Grid Lines -->
+          <div class="absolute inset-0 flex flex-col justify-between pt-6 pb-12 px-6 z-0 pointer-events-none">
+            <div class="w-full h-px bg-[#DDD9D3]/40"></div>
+            <div class="w-full h-px bg-[#DDD9D3]/40"></div>
+            <div class="w-full h-px bg-[#DDD9D3]/40"></div>
+            <div class="w-full h-px bg-[#DDD9D3]/40"></div>
+            <div class="w-full h-px bg-[#DDD9D3]/40"></div>
           </div>
-          <div class="w-full bg-surface-container-low rounded-full h-2">
-            <div id="bar-completed" class="bg-green-400 h-2 rounded-full transition-all duration-700" style="width: 0%"></div>
+          <!-- Y-Axis Labels -->
+          <div class="absolute left-1 top-6 bottom-12 flex flex-col justify-between text-[10px] font-bold text-[#8a8580] pr-2 text-right">
+            <span id="chart-y-4">20</span>
+            <span id="chart-y-3">15</span>
+            <span id="chart-y-2">10</span>
+            <span id="chart-y-1">5</span>
+            <span>0</span>
+          </div>
+          <!-- Bars Container -->
+          <div class="flex flex-1 items-end justify-around h-full z-10 pl-6" id="cv-bars-container">
+            <!-- Rendered dynamically by JS -->
           </div>
         </div>
-        <div>
-          <div class="flex justify-between text-xs mb-1">
-            <span class="text-on-surface flex items-center gap-1">
-              <span class="w-2 h-2 rounded-full bg-blue-400 inline-block"></span>
-              İşleniyor
-            </span>
-            <span id="bar-processing-label" class="text-on-surface-variant">...</span>
-          </div>
-          <div class="w-full bg-surface-container-low rounded-full h-2">
-            <div id="bar-processing" class="bg-blue-400 h-2 rounded-full transition-all duration-700" style="width: 0%"></div>
+        
+        <!-- X-Axis Labels -->
+        <div class="flex justify-around pl-12 pr-2 mt-1 font-semibold text-[11px] text-[#8a8580]" id="cv-bars-labels">
+          <!-- Rendered dynamically by JS -->
+        </div>
+      </div>
+
+      <!-- Donut Chart Card -->
+      <div class="bg-white border border-[#DDD9D3] rounded-[10px] p-6 shadow-sm h-[360px] flex flex-col">
+        <h3 class="font-headline-md text-md font-bold text-[#1b1c1a] mb-2">Analiz Durum Dağılımı</h3>
+        <div class="flex-1 flex items-center justify-center relative">
+          <!-- SVG Donut Chart -->
+          <svg class="w-36 h-36 transform -rotate-90" viewBox="0 0 36 36">
+            <!-- Background circle -->
+            <circle class="text-[#f5f4f0]" cx="18" cy="18" r="15.915" fill="none" stroke="currentColor" stroke-width="3"></circle>
+            <!-- Segments: completed, processing, pending (will set stroke-dasharray dynamically) -->
+            <circle id="donut-completed" class="text-[#3D7A3B] transition-all duration-1000" cx="18" cy="18" r="15.915" fill="none" stroke="currentColor" stroke-width="3" stroke-dasharray="0 100" stroke-dashoffset="0"></circle>
+            <circle id="donut-processing" class="text-[#C17D20] transition-all duration-1000" cx="18" cy="18" r="15.915" fill="none" stroke="currentColor" stroke-width="3" stroke-dasharray="0 100" stroke-dashoffset="0"></circle>
+            <circle id="donut-pending" class="text-[#8A8580] transition-all duration-1000" cx="18" cy="18" r="15.915" fill="none" stroke="currentColor" stroke-width="3" stroke-dasharray="0 100" stroke-dashoffset="0"></circle>
+          </svg>
+          <div class="absolute flex flex-col items-center justify-center">
+            <span class="text-xs text-[#8a8580] font-bold uppercase tracking-wider">TOPLAM</span>
+            <span class="text-2xl font-bold text-[#1b1c1a]" id="donut-center-total">...</span>
           </div>
         </div>
-        <div>
-          <div class="flex justify-between text-xs mb-1">
-            <span class="text-on-surface flex items-center gap-1">
-              <span class="w-2 h-2 rounded-full bg-yellow-400 inline-block"></span>
-              Bekliyor
-            </span>
-            <span id="bar-pending-label" class="text-on-surface-variant">...</span>
+        <div class="mt-4 flex flex-wrap justify-center gap-4 text-xs font-semibold text-[#8a8580]">
+          <div class="flex items-center gap-1.5">
+            <div class="w-2.5 h-2.5 rounded-full bg-[#3D7A3B]"></div>
+            <span>Analiz Hazır (<span id="legend-completed">0%</span>)</span>
           </div>
-          <div class="w-full bg-surface-container-low rounded-full h-2">
-            <div id="bar-pending" class="bg-yellow-400 h-2 rounded-full transition-all duration-700" style="width: 0%"></div>
+          <div class="flex items-center gap-1.5">
+            <div class="w-2.5 h-2.5 rounded-full bg-[#C17D20]"></div>
+            <span>İşleniyor (<span id="legend-processing">0%</span>)</span>
+          </div>
+          <div class="flex items-center gap-1.5">
+            <div class="w-2.5 h-2.5 rounded-full bg-[#8A8580]"></div>
+            <span>Bekliyor (<span id="legend-pending">0%</span>)</span>
           </div>
         </div>
       </div>
     </div>
 
-    <!-- Popüler Yetenekler -->
-    <div class="bg-surface-container-highest border border-outline-variant p-6 rounded-xl flex flex-col">
-      <h3 class="font-bold text-on-surface mb-6">Adaylarda En Çok Görülen Yetenekler</h3>
-      <div id="skills-list" class="flex flex-col gap-4 flex-1 justify-center">
-        <div class="animate-pulse bg-surface-container-low rounded h-4 w-full"></div>
-        <div class="animate-pulse bg-surface-container-low rounded h-4 w-4/5"></div>
-        <div class="animate-pulse bg-surface-container-low rounded h-4 w-3/5"></div>
+    <!-- Table Section -->
+    <div class="bg-white border border-[#DDD9D3] rounded-[10px] shadow-sm overflow-hidden">
+      <div class="p-6 border-b border-[#DDD9D3]">
+        <h3 class="font-headline-md text-md font-bold text-[#1b1c1a]">Son Analizler</h3>
       </div>
-    </div>
-  </div>
-
-  <!-- Son 7 Gün Kayıt -->
-  <div class="bg-surface-container-highest border border-outline-variant p-6 rounded-xl mb-6">
-    <h3 class="font-bold text-on-surface mb-6">Son 7 Günde Yeni Kayıtlar</h3>
-    <div id="signup-chart" class="flex items-end gap-4 h-[160px] justify-center">
-      <!-- Rendered by JS -->
-    </div>
-    <div id="signup-labels" class="flex gap-4 justify-center mt-2">
-      <!-- Rendered by JS -->
-    </div>
-  </div>
-
-  <!-- Export -->
-  <div class="bg-surface-container-lowest border border-outline-variant rounded-xl p-6 flex flex-col md:flex-row gap-6 items-center justify-between">
-    <div>
-      <h3 class="font-bold text-on-surface text-lg">Tüm Verileri Dışa Aktar</h3>
-      <p class="text-on-surface-variant text-sm mt-1">Platformdaki tüm raporları CSV veya PDF formatında indirebilirsiniz.</p>
-    </div>
-    <div class="flex gap-4">
-      <button onclick="exportCSV()" class="border border-outline-variant text-on-surface hover:bg-surface-container-highest px-4 py-2 rounded-lg font-label-md transition-colors flex items-center gap-2">
-        <span class="material-symbols-outlined text-sm">download</span> CSV İndir
-      </button>
-      <button onclick="window.print()" class="bg-primary-container hover:bg-primary-fixed text-on-primary-container px-4 py-2 rounded-lg font-label-md transition-colors flex items-center gap-2">
-        <span class="material-symbols-outlined text-sm">picture_as_pdf</span> PDF İndir
-      </button>
+      <div class="overflow-x-auto">
+        <table class="w-full text-left border-collapse">
+          <thead>
+            <tr class="bg-[#f5f4f0] border-b border-[#DDD9D3] text-xs font-semibold text-[#8a8580] uppercase">
+              <th class="py-3.5 px-6">Aday</th>
+              <th class="py-3.5 px-6">CV</th>
+              <th class="py-3.5 px-6">Tarih</th>
+              <th class="py-3.5 px-6">Skor</th>
+              <th class="py-3.5 px-6">Durum</th>
+            </tr>
+          </thead>
+          <tbody class="divide-y divide-[#DDD9D3] text-sm text-[#1b1c1a]" id="reports-table-body">
+            <tr>
+              <td colspan="5" class="p-8 text-center text-[#8a8580] font-medium">Analizler yükleniyor...</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
     </div>
   </div>
 
@@ -119,100 +148,181 @@ import AdminLayout from '../../layouts/AdminLayout.astro';
       return Math.round((val / total) * 100);
     }
 
-    function renderSignupChart(recentSignups) {
-      const chart = document.getElementById('signup-chart');
-      const labels = document.getElementById('signup-labels');
+    function renderCVChart(recentCvUploads) {
+      const chart = document.getElementById('cv-bars-container');
+      const labels = document.getElementById('cv-bars-labels');
+      if (!chart || !labels) return;
 
-      if (!recentSignups || recentSignups.length === 0) {
-        chart.innerHTML = '<p class="text-on-surface-variant text-sm">Son 7 günde kayıt yok.</p>';
-        return;
-      }
-
-      // Fill missing days
       const days = [];
       for (let i = 6; i >= 0; i--) {
         const d = new Date();
         d.setDate(d.getDate() - i);
         const key = d.toISOString().slice(0, 10);
-        const found = recentSignups.find(r => r.day && r.day.slice(0, 10) === key);
+        const found = recentCvUploads ? recentCvUploads.find(r => r.day && r.day.slice(0, 10) === key) : null;
         days.push({ key, label: d.toLocaleDateString('tr-TR', { weekday: 'short' }), count: found ? found.count : 0 });
       }
 
-      const max = Math.max(...days.map(d => d.count), 1);
+      const maxCount = Math.max(...days.map(d => d.count), 5);
+      
+      // Update Y axis labels
+      document.getElementById('chart-y-4').textContent = Math.round(maxCount);
+      document.getElementById('chart-y-3').textContent = Math.round(maxCount * 0.75);
+      document.getElementById('chart-y-2').textContent = Math.round(maxCount * 0.5);
+      document.getElementById('chart-y-1').textContent = Math.round(maxCount * 0.25);
 
       chart.innerHTML = days.map(d => {
-        const h = Math.round((d.count / max) * 140);
+        const h = Math.round((d.count / maxCount) * 100);
         return `
-          <div class="flex flex-col items-center gap-2 group flex-1">
-            <span class="text-xs text-on-surface-variant opacity-0 group-hover:opacity-100 transition-opacity">${d.count}</span>
-            <div class="w-full rounded-t-sm transition-all duration-700 relative" 
-                 style="height: ${Math.max(h, 4)}px; background: ${d.count > 0 ? '#7c5cfc' : '#2a2a4a'}; opacity: ${d.count > 0 ? 1 : 0.3};">
+          <div class="flex flex-col items-center gap-1.5 group flex-1 h-full justify-end relative">
+            <span class="text-[9px] font-bold text-[#8a8580] opacity-0 group-hover:opacity-100 transition-opacity absolute -top-5">${d.count}</span>
+            <div class="w-8 rounded-t-[4px] transition-all duration-700 hover:bg-[#14422f] cursor-pointer" 
+                 style="height: ${Math.max(h, 4)}%; background: ${d.count > 0 ? '#2D5A45' : '#ddd9d3'}; opacity: ${d.count > 0 ? 1 : 0.4};"
+                 title="${d.count} CV yükleme">
             </div>
           </div>
         `;
       }).join('');
 
       labels.innerHTML = days.map(d =>
-        `<span class="text-xs text-on-surface-variant flex-1 text-center">${d.label}</span>`
+        `<span class="w-8 text-center font-bold text-[10px] text-[#8a8580]">${d.label}</span>`
       ).join('');
     }
 
     async function loadReports() {
-      try {
+      const fetcher = async () => {
         const res = await fetch('/api/admin/reports/stats');
-        if (!res.ok) {
-          document.getElementById('r-total-users').textContent = 'Hata';
-          return;
-        }
+        if (!res.ok) throw new Error("Fetch reports stats error");
+        return res.json();
+      };
 
-        reportData = await res.json();
+      const render = (data) => {
+        reportData = data;
 
         // Stat cards
-        document.getElementById('r-total-users').textContent = reportData.totalUsers ?? '-';
         document.getElementById('r-total-cvs').textContent = reportData.totalCVs ?? '-';
         document.getElementById('r-completed').textContent = reportData.completedAnalyses ?? '-';
         document.getElementById('r-avg-score').textContent = reportData.avgAtsScore !== null ? `%${reportData.avgAtsScore}` : '-';
+        
+        // Sum total weekly uploads
+        const weeklySum = reportData.recentCvUploads ? reportData.recentCvUploads.reduce((sum, item) => sum + item.count, 0) : 0;
+        document.getElementById('r-weekly-uploads').textContent = weeklySum;
 
-        // Analysis status bars
+        // Donut Chart updates
         const total = reportData.totalAnalyses || 0;
         const cp = pct(reportData.completedAnalyses, total);
         const pp = pct(reportData.processingAnalyses, total);
         const ep = pct(reportData.pendingAnalyses, total);
 
-        document.getElementById('bar-completed').style.width = cp + '%';
-        document.getElementById('bar-processing').style.width = pp + '%';
-        document.getElementById('bar-pending').style.width = ep + '%';
-        document.getElementById('bar-completed-label').textContent = `${reportData.completedAnalyses} (${cp}%)`;
-        document.getElementById('bar-processing-label').textContent = `${reportData.processingAnalyses} (${pp}%)`;
-        document.getElementById('bar-pending-label').textContent = `${reportData.pendingAnalyses} (${ep}%)`;
+        document.getElementById('donut-center-total').textContent = total;
+        document.getElementById('legend-completed').textContent = cp + '%';
+        document.getElementById('legend-processing').textContent = pp + '%';
+        document.getElementById('legend-pending').textContent = ep + '%';
 
-        // Top skills
-        const skillsList = document.getElementById('skills-list');
-        if (reportData.topSkills && reportData.topSkills.length > 0) {
-          const maxCount = reportData.topSkills[0].count;
-          skillsList.innerHTML = reportData.topSkills.map(s => {
-            const w = Math.round((s.count / maxCount) * 100);
-            return `
-              <div>
-                <div class="flex justify-between text-xs mb-1">
-                  <span class="text-on-surface">${s.skill}</span>
-                  <span class="text-on-surface-variant">${s.count} aday</span>
-                </div>
-                <div class="w-full bg-surface-container-low rounded-full h-2">
-                  <div class="bg-[#7c5cfc] h-2 rounded-full transition-all duration-700" style="width: ${w}%"></div>
-                </div>
-              </div>
-            `;
-          }).join('');
-        } else {
-          skillsList.innerHTML = '<p class="text-on-surface-variant text-sm text-center">Henüz tamamlanmış analiz yok.</p>';
+        // Update donut circles using stroke-dasharray (circumference = 2 * PI * r = 2 * 3.1415 * 15.915 ≈ 100)
+        const compCircle = document.getElementById('donut-completed');
+        const procCircle = document.getElementById('donut-processing');
+        const pendCircle = document.getElementById('donut-pending');
+
+        if (compCircle && procCircle && pendCircle) {
+          compCircle.setAttribute('stroke-dasharray', `${cp} 100`);
+          compCircle.setAttribute('stroke-dashoffset', '0');
+
+          procCircle.setAttribute('stroke-dasharray', `${pp} 100`);
+          procCircle.setAttribute('stroke-dashoffset', `-${cp}`);
+
+          pendCircle.setAttribute('stroke-dasharray', `${ep} 100`);
+          pendCircle.setAttribute('stroke-dashoffset', `-${cp + pp}`);
         }
 
-        // Signup chart
-        renderSignupChart(reportData.recentSignups);
+        // Weekly bar chart
+        renderCVChart(reportData.recentCvUploads);
+      };
 
-      } catch (err) {
-        console.error('Raporlar yüklenemedi:', err);
+      if (window.__swrCache) {
+        window.__swrCache.query('reports-stats', fetcher, render, 30000);
+      } else {
+        fetcher().then(render).catch(err => console.error("Reports stats failed:", err));
+      }
+    }
+
+    async function loadRecentAnalyses() {
+      const tableBody = document.getElementById('reports-table-body');
+      if (!tableBody) return;
+
+      const fetcher = async () => {
+        const res = await fetch('/api/admin/candidates');
+        if (!res.ok) throw new Error("Fetch candidates for reports error");
+        return res.json();
+      };
+
+      const render = (data) => {
+        if (!data.candidates || data.candidates.length === 0) {
+          tableBody.innerHTML = `
+            <tr>
+              <td colspan="5" class="p-8 text-center text-[#8a8580] font-medium">Platformda kayıtlı aday veya analiz bulunmamaktadır.</td>
+            </tr>
+          `;
+          return;
+        }
+
+        tableBody.innerHTML = '';
+        
+        // Take the top 5 recent candidate analyses for report overview
+        const recentCandidates = data.candidates.slice(0, 5);
+
+        recentCandidates.forEach(cand => {
+          const dateStr = cand.analysisDate 
+            ? new Date(cand.analysisDate).toLocaleDateString('tr-TR', { day: 'numeric', month: 'short', year: 'numeric' })
+            : '-';
+          
+          let statusBadge = '';
+          if (cand.status === 'PENDING') {
+            statusBadge = `
+              <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-semibold bg-amber-50 text-amber-700 border border-amber-200">
+                Bekliyor
+              </span>
+            `;
+          } else if (cand.status === 'PROCESSING') {
+            statusBadge = `
+              <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-semibold bg-blue-50 text-blue-700 border border-blue-200">
+                İşleniyor
+              </span>
+            `;
+          } else if (cand.status === 'COMPLETED') {
+            statusBadge = `
+              <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-semibold bg-emerald-50 text-emerald-700 border border-emerald-200">
+                Analiz Hazır
+              </span>
+            `;
+          } else {
+            statusBadge = `
+              <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-semibold bg-rose-50 text-rose-700 border border-rose-200">
+                Hata
+              </span>
+            `;
+          }
+
+          const scoreStr = cand.atsScore !== null 
+            ? `<span class="font-bold text-emerald-700">%${cand.atsScore}</span>` 
+            : `<span class="text-[#8a8580]">-</span>`;
+
+          const tr = document.createElement('tr');
+          tr.className = 'hover:bg-[#faf9f5]/60 transition-colors duration-150';
+          tr.innerHTML = `
+            <td class="py-4 px-6 font-bold text-[#1b1c1a]">${cand.name}</td>
+            <td class="py-4 px-6 text-[#8a8580] font-medium text-xs truncate max-w-[240px]">${cand.cvName || 'Belge yok'}</td>
+            <td class="py-4 px-6 text-[#8a8580] text-xs font-medium">${dateStr}</td>
+            <td class="py-4 px-6 text-xs font-bold">${scoreStr}</td>
+            <td class="py-4 px-6">${statusBadge}</td>
+          `;
+          tableBody.appendChild(tr);
+        });
+      };
+
+      if (window.__swrCache) {
+        window.__swrCache.query('reports-candidates', fetcher, render, 30000);
+      } else {
+        fetcher().then(render).catch(err => console.error("Reports table load failed:", err));
       }
     }
 
@@ -220,9 +330,6 @@ import AdminLayout from '../../layouts/AdminLayout.astro';
       if (!reportData) return alert('Veri henüz yüklenmedi.');
       const rows = [
         ['Metrik', 'Değer'],
-        ['Toplam Kullanıcı', reportData.totalUsers],
-        ['Aday', reportData.totalCandidates],
-        ['Yönetici', reportData.totalAdmins],
         ['Toplam CV', reportData.totalCVs],
         ['Toplam Analiz', reportData.totalAnalyses],
         ['Tamamlanan Analiz', reportData.completedAnalyses],
@@ -240,6 +347,13 @@ import AdminLayout from '../../layouts/AdminLayout.astro';
       URL.revokeObjectURL(url);
     }
 
-    document.addEventListener('DOMContentLoaded', loadReports);
+    // Page-load initialization
+    document.addEventListener('astro:page-load', () => {
+      const statsCvsEl = document.getElementById('r-total-cvs');
+      if (statsCvsEl) {
+        loadReports();
+        loadRecentAnalyses();
+      }
+    });
   </script>
 </AdminLayout>

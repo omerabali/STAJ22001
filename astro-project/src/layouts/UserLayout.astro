@@ -1,7 +1,9 @@
 ---
 import '../styles/global.css';
 import UserSidebar from '../components/UserSidebar.astro';
-import UserHeader from '../components/UserHeader.astro';
+import Navbar from '../components/Navbar.astro';
+
+import { ClientRouter } from 'astro:transitions';
 
 interface Props {
   title: string;
@@ -9,30 +11,32 @@ interface Props {
 }
 
 const { title, headerTitle } = Astro.props;
+const { user } = Astro.locals;
 ---
 
 <!doctype html>
-<html lang="tr" class="dark">
+<html lang="tr" class="light bg-[#faf9f5]">
   <head>
     <meta charset="UTF-8" />
     <meta name="description" content="Beacon Candidate Portal" />
     <meta name="viewport" content="width=device-width" />
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
     <title>{title}</title>
+    <ClientRouter />
     
     <!-- Google Fonts & Font Awesome Icons -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600&family=Manrope:wght@600;700&display=swap" rel="stylesheet">
     <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet" />
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet"/>
   </head>
-  <body class="theme-dashboard bg-background text-on-surface font-body-md antialiased min-h-screen flex selection:bg-primary-container selection:text-on-primary-container">
+  <body class="theme-dashboard bg-[#faf9f5] text-[#1b1c1a] font-sans antialiased min-h-screen flex selection:bg-brand-accent/20 selection:text-brand-accent">
     <div id="sidebar-overlay" class="fixed inset-0 bg-black/50 z-40 hidden md:hidden transition-opacity"></div>
     <UserSidebar />
-    <UserHeader title={headerTitle} />
+    <Navbar title={headerTitle} user={user} isAdmin={false} />
     
-    <main class="w-full md:ml-[260px] md:w-[calc(100%-260px)] mt-24 p-4 md:p-lg min-h-[calc(100vh-6rem)] bg-background relative overflow-hidden transition-all duration-300">
+    <main class="w-full md:ml-[260px] md:w-[calc(100%-260px)] mt-24 p-4 md:p-lg min-h-[calc(100vh-6rem)] relative overflow-hidden transition-all duration-300">
       <slot />
     </main>
 

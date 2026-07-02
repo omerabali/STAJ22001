@@ -2,61 +2,67 @@
 import AdminLayout from '../../layouts/AdminLayout.astro';
 ---
 
-<AdminLayout title="Beacon AI - Aday Ara">
+<AdminLayout title="Beacon - Aday Ara">
   <!-- Top Header -->
   <header class="mb-8">
-    <h2 class="font-headline-md text-headline-md font-bold mb-2">Aday Ara</h2>
-    <p class="font-body-md text-body-md text-on-surface-variant">Sistemdeki adayları arayın ve filtreleyin.</p>
+    <h2 class="font-headline-md text-headline-md font-bold mb-2 text-[#1b1c1a]">Aday Ara</h2>
+    <p class="font-body-md text-body-md text-[#8a8580]">Sistemdeki adayları arayın ve filtreleyin.</p>
   </header>
 
   <!-- Search Section -->
-  <div class="bg-surface-container-highest border border-outline-variant rounded-2xl p-6 mb-10">
+  <div class="bg-white border border-[#ddd9d3] rounded-[10px] p-6 mb-8 shadow-sm">
     <div class="relative flex items-center mb-6">
-      <span class="material-symbols-outlined absolute left-4 text-on-surface-variant">search</span>
+      <span class="material-symbols-outlined absolute left-4 text-[#8a8580]">search</span>
       <input 
         id="search-input"
         type="text" 
         placeholder="İsim veya e-posta ile ara..." 
-        class="w-full bg-surface-container-lowest border border-outline-variant text-on-surface rounded-xl pl-12 pr-[120px] py-4 focus:border-primary focus:ring-1 focus:ring-primary focus:outline-none font-body-md"
+        class="w-full bg-[#faf9f5] border border-[#ddd9d3] text-[#1b1c1a] rounded-[10px] pl-12 pr-[120px] py-4 focus:border-[#14422f] focus:ring-1 focus:ring-[#14422f] focus:outline-none font-body-md transition-all"
       />
-      <button id="search-btn" class="absolute right-2 bg-[#7c5cfc] hover:bg-[#6b4dec] text-white rounded-lg px-6 py-2.5 font-label-md flex items-center gap-2 transition-colors">
+      <button id="search-btn" class="absolute right-2 bg-[#14422f] hover:bg-[#0f3223] text-white rounded-[8px] px-6 py-2.5 font-label-md flex items-center gap-2 transition-colors">
         <span class="material-symbols-outlined text-sm">search</span>
         Ara
       </button>
     </div>
 
     <!-- Filter Pills -->
-    <div class="flex flex-wrap gap-3" id="filter-pills">
-      <button data-filter="all" class="filter-pill active bg-[#7c5cfc] text-white px-4 py-1.5 rounded-full font-label-sm text-xs transition-colors">Tümü</button>
-      <button data-filter="completed" class="filter-pill bg-surface-container-lowest border border-outline-variant text-on-surface-variant hover:text-on-surface px-4 py-1.5 rounded-full font-label-sm text-xs transition-colors">Analiz Hazır</button>
-      <button data-filter="processing" class="filter-pill bg-surface-container-lowest border border-outline-variant text-on-surface-variant hover:text-on-surface px-4 py-1.5 rounded-full font-label-sm text-xs transition-colors">İşleniyor</button>
-      <button data-filter="pending" class="filter-pill bg-surface-container-lowest border border-outline-variant text-on-surface-variant hover:text-on-surface px-4 py-1.5 rounded-full font-label-sm text-xs transition-colors">Bekliyor / CV Yok</button>
+    <div class="flex flex-wrap gap-2" id="filter-pills">
+      <button data-filter="all" class="filter-pill active bg-[#14422f] text-white px-4 py-1.5 rounded-full font-label-sm text-xs border border-[#14422f] transition-colors">Tümü</button>
+      <button data-filter="completed" class="filter-pill bg-transparent border border-[#ddd9d3] text-[#8a8580] hover:text-[#1b1c1a] px-4 py-1.5 rounded-full font-label-sm text-xs transition-colors">Analiz Hazır</button>
+      <button data-filter="processing" class="filter-pill bg-transparent border border-[#ddd9d3] text-[#8a8580] hover:text-[#1b1c1a] px-4 py-1.5 rounded-full font-label-sm text-xs transition-colors">İşleniyor</button>
+      <button data-filter="pending" class="filter-pill bg-transparent border border-[#ddd9d3] text-[#8a8580] hover:text-[#1b1c1a] px-4 py-1.5 rounded-full font-label-sm text-xs transition-colors">Bekliyor / CV Yok</button>
     </div>
   </div>
 
   <!-- Results Header -->
   <div class="flex justify-between items-center mb-6">
-    <h3 class="font-headline-sm text-headline-sm font-bold text-on-surface">Arama Sonuçları</h3>
-    <span id="result-count" class="text-on-surface-variant font-body-sm text-sm">Yükleniyor...</span>
+    <h3 class="font-headline-sm text-headline-sm font-bold text-[#1b1c1a]">Arama Sonuçları</h3>
+    <span id="result-count" class="text-[#8a8580] font-body-sm text-sm font-medium">Yükleniyor...</span>
   </div>
 
   <!-- Results Grid -->
   <div id="candidates-grid" class="grid grid-cols-1 md:grid-cols-2 gap-6">
     <!-- Loading skeleton -->
-    <div class="bg-[#13132b] border border-[#2a2a4a] rounded-xl p-6 animate-pulse h-[200px]"></div>
-    <div class="bg-[#13132b] border border-[#2a2a4a] rounded-xl p-6 animate-pulse h-[200px]"></div>
+    <div class="bg-white border border-[#ddd9d3] rounded-[10px] p-6 animate-pulse h-[200px] shadow-sm"></div>
+    <div class="bg-white border border-[#ddd9d3] rounded-[10px] p-6 animate-pulse h-[200px] shadow-sm"></div>
   </div>
 
   <style>
     .filter-pill.active {
-      background-color: #7c5cfc;
-      color: white;
-      border-color: #7c5cfc;
+      background-color: #14422f !important;
+      color: white !important;
+      border-color: #14422f !important;
     }
     .filter-pill:not(.active) {
       background-color: transparent;
+      color: #8a8580;
+    }
+    .filter-pill:not(.active):hover {
+      color: #1b1c1a;
+      border-color: #8a8580;
     }
   </style>
+
 
   <script is:inline>
     let currentFilter = 'all';
@@ -75,25 +81,25 @@ import AdminLayout from '../../layouts/AdminLayout.astro';
 
     function getScoreBadge(status, score) {
       if (!status) {
-        return '<div class="flex items-center gap-1 text-on-surface-variant bg-surface-container px-2 py-1 rounded text-xs">CV Yok</div>';
+        return '<div class="flex items-center gap-1 text-[#8a8580] bg-[#faf9f5] border border-[#ddd9d3] px-2 py-1 rounded-[6px] text-xs font-medium">CV Yok</div>';
       }
       if (status === 'COMPLETED' && score !== null) {
-        const color = score >= 80 ? 'text-green-400 bg-green-400/10' : score >= 60 ? 'text-yellow-400 bg-yellow-400/10' : 'text-red-400 bg-red-400/10';
-        const icon = score >= 80 ? 'auto_awesome' : score >= 60 ? 'warning' : 'error';
-        return `<div class="flex items-center gap-1 ${color} px-2 py-1 rounded font-bold text-xs"><span class="material-symbols-outlined text-[14px]">${icon}</span>%${score} ATS</div>`;
+        const color = score >= 80 ? 'text-emerald-700 bg-emerald-50 border border-emerald-200' : score >= 60 ? 'text-amber-700 bg-amber-50 border border-amber-200' : 'text-rose-700 bg-rose-50 border border-rose-200';
+        const icon = score >= 80 ? 'check_circle' : score >= 60 ? 'warning' : 'error';
+        return `<div class="flex items-center gap-1 ${color} px-2 py-1 rounded-[6px] font-bold text-xs"><span class="material-symbols-outlined text-[14px]">${icon}</span>%${score} Uyum</div>`;
       }
       if (status === 'PROCESSING') {
-        return '<div class="flex items-center gap-1 text-blue-400 bg-blue-400/10 px-2 py-1 rounded text-xs"><span class="material-symbols-outlined text-[14px] animate-spin">progress_activity</span>İşleniyor</div>';
+        return '<div class="flex items-center gap-1 text-blue-700 bg-blue-50 border border-blue-200 px-2 py-1 rounded-[6px] text-xs font-medium"><span class="material-symbols-outlined text-[14px] animate-spin">progress_activity</span>İşleniyor</div>';
       }
-      return '<div class="flex items-center gap-1 text-on-surface-variant bg-surface-container px-2 py-1 rounded text-xs"><span class="material-symbols-outlined text-[14px]">schedule</span>Bekliyor</div>';
+      return '<div class="flex items-center gap-1 text-[#8a8580] bg-[#faf9f5] border border-[#ddd9d3] px-2 py-1 rounded-[6px] text-xs font-medium"><span class="material-symbols-outlined text-[14px]">schedule</span>Bekliyor</div>';
     }
 
     function renderSkills(skills) {
       if (!skills || !Array.isArray(skills) || skills.length === 0) {
-        return '<span class="text-on-surface-variant text-xs italic">Henüz analiz yok</span>';
+        return '<span class="text-[#8a8580] text-xs italic font-medium">Henüz analiz yok</span>';
       }
       return skills.slice(0, 3).map(s =>
-        `<span class="bg-purple-900/30 text-purple-300 px-3 py-1 rounded-full font-label-md text-[11px]">${s}</span>`
+        `<span class="bg-[#14422f]/10 text-[#14422f] px-2.5 py-1 rounded-[6px] font-semibold text-[11px]">${s}</span>`
       ).join('');
     }
 
@@ -103,9 +109,9 @@ import AdminLayout from '../../layouts/AdminLayout.astro';
 
       if (candidates.length === 0) {
         grid.innerHTML = `
-          <div class="col-span-2 bg-[#13132b] border border-[#2a2a4a] rounded-xl p-12 flex flex-col items-center justify-center text-center">
-            <span class="material-symbols-outlined text-5xl text-on-surface-variant/30 mb-4">person_search</span>
-            <p class="text-on-surface-variant font-body-md">Hiç aday bulunamadı.</p>
+          <div class="col-span-2 bg-white border border-[#ddd9d3] rounded-[10px] p-12 flex flex-col items-center justify-center text-center shadow-sm">
+            <span class="material-symbols-outlined text-5xl text-[#8a8580]/40 mb-4">person_search</span>
+            <p class="text-[#8a8580] font-body-md font-medium">Hiç aday bulunamadı.</p>
           </div>`;
         countEl.textContent = '0 aday bulundu';
         return;
@@ -115,20 +121,19 @@ import AdminLayout from '../../layouts/AdminLayout.astro';
 
       grid.innerHTML = candidates.map((c, i) => {
         const initials = getInitials(c.name, c.email);
-        const colorClass = COLORS[i % COLORS.length];
         const date = new Date(c.createdAt).toLocaleDateString('tr-TR');
         const scoreBadge = getScoreBadge(c.analysisStatus, c.atsScore);
         const skillsHtml = renderSkills(c.skills);
 
         return `
-          <div class="bg-[#13132b] border border-[#2a2a4a] rounded-xl p-6 hover:border-primary/50 transition-colors flex flex-col justify-between min-h-[200px]">
+          <div class="bg-white border border-[#ddd9d3] rounded-[10px] p-6 hover:shadow-md transition-shadow flex flex-col justify-between min-h-[200px] shadow-sm">
             <div class="flex justify-between items-start">
               <div class="flex gap-4">
-                <div class="w-12 h-12 rounded-full ${colorClass} flex items-center justify-center font-bold text-lg flex-shrink-0">${initials}</div>
+                <div class="w-12 h-12 rounded-full bg-[#14422f]/10 text-[#14422f] flex items-center justify-center font-bold text-lg flex-shrink-0">${initials}</div>
                 <div>
-                  <h4 class="font-bold text-on-surface">${c.name || 'İsimsiz'}</h4>
-                  <p class="text-on-surface-variant text-sm mt-0.5">${c.email}</p>
-                  <p class="text-on-surface-variant text-xs mt-0.5">${c.cvCount} CV yüklendi</p>
+                  <h4 class="font-bold text-[#1b1c1a]">${c.name || 'İsimsiz'}</h4>
+                  <p class="text-[#8a8580] text-sm mt-0.5 font-medium">${c.email}</p>
+                  <p class="text-[#8a8580] text-xs mt-0.5 font-medium">${c.cvCount} CV yüklendi</p>
                 </div>
               </div>
               ${scoreBadge}
@@ -138,12 +143,12 @@ import AdminLayout from '../../layouts/AdminLayout.astro';
               ${skillsHtml}
             </div>
 
-            <div class="flex justify-between items-center mt-auto pt-4 border-t border-[#2a2a4a]/50">
-              <div class="flex items-center gap-2 text-on-surface-variant text-xs">
+            <div class="flex justify-between items-center mt-auto pt-4 border-t border-[#ddd9d3]">
+              <div class="flex items-center gap-2 text-[#8a8580] text-xs font-medium">
                 <span class="material-symbols-outlined text-[14px]">calendar_today</span>
                 ${date}
               </div>
-              <a href="/profile?userId=${c.id}" class="border border-outline-variant text-on-surface hover:bg-[#1a2340] px-4 py-1.5 rounded-lg text-xs font-semibold transition-colors">
+              <a href="/admin/profile?userId=${c.id}" class="border border-[#ddd9d3] text-[#1b1c1a] hover:border-[#14422f] hover:text-[#14422f] px-4 py-1.5 rounded-[8px] text-xs font-semibold transition-colors bg-white">
                 Profili Gör
               </a>
             </div>
@@ -157,53 +162,73 @@ import AdminLayout from '../../layouts/AdminLayout.astro';
       const grid = document.getElementById('candidates-grid');
       const countEl = document.getElementById('result-count');
 
-      grid.innerHTML = `
-        <div class="bg-[#13132b] border border-[#2a2a4a] rounded-xl p-6 animate-pulse h-[200px]"></div>
-        <div class="bg-[#13132b] border border-[#2a2a4a] rounded-xl p-6 animate-pulse h-[200px]"></div>
-      `;
-      countEl.textContent = 'Yükleniyor...';
+      const params = new URLSearchParams({ filter: currentFilter });
+      if (search) params.set('search', search);
 
-      try {
-        const params = new URLSearchParams({ filter: currentFilter });
-        if (search) params.set('search', search);
+      const cacheKey = `candidates-filter-${currentFilter}-search-${search}`;
 
+      const fetcher = async () => {
         const res = await fetch(`/api/admin/candidates?${params}`);
-        if (res.ok) {
-          const data = await res.json();
-          renderCandidates(data.candidates || []);
-        } else if (res.status === 401 || res.status === 403) {
-          grid.innerHTML = '<div class="col-span-2 p-8 text-center text-red-400">Bu sayfayı görüntülemek için Yönetici yetkisi gereklidir.</div>';
-        } else {
-          grid.innerHTML = '<div class="col-span-2 p-8 text-center text-red-400">Adaylar yüklenirken bir hata oluştu.</div>';
-        }
-      } catch (err) {
-        grid.innerHTML = '<div class="col-span-2 p-8 text-center text-red-400">Sunucuya bağlanılamadı.</div>';
+        if (!res.ok) throw new Error("Fetch candidates error");
+        return res.json();
+      };
+
+      const render = (data) => {
+        renderCandidates(data.candidates || []);
+      };
+
+      if (window.__swrCache) {
+        window.__swrCache.query(cacheKey, fetcher, render, 30000);
+      } else {
+        grid.innerHTML = `
+          <div class="bg-[#13132b] border border-[#2a2a4a] rounded-xl p-6 animate-pulse h-[200px]"></div>
+          <div class="bg-[#13132b] border border-[#2a2a4a] rounded-xl p-6 animate-pulse h-[200px]"></div>
+        `;
+        countEl.textContent = 'Yükleniyor...';
+        fetcher().then(render).catch(() => {
+          grid.innerHTML = '<div class="col-span-2 p-8 text-center text-red-400">Yükleme hatası</div>';
+        });
       }
     }
 
-    // Filter pill clicks
-    document.getElementById('filter-pills').addEventListener('click', (e) => {
-      const btn = e.target.closest('[data-filter]');
-      if (!btn) return;
-      currentFilter = btn.dataset.filter;
-      document.querySelectorAll('.filter-pill').forEach(p => p.classList.remove('active'));
-      btn.classList.add('active');
+    // Handle page transitions and DOM listener binding safely under astro:page-load
+    document.addEventListener('astro:page-load', () => {
+      const grid = document.getElementById('candidates-grid');
+      if (!grid) return; // Only run if we are on the candidate search page
+
+      // Initial load
       fetchCandidates();
-    });
 
-    // Search button
-    document.getElementById('search-btn').addEventListener('click', fetchCandidates);
+      // Filter pill clicks
+      const filterPills = document.getElementById('filter-pills');
+      if (filterPills) {
+        filterPills.addEventListener('click', (e) => {
+          const btn = e.target.closest('[data-filter]');
+          if (!btn) return;
+          currentFilter = btn.dataset.filter;
+          document.querySelectorAll('.filter-pill').forEach(p => p.classList.remove('active'));
+          btn.classList.add('active');
+          fetchCandidates();
+        });
+      }
 
-    // Search on Enter / debounce
-    document.getElementById('search-input').addEventListener('keydown', (e) => {
-      if (e.key === 'Enter') fetchCandidates();
-    });
-    document.getElementById('search-input').addEventListener('input', () => {
-      clearTimeout(searchTimeout);
-      searchTimeout = setTimeout(fetchCandidates, 500);
-    });
+      // Search button
+      const searchBtn = document.getElementById('search-btn');
+      if (searchBtn) {
+        searchBtn.addEventListener('click', fetchCandidates);
+      }
 
-    // Initial load
-    document.addEventListener('DOMContentLoaded', fetchCandidates);
+      // Search on Enter / debounce
+      const searchInput = document.getElementById('search-input');
+      if (searchInput) {
+        searchInput.addEventListener('keydown', (e) => {
+          if (e.key === 'Enter') fetchCandidates();
+        });
+        searchInput.addEventListener('input', () => {
+          clearTimeout(searchTimeout);
+          searchTimeout = setTimeout(fetchCandidates, 500);
+        });
+      }
+    });
   </script>
 </AdminLayout>

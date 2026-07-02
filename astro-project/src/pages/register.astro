@@ -2,435 +2,377 @@
 import Layout from '../layouts/Layout.astro';
 ---
 
-<Layout title="Beacon - Register">
-	<div class="theme-register bg-[#0b0b18] text-on-surface font-body-md antialiased min-h-screen flex selection:bg-primary selection:text-on-primary">
-		<div class="flex flex-col md:flex-row w-full min-h-screen">
-			<!-- LEFT SIDE (Atmosphere) -->
-			<div class="relative hidden md:flex flex-col justify-between w-1/2 p-16 bg-[#0d0d1a] overflow-hidden border-r border-surface-variant/30">
-				<!-- Particle Animation Canvas -->
-				<canvas id="particle-canvas" style="opacity: 0.18;"></canvas>
-				<!-- Ambient Glow -->
-				<div class="absolute bottom-0 left-0 w-3/4 h-3/4 bg-[#7c5cfc]/10 rounded-full blur-[120px] pointer-events-none transform -translate-x-1/3 translate-y-1/3"></div>
-				<!-- Header / Logo -->
-				<div class="relative z-10">
-					<a class="font-display text-2xl font-bold text-on-surface flex items-center gap-2 cursor-pointer hover:opacity-90" href="/">
-						<img src="/beacon.png" alt="Beacon Logo" class="h-6 w-auto object-contain" />
-						Beacon <span class="text-[#7c5cfc]">•</span>
-					</a>
-				</div>
-				<!-- Center Content -->
-				<div class="relative z-10 flex flex-col gap-6 max-w-[500px] mt-[-10vh]">
-					<h1 class="font-display text-3xl lg:text-4xl text-white font-bold leading-tight">
-						Profesyonel profilini oluştur.
-					</h1>
-					<p class="font-body-md text-[#a3a3c2] text-lg mt-4">
-						CV'ni yükle ve anlamlı analizler al.
-					</p>
-					<!-- Animated CV Flow Steps -->
-					<div class="flex items-center gap-4 mt-8 animate-flow text-white">
-						<div class="flex flex-col items-center gap-2">
-							<span class="text-3xl">📄</span>
-							<span class="font-label-sm tracking-wider uppercase whitespace-nowrap">CV Yükle</span>
-						</div>
-						<div class="flex-1 h-px border-t border-dashed border-white/40"></div>
-						<div class="flex flex-col items-center gap-2">
-							<span class="text-3xl">🔍</span>
-							<span class="font-label-sm tracking-wider uppercase whitespace-nowrap">YZ Analizi</span>
-						</div>
-						<div class="flex-1 h-px border-t border-dashed border-white/40"></div>
-						<div class="flex flex-col items-center gap-2">
-							<span class="text-3xl">✓</span>
-							<span class="font-label-sm tracking-wider uppercase whitespace-nowrap">Profil Hazır</span>
-						</div>
-					</div>
-				</div>
-				<!-- Spacer to push content center -->
-				<div class="relative z-10 opacity-0">Bottom Spacer</div>
-			</div>
-			<!-- RIGHT SIDE (Form) -->
-			<div class="flex-1 flex flex-col justify-center items-center p-6 md:p-16 bg-[#0b0b18] relative">
-				<!-- Form Container -->
-				<div class="w-full max-w-[420px] flex flex-col gap-8 z-10 relative border border-[rgba(255,255,255,0.05)] rounded-2xl p-8 bg-[#0b0b18]">
-					<!-- Heading Area -->
-					<div class="flex flex-col gap-2">
-						<span class="font-label-sm text-[#6b6b9a] uppercase tracking-wider">BEACON</span>
-						<h2 class="font-display text-headline-lg-mobile md:text-headline-lg text-white font-bold">
-							Hesap oluştur
-						</h2>
-						<p class="font-body-md text-[#6b6b9a]">
-							Hesabınızı oluşturup CV analizine başlayın.
-						</p>
-					</div>
+<Layout title="Beacon - Kayıt Ol">
+  <div style="display: flex; flex-direction: row; min-height: 100vh; background: #ffffff; font-family: 'Inter', sans-serif; color: #1c1b19;">
 
-					<div id="error-feedback" class="hidden w-full bg-red-950/40 border border-red-500/30 text-red-200 text-xs font-mono p-3 rounded-lg"></div>
+    <!-- Left Side: Value Proposition -->
+    <div style="position: relative; display: none; flex-direction: column; justify-content: center; width: 50%; background-color: #f7f3ef; padding: 64px; overflow: hidden; border-right: 1px solid #ded9d6; flex-shrink: 0;" class="left-panel">
 
-					<!-- Form -->
-					<form id="register-form" class="flex flex-col gap-6">
-						<!-- Full Name -->
-						<div class="flex flex-col gap-2">
-							<label class="font-label-md text-on-surface-variant text-sm font-medium" for="fullname">Ad Soyad</label>
-							<div class="relative group">
-								<span class="material-symbols-outlined absolute left-4 top-1/2 -translate-y-1/2 text-[#6b6b9a]">person</span>
-								<input class="w-full bg-[#13132b] border border-[#2a2a4a] text-white placeholder-[#a3a3c2] pl-11 pr-4 h-[48px] focus:outline-none focus:border-[#7c5cfc] focus:ring-1 focus:ring-[#7c5cfc] focus:shadow-[0_0_15px_rgba(124,92,252,0.15)] transition-all duration-300" id="fullname" placeholder="Adın Soyadın" type="text" required/>
-							</div>
-						</div>
-						<!-- Email -->
-						<div class="flex flex-col gap-2">
-							<label class="font-label-md text-on-surface-variant text-sm font-medium" for="email">E-posta</label>
-							<div class="relative group">
-								<span class="material-symbols-outlined absolute left-4 top-1/2 -translate-y-1/2 text-[#6b6b9a]">mail</span>
-								<input class="w-full bg-[#13132b] border border-[#2a2a4a] text-white placeholder-[#a3a3c2] pl-11 pr-4 h-[48px] focus:outline-none focus:border-[#7c5cfc] focus:ring-1 focus:ring-[#7c5cfc] focus:shadow-[0_0_15px_rgba(124,92,252,0.15)] transition-all duration-300" id="email" placeholder="ornek@email.com" type="email" required/>
-							</div>
-						</div>
-						<!-- Phone -->
-						<div class="flex flex-col gap-2">
-							<label class="font-label-md text-on-surface-variant text-sm font-medium" for="phone">Telefon</label>
-							<div class="relative group">
-								<span class="material-symbols-outlined absolute left-4 top-1/2 -translate-y-1/2 text-[#6b6b9a]">call</span>
-								<input class="w-full bg-[#13132b] border border-[#2a2a4a] text-white placeholder-[#a3a3c2] pl-11 pr-4 h-[48px] focus:outline-none focus:border-[#7c5cfc] focus:ring-1 focus:ring-[#7c5cfc] focus:shadow-[0_0_15px_rgba(124,92,252,0.15)] transition-all duration-300" id="phone" placeholder="0555..." type="tel" required/>
-							</div>
-						</div>
-						<!-- Password -->
-						<div class="flex flex-col gap-2">
-							<label class="font-label-md text-on-surface-variant text-sm font-medium" for="password">Şifre</label>
-							<div class="relative group">
-								<span class="material-symbols-outlined absolute left-4 top-1/2 -translate-y-1/2 text-[#6b6b9a]">lock</span>
-								<input class="w-full bg-[#13132b] border border-[#2a2a4a] text-white placeholder-[#a3a3c2] pl-11 pr-12 h-[48px] focus:outline-none focus:border-[#7c5cfc] focus:ring-1 focus:ring-[#7c5cfc] focus:shadow-[0_0_15px_rgba(124,92,252,0.15)] transition-all duration-300" id="password" placeholder="••••••••" type="password" required autocomplete="new-password" value=""/>
-								<button class="absolute right-3 top-1/2 -translate-y-1/2 text-[#6b6b9a] hover:text-white transition-colors" type="button" id="toggle-password">
-									<span class="material-symbols-outlined text-xl select-none">visibility</span>
-								</button>
-							</div>
-							<!-- Password Strength -->
-							<div class="flex gap-1 mt-1 h-1.5 w-full" id="password-strength">
-								<div class="flex-1 rounded-full bg-[#2a2a4a] transition-colors duration-300" id="strength-1"></div>
-								<div class="flex-1 rounded-full bg-[#2a2a4a] transition-colors duration-300" id="strength-2"></div>
-								<div class="flex-1 rounded-full bg-[#2a2a4a] transition-colors duration-300" id="strength-3"></div>
-							</div>
-							<span class="text-xs text-[#6b6b9a] mt-1 font-mono" id="strength-text">Şifre gücü</span>
-						</div>
-						<!-- Confirm Password -->
-						<div class="flex flex-col gap-2">
-							<label class="font-label-md text-on-surface-variant text-sm font-medium" for="confirm_password">Şifre Tekrar</label>
-							<div class="relative group">
-								<span class="material-symbols-outlined absolute left-4 top-1/2 -translate-y-1/2 text-[#6b6b9a]">lock</span>
-								<input class="w-full bg-[#13132b] border border-[#2a2a4a] text-white placeholder-[#a3a3c2] pl-11 pr-12 h-[48px] focus:outline-none focus:border-[#7c5cfc] focus:ring-1 focus:ring-[#7c5cfc] focus:shadow-[0_0_15px_rgba(124,92,252,0.15)] transition-all duration-300" id="confirm_password" placeholder="••••••••" type="password" required autocomplete="new-password" value=""/>
-								<button class="absolute right-3 top-1/2 -translate-y-1/2 text-[#6b6b9a] hover:text-white transition-colors" type="button" id="toggle-confirm-password">
-									<span class="material-symbols-outlined text-xl select-none">visibility</span>
-								</button>
-							</div>
-						</div>
-						<!-- Remember Me Checkbox -->
-						<div class="flex items-start gap-3 mt-1">
-							<div class="relative flex items-center pt-0.5">
-								<input class="appearance-none custom-checkbox h-[20px] w-[20px] shrink-0 rounded border border-slate-600 bg-[#13132b] focus:outline-none focus:border-[#7c5cfc] focus:ring-1 focus:ring-[#7c5cfc] hover:border-[#7c5cfc] cursor-pointer transition-colors relative" id="remember_me" type="checkbox"/>
-							</div>
-							<label class="font-body-md text-xs text-slate-400 leading-tight cursor-pointer" for="remember_me">
-								Beni Hatırla
-							</label>
-						</div>
-						<!-- Terms Checkbox -->
-						<div class="flex items-start gap-3 mt-1">
-							<div class="relative flex items-center pt-1">
-								<input class="appearance-none custom-checkbox h-[20px] w-[20px] shrink-0 rounded border border-slate-600 bg-[#13132b] focus:outline-none focus:border-[#7c5cfc] focus:ring-1 focus:ring-[#7c5cfc] hover:border-[#7c5cfc] cursor-pointer transition-colors relative" id="terms" type="checkbox"/>
-							</div>
-							<label class="font-body-md text-xs text-slate-400 leading-tight cursor-pointer" for="terms">
-								Hesap oluşturarak, <span class="text-[#a78bfa] underline hover:text-white transition-colors">Kullanım Şartları</span> ve <span class="text-[#a78bfa] underline hover:text-white transition-colors">Gizlilik Politikası</span>'nı kabul etmiş olursunuz.
-							</label>
-						</div>
-						<!-- Submit Button -->
-						<button class="w-full bg-[#7c5cfc] text-white font-label-md py-3 rounded mt-2 hover:bg-[#8b6fff] hover:-translate-y-[2px] transition-all duration-300 shadow-[0_0_20px_rgba(124,92,252,0.2)] hover:shadow-[0_0_30px_rgba(124,92,252,0.5)] flex justify-center items-center gap-2 group cursor-pointer" type="submit">
-							Hesap Oluştur <span class="material-symbols-outlined text-sm group-hover:translate-x-1 transition-transform">arrow_forward</span>
-						</button>
-					</form>
-					<!-- Footer Link -->
-					<div class="text-center mt-4">
-						<p class="font-body-md text-slate-400 text-sm">
-							Zaten hesabın var mı? <a class="text-[#a78bfa] hover:text-white hover:underline hover:brightness-110 transition-all cursor-pointer font-medium" href="/login">Giriş yap</a>
-						</p>
-					</div>
-				</div>
-			</div>
-		</div>
-	</div>
+      <!-- Dot grid background -->
+      <div style="position: absolute; inset: 0; opacity: 0.03; pointer-events: none; background-image: radial-gradient(#1c1b19 1px, transparent 1px); background-size: 24px 24px;"></div>
+
+      <!-- Floating Background Cards -->
+      <div style="position: absolute; inset: 0; z-index: 0; overflow: hidden; pointer-events: none; opacity: 0.6;">
+        <div class="animate-float" style="position: absolute; top: 128px; right: 48px; width: 256px; background: rgba(255,255,255,0.9); backdrop-filter: blur(12px); border: 1px solid rgba(222,217,214,0.6); border-radius: 12px; padding: 16px; box-shadow: 0 4px 24px rgba(0,0,0,0.04);">
+          <div style="display: flex; align-items: center; gap: 12px;">
+            <div style="width: 40px; height: 40px; border-radius: 50%; background: rgba(230,226,222,0.8); flex-shrink: 0;"></div>
+            <div style="flex: 1; display: flex; flex-direction: column; gap: 8px;">
+              <div style="height: 8px; width: 75%; border-radius: 9999px; background: rgba(230,226,222,0.8);"></div>
+              <div style="height: 8px; width: 50%; border-radius: 9999px; background: rgba(230,226,222,0.8);"></div>
+            </div>
+            <span class="material-symbols-outlined" style="color: #2d5a45; font-size: 18px;">check</span>
+          </div>
+        </div>
+        <div class="animate-float-delayed" style="position: absolute; bottom: 192px; left: -32px; width: 288px; background: rgba(255,255,255,0.9); backdrop-filter: blur(12px); border: 1px solid rgba(222,217,214,0.6); border-radius: 12px; padding: 16px; box-shadow: 0 4px 24px rgba(0,0,0,0.04);">
+          <div style="display: flex; align-items: center; gap: 12px;">
+            <div style="width: 40px; height: 40px; border-radius: 50%; background: rgba(230,226,222,0.8); flex-shrink: 0;"></div>
+            <div style="flex: 1; display: flex; flex-direction: column; gap: 8px;">
+              <div style="height: 8px; width: 100%; border-radius: 9999px; background: rgba(230,226,222,0.8);"></div>
+              <div style="height: 8px; width: 66%; border-radius: 9999px; background: rgba(230,226,222,0.8);"></div>
+            </div>
+            <span class="material-symbols-outlined" style="color: #2d5a45; font-size: 18px;">check</span>
+          </div>
+        </div>
+        <div class="animate-float-slow" style="position: absolute; bottom: 96px; right: 96px; width: 224px; background: rgba(255,255,255,0.9); backdrop-filter: blur(12px); border: 1px solid rgba(222,217,214,0.6); border-radius: 12px; padding: 16px; box-shadow: 0 4px 24px rgba(0,0,0,0.04);">
+          <div style="display: flex; align-items: center; gap: 12px;">
+            <div style="width: 32px; height: 32px; border-radius: 50%; background: rgba(230,226,222,0.8); flex-shrink: 0;"></div>
+            <div style="flex: 1; display: flex; flex-direction: column; gap: 8px;">
+              <div style="height: 8px; width: 80%; border-radius: 9999px; background: rgba(230,226,222,0.8);"></div>
+              <div style="height: 8px; width: 50%; border-radius: 9999px; background: rgba(230,226,222,0.8);"></div>
+            </div>
+            <span class="material-symbols-outlined" style="color: #2d5a45; font-size: 18px;">check</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Brand Logo -->
+      <div style="position: absolute; top: 64px; left: 64px; z-index: 10; display: flex; align-items: center; gap: 8px;">
+        <img src="/mixboard-image.png" alt="Beacon Logo" style="height: 28px; width: auto; object-fit: contain;" />
+        <span style="font-family: 'Manrope', sans-serif; font-size: 22px; font-weight: 700; color: #1c1b19;">Beacon</span>
+        <span style="display: inline-block; width: 8px; height: 8px; border-radius: 50%; background: #2d5a45; margin-left: 2px;"></span>
+      </div>
+
+      <!-- Main Content -->
+      <div style="position: relative; z-index: 10; max-width: 480px; margin-top: 40px;">
+        <h2 style="font-family: 'Manrope', sans-serif; font-size: 40px; line-height: 50px; letter-spacing: -0.02em; font-weight: 700; color: #1c1b19; margin-bottom: 24px; margin-top: 0;">
+          Kariyerinde doğru yönü bul.
+        </h2>
+        <p style="font-size: 18px; line-height: 28px; color: #414943; margin-bottom: 48px;">
+          CV'ni yükle, yapay zeka güçlü yönlerini ve gelişim alanlarını analiz etsin.
+        </p>
+        <ul style="display: flex; flex-direction: column; gap: 20px; list-style: none; padding: 0; margin: 0;">
+          <li style="display: flex; align-items: flex-start; gap: 16px;">
+            <div style="display: flex; align-items: center; justify-content: center; width: 24px; height: 24px; border-radius: 50%; background: #2d5a45; flex-shrink: 0; margin-top: 2px;">
+              <span class="material-symbols-outlined" style="font-size: 13px; color: white; font-variation-settings: 'FILL' 1;">check</span>
+            </div>
+            <div>
+              <p style="font-size: 14px; font-weight: 700; color: #1c1b19; margin: 0;">Ücretsiz CV analizi</p>
+              <p style="font-size: 12px; color: #717973; margin: 2px 0 0 0;">Yapay zeka ile profesyonel değerlendirme.</p>
+            </div>
+          </li>
+          <li style="display: flex; align-items: flex-start; gap: 16px;">
+            <div style="display: flex; align-items: center; justify-content: center; width: 24px; height: 24px; border-radius: 50%; background: #2d5a45; flex-shrink: 0; margin-top: 2px;">
+              <span class="material-symbols-outlined" style="font-size: 13px; color: white; font-variation-settings: 'FILL' 1;">check</span>
+            </div>
+            <div>
+              <p style="font-size: 14px; font-weight: 700; color: #1c1b19; margin: 0;">Detaylı güçlü/zayıf yön raporu</p>
+              <p style="font-size: 12px; color: #717973; margin: 2px 0 0 0;">Kapsamlı yetkinlik haritası.</p>
+            </div>
+          </li>
+          <li style="display: flex; align-items: flex-start; gap: 16px;">
+            <div style="display: flex; align-items: center; justify-content: center; width: 24px; height: 24px; border-radius: 50%; background: #2d5a45; flex-shrink: 0; margin-top: 2px;">
+              <span class="material-symbols-outlined" style="font-size: 13px; color: white; font-variation-settings: 'FILL' 1;">check</span>
+            </div>
+            <div>
+              <p style="font-size: 14px; font-weight: 700; color: #1c1b19; margin: 0;">Kişisel gelişim önerileri</p>
+              <p style="font-size: 12px; color: #717973; margin: 2px 0 0 0;">Kariyer hedeflerinize özel yol haritası.</p>
+            </div>
+          </li>
+        </ul>
+      </div>
+    </div>
+
+    <!-- Right Side: Registration Form -->
+    <div style="flex: 1; display: flex; flex-direction: column; justify-content: center; align-items: center; background-color: #ffffff; padding: 32px; min-height: 100vh; overflow-y: auto;">
+      <div style="width: 100%; max-width: 420px; padding: 20px 0;">
+
+        <!-- Form Header -->
+        <div style="margin-bottom: 32px;">
+          <div style="font-size: 12px; letter-spacing: 0.08em; font-weight: 500; color: #717973; text-transform: uppercase; margin-bottom: 4px; font-family: 'IBM Plex Sans', sans-serif;">BEACON</div>
+          <h2 style="font-family: 'Manrope', sans-serif; font-size: 28px; line-height: 36px; font-weight: 700; color: #1c1b19; margin-bottom: 4px; margin-top: 0;">Hesap oluştur</h2>
+          <p style="font-size: 16px; color: #414943; margin: 0;">Birkaç saniyede başla</p>
+        </div>
+
+        <!-- Error Feedback -->
+        <div id="error-feedback" style="display: none; width: 100%; background: #fff5f5; border: 1px solid #fecaca; color: #dc2626; font-size: 12px; font-weight: 600; padding: 12px; border-radius: 8px; margin-bottom: 24px;"></div>
+
+        <!-- Form Card -->
+        <div style="background: #ffffff; padding: 32px; border-radius: 16px; box-shadow: 0 8px 30px rgba(0,0,0,0.06); border: 1px solid rgba(222,217,214,0.5);">
+          <form id="register-form" style="display: flex; flex-direction: column; gap: 20px;">
+
+            <!-- Ad Soyad -->
+            <div>
+              <label for="fullname" style="display: block; font-size: 12px; letter-spacing: 0.08em; font-weight: 500; color: #414943; text-transform: uppercase; margin-bottom: 8px; font-family: 'IBM Plex Sans', sans-serif;">Ad Soyad</label>
+              <div style="position: relative;">
+                <span class="material-symbols-outlined" style="position: absolute; left: 14px; top: 50%; transform: translateY(-50%); color: #717973; font-size: 18px; pointer-events: none;">person</span>
+                <input id="fullname" type="text" placeholder="Adın Soyadın" required class="form-input"
+                  style="width: 100%; height: 48px; padding: 0 16px 0 42px; background: #fdf8f5; border: 1px solid #c0c9c2; border-radius: 10px; font-size: 14px; color: #1c1b19; outline: none; transition: all 0.2s; box-sizing: border-box; font-family: 'Inter', sans-serif;"
+                />
+              </div>
+            </div>
+
+            <!-- E-posta -->
+            <div>
+              <label for="email" style="display: block; font-size: 12px; letter-spacing: 0.08em; font-weight: 500; color: #414943; text-transform: uppercase; margin-bottom: 8px; font-family: 'IBM Plex Sans', sans-serif;">E-posta</label>
+              <div style="position: relative;">
+                <span class="material-symbols-outlined" style="position: absolute; left: 14px; top: 50%; transform: translateY(-50%); color: #717973; font-size: 18px; pointer-events: none;">mail</span>
+                <input id="email" type="email" placeholder="ornek@email.com" required class="form-input"
+                  style="width: 100%; height: 48px; padding: 0 16px 0 42px; background: #fdf8f5; border: 1px solid #c0c9c2; border-radius: 10px; font-size: 14px; color: #1c1b19; outline: none; transition: all 0.2s; box-sizing: border-box; font-family: 'Inter', sans-serif;"
+                />
+              </div>
+            </div>
+
+            <!-- Telefon -->
+            <div>
+              <label for="phone" style="display: block; font-size: 12px; letter-spacing: 0.08em; font-weight: 500; color: #414943; text-transform: uppercase; margin-bottom: 8px; font-family: 'IBM Plex Sans', sans-serif;">Telefon</label>
+              <div style="position: relative;">
+                <span class="material-symbols-outlined" style="position: absolute; left: 14px; top: 50%; transform: translateY(-50%); color: #717973; font-size: 18px; pointer-events: none;">call</span>
+                <input id="phone" type="tel" placeholder="5xxxxxxxxx" required class="form-input"
+                  style="width: 100%; height: 48px; padding: 0 16px 0 42px; background: #fdf8f5; border: 1px solid #c0c9c2; border-radius: 10px; font-size: 14px; color: #1c1b19; outline: none; transition: all 0.2s; box-sizing: border-box; font-family: 'Inter', sans-serif;"
+                />
+              </div>
+            </div>
+
+            <!-- Şifre -->
+            <div>
+              <label for="password" style="display: block; font-size: 12px; letter-spacing: 0.08em; font-weight: 500; color: #414943; text-transform: uppercase; margin-bottom: 8px; font-family: 'IBM Plex Sans', sans-serif;">Şifre</label>
+              <div style="position: relative;">
+                <span class="material-symbols-outlined" style="position: absolute; left: 14px; top: 50%; transform: translateY(-50%); color: #717973; font-size: 18px; pointer-events: none;">lock</span>
+                <input id="password" type="password" placeholder="••••••••" required autocomplete="new-password" class="form-input"
+                  style="width: 100%; height: 48px; padding: 0 44px 0 42px; background: #fdf8f5; border: 1px solid #c0c9c2; border-radius: 10px; font-size: 14px; color: #1c1b19; outline: none; transition: all 0.2s; box-sizing: border-box; font-family: 'Inter', sans-serif;"
+                />
+                <button type="button" id="toggle-password" style="position: absolute; right: 0; top: 0; bottom: 0; padding: 0 12px; display: flex; align-items: center; background: none; border: none; cursor: pointer; color: #717973;">
+                  <span class="material-symbols-outlined" style="font-size: 20px;">visibility</span>
+                </button>
+              </div>
+              <!-- Password Strength -->
+              <div style="margin-top: 8px;">
+                <div style="display: flex; gap: 4px; height: 4px; border-radius: 2px; overflow: hidden;">
+                  <div id="strength-1" style="flex: 1; border-radius: 9999px; background: #fecaca; transition: background 0.3s;"></div>
+                  <div id="strength-2" style="flex: 1; border-radius: 9999px; background: #e5e7eb; transition: background 0.3s;"></div>
+                  <div id="strength-3" style="flex: 1; border-radius: 9999px; background: #e5e7eb; transition: background 0.3s;"></div>
+                </div>
+                <p id="strength-text" style="margin-top: 4px; font-size: 10px; color: #717973; font-weight: 600; margin-bottom: 0;">Şifre gücü: Bekleniyor</p>
+              </div>
+            </div>
+
+            <!-- Şifre Tekrar -->
+            <div>
+              <label for="confirm_password" style="display: block; font-size: 12px; letter-spacing: 0.08em; font-weight: 500; color: #414943; text-transform: uppercase; margin-bottom: 8px; font-family: 'IBM Plex Sans', sans-serif;">Şifre Tekrar</label>
+              <div style="position: relative;">
+                <span class="material-symbols-outlined" style="position: absolute; left: 14px; top: 50%; transform: translateY(-50%); color: #717973; font-size: 18px; pointer-events: none;">lock</span>
+                <input id="confirm_password" type="password" placeholder="••••••••" required autocomplete="new-password" class="form-input"
+                  style="width: 100%; height: 48px; padding: 0 44px 0 42px; background: #fdf8f5; border: 1px solid #c0c9c2; border-radius: 10px; font-size: 14px; color: #1c1b19; outline: none; transition: all 0.2s; box-sizing: border-box; font-family: 'Inter', sans-serif;"
+                />
+                <button type="button" id="toggle-confirm-password" style="position: absolute; right: 0; top: 0; bottom: 0; padding: 0 12px; display: flex; align-items: center; background: none; border: none; cursor: pointer; color: #717973;">
+                  <span class="material-symbols-outlined" style="font-size: 20px;">visibility</span>
+                </button>
+              </div>
+            </div>
+
+            <!-- Terms -->
+            <div style="display: flex; flex-direction: column; gap: 10px; padding-top: 4px;">
+              <div style="display: flex; align-items: flex-start; gap: 12px;">
+                <input id="terms" name="terms" type="checkbox" style="width: 16px; height: 16px; margin-top: 2px; accent-color: #2d5a45; flex-shrink: 0;" />
+                <label for="terms" style="font-size: 11px; line-height: 1.5; color: #717973; font-weight: 500;">
+                  Hesap oluşturarak <a href="#" style="color: #2d5a45; font-weight: 700; text-decoration: none;">Kullanım Şartları</a> ve <a href="#" style="color: #2d5a45; font-weight: 700; text-decoration: none;">Gizlilik Politikası</a>'nı kabul etmiş olursunuz.
+                </label>
+              </div>
+              <div style="display: flex; align-items: center; gap: 12px;">
+                <input id="remember_me" name="remember_me" type="checkbox" checked style="width: 16px; height: 16px; accent-color: #2d5a45; flex-shrink: 0;" />
+                <label for="remember_me" style="font-size: 11px; color: #717973; font-weight: 600;">Beni hatırla</label>
+              </div>
+            </div>
+
+            <!-- Submit -->
+            <button type="submit" id="register-btn"
+              style="width: 100%; height: 48px; background: #2d5a45; color: #ffffff; font-size: 14px; font-weight: 600; letter-spacing: 0.05em; border: none; border-radius: 10px; cursor: pointer; box-shadow: 0 4px 14px rgba(45,90,69,0.3); transition: all 0.2s; display: flex; align-items: center; justify-content: center; gap: 8px; font-family: 'IBM Plex Sans', sans-serif;">
+              Hesap Oluştur
+              <span class="material-symbols-outlined" style="font-size: 16px;">arrow_forward</span>
+            </button>
+          </form>
+
+          <div style="margin-top: 32px; text-align: center; border-top: 1px solid rgba(222,217,214,0.6); padding-top: 24px;">
+            <p style="font-size: 12px; color: #717973; font-weight: 500; margin: 0;">
+              Zaten hesabın var mı? <a href="/login" style="color: #2d5a45; font-weight: 700; text-decoration: none; margin-left: 4px;">Giriş yap</a>
+            </p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
 </Layout>
 
 <script>
-	// Particle Network Animation
-	const canvas = document.getElementById('particle-canvas') as HTMLCanvasElement;
-	if (canvas) {
-		const ctx = canvas.getContext('2d')!;
-		let particles: any[] = [];
-		let w: number, h: number;
+  // Focus styles
+  document.querySelectorAll('.form-input').forEach((el) => {
+    const input = el as HTMLInputElement;
+    input.addEventListener('focus', () => {
+      input.style.borderColor = '#2d5a45';
+      input.style.boxShadow = '0 0 0 4px rgba(45,90,69,0.1)';
+    });
+    input.addEventListener('blur', () => {
+      input.style.borderColor = '#c0c9c2';
+      input.style.boxShadow = 'none';
+    });
+  });
 
-		const init = () => {
-			w = canvas.width = canvas.parentElement!.offsetWidth;
-			h = canvas.height = canvas.parentElement!.offsetHeight;
-			particles = [];
-			for (let i = 0; i < 50; i++) {
-				particles.push({
-					x: Math.random() * w,
-					y: Math.random() * h,
-					vx: (Math.random() - 0.5) * 0.5,
-					vy: (Math.random() - 0.5) * 0.5,
-					radius: Math.random() * 1.5 + 0.5
-				});
-			}
-		};
+  // Password Strength
+  const passwordInput = document.getElementById('password') as HTMLInputElement;
+  const strength1 = document.getElementById('strength-1') as HTMLDivElement;
+  const strength2 = document.getElementById('strength-2') as HTMLDivElement;
+  const strength3 = document.getElementById('strength-3') as HTMLDivElement;
+  const strengthText = document.getElementById('strength-text') as HTMLParagraphElement;
 
-		const animate = () => {
-			ctx.clearRect(0, 0, w, h);
-			ctx.fillStyle = 'rgba(124, 92, 252, 1)'; 
-			
-			particles.forEach(p => {
-				p.x += p.vx;
-				p.y += p.vy;
+  passwordInput?.addEventListener('input', () => {
+    const val = passwordInput.value;
+    let strength = 0;
+    if (val.length >= 6) strength = 1;
+    if (val.length >= 8 && /[a-z]/.test(val) && /[A-Z]/.test(val) && /\d/.test(val)) strength = 2;
+    if (val.length >= 10 && /[a-z]/.test(val) && /[A-Z]/.test(val) && /\d/.test(val) && /[^A-Za-z0-9]/.test(val)) strength = 3;
 
-				if (p.x < 0 || p.x > w) p.vx *= -1;
-				if (p.y < 0 || p.y > h) p.vy *= -1;
+    if (val.length === 0) {
+      strength1.style.background = '#fecaca'; strength2.style.background = '#e5e7eb'; strength3.style.background = '#e5e7eb';
+      strengthText.textContent = 'Şifre gücü: Bekleniyor'; strengthText.style.color = '#717973'; return;
+    }
+    if (strength === 1) {
+      strength1.style.background = '#f43f5e'; strength2.style.background = '#e5e7eb'; strength3.style.background = '#e5e7eb';
+      strengthText.textContent = 'Şifre gücü: Zayıf'; strengthText.style.color = '#f43f5e';
+    } else if (strength === 2) {
+      strength1.style.background = '#f59e0b'; strength2.style.background = '#f59e0b'; strength3.style.background = '#e5e7eb';
+      strengthText.textContent = 'Şifre gücü: Orta'; strengthText.style.color = '#f59e0b';
+    } else {
+      strength1.style.background = '#10b981'; strength2.style.background = '#10b981'; strength3.style.background = '#10b981';
+      strengthText.textContent = 'Şifre gücü: Güçlü'; strengthText.style.color = '#10b981';
+    }
+  });
 
-				ctx.beginPath();
-				ctx.arc(p.x, p.y, p.radius, 0, Math.PI * 2);
-				ctx.fill();
-			});
+  // Clear on load
+  window.addEventListener('DOMContentLoaded', () => {
+    const p = document.getElementById('password') as HTMLInputElement;
+    const c = document.getElementById('confirm_password') as HTMLInputElement;
+    if (p) p.value = ''; if (c) c.value = '';
+  });
 
-			ctx.strokeStyle = 'rgba(124, 92, 252, 0.2)';
-			for (let i = 0; i < particles.length; i++) {
-				for (let j = i + 1; j < particles.length; j++) {
-					const dx = particles[i].x - particles[j].x;
-					const dy = particles[i].y - particles[j].y;
-					const dist = Math.sqrt(dx * dx + dy * dy);
+  // Toggle Password
+  const togglePasswordBtn = document.getElementById('toggle-password');
+  togglePasswordBtn?.addEventListener('click', () => {
+    const isPass = passwordInput.type === 'password';
+    passwordInput.type = isPass ? 'text' : 'password';
+    const icon = togglePasswordBtn.querySelector('span');
+    if (icon) icon.textContent = isPass ? 'visibility_off' : 'visibility';
+  });
 
-					if (dist < 150) {
-						ctx.beginPath();
-						ctx.moveTo(particles[i].x, particles[i].y);
-						ctx.lineTo(particles[j].x, particles[j].y);
-						ctx.stroke();
-					}
-				}
-			}
-			requestAnimationFrame(animate);
-		};
+  const confirmPasswordInput = document.getElementById('confirm_password') as HTMLInputElement;
+  const toggleConfirmBtn = document.getElementById('toggle-confirm-password');
+  toggleConfirmBtn?.addEventListener('click', () => {
+    const isPass = confirmPasswordInput.type === 'password';
+    confirmPasswordInput.type = isPass ? 'text' : 'password';
+    const icon = toggleConfirmBtn.querySelector('span');
+    if (icon) icon.textContent = isPass ? 'visibility_off' : 'visibility';
+  });
 
-		window.addEventListener('resize', init);
-		init();
-		animate();
-	}
+  // Button hover
+  const registerBtn = document.getElementById('register-btn');
+  registerBtn?.addEventListener('mouseover', () => {
+    (registerBtn as HTMLButtonElement).style.background = '#224f3b';
+    (registerBtn as HTMLButtonElement).style.transform = 'translateY(-1px)';
+  });
+  registerBtn?.addEventListener('mouseout', () => {
+    (registerBtn as HTMLButtonElement).style.background = '#2d5a45';
+    (registerBtn as HTMLButtonElement).style.transform = 'translateY(0)';
+  });
 
-	// Password Strength Checker
-	const passwordInput = document.getElementById('password') as HTMLInputElement;
-	passwordInput?.addEventListener('input', (e) => {
-		const password = (e.target as HTMLInputElement).value;
-		const strength1 = document.getElementById('strength-1')!;
-		const strength2 = document.getElementById('strength-2')!;
-		const strength3 = document.getElementById('strength-3')!;
-		const strengthText = document.getElementById('strength-text')!;
+  // Handle Submit
+  const form = document.getElementById('register-form') as HTMLFormElement;
+  const errorFeedback = document.getElementById('error-feedback') as HTMLDivElement;
 
-		if (!password) {
-			strength1.className = 'flex-1 rounded-full bg-[#2a2a4a] transition-colors duration-300';
-			strength2.className = 'flex-1 rounded-full bg-[#2a2a4a] transition-colors duration-300';
-			strength3.className = 'flex-1 rounded-full bg-[#2a2a4a] transition-colors duration-300';
-			strengthText.innerText = 'Şifre gücü';
-			strengthText.className = 'text-xs text-[#6b6b9a] mt-1';
-			return;
-		}
+  form?.addEventListener('submit', async (e) => {
+    e.preventDefault();
+    const rawEmail = (document.getElementById('email') as HTMLInputElement).value;
+    const email = rawEmail.trim().toLowerCase();
+    const phone = (document.getElementById('phone') as HTMLInputElement).value.trim();
+    const name = (document.getElementById('fullname') as HTMLInputElement).value.trim();
+    const password = passwordInput.value;
+    const confirmPassword = confirmPasswordInput.value;
+    const termsChecked = (document.getElementById('terms') as HTMLInputElement).checked;
+    const rememberMeChecked = (document.getElementById('remember_me') as HTMLInputElement).checked;
 
-		let strength = 0;
-		if (password.length > 5) strength += 1;
-		if (password.match(/[a-z]/) && password.match(/[A-Z]/)) strength += 1;
-		if (password.match(/\d/) || password.match(/[^a-zA-Z\d]/)) strength += 1;
+    errorFeedback.style.display = 'none';
+    errorFeedback.textContent = '';
 
-		if (strength === 1) {
-			strength1.className = 'flex-1 rounded-full bg-red-500 transition-colors duration-300';
-			strength2.className = 'flex-1 rounded-full bg-[#2a2a4a] transition-colors duration-300';
-			strength3.className = 'flex-1 rounded-full bg-[#2a2a4a] transition-colors duration-300';
-			strengthText.innerText = 'Zayıf';
-			strengthText.className = 'text-xs text-red-500 mt-1';
-		} else if (strength === 2) {
-			strength1.className = 'flex-1 rounded-full bg-yellow-500 transition-colors duration-300';
-			strength2.className = 'flex-1 rounded-full bg-yellow-500 transition-colors duration-300';
-			strength3.className = 'flex-1 rounded-full bg-[#2a2a4a] transition-colors duration-300';
-			strengthText.innerText = 'Orta';
-			strengthText.className = 'text-xs text-yellow-500 mt-1';
-		} else if (strength === 3) {
-			strength1.className = 'flex-1 rounded-full bg-green-500 transition-colors duration-300';
-			strength2.className = 'flex-1 rounded-full bg-green-500 transition-colors duration-300';
-			strength3.className = 'flex-1 rounded-full bg-green-500 transition-colors duration-300';
-			strengthText.innerText = 'Güçlü';
-			strengthText.className = 'text-xs text-green-500 mt-1';
-		}
-	});
+    const nameRegex = /^[a-zA-ZğüşıöçĞÜŞİÖÇ\s]{3,}$/;
+    if (!nameRegex.test(name)) { errorFeedback.style.display = 'block'; errorFeedback.textContent = '[Hata]: Ad Soyad en az 3 karakter olmalı ve yalnızca harflerden oluşmalıdır.'; return; }
 
-	// Clear passwords on window load to prevent browser autofill
-	window.addEventListener('DOMContentLoaded', () => {
-		const passwordInput = document.getElementById('password') as HTMLInputElement;
-		const confirmPasswordInput = document.getElementById('confirm_password') as HTMLInputElement;
-		if (passwordInput) passwordInput.value = '';
-		if (confirmPasswordInput) confirmPasswordInput.value = '';
-	});
+    const emailRegex = /^[a-zA-Z0-9._%+-]+@gmail\.com$/;
+    if (!emailRegex.test(email)) { errorFeedback.style.display = 'block'; errorFeedback.textContent = '[Hata]: Yalnızca @gmail.com uzantılı e-posta adresleri kabul edilmektedir.'; return; }
 
-	// Toggle Password Visibility
-	const togglePasswordBtn = document.getElementById('toggle-password');
-	togglePasswordBtn?.addEventListener('click', () => {
-		const type = passwordInput.getAttribute('type') === 'password' ? 'text' : 'password';
-		passwordInput.setAttribute('type', type);
-		const icon = togglePasswordBtn.querySelector('span');
-		if (icon) {
-			icon.textContent = type === 'password' ? 'visibility' : 'visibility_off';
-		}
-	});
+    const phoneRegex = /^5\d{9}$/;
+    if (!phoneRegex.test(phone)) { errorFeedback.style.display = 'block'; errorFeedback.textContent = '[Hata]: Telefon numarası 10 haneli olmalı ve 5 ile başlamalıdır.'; return; }
 
-	const confirmPasswordInput = document.getElementById('confirm_password') as HTMLInputElement;
-	const toggleConfirmPasswordBtn = document.getElementById('toggle-confirm-password');
-	toggleConfirmPasswordBtn?.addEventListener('click', () => {
-		const type = confirmPasswordInput.getAttribute('type') === 'password' ? 'text' : 'password';
-		confirmPasswordInput.setAttribute('type', type);
-		const icon = toggleConfirmPasswordBtn.querySelector('span');
-		if (icon) {
-			icon.textContent = type === 'password' ? 'visibility' : 'visibility_off';
-		}
-	});
+    if (password.length < 6) { errorFeedback.style.display = 'block'; errorFeedback.textContent = '[Hata]: Şifre en az 6 karakter olmalıdır.'; return; }
+    if (password.includes(' ')) { errorFeedback.style.display = 'block'; errorFeedback.textContent = '[Hata]: Şifre boşluk içeremez.'; return; }
+    if (password !== confirmPassword) { errorFeedback.style.display = 'block'; errorFeedback.textContent = '[Hata]: Şifreler eşleşmiyor.'; return; }
+    if (!termsChecked) { errorFeedback.style.display = 'block'; errorFeedback.textContent = '[Hata]: Lütfen kullanım şartlarını kabul edin.'; return; }
 
-	// Handle Submit
-	const form = document.getElementById('register-form') as HTMLFormElement;
-	const errorFeedback = document.getElementById('error-feedback') as HTMLDivElement;
-
-	form?.addEventListener('submit', async (e) => {
-		e.preventDefault();
-
-		const rawEmail = (document.getElementById('email') as HTMLInputElement).value;
-		const email = rawEmail.trim().toLowerCase();
-		const rawPhone = (document.getElementById('phone') as HTMLInputElement).value;
-		const phone = rawPhone.trim();
-		const rawName = (document.getElementById('fullname') as HTMLInputElement).value;
-		const name = rawName.trim();
-		const password = passwordInput.value;
-		const confirmPassword = confirmPasswordInput.value;
-		const termsChecked = (document.getElementById('terms') as HTMLInputElement).checked;
-		const rememberMeChecked = (document.getElementById('remember_me') as HTMLInputElement).checked;
-
-		errorFeedback.classList.add('hidden');
-		errorFeedback.textContent = '';
-
-		// Ad Soyad kontrolü
-		const nameRegex = /^[a-zA-ZğüşıöçĞÜŞİÖÇ\s]{3,}$/;
-		if (!nameRegex.test(name)) {
-			errorFeedback.classList.remove('hidden');
-			errorFeedback.textContent = '[Hata]: Ad Soyad en az 3 karakter olmalı ve yalnızca harflerden oluşmalıdır.';
-			return;
-		}
-
-		// E-posta regex kontrolü - Yalnızca @gmail.com
-		const emailRegex = /^[a-zA-Z0-9._%+-]+@gmail\.com$/;
-		if (!emailRegex.test(email)) {
-			errorFeedback.classList.remove('hidden');
-			errorFeedback.textContent = '[Hata]: Yalnızca @gmail.com uzantılı e-posta adresleri kabul edilmektedir.';
-			return;
-		}
-
-		// Telefon kontrolü - 10 hane ve 5 ile başlama
-		const phoneRegex = /^5\d{9}$/;
-		if (!phoneRegex.test(phone)) {
-			errorFeedback.classList.remove('hidden');
-			errorFeedback.textContent = '[Hata]: Telefon numarası 10 haneli olmalı ve 5 ile başlamalıdır (Örn: 5xxxxxxxxx).';
-			return;
-		}
-
-		// Şifre uzunluk kontrolü
-		if (password.length < 6) {
-			errorFeedback.classList.remove('hidden');
-			errorFeedback.textContent = '[Hata]: Şifre en az 6 karakter olmalıdır.';
-			return;
-		}
-
-		// Şifre boşluk kontrolü
-		if (password.includes(' ')) {
-			errorFeedback.classList.remove('hidden');
-			errorFeedback.textContent = '[Hata]: Şifre boşluk karakteri içeremez.';
-			return;
-		}
-
-		if (password !== confirmPassword) {
-			errorFeedback.classList.remove('hidden');
-			errorFeedback.textContent = '[Hata]: Şifreler eşleşmiyor.';
-			return;
-		}
-
-		if (!termsChecked) {
-			errorFeedback.classList.remove('hidden');
-			errorFeedback.textContent = '[Hata]: Lütfen kullanım şartlarını kabul edin.';
-			return;
-		}
-
-		try {
-			// Proxy yönlendirmesi: /api/* → backend :5000 (vite proxy)
-			const response = await fetch('/api/auth/register', {
-				method: 'POST',
-				headers: {
-					'Content-Type': 'application/json',
-				},
-				body: JSON.stringify({ email, phone, name, password }),
-				credentials: 'include'
-			});
-
-			const data = await response.json();
-
-			if (!response.ok) {
-				throw new Error(data.message || 'Kayıt işlemi başarısız.');
-			}
-
-			// Store or clear remembered email based on the checkbox
-			if (rememberMeChecked) {
-				localStorage.setItem('remembered_email', email);
-			} else {
-				localStorage.removeItem('remembered_email');
-			}
-
-			// Redirect on success
-			window.location.href = '/login';
-
-		} catch (error: any) {
-			errorFeedback.classList.remove('hidden');
-			errorFeedback.textContent = `[Hata]: ${error.message}`;
-		}
-	});
+    try {
+      const response = await fetch('/api/auth/register', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email, phone, name, password }),
+        credentials: 'include'
+      });
+      const data = await response.json();
+      if (!response.ok) throw new Error(data.message || 'Kayıt işlemi başarısız.');
+      if (rememberMeChecked) { localStorage.setItem('remembered_email', email); } else { localStorage.removeItem('remembered_email'); }
+      window.location.href = '/login';
+    } catch (error: any) {
+      errorFeedback.style.display = 'block';
+      errorFeedback.textContent = `[Hata]: ${error.message}`;
+    }
+  });
 </script>
 
 <style>
-	/* Particle Canvas Style */
-	#particle-canvas {
-		position: absolute;
-		top: 0;
-		left: 0;
-		width: 100%;
-		height: 100%;
-		z-index: 0;
-		pointer-events: none;
-	}
+  @media (min-width: 768px) {
+    .left-panel {
+      display: flex !important;
+    }
+  }
 
-	/* Checkbox Style */
-	.custom-checkbox:checked {
-		background-color: #7c5cfc;
-		border-color: #7c5cfc;
-	}
-	.custom-checkbox:checked::after {
-		content: '';
-		position: absolute;
-		left: 6px;
-		top: 3px;
-		width: 5px;
-		height: 10px;
-		border: solid white;
-		border-width: 0 2px 2px 0;
-		transform: rotate(45deg);
-	}
+  @keyframes float {
+    0% { transform: translateY(0px); }
+    50% { transform: translateY(-15px); }
+    100% { transform: translateY(0px); }
+  }
+  @keyframes float-alt {
+    0% { transform: translateY(0px) translateX(0px); }
+    50% { transform: translateY(-10px) translateX(5px); }
+    100% { transform: translateY(0px) translateX(0px); }
+  }
+  .animate-float { animation: float 6s ease-in-out infinite; }
+  .animate-float-delayed { animation: float-alt 7s ease-in-out infinite 2s; }
+  .animate-float-slow { animation: float 9s ease-in-out infinite 1s; }
 
-	/* Flow Animation */
-	@keyframes flowFloat {
-		0% { transform: translateY(0px); opacity: 0.08; }
-		50% { transform: translateY(-6px); opacity: 0.12; }
-		100% { transform: translateY(0px); opacity: 0.08; }
-	}
-	.animate-flow {
-		animation: flowFloat 4s ease-in-out infinite;
-	}
+  .form-input:-webkit-autofill,
+  .form-input:-webkit-autofill:hover,
+  .form-input:-webkit-autofill:focus {
+    -webkit-box-shadow: 0 0 0 40px #fdf8f5 inset !important;
+    -webkit-text-fill-color: #1c1b19 !important;
+  }
+</style>
+
+<style is:global>
+  /* Sadece kayıt sayfası için %75 zoom */
+  html { zoom: 75%; }
 </style>

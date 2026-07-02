@@ -1,0 +1,423 @@
+---
+import AdminLayout from '../../layouts/AdminLayout.astro';
+---
+
+<AdminLayout title="Beacon - CV Yükle">
+  <!-- Welcome Section -->
+  <section class="mb-8">
+    <h2 class="font-headline-lg text-headline-lg text-[#1b1c1a] mb-2">CV Yükle ve Analiz Et</h2>
+    <p class="font-body-lg text-body-lg text-[#8a8580] max-w-2xl font-medium">Sistemimizin derinlemesine kariyer analizi yapabilmesi için güncel özgeçmişinizi PDF formatında yükleyin.</p>
+  </section>
+
+  <!-- Upload Area -->
+  <section class="bg-white border border-[#ddd9d3] rounded-[10px] p-8 shadow-sm flex flex-col items-center justify-center cursor-pointer hover:bg-[#faf9f5]/50 transition-colors duration-200" id="drop-zone">
+    <span class="material-symbols-outlined text-4xl text-[#8a8580] mb-4">upload_file</span>
+    <h3 class="font-headline-md text-headline-md text-[#1b1c1a] mb-2 font-bold">Dosyayı Buraya Sürükleyin</h3>
+    <p class="font-body-sm text-body-sm text-[#8a8580] mb-6 font-medium">veya bilgisayarınızdan seçmek için tıklayın (PDF - Maks: 5MB)</p>
+    <input type="file" id="cv-file-input" accept=".pdf" class="hidden" />
+    <button class="bg-[#14422f] text-white font-semibold text-sm px-6 py-3 rounded-[8px] hover:opacity-90 transition-opacity shadow-sm">
+      Dosya Seç
+    </button>
+  </section>
+
+  <!-- Upload Progress Bar -->
+  <div class="mt-4 hidden" id="upload-progress-container">
+    <div class="flex justify-between text-xs font-semibold text-[#8a8580] mb-2">
+      <span id="upload-status-text">Dosya yükleniyor...</span>
+      <span id="upload-percent">0%</span>
+    </div>
+    <div class="w-full bg-[#f5f4f0] h-2 rounded-full overflow-hidden border border-[#ddd9d3]">
+      <div class="bg-[#14422f] h-full w-0 transition-all duration-200" id="upload-progress-bar"></div>
+    </div>
+  </div>
+
+  <!-- Uploaded CVs Table -->
+  <section class="mt-8">
+    <h3 class="font-headline-sm text-headline-sm text-[#1b1c1a] mb-4 font-bold">Son Yüklenen Özgeçmişler</h3>
+    <div class="bg-white border border-[#ddd9d3] rounded-[10px] overflow-hidden shadow-sm">
+      <table class="w-full text-left border-collapse">
+        <thead>
+          <tr class="bg-[#f5f4f0] border-b border-[#ddd9d3] font-semibold text-xs text-[#8a8580] uppercase">
+            <th class="p-4 font-semibold">Dosya Adı</th>
+            <th class="p-4 font-semibold">Yükleme Tarihi</th>
+            <th class="p-4 font-semibold">Durum</th>
+            <th class="p-4 font-semibold text-center">Uyum Skoru</th>
+            <th class="p-4 font-semibold text-right">İşlem</th>
+          </tr>
+        </thead>
+        <tbody class="font-body-sm text-sm text-[#1b1c1a] divide-y divide-[#ddd9d3]" id="my-cvs-body">
+          <tr>
+            <td colspan="5" class="p-8 text-center text-[#8a8580] font-medium">Yüklemeler sorgulanıyor...</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <!-- Analysis Results Preview (Bento Grid) -->
+  <section class="mt-10 space-y-4 hidden" id="analysis-detail-section">
+    <h3 class="font-headline-sm text-headline-sm text-[#1b1c1a] font-bold" id="analysis-cv-header">Son Analiz Özeti</h3>
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-6" id="analysis-bento-grid">
+      <!-- Dynamic Bento Cards will be injected by JS -->
+    </div>
+  </section>
+
+  <script is:inline>
+    let activeInterval = null;
+    let selectedCvId = null;
+
+    // Delete CV handler
+    window.deleteCV = async function(cvId) {
+      if (!confirm('Bu özgeçmişi ve tüm ilişkili verileri silmek istediğinize emin misiniz?')) {
+        return;
+      }
+      try {
+        const res = await fetch(`/api/cv/${cvId}`, {
+          method: 'DELETE'
+        });
+        if (!res.ok) {
+          const err = await res.json();
+          throw new Error(err.message || 'Silme işlemi başarısız.');
+        }
+        
+        if (selectedCvId === cvId) {
+          selectedCvId = null;
+          document.getElementById('analysis-detail-section').classList.add('hidden');
+        }
+        
+        // Invalidate query caches on delete
+        if (window.__swrCache) {
+          window.__swrCache.invalidate('user-cvs');
+        }
+        await loadCVList();
+      } catch (err) {
+        console.error(err);
+        alert(err.message);
+      }
+    };
+
+    // Load CV List and poll if PENDING/PROCESSING status is active
+    async function loadCVList() {
+      const tbody = document.getElementById('my-cvs-body');
+      if (!tbody) return;
+
+      const fetcher = async () => {
+        const res = await fetch('/api/cv/list');
+        if (!res.ok) throw new Error("Fetch CV list error");
+        return res.json();
+      };
+
+      const render = (data) => {
+        if (!data.cvs || data.cvs.length === 0) {
+          tbody.innerHTML = `
+            <tr>
+              <td colspan="5" class="p-8 text-center text-[#8a8580] font-medium">Henüz CV yüklemediniz. Yukarıdaki alandan yeni bir dosya seçebilirsiniz.</td>
+            </tr>
+          `;
+          return;
+        }
+
+        tbody.innerHTML = '';
+        let hasPendingOrProcessing = false;
+
+        data.cvs.forEach(cv => {
+          const latestAnalysis = cv.analyses && cv.analyses[0];
+          const status = latestAnalysis ? latestAnalysis.status : 'PENDING';
+          if (status === 'PENDING' || status === 'PROCESSING') {
+            hasPendingOrProcessing = true;
+          }
+        });
+
+        // Show all user's uploaded CVs in list
+        data.cvs.forEach(cv => {
+          const latestAnalysis = cv.analyses && cv.analyses[0];
+          const status = latestAnalysis ? latestAnalysis.status : 'PENDING';
+          const dateStr = new Date(cv.createdAt).toLocaleDateString('tr-TR', {
+            year: 'numeric', month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit'
+          });
+          
+          let statusBadge = '';
+          if (status === 'PENDING') {
+            statusBadge = `
+              <span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-[6px] text-xs font-semibold bg-amber-50 text-amber-700 border border-amber-200">
+                <span class="w-1.5 h-1.5 rounded-full bg-amber-600 animate-pulse"></span> Sırada
+              </span>
+            `;
+          } else if (status === 'PROCESSING') {
+            statusBadge = `
+              <span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-[6px] text-xs font-semibold bg-blue-50 text-blue-700 border border-blue-200">
+                <span class="w-1.5 h-1.5 rounded-full bg-blue-600 animate-spin"></span> İşleniyor
+              </span>
+            `;
+          } else if (status === 'COMPLETED') {
+            statusBadge = `
+              <span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-[6px] text-xs font-semibold bg-emerald-50 text-emerald-700 border border-emerald-200">
+                <span class="w-1.5 h-1.5 rounded-full bg-emerald-600"></span> Analiz Hazır
+              </span>
+            `;
+          } else {
+            statusBadge = `
+              <span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-[6px] text-xs font-semibold bg-rose-50 text-rose-700 border border-rose-200">
+                <span class="w-1.5 h-1.5 rounded-full bg-rose-600"></span> Hata
+              </span>
+            `;
+          }
+
+          const scoreStr = latestAnalysis && latestAnalysis.atsScore !== null 
+            ? `<span class="font-bold text-emerald-700">%${latestAnalysis.atsScore} Uyum</span>` 
+            : `<span class="text-[#8a8580]">-</span>`;
+
+          const tr = document.createElement('tr');
+          tr.className = `hover:bg-[#f5f4f0]/60 transition-all group cursor-pointer ${selectedCvId === cv.id ? 'bg-[#f5f4f0]' : ''}`;
+          tr.onclick = () => {
+            selectedCvId = cv.id;
+            const rows = tbody.querySelectorAll('tr');
+            rows.forEach(r => r.classList.remove('bg-[#f5f4f0]'));
+            tr.classList.add('bg-[#f5f4f0]');
+            showAnalysisBento(cv, latestAnalysis);
+          };
+
+          tr.innerHTML = `
+            <td class="p-4">
+              <div class="flex items-center gap-3">
+                <span class="material-symbols-outlined text-red-600 text-[20px] shrink-0">picture_as_pdf</span>
+                <span class="font-bold text-[#1b1c1a] truncate max-w-[320px] text-sm">${cv.fileName}</span>
+              </div>
+            </td>
+            <td class="p-4 text-[#8a8580] font-medium text-xs">${dateStr}</td>
+            <td class="p-4">${statusBadge}</td>
+            <td class="p-4 text-center text-xs font-bold">${scoreStr}</td>
+            <td class="p-4 text-right" onclick="event.stopPropagation();">
+              <button class="text-[#8a8580] hover:text-red-600 p-1.5 rounded-lg hover:bg-red-50 transition-colors" onclick="deleteCV('${cv.id}')" title="Sil">
+                <span class="material-symbols-outlined text-[18px]">delete</span>
+              </button>
+            </td>
+          `;
+          tbody.appendChild(tr);
+
+          // Keep updating selected analysis details in real-time
+          if (selectedCvId === cv.id) {
+            showAnalysisBento(cv, latestAnalysis);
+          }
+        });
+
+        // Poll every 3 seconds if status is changing
+        if (hasPendingOrProcessing) {
+          if (!activeInterval) {
+            activeInterval = setInterval(loadCVList, 3000);
+          }
+        } else {
+          if (activeInterval) {
+            clearInterval(activeInterval);
+            activeInterval = null;
+          }
+        }
+      };
+
+      const staleTime = activeInterval ? 0 : 30000;
+
+      if (window.__swrCache) {
+        window.__swrCache.query('user-cvs', fetcher, render, staleTime);
+      } else {
+        fetcher().then(render).catch(err => console.error("CV List load failed:", err));
+      }
+    }
+
+    function showAnalysisBento(cv, analysis) {
+      const bentoSection = document.getElementById('analysis-detail-section');
+      const bentoGrid = document.getElementById('analysis-bento-grid');
+      const headerText = document.getElementById('analysis-cv-header');
+      if (!bentoSection || !bentoGrid || !headerText) return;
+
+      bentoSection.classList.remove('hidden');
+      headerText.textContent = `Son Analiz Özeti: ${cv.fileName}`;
+
+      if (!analysis) {
+        bentoGrid.innerHTML = `
+          <div class="col-span-3 bg-white border border-[#ddd9d3] rounded-[10px] p-12 text-center shadow-sm">
+            <p class="text-[#8a8580] font-medium text-sm">Analiz verisi bulunamadı.</p>
+          </div>
+        `;
+        return;
+      }
+
+      const status = analysis.status;
+
+      if (status === 'COMPLETED') {
+        const strengthsHtml = Array.isArray(analysis.strengths) && analysis.strengths.length > 0
+          ? analysis.strengths.map(st => `
+              <li class="flex items-start gap-2">
+                <span class="material-symbols-outlined text-[16px] text-emerald-600 mt-0.5">done</span>
+                <span>${st}</span>
+              </li>`).join('')
+          : '<li class="text-[#8a8580]">Veri yok.</li>';
+
+        const suggestionsHtml = Array.isArray(analysis.suggestions) && analysis.suggestions.length > 0
+          ? analysis.suggestions.map(sg => `
+              <li class="flex items-start gap-2">
+                <span class="material-symbols-outlined text-[16px] text-amber-600 mt-0.5">arrow_right</span>
+                <span>${sg}</span>
+              </li>`).join('')
+          : '<li class="text-[#8a8580]">Veri yok.</li>';
+
+        const weaknessesHtml = Array.isArray(analysis.weaknesses) && analysis.weaknesses.length > 0
+          ? analysis.weaknesses.map(w => `
+              <li class="flex items-start gap-2">
+                <span class="material-symbols-outlined text-[16px] text-rose-600 mt-0.5">close</span>
+                <span>${w}</span>
+              </li>`).join('')
+          : '<li class="text-[#8a8580]">Veri yok.</li>';
+
+        bentoGrid.innerHTML = `
+          <!-- Strength Card -->
+          <div class="bg-white border border-[#ddd9d3] p-6 border-l-[3px] border-l-emerald-600 rounded-[10px] flex flex-col h-full shadow-sm text-left">
+            <div class="flex items-center gap-2 mb-4">
+              <span class="material-symbols-outlined text-emerald-600">military_tech</span>
+              <h4 class="font-bold text-[#1b1c1a] text-sm">Güçlü Yönler</h4>
+            </div>
+            <ul class="space-y-3 flex-1 font-body-sm text-xs text-[#8a8580] font-medium leading-relaxed">
+              ${strengthsHtml}
+            </ul>
+          </div>
+
+          <!-- Improvement Card -->
+          <div class="bg-white border border-[#ddd9d3] p-6 border-l-[3px] border-l-amber-600 rounded-[10px] flex flex-col h-full shadow-sm text-left">
+            <div class="flex items-center gap-2 mb-4">
+              <span class="material-symbols-outlined text-amber-600">trending_up</span>
+              <h4 class="font-bold text-[#1b1c1a] text-sm">Gelişim Alanları</h4>
+            </div>
+            <ul class="space-y-3 flex-1 font-body-sm text-xs text-[#8a8580] font-medium leading-relaxed">
+              ${suggestionsHtml}
+            </ul>
+          </div>
+
+          <!-- Weakness Card -->
+          <div class="bg-white border border-[#ddd9d3] p-6 border-l-[3px] border-l-rose-600 rounded-[10px] flex flex-col h-full shadow-sm text-left">
+            <div class="flex items-center gap-2 mb-4">
+              <span class="material-symbols-outlined text-rose-600">warning</span>
+              <h4 class="font-bold text-[#1b1c1a] text-sm">Eksikler</h4>
+            </div>
+            <ul class="space-y-3 flex-1 font-body-sm text-xs text-[#8a8580] font-medium leading-relaxed">
+              ${weaknessesHtml}
+            </ul>
+          </div>
+        `;
+      } else if (status === 'PROCESSING') {
+        bentoGrid.innerHTML = `
+          <div class="col-span-3 bg-white border border-[#ddd9d3] rounded-[10px] p-12 text-center shadow-sm flex flex-col items-center justify-center gap-4">
+            <span class="material-symbols-outlined text-5xl text-blue-600 animate-spin">progress_activity</span>
+            <div>
+              <h4 class="font-bold text-[#1b1c1a] mb-1">Metin Çıkarılıyor...</h4>
+              <p class="text-xs text-[#8a8580] font-medium">Özgeçmiş PDF belgesinden metinler ayıklanıyor ve analiz ediliyor.</p>
+            </div>
+          </div>
+        `;
+      } else if (status === 'PENDING') {
+        bentoGrid.innerHTML = `
+          <div class="col-span-3 bg-white border border-[#ddd9d3] rounded-[10px] p-12 text-center shadow-sm flex flex-col items-center justify-center gap-4">
+            <span class="material-symbols-outlined text-5xl text-[#8a8580] animate-pulse">schedule</span>
+            <div>
+              <h4 class="font-bold text-[#1b1c1a] mb-1">İşlem Sırasında</h4>
+              <p class="text-xs text-[#8a8580] font-medium">Analiz sırasının gelmesi bekleniyor.</p>
+            </div>
+          </div>
+        `;
+      } else {
+        bentoGrid.innerHTML = `
+          <div class="col-span-3 bg-white border border-rose-200 rounded-[10px] p-12 text-center shadow-sm flex flex-col items-center justify-center gap-4 bg-rose-50/20">
+            <span class="material-symbols-outlined text-5xl text-rose-600">error</span>
+            <div>
+              <h4 class="font-bold text-rose-600 mb-1">Ayrıştırma Hatası</h4>
+              <p class="text-xs text-[#8a8580] font-medium">PDF belgesi analiz edilirken bir hata oluştu.</p>
+            </div>
+          </div>
+        `;
+      }
+    }
+
+    // Set up dropzone and upload behaviors
+    const dropZone = document.getElementById('drop-zone');
+    const fileInput = document.getElementById('cv-file-input');
+    const progressContainer = document.getElementById('upload-progress-container');
+    const progressBar = document.getElementById('upload-progress-bar');
+    const percentText = document.getElementById('upload-percent');
+    const statusText = document.getElementById('upload-status-text');
+
+    dropZone?.addEventListener('click', () => fileInput?.click());
+    dropZone?.addEventListener('dragover', (e) => { e.preventDefault(); dropZone.classList.add('border-[#14422f]/50', 'bg-[#14422f]/5'); });
+    dropZone?.addEventListener('dragleave', () => { dropZone.classList.remove('border-[#14422f]/50', 'bg-[#14422f]/5'); });
+    dropZone?.addEventListener('drop', (e) => {
+      e.preventDefault();
+      dropZone.classList.remove('border-[#14422f]/50', 'bg-[#14422f]/5');
+      const files = e.dataTransfer?.files;
+      if (files && files.length > 0) handleCVUpload(files[0]);
+    });
+
+    fileInput?.addEventListener('change', () => {
+      if (fileInput.files && fileInput.files.length > 0) handleCVUpload(fileInput.files[0]);
+    });
+
+    async function handleCVUpload(file) {
+      if (file.type !== 'application/pdf') {
+        alert('Lütfen sadece PDF dosyası yükleyin.');
+        return;
+      }
+      
+      if (file.size > 5 * 1024 * 1024) {
+        alert('Maksimum dosya boyutu limitini (5MB) aştınız.');
+        return;
+      }
+      
+      if (progressContainer && progressBar && percentText && statusText) {
+        progressContainer.classList.remove('hidden');
+        progressBar.style.width = '0%';
+        percentText.textContent = '0%';
+        progressBar.style.backgroundColor = '#14422f';
+        statusText.textContent = 'Dosya sunucuya gönderiliyor...';
+        
+        const formData = new FormData();
+        formData.append('cv', file);
+        
+        try {
+          const res = await fetch('/api/cv/upload', {
+            method: 'POST',
+            body: formData
+          });
+          
+          if (!res.ok) {
+            const errData = await res.json();
+            throw new Error(errData.message || 'Yükleme başarısız.');
+          }
+          
+          const data = await res.json();
+          progressBar.style.width = '100%';
+          percentText.textContent = '100%';
+          statusText.textContent = 'CV başarıyla yüklendi, analiz sıraya alındı!';
+          
+          // Invalidate query caches on upload
+          if (window.__swrCache) {
+            window.__swrCache.invalidate('user-cvs');
+          }
+          
+          // Refresh list
+          selectedCvId = data.cv.id;
+          await loadCVList();
+          
+        } catch (err) {
+          console.error(err);
+          statusText.textContent = `Hata: ${err.message}`;
+          progressBar.style.width = '100%';
+          progressBar.style.backgroundColor = 'rgba(255, 0, 0, 0.6)';
+        }
+      }
+    }
+
+    // Load initial list under page load
+    document.addEventListener('astro:page-load', () => {
+      const listBody = document.getElementById('my-cvs-body');
+      if (listBody) {
+        loadCVList();
+      }
+    });
+  </script>
+</AdminLayout>

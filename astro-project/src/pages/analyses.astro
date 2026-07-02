@@ -2,104 +2,81 @@
 import UserLayout from '../layouts/UserLayout.astro';
 ---
 
-<UserLayout title="Beacon AI - Analiz Sonuçlarım" headerTitle="Analiz Sonuçlarım">
+<UserLayout title="Beacon - Analiz Sonuçlarım" headerTitle="Analiz Sonuçlarım">
   <div class="flex gap-6 h-full min-h-[600px] flex-col lg:flex-row">
-
-    <!-- ═══════════════════════════════════════
-         LEFT PANEL: Tüm CV Listesi
-    ════════════════════════════════════════ -->
-    <div class="flex flex-col flex-1 min-w-0">
-      <div class="glass-card rounded-2xl flex flex-col overflow-hidden h-full shadow-[0_8px_32px_rgba(0,0,0,0.4)]">
-        <!-- Panel Header -->
-        <div class="p-6 border-b border-brand-border/60 relative overflow-hidden">
-          <div class="absolute inset-0 bg-gradient-to-r from-brand-accent/5 to-transparent pointer-events-none"></div>
-          <h3 class="text-lg font-bold text-brand-text relative z-10">Tüm Yüklenen CV'ler</h3>
-          <p class="text-sm text-brand-muted mt-1 relative z-10">Tüm özgeçmişlerinizi ve analiz durumlarını buradan yönetebilirsiniz.</p>
+    
+    <!-- LEFT COLUMN: CV List -->
+    <div class="w-full lg:flex-1 flex flex-col gap-6 min-w-0">
+      <div class="bg-white border border-[#ddd9d3] rounded-[10px] shadow-sm overflow-hidden flex flex-col h-full min-h-[500px]">
+        <!-- Card Header -->
+        <div class="p-6 border-b border-[#ddd9d3] bg-white">
+          <h3 class="font-bold text-lg text-[#1b1c1a] mb-1">Tüm Yüklenen CV'ler</h3>
+          <p class="text-xs text-[#8a8580] font-medium">Analiz görmek için listeden bir özgeçmiş seçin</p>
         </div>
 
-        <!-- Table -->
-        <div class="flex-1 overflow-auto custom-scrollbar p-2">
-          <table class="w-full text-left text-sm text-brand-text border-separate border-spacing-y-1">
-            <thead class="text-xs text-brand-muted uppercase sticky top-0 z-10 backdrop-blur-md">
-              <tr>
-                <th class="px-5 py-3 font-semibold rounded-tl-lg" scope="col">Belge Adı</th>
-                <th class="px-5 py-3 font-semibold text-center" scope="col">Yükleme Tarihi</th>
-                <th class="px-5 py-3 font-semibold text-center" scope="col">Analiz Durumu</th>
-                <th class="px-5 py-3 font-semibold text-center" scope="col">Uyum Skoru</th>
-                <th class="px-5 py-3 font-semibold text-right rounded-tr-lg" scope="col">İşlem</th>
-              </tr>
-            </thead>
-            <tbody id="my-cvs-body">
-              <tr>
-                <td colspan="5" class="px-6 py-8 text-center text-brand-muted">Yüklemeler sorgulanıyor...</td>
-              </tr>
-            </tbody>
-          </table>
+        <!-- Column Header Row -->
+        <div class="px-8 py-3 bg-[#f5f4f0] border-b border-[#ddd9d3] grid grid-cols-12 text-[10px] font-bold text-[#8a8580] uppercase tracking-wider gap-2 shrink-0">
+          <div class="col-span-5">Belge Adı</div>
+          <div class="col-span-3 pl-2">Yükleme Tarihi</div>
+          <div class="col-span-3">Analiz Durumu</div>
+          <div class="col-span-1 text-right">İşlem</div>
+        </div>
+        
+        <!-- List Items Container -->
+        <div class="p-4 flex flex-col gap-2 overflow-y-auto" id="analyses-cvs-body">
+          <div class="text-center py-8 text-[#8a8580] font-medium text-xs">Yüklemeler sorgulanıyor...</div>
         </div>
       </div>
     </div>
 
-    <!-- ═══════════════════════════════════════
-         RIGHT PANEL: Detay / Boş Durum
-    ════════════════════════════════════════ -->
-    <div class="w-full lg:w-[480px] xl:w-[540px] flex-shrink-0">
-      <div class="glass-card rounded-2xl h-full flex flex-col shadow-[0_8px_32px_rgba(0,0,0,0.5)] relative overflow-hidden" id="analysis-detail-card">
-
-        <!-- Background accent glow -->
-        <div class="absolute top-0 right-0 w-64 h-64 bg-brand-accent/5 rounded-full blur-3xl pointer-events-none"></div>
-
+    <!-- RIGHT COLUMN: Detailed Analysis Panel -->
+    <div class="w-full lg:flex-1 min-w-0">
+      <div class="bg-white border border-[#ddd9d3] rounded-[10px] shadow-sm p-6 h-full flex flex-col min-h-[500px] relative overflow-hidden" id="analysis-detail-card">
+        
         <!-- ─── EMPTY STATE ─── -->
-        <div class="flex flex-col items-center justify-center h-full p-8 relative z-10" id="no-analysis-state">
-          <!-- Atmospheric dot grid -->
-          <div class="absolute inset-0 pointer-events-none opacity-40"
-            style="background-image: radial-gradient(circle at center, rgba(56,189,248,0.04) 1px, transparent 1px); background-size: 22px 22px;">
+        <div class="flex flex-col items-center justify-center h-full py-12 my-auto text-center" id="no-analysis-state">
+          <div class="w-24 h-24 mb-6 rounded-full border border-[#ddd9d3] bg-[#faf9f5] flex items-center justify-center shadow-sm">
+            <span class="material-symbols-outlined text-4xl text-[#14422f]">analytics</span>
           </div>
-
-          <!-- Animated icon cluster -->
-          <div class="w-44 h-44 mb-6 relative flex items-center justify-center animate-float">
-            <div class="absolute w-36 h-36 bg-brand-accent/8 rounded-full blur-2xl mix-blend-screen animate-pulse-slow"></div>
-            <div class="absolute w-40 h-40 border border-brand-accent/8 rounded-full animate-spin-slow"></div>
-            <div class="w-32 h-32 rounded-full border border-brand-accent/20 bg-brand-card/40 flex items-center justify-center relative shadow-[inset_0_0_24px_rgba(56,189,248,0.08)]">
-              <div class="absolute inset-0 rounded-full border border-brand-accent/15 animate-ping opacity-30"></div>
-              <!-- Chart-pie icon like Stitch design -->
-              <i class="fa-solid fa-chart-pie text-brand-accent text-5xl drop-shadow-[0_0_18px_rgba(56,189,248,0.6)]"></i>
-            </div>
-          </div>
-
-          <div class="text-center relative z-10 max-w-xs">
-            <h3 class="text-xl font-bold text-brand-text mb-2">Detaylı Analiz Paneli</h3>
-            <p class="text-sm text-brand-muted leading-relaxed">
+          <div class="w-full max-w-[320px]">
+            <h3 class="text-lg font-bold text-[#1b1c1a] mb-2">Detaylı Analiz Paneli</h3>
+            <p class="text-xs text-[#8a8580] font-medium leading-relaxed">
               Yandaki listeden bir özgeçmiş seçerek yapay zeka analiz raporunu detaylıca görüntüleyebilirsiniz.
             </p>
-          </div>
-
-          <!-- Bottom hint bar -->
-          <div class="mt-8 w-full border-t border-brand-border/40 pt-4 flex items-center justify-center gap-2 text-xs text-brand-muted/60 relative z-10">
-            <i class="fa-solid fa-microchip text-brand-accent/50 animate-pulse"></i>
-            <span>Beacon AI sistemi analiz için hazır bekliyor.</span>
           </div>
         </div>
 
         <!-- ─── ACTIVE ANALYSIS STATE ─── -->
-        <div class="hidden flex-col h-full relative z-10" id="active-analysis-state">
-
-          <!-- Panel Header -->
-          <div class="p-6 border-b border-brand-border/60 flex items-start justify-between">
-            <div class="min-w-0 flex-1">
-              <h3 class="text-lg font-extrabold text-brand-text truncate tracking-tight max-w-[280px]" id="analysis-cv-name">Özgeçmiş</h3>
-              <p class="text-xs text-brand-accent/80 font-medium mt-0.5">Yapay Zeka Analiz Raporu</p>
+        <div class="hidden flex-col h-full" id="active-analysis-state">
+          <!-- Top Header info -->
+          <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 pb-6 border-b border-[#ddd9d3] shrink-0">
+            <div>
+              <h2 class="text-lg text-[#1b1c1a] font-bold truncate max-w-[280px]" id="analysis-cv-name">
+                Özgeçmiş Belgesi
+              </h2>
+              <p class="text-xs text-[#8a8580] font-medium mt-1 flex items-center gap-1">
+                <span class="material-symbols-outlined text-[14px]">calendar_today</span>
+                Analiz Raporu
+              </p>
             </div>
-            <div id="analysis-status-indicator" class="shrink-0 ml-3">
-              <span class="material-symbols-outlined text-brand-success text-3xl">verified</span>
+            <div id="analysis-status-indicator" class="shrink-0">
+              <!-- verified status icon -->
             </div>
           </div>
 
           <!-- Scrollable Content -->
-          <div class="flex-1 overflow-y-auto custom-scrollbar p-6 flex flex-col gap-6" id="analysis-content-area">
+          <div class="flex-1 overflow-y-auto custom-scrollbar pt-6 pr-2 flex flex-col gap-6" id="analysis-content-area">
             <!-- Dynamic content injected here -->
           </div>
 
+          <!-- Bottom Action -->
+          <div class="mt-6 pt-6 border-t border-[#ddd9d3] flex justify-end shrink-0">
+            <button onclick="window.location.href = '/profile';" class="bg-[#14422f] hover:bg-[#0f3223] text-white font-label-md text-sm px-6 py-2.5 rounded-[8px] flex items-center gap-2 transition-colors shadow-sm">
+              <span class="material-symbols-outlined text-sm">add_circle</span>
+              Yeni Analiz Başlat
+            </button>
           </div>
+        </div>
 
       </div>
     </div>
@@ -107,6 +84,7 @@ import UserLayout from '../layouts/UserLayout.astro';
   </div>
 
   <script is:inline>
+  {
     let selectedCvId = null;
     let activeInterval = null;
 
@@ -122,8 +100,11 @@ import UserLayout from '../layouts/UserLayout.astro';
         if (selectedCvId === cvId) {
           selectedCvId = null;
           document.getElementById('no-analysis-state').classList.remove('hidden');
-          document.getElementById('active-analysis-state').classList.remove('flex');
           document.getElementById('active-analysis-state').classList.add('hidden');
+        }
+        if (window.__swrCache) {
+          window.__swrCache.invalidate('user-cvs');
+          window.__swrCache.invalidate('user-analyses');
         }
         await loadCVList();
       } catch (err) {
@@ -133,18 +114,19 @@ import UserLayout from '../layouts/UserLayout.astro';
     };
 
     async function loadCVList() {
-      try {
+      const fetcher = async () => {
         const res = await fetch('/api/cv/list');
-        if (!res.ok) return;
-        const data = await res.json();
-        const tbody = document.getElementById('my-cvs-body');
+        if (!res.ok) throw new Error("Fetch CV list error");
+        return res.json();
+      };
+
+      const render = (data) => {
+        const tbody = document.getElementById('analyses-cvs-body');
         if (!tbody) return;
 
         if (!data.cvs || data.cvs.length === 0) {
           tbody.innerHTML = `
-            <tr>
-              <td colspan="5" class="px-6 py-10 text-center text-brand-muted">Henüz yüklenmiş bir CV bulunamadı.</td>
-            </tr>
+            <div class="text-center py-12 text-[#8a8580] font-medium text-xs">Henüz yüklenmiş bir CV bulunamadı.</div>
           `;
           return;
         }
@@ -156,80 +138,75 @@ import UserLayout from '../layouts/UserLayout.astro';
           const latestAnalysis = cv.analyses && cv.analyses[0];
           const status = latestAnalysis ? latestAnalysis.status : 'PENDING';
           if (status === 'PENDING' || status === 'PROCESSING') hasPendingOrProcessing = true;
-          const dateStr = new Date(cv.createdAt).toLocaleDateString('tr-TR');
+          const dateStr = new Date(cv.createdAt).toLocaleDateString('tr-TR', { day: 'numeric', month: 'short', year: 'numeric' });
 
           // Status badge
           let statusBadge = '';
           if (status === 'PENDING') {
-            statusBadge = `<span class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-semibold bg-yellow-500/10 text-yellow-400 border border-yellow-500/20"><span class="w-1.5 h-1.5 rounded-full bg-yellow-400 animate-pulse"></span>Sırada</span>`;
+            statusBadge = `
+              <span class="inline-flex items-center gap-1 px-2 py-0.5 rounded-[6px] text-[10px] font-semibold bg-amber-50 text-amber-700 border border-amber-200">
+                <span class="w-1.5 h-1.5 rounded-full bg-amber-600 animate-pulse"></span> Sırada
+              </span>
+            `;
           } else if (status === 'PROCESSING') {
-            statusBadge = `<span class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-semibold bg-brand-accent/10 text-brand-accent border border-brand-accent/20"><span class="w-1.5 h-1.5 rounded-full bg-brand-accent animate-spin"></span>İşleniyor...</span>`;
+            statusBadge = `
+              <span class="inline-flex items-center gap-1 px-2 py-0.5 rounded-[6px] text-[10px] font-semibold bg-blue-50 text-blue-700 border border-blue-200">
+                <span class="w-1.5 h-1.5 rounded-full bg-blue-600 animate-spin"></span> İşleniyor
+              </span>
+            `;
           } else if (status === 'COMPLETED') {
-            statusBadge = `<span class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-semibold bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 shadow-[0_0_10px_rgba(52,211,153,0.1)]"><span class="w-1.5 h-1.5 rounded-full bg-emerald-400 shadow-[0_0_5px_rgba(52,211,153,0.8)]"></span>Hazır</span>`;
+            statusBadge = `
+              <span class="inline-flex items-center gap-1 px-2 py-0.5 rounded-[6px] text-[10px] font-semibold bg-emerald-50 text-emerald-700 border border-emerald-200">
+                <span class="w-1.5 h-1.5 rounded-full bg-emerald-600"></span> Hazır
+              </span>
+            `;
           } else {
-            statusBadge = `<span class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-semibold bg-red-500/10 text-red-400 border border-red-500/20 shadow-[0_0_10px_rgba(239,68,68,0.1)]"><span class="w-1.5 h-1.5 rounded-full bg-red-400"></span>Hata</span>`;
-          }
-
-          // Score column
-          let scoreCell = '';
-          if (latestAnalysis && latestAnalysis.atsScore !== null) {
-            const pct = latestAnalysis.atsScore;
-            scoreCell = `
-              <div class="relative inline-flex items-center justify-center w-12 h-12">
-                <svg class="w-full h-full transform -rotate-90" viewBox="0 0 36 36">
-                  <path class="text-brand-border" d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831" fill="none" stroke="currentColor" stroke-width="3"></path>
-                  <path class="text-brand-accent drop-shadow-[0_0_4px_rgba(56,189,248,0.8)]" d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831" fill="none" stroke="currentColor" stroke-dasharray="${pct}, 100" stroke-width="3"></path>
-                </svg>
-                <div class="absolute flex flex-col items-center justify-center text-brand-accent font-mono text-xs font-bold">
-                  ${pct}<span class="text-[8px] -mt-1 opacity-70">%</span>
-                </div>
-              </div>`;
-          } else {
-            scoreCell = `<span class="text-brand-muted font-mono text-sm">—</span>`;
+            statusBadge = `
+              <span class="inline-flex items-center gap-1 px-2 py-0.5 rounded-[6px] text-[10px] font-semibold bg-rose-50 text-rose-700 border border-rose-200">
+                <span class="w-1.5 h-1.5 rounded-full bg-rose-600"></span> Hata
+              </span>
+            `;
           }
 
           const isSelected = selectedCvId === cv.id;
-          const tr = document.createElement('tr');
-          tr.className = `group rounded-xl cursor-pointer transition-all duration-200 ${
+          const div = document.createElement('div');
+          div.className = `group grid grid-cols-12 items-center p-4 border rounded-[10px] cursor-pointer transition-colors shadow-sm gap-2 ${
             isSelected
-              ? 'bg-brand-accent/10 shadow-[inset_0_0_0_1px_rgba(56,189,248,0.3)]'
-              : 'hover:bg-white/[0.03]'
+              ? 'bg-[#14422f]/5 border-[#14422f]'
+              : 'bg-white border-[#ddd9d3] hover:bg-[#faf9f5]'
           }`;
 
-          tr.onclick = () => {
+          div.onclick = () => {
             selectedCvId = cv.id;
-            // Update row highlights
-            document.querySelectorAll('#my-cvs-body tr').forEach(r => {
-              r.classList.remove('bg-brand-accent/10', 'shadow-[inset_0_0_0_1px_rgba(56,189,248,0.3)]');
-              r.classList.add('hover:bg-white/[0.03]');
+            // Update highlights
+            const items = tbody.querySelectorAll('.group');
+            items.forEach(item => {
+              item.classList.remove('bg-[#14422f]/5', 'border-[#14422f]');
+              item.classList.add('bg-white', 'border-[#ddd9d3]');
             });
-            tr.classList.add('bg-brand-accent/10', 'shadow-[inset_0_0_0_1px_rgba(56,189,248,0.3)]');
-            tr.classList.remove('hover:bg-white/[0.03]');
+            div.classList.add('bg-[#14422f]/5', 'border-[#14422f]');
+            div.classList.remove('bg-white', 'border-[#ddd9d3]');
             showAnalysisDetails(cv, latestAnalysis);
           };
 
-          tr.innerHTML = `
-            <td class="px-5 py-4 rounded-l-xl">
-              <div class="flex items-center gap-3 overflow-hidden">
-                <div class="w-8 h-8 rounded-lg bg-brand-accent/10 flex items-center justify-center border border-brand-accent/20 group-hover:border-brand-accent/40 transition-colors shrink-0">
-                  <i class="fa-regular fa-file-lines text-brand-accent"></i>
-                </div>
-                <span class="font-semibold text-brand-text truncate max-w-[180px] group-hover:text-white transition-colors">${cv.fileName}</span>
-              </div>
-            </td>
-            <td class="px-5 py-4 text-center text-brand-muted font-mono text-xs">${dateStr}</td>
-            <td class="px-5 py-4 text-center">${statusBadge}</td>
-            <td class="px-5 py-4 text-center">${scoreCell}</td>
-            <td class="px-5 py-4 text-right rounded-r-xl" onclick="event.stopPropagation();">
-              <button
-                class="text-brand-muted hover:text-red-400 hover:bg-red-500/10 p-2 rounded-lg transition-all duration-300"
-                onclick="deleteCV('${cv.id}')"
-                title="Sil">
-                <i class="fa-regular fa-trash-can"></i>
+          div.innerHTML = `
+            <div class="col-span-5 flex items-center gap-3 min-w-0">
+              <span class="material-symbols-outlined text-red-600 shrink-0">picture_as_pdf</span>
+              <p class="font-bold text-sm text-[#1b1c1a] truncate" title="${cv.fileName}">${cv.fileName}</p>
+            </div>
+            <div class="col-span-3 text-xs text-[#8a8580] font-medium whitespace-nowrap pl-2">
+              ${dateStr}
+            </div>
+            <div class="col-span-3 flex items-center justify-start">
+              ${statusBadge}
+            </div>
+            <div class="col-span-1 flex justify-end" onclick="event.stopPropagation();">
+              <button class="text-[#8a8580] hover:text-red-600 p-1 rounded hover:bg-red-50 transition-colors" onclick="deleteCV('${cv.id}')" title="Sil">
+                <span class="material-symbols-outlined text-[16px]">delete</span>
               </button>
-            </td>
+            </div>
           `;
-          tbody.appendChild(tr);
+          tbody.appendChild(div);
 
           if (selectedCvId === cv.id) showAnalysisDetails(cv, latestAnalysis);
         });
@@ -239,8 +216,14 @@ import UserLayout from '../layouts/UserLayout.astro';
         } else {
           if (activeInterval) { clearInterval(activeInterval); activeInterval = null; }
         }
-      } catch (err) {
-        console.error('CV yükleme geçmişi alınamadı:', err);
+      };
+
+      const staleTime = activeInterval ? 0 : 30000;
+
+      if (window.__swrCache) {
+        window.__swrCache.query('user-cvs', fetcher, render, staleTime);
+      } else {
+        fetcher().then(render).catch(err => console.error("CV List load failed:", err));
       }
     }
 
@@ -262,15 +245,15 @@ import UserLayout from '../layouts/UserLayout.astro';
       const status = analysis.status;
 
       if (status === 'COMPLETED') {
-        statusIndicator.innerHTML = `<span class="material-symbols-outlined text-emerald-400 text-3xl drop-shadow-[0_0_8px_rgba(52,211,153,0.7)]">verified</span>`;
+        statusIndicator.innerHTML = `<span class="material-symbols-outlined text-emerald-600 text-3xl">verified</span>`;
 
         if (analysis.atsScore === null) {
-          // Day 13: chunks + skills, no score yet
+          // Day 13 completed state: text chunks generated but AI scoring not done
           const skillsHtml = Array.isArray(analysis.skills) && analysis.skills.length > 0
             ? analysis.skills.map(s => `
-                <span class="px-3 py-1.5 rounded-lg text-xs font-semibold bg-brand-accent/10 text-brand-accent border border-brand-accent/20 shadow-[0_2px_10px_rgba(56,189,248,0.1)] hover:bg-brand-accent/20 hover:border-brand-accent/40 transition-all cursor-default">${s}</span>
+                <span class="px-3 py-1.5 rounded-full bg-white border border-[#ddd9d3] text-[#14422f] text-xs font-semibold shadow-sm cursor-default">${s}</span>
               `).join('')
-            : `<span class="text-xs text-brand-muted">Yetenek kelimeleri çıkarılamadı.</span>`;
+            : `<span class="text-xs text-[#8a8580]">Yetenek kelimeleri çıkarılamadı.</span>`;
 
           const chunkHtml = cv.chunks && cv.chunks.length > 0
             ? cv.chunks.map((chunk, idx) => {
@@ -278,125 +261,147 @@ import UserLayout from '../layouts/UserLayout.astro';
                 const header = firstLB !== -1 ? chunk.content.substring(0, firstLB) : `PARÇA #${idx + 1}`;
                 const body = firstLB !== -1 ? chunk.content.substring(firstLB + 1) : chunk.content;
                 const wordCount = body.split(/\s+/).filter(w => w.length > 0).length;
-                const isFirst = idx === 0;
                 return `
-                  <div class="${isFirst
-                    ? 'bg-brand-bg/60 border border-brand-accent/40 rounded-xl overflow-hidden shadow-[0_0_20px_rgba(56,189,248,0.15),inset_0_2px_10px_rgba(0,0,0,0.5)] relative'
-                    : 'bg-brand-bg/30 border border-brand-border/30 rounded-xl overflow-hidden hover:border-brand-border/60 transition-colors duration-300'
-                  }">
-                    ${isFirst ? '<div class="absolute left-0 top-0 bottom-0 w-1 bg-brand-accent shadow-[0_0_10px_rgba(56,189,248,0.8)]"></div>' : ''}
-                    <div class="px-4 py-2 border-b border-brand-border/30 flex justify-between items-center ${isFirst ? 'pl-5' : ''}">
-                      <span class="text-xs font-bold ${isFirst ? 'text-brand-accent' : 'text-brand-muted'} tracking-wide">${header}</span>
-                      <span class="text-[10px] font-semibold ${isFirst ? 'text-brand-accent/70 bg-brand-accent/10' : 'text-brand-muted/60 bg-white/5'} px-2 py-0.5 rounded-md">${wordCount} kelime</span>
+                  <div class="bg-[#faf9f5] border border-[#ddd9d3] rounded-[10px] p-5 hover:bg-[#f5f4f0] transition-all text-left">
+                    <div class="flex justify-between items-start mb-2">
+                      <span class="text-[10px] font-bold text-[#14422f] uppercase tracking-wider">${header}</span>
+                      <span class="text-[10px] font-mono text-[#8a8580] bg-white border border-[#ddd9d3] px-2 py-0.5 rounded">${wordCount} kelime</span>
                     </div>
-                    <div class="p-4 text-xs text-brand-muted font-mono whitespace-pre-wrap leading-relaxed max-h-28 overflow-hidden relative ${isFirst ? 'pl-5' : ''}">
-                      ${body}
-                      <div class="absolute bottom-0 left-0 right-0 h-8 bg-gradient-to-t from-brand-card/90 to-transparent pointer-events-none"></div>
-                    </div>
+                    <p class="text-xs text-[#1b1c1a] leading-relaxed font-sans whitespace-pre-wrap select-all max-h-[120px] overflow-y-auto pr-2 mt-2">${body}</p>
                   </div>
                 `;
               }).join('')
-            : `<p class="text-xs text-brand-muted text-center py-6">Metin parçaları veritabanında bulunamadı.</p>`;
+            : `<p class="text-xs text-[#8a8580] text-center py-4">Metin parçaları veritabanında bulunamadı.</p>`;
 
           contentArea.innerHTML = `
-            <div class="space-y-3">
-              <h4 class="text-[10px] font-extrabold text-brand-muted uppercase tracking-widest flex items-center gap-2">
-                <i class="fa-solid fa-layer-group text-brand-accent"></i> Özgeçmişten Çıkarılan Yetenekler
-              </h4>
-              <div class="flex flex-wrap gap-2 p-4 bg-brand-bg/30 rounded-xl border border-brand-border/20 shadow-inner">
-                ${skillsHtml}
+            <div class="space-y-4 flex flex-col h-full overflow-hidden">
+              <div class="space-y-2 shrink-0">
+                <h4 class="text-[10px] font-bold text-[#8a8580] tracking-widest uppercase px-1">ÖZGEÇMİŞTEN ÇIKARILAN YETENEKLER</h4>
+                <div class="flex flex-wrap gap-2 pt-1">${skillsHtml}</div>
               </div>
-            </div>
-            <div class="flex flex-col gap-3 flex-1">
-              <h4 class="text-[10px] font-extrabold text-brand-muted uppercase tracking-widest flex items-center gap-2">
-                <i class="fa-solid fa-puzzle-piece text-brand-accent"></i> Bölümlere Göre Parçalama (Chunks)
-              </h4>
-              <div class="space-y-3 overflow-y-auto custom-scrollbar flex-1 pr-1" style="max-height: 340px;">
-                ${chunkHtml}
+              <div class="space-y-2 flex-1 flex flex-col overflow-hidden">
+                <h4 class="text-[10px] font-bold text-[#8a8580] tracking-widest uppercase px-1">BÖLÜMLERE GÖRE PARÇALAMA (CHUNKS)</h4>
+                <div class="space-y-4 overflow-y-auto flex-1 pr-2 custom-scrollbar mt-1" style="max-height: 320px;">${chunkHtml}</div>
               </div>
             </div>
           `;
-
-
-
         } else {
-          // Full AI report (Day 14+)
+          // Full AI report
           const pct = analysis.atsScore;
           const skillsHtml = Array.isArray(analysis.skills) && analysis.skills.length > 0
-            ? analysis.skills.map(s => `<span class="px-3 py-1.5 rounded-lg text-xs font-semibold bg-brand-accent/10 text-brand-accent border border-brand-accent/20 hover:bg-brand-accent/20 transition-all cursor-default">${s}</span>`).join('')
-            : `<span class="text-xs text-brand-muted">Yetenek kelimeleri çıkarılamadı.</span>`;
+            ? analysis.skills.map(s => `
+                <span class="px-3 py-1.5 rounded-full bg-[#14422f]/10 border border-[#14422f]/20 text-[#14422f] text-xs font-semibold shadow-sm cursor-default">${s}</span>
+              `).join('')
+            : `<span class="text-xs text-[#8a8580]">Yetenek kelimeleri çıkarılamadı.</span>`;
           const strengthsHtml = Array.isArray(analysis.strengths) && analysis.strengths.length > 0
             ? analysis.strengths.map(st => `<li>${st}</li>`).join('') : '<li>Veri yok.</li>';
+          const suggestionsHtml = Array.isArray(analysis.suggestions) && analysis.suggestions.length > 0
+            ? analysis.suggestions.map(sg => `<li>${sg}</li>`).join('') : '<li>Veri yok.</li>';
           const weaknessesHtml = Array.isArray(analysis.weaknesses) && analysis.weaknesses.length > 0
             ? analysis.weaknesses.map(w => `<li>${w}</li>`).join('') : '<li>Veri yok.</li>';
 
           contentArea.innerHTML = `
-            <!-- Score Ring -->
-            <div class="flex items-center gap-5 bg-brand-bg/40 p-5 rounded-2xl border border-brand-border/40 shrink-0">
-              <div class="relative w-20 h-20 flex items-center justify-center shrink-0">
-                <svg class="w-full h-full transform -rotate-90" viewBox="0 0 36 36">
-                  <path class="text-brand-border" d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831" fill="none" stroke="currentColor" stroke-width="3"></path>
-                  <path class="text-brand-accent" d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831" fill="none" stroke="currentColor" stroke-dasharray="${pct}, 100" stroke-linecap="round" stroke-width="3"></path>
-                </svg>
-                <span class="absolute text-lg font-bold text-brand-text">%${pct}</span>
+            <div class="space-y-6 flex flex-col h-full overflow-y-auto pr-2 custom-scrollbar">
+              <!-- Score Card -->
+              <div class="flex items-center gap-6 bg-[#faf9f5] p-5 rounded-[10px] border border-[#ddd9d3] shrink-0 text-left">
+                <div class="relative w-20 h-20 flex items-center justify-center shrink-0">
+                  <svg class="w-full h-full transform -rotate-90" viewBox="0 0 36 36">
+                    <path class="text-[#ddd9d3]" d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831" fill="none" stroke="currentColor" stroke-width="3"></path>
+                    <path class="text-emerald-600" d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831" fill="none" stroke="currentColor" stroke-dasharray="${pct}, 100" stroke-linecap="round" stroke-width="3"></path>
+                  </svg>
+                  <span class="absolute text-lg font-bold text-[#1b1c1a]">%${pct}</span>
+                </div>
+                <div>
+                  <span class="text-[10px] text-[#14422f] uppercase font-bold tracking-widest">GENEL UYUM SKORU</span>
+                  <h5 class="text-md font-bold text-[#1b1c1a] mt-1">${analysis.role || 'Özgeçmiş Analizi'}</h5>
+                  <p class="text-xs text-[#8a8580] mt-0.5">Yapay zeka uyumluluk skoru hesaplandı.</p>
+                </div>
               </div>
-              <div>
-                <span class="text-[10px] text-brand-accent font-bold tracking-widest uppercase">Genel Uyum Skoru</span>
-                <h5 class="text-base font-bold text-brand-text mt-1">${analysis.role || 'Özgeçmiş Analizi'}</h5>
-                <p class="text-xs text-brand-muted mt-0.5">Yapay zeka uyumluluk skoru hesaplandı.</p>
+              
+              <!-- Skills -->
+              <div class="space-y-2 text-left">
+                <h4 class="text-[10px] font-bold text-[#8a8580] tracking-widest uppercase px-1">ÖNE ÇIKAN YETENEKLER</h4>
+                <div class="flex flex-wrap gap-2 pt-1">${skillsHtml}</div>
               </div>
-            </div>
-            <!-- Skills -->
-            <div class="space-y-2">
-              <h4 class="text-[10px] font-bold text-brand-muted tracking-widest uppercase flex items-center gap-2">
-                <i class="fa-solid fa-layer-group text-brand-accent"></i> Öne Çıkan Yetenekler
-              </h4>
-              <div class="flex flex-wrap gap-2 pt-1">${skillsHtml}</div>
-            </div>
-            <!-- Strengths / Weaknesses -->
-            <div class="space-y-3">
-              <div class="bg-emerald-500/5 border border-emerald-500/15 p-4 rounded-2xl space-y-2">
-                <span class="text-xs text-emerald-400 font-bold flex items-center gap-1.5"><i class="fa-regular fa-thumbs-up"></i> Güçlü Yönler</span>
-                <ul class="text-xs text-brand-muted space-y-1 list-disc pl-4">${strengthsHtml}</ul>
-              </div>
-              <div class="bg-red-500/5 border border-red-500/15 p-4 rounded-2xl space-y-2">
-                <span class="text-xs text-red-400 font-bold flex items-center gap-1.5"><i class="fa-solid fa-triangle-exclamation"></i> Gelişim Alanları</span>
-                <ul class="text-xs text-brand-muted space-y-1 list-disc pl-4">${weaknessesHtml}</ul>
+              
+              <!-- Strengths / Weaknesses Bento -->
+              <div class="grid grid-cols-1 gap-4 pt-1 shrink-0">
+                <div class="bg-emerald-50 border border-emerald-200 p-5 rounded-[10px] space-y-2 text-left">
+                  <span class="text-xs text-emerald-800 font-bold flex items-center gap-1">
+                    <span class="material-symbols-outlined text-sm">thumb_up</span> GÜÇLÜ YÖNLER
+                  </span>
+                  <ul class="text-xs text-emerald-700 space-y-1.5 list-disc pl-4">${strengthsHtml}</ul>
+                </div>
+                
+                <div class="bg-amber-50 border border-amber-200 p-5 rounded-[10px] space-y-2 text-left">
+                  <span class="text-xs text-amber-800 font-bold flex items-center gap-1">
+                    <span class="material-symbols-outlined text-sm">trending_up</span> GELİŞİM ALANLARI
+                  </span>
+                  <ul class="text-xs text-amber-700 space-y-1.5 list-disc pl-4">${suggestionsHtml}</ul>
+                </div>
+                
+                <div class="bg-rose-50 border border-rose-200 p-5 rounded-[10px] space-y-2 text-left">
+                  <span class="text-xs text-rose-800 font-bold flex items-center gap-1">
+                    <span class="material-symbols-outlined text-sm">warning</span> EKSİKLER
+                  </span>
+                  <ul class="text-xs text-rose-700 space-y-1.5 list-disc pl-4">${weaknessesHtml}</ul>
+                </div>
               </div>
             </div>
           `;
-          footerBar.classList.add('hidden');
         }
-
       } else if (status === 'PENDING') {
-        statusIndicator.innerHTML = `<i class="fa-regular fa-clock text-brand-muted text-3xl animate-pulse"></i>`;
+        statusIndicator.innerHTML = `<span class="material-symbols-outlined text-[#8a8580] text-3xl animate-pulse">schedule</span>`;
         contentArea.innerHTML = `
-          <div class="flex flex-col items-center justify-center flex-1 text-center py-10 space-y-4">
-            <i class="fa-regular fa-clock text-5xl text-brand-muted animate-pulse mb-2"></i>
-            <h4 class="text-base font-bold text-brand-text">İşlem Sırasında</h4>
-            <p class="text-sm text-brand-muted max-w-[240px]">CV dosyası sunucuya ulaştı, metin çıkarma sırasının kendisine gelmesi bekleniyor.</p>
+          <div class="text-center py-12 text-[#8a8580] flex flex-col items-center justify-center h-full space-y-6 my-auto">
+            <div class="w-24 h-24 rounded-full border border-[#ddd9d3] bg-[#faf9f5] flex items-center justify-center shadow-sm">
+              <span class="material-symbols-outlined text-5xl text-[#8a8580] animate-pulse">schedule</span>
+            </div>
+            <div class="text-center w-full max-w-[320px] px-4 mx-auto">
+              <h3 class="text-lg font-bold text-[#1b1c1a] mb-2">İşlem Sırasında</h3>
+              <p class="text-xs text-[#8a8580] leading-relaxed font-medium">CV dosyası sunucuya ulaştı, metin çıkarma sırasının kendisine gelmesi bekleniyor.</p>
+            </div>
           </div>`;
-
       } else if (status === 'PROCESSING') {
-        statusIndicator.innerHTML = `<i class="fa-solid fa-circle-notch text-brand-accent text-3xl animate-spin"></i>`;
+        statusIndicator.innerHTML = `<span class="material-symbols-outlined text-blue-600 text-3xl animate-spin">progress_activity</span>`;
         contentArea.innerHTML = `
-          <div class="flex flex-col items-center justify-center flex-1 text-center py-10 space-y-4">
-            <i class="fa-solid fa-circle-notch text-5xl text-brand-accent animate-spin mb-2"></i>
-            <h4 class="text-base font-bold text-brand-text">Metin Çıkarılıyor...</h4>
-            <p class="text-sm text-brand-muted max-w-[240px]">Özgeçmiş PDF belgesinden metinler ayıklanıyor ve semantik arama chunk'larına bölünüyor.</p>
+          <div class="text-center py-12 text-[#8a8580] flex flex-col items-center justify-center h-full space-y-6 my-auto">
+            <div class="w-24 h-24 rounded-full border border-[#ddd9d3] bg-[#faf9f5] flex items-center justify-center shadow-sm">
+              <span class="material-symbols-outlined text-5xl text-blue-600 animate-spin">progress_activity</span>
+            </div>
+            <div class="text-center w-full max-w-[320px] px-4 mx-auto">
+              <h3 class="text-lg font-bold text-[#1b1c1a] mb-2">Metin Çıkarılıyor...</h3>
+              <p class="text-xs text-[#8a8580] leading-relaxed font-medium">Özgeçmiş PDF belgesinden metinler ayıklanıyor ve semantik arama chunk'larına bölünüyor.</p>
+            </div>
           </div>`;
-
       } else {
-        statusIndicator.innerHTML = `<i class="fa-solid fa-circle-exclamation text-red-400 text-3xl"></i>`;
+        statusIndicator.innerHTML = `<span class="material-symbols-outlined text-rose-600 text-3xl">error</span>`;
         contentArea.innerHTML = `
-          <div class="flex flex-col items-center justify-center flex-1 text-center py-10 space-y-4">
-            <i class="fa-solid fa-circle-exclamation text-5xl text-red-400 mb-2"></i>
-            <h4 class="text-base font-bold text-brand-text">Ayrıştırma Hatası</h4>
-            <p class="text-sm text-brand-muted max-w-[240px]">PDF belgesi parse edilirken sunucu hatası oluştu. Dosyanın şifreli veya bozuk olmadığından emin olun.</p>
+          <div class="text-center py-12 text-[#8a8580] flex flex-col items-center justify-center h-full space-y-6 my-auto">
+            <div class="w-24 h-24 rounded-full border border-rose-200 bg-rose-50 flex items-center justify-center shadow-sm">
+              <span class="material-symbols-outlined text-5xl text-rose-600">error</span>
+            </div>
+            <div class="text-center w-full max-w-[320px] px-4 mx-auto">
+              <h3 class="text-lg font-bold text-rose-600 mb-2">Ayrıştırma Hatası</h3>
+              <p class="text-xs text-[#8a8580] leading-relaxed font-medium">PDF belgesi parse edilirken sunucu hatası oluştu. Dosyanın şifreli veya bozuk olmadığından emin olun.</p>
+            </div>
           </div>`;
       }
     }
 
-    loadCVList();
+    function initAnalysesPage() {
+      const cvsBody = document.getElementById('analyses-cvs-body');
+      if (cvsBody && !cvsBody.dataset.initialized) {
+        cvsBody.dataset.initialized = "true";
+        loadCVList();
+      }
+    }
+
+    document.addEventListener("astro:page-load", initAnalysesPage);
+
+    if (document.readyState === "complete" || document.readyState === "interactive") {
+      initAnalysesPage();
+    }
+  }
   </script>
 </UserLayout>

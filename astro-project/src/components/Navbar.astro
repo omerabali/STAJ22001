@@ -1,0 +1,160 @@
+---
+interface Props {
+  title?: string;
+  user: {
+    id: string;
+    email: string;
+    role: string;
+    name?: string | null;
+  } | null;
+  isAdmin?: boolean;
+}
+
+const { title = 'Beacon', user, isAdmin = false } = Astro.props;
+
+let displayLabel = 'Misafir';
+if (user) {
+  displayLabel = user.name || user.email;
+  if (!user.name && user.email) {
+    displayLabel = user.email.split('@')[0];
+  }
+}
+const avatarInitial = displayLabel.charAt(0).toUpperCase();
+const displayRole = user ? (user.role === 'ADMIN' ? 'YÖNETİCİ' : 'KULLANICI') : 'ADMIN';
+---
+
+{isAdmin ? (
+  <header class="flex justify-between items-center mb-8 pb-4 border-b border-[#ddd9d3]">
+    <div class="flex items-center gap-4">
+      <button id="admin-mobile-menu-btn" class="md:hidden w-10 h-10 rounded-[10px] bg-white flex items-center justify-center text-[#1b1c1a] hover:bg-[#faf9f5] transition-all shadow-sm border border-[#ddd9d3]">
+        <span class="material-symbols-outlined">menu</span>
+      </button>
+    </div>
+    
+    <div class="flex items-center gap-4 bg-white px-4 py-2 rounded-[10px] border border-[#ddd9d3] shadow-sm transition-all duration-200 hover:border-[#14422f]/50">
+      <div class="text-right hidden sm:block">
+        <p class="font-body-md text-sm text-[#1b1c1a] font-bold" id="header-user-name">{displayLabel}</p>
+        <p class="font-label-xs text-[10px] text-[#14422f] uppercase tracking-widest font-mono font-bold" id="header-user-role">{displayRole}</p>
+      </div>
+      
+      <div 
+        id="header-user-avatar" 
+        class="w-10 h-10 rounded-full bg-[#faf9f5] text-[#14422f] border border-[#ddd9d3] flex items-center justify-center font-bold font-mono bg-cover bg-center cursor-pointer hover:border-[#14422f] hover:scale-105 transition-all duration-200 overflow-hidden"
+      >
+        <span id="avatar-initial-span">{avatarInitial}</span>
+      </div>
+    </div>
+  </header>
+) : (
+  <header class="fixed top-0 right-0 w-full md:w-[calc(100%-260px)] h-24 bg-[#faf9f5]/90 backdrop-blur-md border-b border-[#ddd9d3] flex justify-between items-center px-4 md:px-10 z-40 transition-all duration-200">
+    <div class="flex items-center gap-2">
+      <button id="mobile-menu-btn" class="md:hidden w-10 h-10 rounded-full hover:bg-white/40 flex items-center justify-center text-[#1b1c1a]">
+        <span class="material-symbols-outlined">menu</span>
+      </button>
+      <div class="flex items-baseline gap-4">
+        <h2 class="text-2xl font-bold text-[#1b1c1a] shrink-0">{title}</h2>
+      </div>
+    </div>
+    <div class="flex items-center gap-8">
+      <div class="text-sm text-[#8a8580] font-medium hidden lg:block" id="header-date">
+        <!-- Will be updated dynamically by client script -->
+      </div>
+      
+      <!-- User Profile Badge -->
+      <button class="flex items-center gap-3 bg-white hover:bg-[#faf9f5] border border-[#ddd9d3] rounded-[10px] py-1.5 pr-2 pl-4 transition-all shadow-sm focus:outline-none focus:ring-2 focus:ring-[#14422f]" onclick="window.location.href='/settings'">
+        <div class="text-right">
+          <div class="text-sm font-bold text-[#1b1c1a] leading-none" id="header-user-name">{displayLabel}</div>
+          <div class="text-[10px] text-[#8a8580] uppercase tracking-wider mt-1.5 font-bold">Kullanıcı</div>
+        </div>
+        <div 
+          id="header-user-avatar" 
+          class="w-10 h-10 rounded-full overflow-hidden border border-[#ddd9d3] bg-cover bg-center shrink-0 flex items-center justify-center bg-[#faf9f5] text-[#14422f] hover:border-[#14422f] transition-all duration-200"
+        >
+          <span id="avatar-initial-span" class="font-bold">{avatarInitial}</span>
+        </div>
+      </button>
+    </div>
+  </header>
+)}
+
+<script is:inline>
+  // Unified SWR (Stale-While-Revalidate) Cache Manager with sessionStorage persistence
+  if (!window.__swrCache) {
+    window.__swrCache = {
+      get(key) {
+        try {
+          const raw = sessionStorage.getItem(`swr-${key}`);
+          return raw ? JSON.parse(raw) : null;
+        } catch (e) {
+          return null;
+        }
+      },
+      set(key, data) {
+        try {
+          sessionStorage.setItem(`swr-${key}`, JSON.stringify({ data, timestamp: Date.now() }));
+        } catch (e) {}
+      },
+      invalidate(key) {
+        try {
+          sessionStorage.removeItem(`swr-${key}`);
+        } catch (e) {}
+      },
+      query(key, fetcher, onData, staleTime = 30000) {
+        const cached = this.get(key);
+        const now = Date.now();
+
+        // 1. If cache exists, render it instantly (TanStack style)
+        if (cached) {
+          onData(cached.data);
+        }
+
+        // 2. If no cache or cache is stale (older than staleTime), fetch in background
+        if (!cached || (now - cached.timestamp > staleTime)) {
+          fetcher().then(data => {
+            this.set(key, data);
+            onData(data); // Re-render with fresh data
+          }).catch(err => console.error(`SWR Cache refetch failed for key: ${key}`, err));
+        }
+      }
+    };
+  }
+
+  const initNavbar = async () => {
+    // 1. Candidate/User Date
+    const dateEl = document.getElementById('header-date');
+    if (dateEl) {
+      dateEl.textContent = new Date().toLocaleDateString('tr-TR', { 
+        weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' 
+      });
+    }
+
+    // 2. Avatar resmini yükle ve cache'le (sessionStorage)
+    const avatarContainer = document.getElementById('header-user-avatar');
+    const avatarInitialSpan = document.getElementById('avatar-initial-span');
+
+    if (avatarContainer) {
+      const cachedAvatar = sessionStorage.getItem('user-avatar');
+      if (cachedAvatar) {
+        avatarContainer.style.backgroundImage = `url(${cachedAvatar})`;
+        if (avatarInitialSpan) avatarInitialSpan.style.display = 'none';
+      } else {
+        try {
+          const res = await fetch('/api/auth/me');
+          if (res.ok) {
+            const data = await res.json();
+            if (data.user && data.user.avatarUrl) {
+              sessionStorage.setItem('user-avatar', data.user.avatarUrl);
+              avatarContainer.style.backgroundImage = `url(${data.user.avatarUrl})`;
+              if (avatarInitialSpan) avatarInitialSpan.style.display = 'none';
+            }
+          }
+        } catch (e) {
+          console.error("Avatar yüklenirken hata:", e);
+        }
+      }
+    }
+  };
+
+  // Run initNavbar on DOM load and on every Astro SPA page transition
+  document.addEventListener("astro:page-load", initNavbar);
+</script>

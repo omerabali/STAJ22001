@@ -1,17 +1,20 @@
 ---
 import '../styles/global.css';
 import AdminSidebar from '../components/AdminSidebar.astro';
-import AdminHeader from '../components/AdminHeader.astro';
+import Navbar from '../components/Navbar.astro';
+
+import { ClientRouter } from 'astro:transitions';
 
 interface Props {
   title: string;
 }
 
 const { title } = Astro.props;
+const { user } = Astro.locals;
 ---
 
 <!doctype html>
-<html lang="tr" class="dark">
+<html lang="tr" class="light bg-[#faf9f5]">
   <head>
     <meta charset="UTF-8" />
     <meta name="description" content="Beacon Admin Panel" />
@@ -19,22 +22,106 @@ const { title } = Astro.props;
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
     <meta name="generator" content={Astro.generator} />
     <title>{title}</title>
+    <ClientRouter />
     
     <!-- Google Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
-    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet" />
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=IBM+Plex+Sans:wght@400;500;600&family=Manrope:wght@600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" rel="stylesheet" />
   </head>
-  <body class="theme-admin bg-background text-on-surface font-body-md antialiased min-h-screen flex selection:bg-primary-container selection:text-on-primary-container">
+  <body class="theme-admin bg-[#faf9f5] text-[#1b1c1a] font-sans antialiased min-h-screen flex selection:bg-brand-accent/20 selection:text-brand-accent">
     <div id="admin-sidebar-overlay" class="fixed inset-0 bg-black/50 z-40 hidden md:hidden transition-opacity"></div>
     <AdminSidebar />
     <main class="w-full md:ml-[280px] flex-1 p-4 md:p-8 transition-all duration-300">
-      <AdminHeader />
+      <Navbar user={user} isAdmin={true} />
       <slot />
     </main>
 
     <script is:inline>
+      // ── SWR Cache Mekanizması (Admin Panel) ──────────────────────────────
+      // localStorage tabanlı kalıcı cache + in-memory hız katmanı
+      // TTL dolunca arka planda sessizce günceller (stale-while-revalidate)
+      window.__swrCache = (function() {
+        const MEM = {};           // in-memory cache (aynı oturumda anlık)
+        const PREFIX = 'beacon_cache_';
+
+        function getLS(key) {
+          try {
+            const raw = localStorage.getItem(PREFIX + key);
+            if (!raw) return null;
+            return JSON.parse(raw);
+          } catch { return null; }
+        }
+
+        function setLS(key, data, ttl) {
+          try {
+            localStorage.setItem(PREFIX + key, JSON.stringify({
+              data,
+              expires: Date.now() + ttl
+            }));
+          } catch {}
+        }
+
+        /**
+         * query(key, fetcher, onData, ttl)
+         *  1. Anlık: in-memory varsa hemen render et
+         *  2. LocalStorage varsa hemen render et
+         *  3. Hem (1) hem (2) varsa ve TTL dolmamışsa yeniden fetch etme
+         *  4. TTL dolmuşsa veya hiç yoksa fetch et, cache'i güncelle
+         */
+        function query(key, fetcher, onData, ttl) {
+          ttl = ttl || 30000; // default 30 saniye
+
+          // 1. In-memory kontrol
+          if (MEM[key] && MEM[key].expires > Date.now()) {
+            onData(MEM[key].data);
+            return;
+          }
+
+          // 2. LocalStorage kontrol
+          const cached = getLS(key);
+          if (cached) {
+            onData(cached.data); // Stale veriyi hemen göster
+            MEM[key] = cached;   // Memory'e koy
+            if (cached.expires > Date.now()) return; // Taze ise fetch etme
+          }
+
+          // 3. Fetch et ve cache'i güncelle (arka planda)
+          fetcher().then(data => {
+            const entry = { data, expires: Date.now() + ttl };
+            MEM[key] = entry;
+            setLS(key, data, ttl);
+            onData(data);
+          }).catch(err => {
+            console.warn('[SWR] Fetch hatası (' + key + '):', err);
+          });
+        }
+
+        /**
+         * invalidate(key) - cache'i temizle (veri değişince çağır)
+         */
+        function invalidate(key) {
+          delete MEM[key];
+          try { localStorage.removeItem(PREFIX + key); } catch {}
+        }
+
+        /**
+         * invalidateAll() - tüm admin cache'ini temizle
+         */
+        function invalidateAll() {
+          Object.keys(MEM).forEach(k => delete MEM[k]);
+          try {
+            Object.keys(localStorage)
+              .filter(k => k.startsWith(PREFIX))
+              .forEach(k => localStorage.removeItem(k));
+          } catch {}
+        }
+
+        return { query, invalidate, invalidateAll };
+      })();
+      // ─────────────────────────────────────────────────────────────────────
+
       document.addEventListener("DOMContentLoaded", () => {
         const mobileBtn = document.getElementById('admin-mobile-menu-btn');
         const sidebar = document.getElementById('admin-sidebar');

@@ -15,7 +15,7 @@ const prisma = new PrismaClient({ adapter });
 
 const SALT_ROUNDS = 10;
 
-function signToken(payload: { id: string; email: string; role: string }): string {
+function signToken(payload: { id: string; email: string; role: string; name: string | null }): string {
   const secret = process.env.JWT_SECRET;
   if (!secret) throw new Error("JWT_SECRET tanımlı değil!");
   return jwt.sign(payload, secret, { expiresIn: "7d" });
@@ -100,7 +100,7 @@ router.post("/register", async (req: Request, res: Response): Promise<void> => {
     });
 
     // JWT oluştur ve çereze kaydet
-    const token = signToken({ id: user.id, email: user.email, role: user.role });
+    const token = signToken({ id: user.id, email: user.email, role: user.role, name: user.name });
 
     res.cookie("token", token, {
       httpOnly: true,
@@ -156,7 +156,7 @@ router.post("/login", async (req: Request, res: Response): Promise<void> => {
     }
 
     // JWT oluştur ve çereze kaydet
-    const token = signToken({ id: user.id, email: user.email, role: user.role });
+    const token = signToken({ id: user.id, email: user.email, role: user.role, name: user.name });
 
     res.cookie("token", token, {
       httpOnly: true,
@@ -284,7 +284,7 @@ router.put("/profile", authMiddleware, async (req: Request, res: Response): Prom
       select: { id: true, email: true, role: true, name: true, phone: true, avatarUrl: true }
     });
 
-    const token = signToken({ id: updatedUser.id, email: updatedUser.email, role: updatedUser.role });
+    const token = signToken({ id: updatedUser.id, email: updatedUser.email, role: updatedUser.role, name: updatedUser.name });
     res.cookie("token", token, {
       httpOnly: true,
       secure: process.env.NODE_ENV === "production",
@@ -391,7 +391,7 @@ router.post("/verify-code", async (req: Request, res: Response): Promise<void> =
       data: { resetCode: null, resetCodeExpires: null }
     });
 
-    const token = signToken({ id: user.id, email: user.email, role: user.role });
+    const token = signToken({ id: user.id, email: user.email, role: user.role, name: user.name });
 
     res.cookie("token", token, {
       httpOnly: true,

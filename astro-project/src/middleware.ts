@@ -16,6 +16,9 @@ export const onRequest = defineMiddleware((context, next) => {
   const user = token ? parseJwt(token) : null;
   const path = context.url.pathname;
 
+  // Save user object to Astro.locals
+  context.locals.user = user;
+
   console.log(`[MIDDLEWARE] Path: ${path} | Token exists: ${!!token} | User parsed: ${JSON.stringify(user)}`);
 
   // Define route groups

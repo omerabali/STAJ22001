@@ -1,42 +1,40 @@
 ---
 const currentPath = Astro.url.pathname;
 ---
-<nav id="user-sidebar" class="fixed left-0 top-0 h-full w-[260px] bg-brand-bg border-r border-brand-border flex flex-col z-50 transform -translate-x-full md:translate-x-0 transition-transform duration-300">
+<nav id="user-sidebar" class="fixed left-0 top-0 h-full w-[260px] bg-[#f5f4f0] border-r border-[#ddd9d3] flex flex-col z-50 transform -translate-x-full md:translate-x-0 transition-transform duration-300">
   <!-- Logo Area -->
-  <div class="h-24 flex items-center px-8 border-b border-brand-border shrink-0">
-    <div class="w-10 h-10 rounded-xl bg-brand-card flex items-center justify-center border border-brand-border shadow-sm mr-3">
-      <i class="fa-solid fa-cube text-brand-accent text-xl"></i>
-    </div>
+  <div class="h-24 flex items-center px-8 border-b border-[#ddd9d3] shrink-0">
+    <img src="/mixboard-image.png" alt="Beacon Logo" class="h-9 w-auto object-contain mr-3" />
     <div>
-      <h1 class="font-bold text-lg leading-tight tracking-wide text-brand-text">Beacon AI</h1>
-      <span class="text-[10px] uppercase tracking-widest text-brand-success font-semibold flex items-center gap-1">
-        <span class="w-1.5 h-1.5 rounded-full bg-brand-success animate-pulse"></span>
+      <h1 class="font-bold text-lg leading-tight tracking-wide text-[#1b1c1a]">Beacon</h1>
+      <span class="text-[10px] uppercase tracking-widest text-[#10b981] font-mono font-bold flex items-center gap-1">
+        <span class="w-1.5 h-1.5 rounded-full bg-[#10b981] animate-pulse"></span>
         Aday Portalı
       </span>
     </div>
   </div>
   
   <!-- Navigation -->
-  <div class="flex-1 overflow-y-auto mt-8 px-4 space-y-2">
-    <a class={`flex items-center px-4 py-3.5 rounded-r-2xl transition-all group relative overflow-hidden ${currentPath === '/profile' ? 'text-brand-text glass-active' : 'text-brand-muted hover:text-brand-text hover:bg-white/5'}`} href="/profile">
-      <i class="fa-solid fa-cloud-arrow-up text-brand-accent w-6 text-center relative z-10"></i>
-      <span class="ml-3 font-semibold relative z-10">CV Yükle & Analiz</span>
+  <div class="flex-1 overflow-y-auto mt-8 px-3 space-y-1">
+    <a class={`flex items-center px-4 py-3 rounded-lg transition-all group ${currentPath === '/profile' ? 'bg-white text-[#14422f] border-l-3 border-[#14422f] shadow-sm font-semibold' : 'text-[#8a8580] hover:bg-white/40 hover:text-[#1b1c1a]'}`} href="/profile">
+      <i class="fa-solid fa-cloud-arrow-up w-6 text-center text-sm group-hover:text-[#14422f] transition-colors"></i>
+      <span class="ml-3 text-sm font-medium tracking-wide">CV Yükle & Analiz</span>
     </a>
-    <a class={`flex items-center px-4 py-3.5 rounded-r-2xl transition-all group relative overflow-hidden ${currentPath === '/analyses' ? 'text-brand-text glass-active' : 'text-brand-muted hover:text-brand-text hover:bg-white/5'}`} href="/analyses">
-      <i class="fa-solid fa-chart-pie w-6 text-center group-hover:text-brand-accent transition-colors relative z-10"></i>
-      <span class="ml-3 font-semibold relative z-10">Analiz Sonuçlarım</span>
+    <a class={`flex items-center px-4 py-3 rounded-lg transition-all group ${currentPath === '/analyses' ? 'bg-white text-[#14422f] border-l-3 border-[#14422f] shadow-sm font-semibold' : 'text-[#8a8580] hover:bg-white/40 hover:text-[#1b1c1a]'}`} href="/analyses">
+      <i class="fa-solid fa-chart-pie w-6 text-center text-sm group-hover:text-[#14422f] transition-colors"></i>
+      <span class="ml-3 text-sm font-medium tracking-wide">Analiz Sonuçlarım</span>
     </a>
   </div>
 
   <!-- Bottom Actions -->
-  <div class="px-4 pb-8 space-y-2 mt-auto">
-    <a class={`flex items-center px-4 py-3 rounded-xl transition-all group ${currentPath === '/settings' ? 'text-brand-text glass-active' : 'text-brand-muted hover:text-brand-text hover:bg-white/5'}`} href="/settings">
-      <i class="fa-solid fa-gear w-6 text-center group-hover:text-brand-accent transition-colors"></i>
-      <span class="ml-3 text-sm font-medium">Ayarlar</span>
+  <div class="px-3 pb-8 space-y-1 mt-auto border-t border-[#ddd9d3] pt-4">
+    <a class={`flex items-center px-4 py-3 rounded-lg transition-all group ${currentPath === '/settings' ? 'bg-white text-[#14422f] border-l-3 border-[#14422f] shadow-sm font-semibold' : 'text-[#8a8580] hover:bg-white/40 hover:text-[#1b1c1a]'}`} href="/settings">
+      <i class="fa-solid fa-gear w-6 text-center text-sm group-hover:text-[#14422f] transition-colors"></i>
+      <span class="ml-3 text-sm font-medium tracking-wide">Ayarlar</span>
     </a>
-    <button onclick="handleUserLogout()" class="flex items-center px-4 py-3 text-brand-muted hover:text-brand-danger hover:bg-red-500/10 rounded-xl transition-all group w-full text-left">
-      <i class="fa-solid fa-arrow-right-from-bracket w-6 text-center"></i>
-      <span class="ml-3 text-sm font-medium">Çıkış Yap</span>
+    <button onclick="handleUserLogout()" class="flex items-center px-4 py-3 text-[#8a8580] hover:bg-red-50 hover:text-[#ef4444] rounded-lg transition-all group w-full text-left font-sans">
+      <i class="fa-solid fa-arrow-right-from-bracket w-6 text-center text-sm"></i>
+      <span class="ml-3 text-sm font-medium tracking-wide">Çıkış Yap</span>
     </button>
   </div>
 </nav>

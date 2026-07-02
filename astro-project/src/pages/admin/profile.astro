@@ -1,0 +1,392 @@
+---
+import AdminLayout from '../../layouts/AdminLayout.astro';
+---
+
+<AdminLayout title="Beacon - Aday Profili">
+  <!-- Back Button & Header -->
+  <header class="mb-8 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+    <div>
+      <a href="/admin/search" class="inline-flex items-center gap-2 text-xs font-bold text-[#8a8580] hover:text-[#14422f] transition-colors mb-3 uppercase tracking-wider">
+        <span class="material-symbols-outlined text-[16px]">arrow_back</span> Aday Arama Ekranına Dön
+      </a>
+      <h2 class="font-headline-md text-headline-md font-bold mb-2 text-[#1b1c1a] text-3xl" id="candidate-name-header">Aday Profili</h2>
+      <p class="font-body-sm text-sm text-[#8a8580] font-medium" id="candidate-email-header">Yükleniyor...</p>
+    </div>
+  </header>
+
+  <div class="flex flex-col lg:flex-row gap-6 items-start">
+    <!-- Left side: Candidate Info & CV History -->
+    <div class="flex-1 min-w-0 flex flex-col gap-6 w-full">
+      
+      <!-- Personal Info Card -->
+      <div class="bg-white border border-[#ddd9d3] rounded-[10px] p-6 shadow-sm relative overflow-hidden">
+        <div class="absolute left-0 top-0 bottom-0 w-[3px] bg-[#14422f]"></div>
+        <h3 class="text-md font-bold text-[#1b1c1a] mb-4">Aday Bilgileri</h3>
+        
+        <div class="flex items-center gap-6">
+          <div class="w-16 h-16 rounded-full bg-[#14422f]/10 text-[#14422f] flex items-center justify-center font-bold text-xl border border-[#ddd9d3]" id="profile-avatar">
+            ?
+          </div>
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-x-8 gap-y-2 text-sm">
+            <div>
+              <span class="text-[10px] font-bold text-[#8a8580] uppercase tracking-wider block">AD SOYAD</span>
+              <span class="font-semibold text-[#1b1c1a]" id="profile-name">-</span>
+            </div>
+            <div>
+              <span class="text-[10px] font-bold text-[#8a8580] uppercase tracking-wider block">E-POSTA</span>
+              <span class="font-semibold text-[#1b1c1a]" id="profile-email">-</span>
+            </div>
+            <div class="mt-2">
+              <span class="text-[10px] font-bold text-[#8a8580] uppercase tracking-wider block">TELEFON</span>
+              <span class="font-semibold text-[#1b1c1a]" id="profile-phone">-</span>
+            </div>
+            <div class="mt-2">
+              <span class="text-[10px] font-bold text-[#8a8580] uppercase tracking-wider block">KAYIT TARİHİ</span>
+              <span class="font-semibold text-[#1b1c1a]" id="profile-date">-</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- CV List Card -->
+      <div class="bg-white border border-[#ddd9d3] rounded-[10px] flex flex-col overflow-hidden shadow-sm">
+        <div class="p-6 border-b border-[#ddd9d3]">
+          <h3 class="text-md font-bold text-[#1b1c1a]">Yüklenen Özgeçmişler</h3>
+        </div>
+        <div class="overflow-x-auto">
+          <table class="w-full text-left text-sm whitespace-nowrap">
+            <thead class="text-xs text-[#8a8580] uppercase bg-[#f5f4f0] border-b border-[#ddd9d3]">
+              <tr>
+                <th class="px-6 py-4 font-semibold">Belge Adı</th>
+                <th class="px-6 py-4 font-semibold">Yükleme Tarihi</th>
+                <th class="px-6 py-4 font-semibold">Durum</th>
+                <th class="px-6 py-4 font-semibold text-center">Uyum Skoru</th>
+                <th class="px-6 py-4 font-semibold text-right">İşlem</th>
+              </tr>
+            </thead>
+            <tbody class="divide-y divide-[#ddd9d3] text-[#1b1c1a]" id="cvs-table-body">
+              <tr>
+                <td colspan="5" class="px-6 py-8 text-center text-[#8a8580] font-medium">Yüklemeler sorgulanıyor...</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- Right side: Selected CV Analysis Details -->
+    <div class="analysis-panel-right">
+      <div class="bg-white border border-[#ddd9d3] rounded-[10px] min-h-[480px] flex flex-col p-6 shadow-sm" id="analysis-detail-card">
+        <div class="text-center py-12 text-[#8a8580] flex flex-col items-center justify-center h-full space-y-4 my-auto" id="analysis-placeholder">
+          <span class="material-symbols-outlined text-5xl text-[#8a8580]/40">analytics</span>
+          <div>
+            <h4 class="font-bold text-[#1b1c1a]">Analiz Detayları</h4>
+            <p class="text-xs text-[#8a8580] max-w-[240px] mt-1 font-medium leading-relaxed">Analiz raporunu görüntülemek için sol taraftan bir özgeçmiş seçin.</p>
+          </div>
+        </div>
+
+        <div id="analysis-content-area" class="space-y-6 flex flex-col h-full overflow-hidden hidden">
+          <!-- Dynamic content will be injected by JS -->
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script is:inline>
+    let selectedCvId = null;
+    let candidateData = null;
+    // NOT: userId burada DEĞİL, her sayfa yüklemesinde yeniden okunacak
+
+    async function loadCandidateProfile() {
+      // Her seferinde URL'den taze oku (ClientRouter uyumlu)
+      const urlParams = new URLSearchParams(window.location.search);
+      const userId = urlParams.get('userId');
+
+      if (!userId) {
+        alert('Aday ID parametresi eksik.');
+        window.location.href = '/admin/search';
+        return;
+      }
+
+      // Farklı bir profile geçildiğinde eski cache'i bypass et
+      // (30sn TTL yerine her profil açılışında taze veri çek)
+      if (window.__swrCache) {
+        window.__swrCache.invalidate(`candidate-profile-${userId}`);
+      }
+
+      const tableBody = document.getElementById('cvs-table-body');
+      if (!tableBody) return;
+
+      const fetcher = async () => {
+        const res = await fetch(`/api/admin/candidates/${userId}`);
+        if (!res.ok) throw new Error("Aday profili yüklenemedi.");
+        return res.json();
+      };
+
+      const render = (data) => {
+        candidateData = data.candidate;
+        
+        // Header info
+        document.getElementById('candidate-name-header').textContent = candidateData.name || 'İsimsiz Aday';
+        document.getElementById('candidate-email-header').textContent = candidateData.email;
+
+        // Personal Info Card
+        document.getElementById('profile-name').textContent = candidateData.name || '-';
+        document.getElementById('profile-email').textContent = candidateData.email || '-';
+        document.getElementById('profile-phone').textContent = candidateData.phone || '-';
+        document.getElementById('profile-date').textContent = new Date(candidateData.createdAt).toLocaleDateString('tr-TR', { year: 'numeric', month: 'long', day: 'numeric' });
+        
+        // Avatar initials
+        const initials = (candidateData.name || candidateData.email || '??').substring(0, 2).toUpperCase();
+        const avatarEl = document.getElementById('profile-avatar');
+        if (candidateData.avatarUrl) {
+          avatarEl.style.backgroundImage = `url(${candidateData.avatarUrl})`;
+          avatarEl.textContent = '';
+        } else {
+          avatarEl.style.backgroundImage = '';
+          avatarEl.textContent = initials;
+        }
+
+        // CV table list
+        if (!candidateData.cvs || candidateData.cvs.length === 0) {
+          tableBody.innerHTML = `
+            <tr>
+              <td colspan="5" class="px-6 py-8 text-center text-[#8a8580] font-medium">Bu adaya ait yüklenmiş özgeçmiş bulunmamaktadır.</td>
+            </tr>
+          `;
+          return;
+        }
+
+        tableBody.innerHTML = '';
+        
+        candidateData.cvs.forEach(cv => {
+          const latestAnalysis = cv.analyses && cv.analyses[0];
+          const status = latestAnalysis ? latestAnalysis.status : 'PENDING';
+          const dateStr = new Date(cv.createdAt).toLocaleDateString('tr-TR', { day: 'numeric', month: 'short', year: 'numeric' });
+          
+          let statusBadge = '';
+          if (status === 'PENDING') {
+            statusBadge = `
+              <span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-[6px] text-xs font-semibold bg-amber-50 text-amber-700 border border-amber-200">
+                <span class="w-1.5 h-1.5 rounded-full bg-amber-600 animate-pulse"></span> Sırada
+              </span>
+            `;
+          } else if (status === 'PROCESSING') {
+            statusBadge = `
+              <span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-[6px] text-xs font-semibold bg-blue-50 text-blue-700 border border-blue-200">
+                <span class="w-1.5 h-1.5 rounded-full bg-blue-600 animate-spin"></span> İşleniyor
+              </span>
+            `;
+          } else if (status === 'COMPLETED') {
+            statusBadge = `
+              <span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-[6px] text-xs font-semibold bg-emerald-50 text-emerald-700 border border-emerald-200">
+                <span class="w-1.5 h-1.5 rounded-full bg-emerald-600"></span> Hazır
+              </span>
+            `;
+          } else {
+            statusBadge = `
+              <span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-[6px] text-xs font-semibold bg-rose-50 text-rose-700 border border-rose-200">
+                <span class="w-1.5 h-1.5 rounded-full bg-rose-600"></span> Hata
+              </span>
+            `;
+          }
+
+          const scoreStr = latestAnalysis && latestAnalysis.atsScore !== null 
+            ? `<span class="font-bold text-emerald-700">%${latestAnalysis.atsScore} Uyum</span>` 
+            : `<span class="text-[#8a8580]">-</span>`;
+
+          const tr = document.createElement('tr');
+          tr.className = `hover:bg-[#f5f4f0]/60 transition-all group cursor-pointer ${selectedCvId === cv.id ? 'bg-[#f5f4f0]' : ''}`;
+          tr.onclick = () => {
+            selectedCvId = cv.id;
+            const rows = tableBody.querySelectorAll('tr');
+            rows.forEach(r => r.classList.remove('bg-[#f5f4f0]'));
+            tr.classList.add('bg-[#f5f4f0]');
+            showAnalysisDetails(cv, latestAnalysis);
+          };
+
+          tr.innerHTML = `
+            <td class="px-6 py-5">
+              <div class="flex items-center gap-3">
+                <span class="material-symbols-outlined text-red-600 text-[20px] shrink-0">picture_as_pdf</span>
+                <span class="font-bold text-[#1b1c1a] truncate max-w-[200px] text-sm">${cv.fileName}</span>
+              </div>
+            </td>
+            <td class="px-6 py-5 text-[#8a8580] font-medium text-xs">${dateStr}</td>
+            <td class="px-6 py-5">${statusBadge}</td>
+            <td class="px-6 py-5 text-center text-xs font-bold">${scoreStr}</td>
+            <td class="px-6 py-5 text-right" onclick="event.stopPropagation();">
+              <a href="${cv.fileUrl}" target="_blank" class="inline-flex items-center justify-center text-[#8a8580] hover:text-[#14422f] p-1.5 rounded-lg hover:bg-[#14422f]/5 transition-colors" title="Dosyayı İndir / Görüntüle">
+                <span class="material-symbols-outlined text-[18px]">download</span>
+              </a>
+            </td>
+          `;
+          tableBody.appendChild(tr);
+
+          // Update active analysis details display on selection
+          if (selectedCvId === cv.id) {
+            showAnalysisDetails(cv, latestAnalysis);
+          }
+        });
+      };
+
+      if (window.__swrCache) {
+        window.__swrCache.query(`candidate-profile-${userId}`, fetcher, render, 30000);
+      } else {
+        fetcher().then(render).catch(err => {
+          console.error(err);
+          tableBody.innerHTML = `<tr><td colspan="5" class="p-8 text-center text-rose-600">Veriler yüklenemedi.</td></tr>`;
+        });
+      }
+    }
+
+    function showAnalysisDetails(cv, analysis) {
+      const placeholder = document.getElementById('analysis-placeholder');
+      const contentArea = document.getElementById('analysis-content-area');
+      if (!placeholder || !contentArea) return;
+
+      placeholder.classList.add('hidden');
+      contentArea.classList.remove('hidden');
+
+      if (!analysis) {
+        contentArea.innerHTML = `
+          <div class="text-center py-12 text-[#8a8580] flex flex-col items-center justify-center h-full space-y-4 my-auto">
+            <span class="material-symbols-outlined text-5xl text-[#8a8580]/40">warning</span>
+            <div>
+              <h4 class="font-bold text-[#1b1c1a]">Analiz Raporu Yok</h4>
+              <p class="text-xs text-[#8a8580] max-w-[240px] mt-1 font-medium leading-relaxed">Seçilen CV için henüz bir analiz raporu oluşturulmamış.</p>
+            </div>
+          </div>
+        `;
+        return;
+      }
+
+      const status = analysis.status;
+
+      if (status === 'COMPLETED') {
+        const strengthsHtml = Array.isArray(analysis.strengths) && analysis.strengths.length > 0
+          ? analysis.strengths.map(st => `<li>${st}</li>`).join('')
+          : '<li>Analiz başarısız veya veri yok.</li>';
+
+        const suggestionsHtml = Array.isArray(analysis.suggestions) && analysis.suggestions.length > 0
+          ? analysis.suggestions.map(sg => `<li>${sg}</li>`).join('')
+          : '<li>Analiz başarısız veya veri yok.</li>';
+
+        const weaknessesHtml = Array.isArray(analysis.weaknesses) && analysis.weaknesses.length > 0
+          ? analysis.weaknesses.map(w => `<li>${w}</li>`).join('')
+          : '<li>Analiz başarısız veya veri yok.</li>';
+
+        const skillsHtml = Array.isArray(analysis.skills) && analysis.skills.length > 0
+          ? analysis.skills.map(s => `
+              <span class="px-3 py-1.5 rounded-full bg-[#14422f]/10 border border-[#14422f]/20 text-[#14422f] text-xs font-semibold shadow-sm cursor-default">
+                ${s}
+              </span>
+            `).join('')
+          : `<span class="text-xs text-[#8a8580]">Yetenek kelimeleri çıkarılamadı.</span>`;
+
+        contentArea.innerHTML = `
+          <div class="space-y-6 flex flex-col h-full overflow-y-auto pr-2 custom-scrollbar">
+            <!-- Score Card -->
+            <div class="flex items-center gap-6 bg-[#faf9f5] p-5 rounded-[10px] border border-[#ddd9d3] shrink-0 text-left">
+              <div class="relative w-20 h-20 flex items-center justify-center shrink-0">
+                <svg class="w-full h-full transform -rotate-90" viewBox="0 0 36 36">
+                  <path class="text-[#ddd9d3]" d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831" fill="none" stroke="currentColor" stroke-width="3"></path>
+                  <path class="text-emerald-600" d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831" fill="none" stroke="currentColor" stroke-dasharray="${analysis.atsScore}, 100" stroke-linecap="round" stroke-width="3"></path>
+                </svg>
+                <span class="absolute text-lg font-bold text-[#1b1c1a]">%${analysis.atsScore}</span>
+              </div>
+              <div>
+                <span class="text-[10px] text-[#14422f] uppercase font-bold tracking-widest">GENEL UYUM SKORU</span>
+                <h5 class="text-md font-bold text-[#1b1c1a] mt-1">${analysis.role || 'Özgeçmiş Analizi'}</h5>
+                <p class="text-xs text-[#8a8580] mt-0.5">Yapay zeka uyumluluk skoru hesaplandı.</p>
+              </div>
+            </div>
+
+            <!-- Skills cloud -->
+            <div class="space-y-2 shrink-0 text-left">
+              <h4 class="text-[10px] font-bold text-[#8a8580] tracking-widest uppercase px-1">ÖNE ÇIKAN YETENEKLER</h4>
+              <div class="flex flex-wrap gap-2 pt-1">
+                ${skillsHtml}
+              </div>
+            </div>
+
+            <!-- Strengths, Suggestions and Weaknesses -->
+            <div class="grid grid-cols-1 gap-4 pt-1 shrink-0">
+              <div class="bg-emerald-50 border border-emerald-200 p-5 rounded-[10px] space-y-2 text-left">
+                <span class="text-xs text-emerald-800 font-bold flex items-center gap-1">
+                  <span class="material-symbols-outlined text-sm">thumb_up</span> GÜÇLÜ YÖNLER
+                </span>
+                <ul class="text-xs text-emerald-700 space-y-1.5 list-disc pl-4">
+                  ${strengthsHtml}
+                </ul>
+              </div>
+
+              <div class="bg-amber-50 border border-amber-200 p-5 rounded-[10px] space-y-2 text-left">
+                <span class="text-xs text-amber-800 font-bold flex items-center gap-1">
+                  <span class="material-symbols-outlined text-sm">trending_up</span> GELİŞİM ALANLARI
+                </span>
+                <ul class="text-xs text-amber-700 space-y-1.5 list-disc pl-4">
+                  ${suggestionsHtml}
+                </ul>
+              </div>
+              
+              <div class="bg-rose-50 border border-rose-200 p-5 rounded-[10px] space-y-2 text-left">
+                <span class="text-xs text-rose-800 font-bold flex items-center gap-1">
+                  <span class="material-symbols-outlined text-sm">warning</span> EKSİKLER
+                </span>
+                <ul class="text-xs text-rose-700 space-y-1.5 list-disc pl-4">
+                  ${weaknessesHtml}
+                </ul>
+              </div>
+            </div>
+          </div>
+        `;
+      } else if (status === 'PROCESSING') {
+        contentArea.innerHTML = `
+          <div class="text-center py-12 text-[#8a8580] flex flex-col items-center justify-center h-full space-y-6 my-auto">
+            <div class="w-24 h-24 rounded-full border border-[#ddd9d3] bg-[#faf9f5] flex items-center justify-center shadow-sm">
+              <span class="material-symbols-outlined text-5xl text-blue-600 animate-spin">progress_activity</span>
+            </div>
+            <div class="text-center max-w-sm px-4">
+              <h3 class="text-lg font-bold text-[#1b1c1a] mb-2">Metin Çıkarılıyor...</h3>
+              <p class="text-xs text-[#8a8580] leading-relaxed font-medium">Özgeçmiş PDF belgesinden metinler ayıklanıyor ve semantik arama chunk'larına bölünüyor.</p>
+            </div>
+          </div>
+        `;
+      } else if (status === 'PENDING') {
+        contentArea.innerHTML = `
+          <div class="text-center py-12 text-[#8a8580] flex flex-col items-center justify-center h-full space-y-6 my-auto">
+            <div class="w-24 h-24 rounded-full border border-[#ddd9d3] bg-[#faf9f5] flex items-center justify-center shadow-sm">
+              <span class="material-symbols-outlined text-5xl text-[#8a8580] animate-pulse">schedule</span>
+            </div>
+            <div class="text-center max-w-sm px-4">
+              <h3 class="text-lg font-bold text-[#1b1c1a] mb-2">İşlem Sırasında</h3>
+              <p class="text-xs text-[#8a8580] leading-relaxed font-medium">CV dosyası sunucuya ulaştı, metin çıkarma sırasının kendisine gelmesi bekleniyor.</p>
+            </div>
+          </div>
+        `;
+      } else {
+        contentArea.innerHTML = `
+          <div class="text-center py-12 text-[#8a8580] flex flex-col items-center justify-center h-full space-y-6 my-auto">
+            <div class="w-24 h-24 rounded-full border border-rose-200 bg-rose-50 flex items-center justify-center shadow-sm">
+              <span class="material-symbols-outlined text-5xl text-rose-600">error</span>
+            </div>
+            <div class="text-center max-w-sm px-4">
+              <h3 class="text-lg font-bold text-rose-600 mb-2">Ayrıştırma Hatası</h3>
+              <p class="text-xs text-[#8a8580] leading-relaxed font-medium">PDF belgesi parse edilirken sunucu hatası oluştu. Lütfen dosyanın şifreli veya bozuk olmadığından emin olun.</p>
+            </div>
+          </div>
+        `;
+      }
+    }
+
+    // Load candidate info safely under page load
+    document.addEventListener('astro:page-load', () => {
+      const listBody = document.getElementById('cvs-table-body');
+      if (listBody) {
+        loadCandidateProfile();
+      }
+    });
+  </script>
+</AdminLayout>

@@ -3,6 +3,7 @@ import { PrismaClient, Prisma } from "@prisma/client";
 import { PrismaPg } from "@prisma/adapter-pg";
 import pg from "pg";
 import { authMiddleware, adminMiddleware } from "../middleware/auth.js";
+import { supabase } from "../lib/supabase.js";
 
 const pool = new pg.Pool({
   connectionString: process.env.DATABASE_URL,
@@ -191,6 +192,7 @@ router.get("/reports/stats", authMiddleware, adminMiddleware, async (_req: Reque
       processingAnalyses,
       avgScoreResult,
       recentUsers,
+      recentCvs,
     ] = await Promise.all([
       prisma.user.count(),
       prisma.user.count({ where: { role: "CANDIDATE" } }),
@@ -208,6 +210,14 @@ router.get("/reports/stats", authMiddleware, adminMiddleware, async (_req: Reque
       prisma.$queryRaw<{ day: string; count: bigint }[]>`
         SELECT DATE_TRUNC('day', "createdAt") AS day, COUNT(*) AS count
         FROM users
+        WHERE "createdAt" >= NOW() - INTERVAL '7 days'
+        GROUP BY day
+        ORDER BY day ASC
+      `,
+      // Last 7 days CV uploads (grouped by day)
+      prisma.$queryRaw<{ day: string; count: bigint }[]>`
+        SELECT DATE_TRUNC('day', "createdAt") AS day, COUNT(*) AS count
+        FROM cvs
         WHERE "createdAt" >= NOW() - INTERVAL '7 days'
         GROUP BY day
         ORDER BY day ASC
@@ -242,6 +252,11 @@ router.get("/reports/stats", authMiddleware, adminMiddleware, async (_req: Reque
       count: Number(r.count),
     }));
 
+    const recentCvUploads = recentCvs.map((r) => ({
+      day: r.day,
+      count: Number(r.count),
+    }));
+
     res.json({
       totalUsers,
       totalCandidates,
@@ -256,9 +271,74 @@ router.get("/reports/stats", authMiddleware, adminMiddleware, async (_req: Reque
         : null,
       topSkills,
       recentSignups,
+      recentCvUploads,
     });
   } catch (error) {
     console.error("Rapor istatistikleri alınırken hata:", error);
+    res.status(500).json({ message: "Sunucu hatası." });
+  }
+});
+
+// GET /api/admin/candidates/:id
+router.get("/candidates/:id", authMiddleware, adminMiddleware, async (req: Request, res: Response): Promise<void> => {
+  const id = req.params.id as string;
+  try {
+    const candidate = await prisma.user.findFirst({
+      where: { id: id, role: "CANDIDATE" },
+      select: {
+        id: true,
+        email: true,
+        name: true,
+        phone: true,
+        avatarUrl: true,
+        createdAt: true,
+        cvs: {
+          include: {
+            analyses: {
+              orderBy: { createdAt: "desc" }
+            }
+          },
+          orderBy: { createdAt: "desc" }
+        }
+      }
+    });
+
+    if (!candidate) {
+      res.status(404).json({ message: "Aday bulunamadı." });
+      return;
+    }
+
+    // Generate signed URLs for CVs
+    const cvsWithSignedUrls = await Promise.all(
+      candidate.cvs.map(async (cv) => {
+        const urlParts = cv.fileUrl.split('/cv-files/');
+        const filePath = urlParts[1];
+
+        if (!filePath) return cv;
+
+        const { data, error } = await supabase.storage
+          .from("cv-files")
+          .createSignedUrl(filePath, 3600); // 1 hour expiration
+
+        if (error) {
+          console.error(`Error generating signed URL for CV ${cv.id}:`, error);
+        }
+
+        return {
+          ...cv,
+          fileUrl: data?.signedUrl || cv.fileUrl
+        };
+      })
+    );
+
+    res.json({
+      candidate: {
+        ...candidate,
+        cvs: cvsWithSignedUrls
+      }
+    });
+  } catch (error) {
+    console.error("Aday detayları alınırken hata:", error);
     res.status(500).json({ message: "Sunucu hatası." });
   }
 });

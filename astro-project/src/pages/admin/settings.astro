@@ -2,27 +2,27 @@
 import AdminLayout from '../../layouts/AdminLayout.astro';
 ---
 
-<AdminLayout title="Beacon AI - Sistem Ayarları">
+<AdminLayout title="Beacon - Sistem Ayarları">
   <div class="max-w-6xl mx-auto">
     <!-- Header -->
     <header class="mb-8">
-      <h2 class="font-headline-md text-headline-md font-bold mb-2 text-on-surface">Ayarlar</h2>
-      <p class="font-body-md text-body-md text-on-surface-variant">Hesap ve sistem ayarlarınızı yönetin.</p>
+      <h2 class="font-headline-md text-headline-md font-bold mb-2 text-[#1b1c1a]">Ayarlar</h2>
+      <p class="font-body-md text-body-md text-[#8a8580]">Hesap ve sistem ayarlarınızı yönetin.</p>
     </header>
 
     <div class="flex flex-col lg:flex-row gap-8">
       <!-- Settings Sidebar -->
       <aside class="w-full lg:w-64 flex-shrink-0">
-        <nav class="flex flex-col gap-2 bg-surface-container-highest border border-outline-variant rounded-xl p-4 shadow-sm" id="settings-nav">
-          <button data-target="section-profile" class="tab-btn w-full text-left bg-secondary-container text-on-secondary-container font-label-md px-4 py-3 rounded-lg border-l-4 border-primary transition-all duration-300 flex items-center gap-3 shadow-[0_0_10px_rgba(167,139,250,0.1)]">
+        <nav class="flex flex-col gap-2 bg-[#faf9f5]/60 border border-[#ddd9d3] rounded-[10px] p-4 shadow-sm" id="settings-nav">
+          <button data-target="section-profile" class="tab-btn w-full text-left bg-white text-[#14422f] font-semibold px-4 py-3 rounded-lg border-l-4 border-[#14422f] transition-all duration-200 flex items-center gap-3 shadow-sm">
             <span class="material-symbols-outlined text-[18px]">person</span>
             Profil
           </button>
-          <button data-target="section-security" class="tab-btn w-full text-left text-on-surface-variant hover:text-on-surface hover:bg-surface-container-high border-l-4 border-transparent font-label-md px-4 py-3 rounded-lg transition-all duration-300 flex items-center gap-3">
+          <button data-target="section-security" class="tab-btn w-full text-left text-[#8a8580] hover:text-[#1b1c1a] hover:bg-white/40 border-l-4 border-transparent font-semibold px-4 py-3 rounded-lg transition-all duration-200 flex items-center gap-3">
             <span class="material-symbols-outlined text-[18px]">security</span>
             Güvenlik
           </button>
-          <button data-target="section-notifications" class="tab-btn w-full text-left text-on-surface-variant hover:text-on-surface hover:bg-surface-container-high border-l-4 border-transparent font-label-md px-4 py-3 rounded-lg transition-all duration-300 flex items-center gap-3">
+          <button data-target="section-notifications" class="tab-btn w-full text-left text-[#8a8580] hover:text-[#1b1c1a] hover:bg-white/40 border-l-4 border-transparent font-semibold px-4 py-3 rounded-lg transition-all duration-200 flex items-center gap-3">
             <span class="material-symbols-outlined text-[18px]">notifications</span>
             Bildirimler
           </button>
@@ -30,43 +30,44 @@ import AdminLayout from '../../layouts/AdminLayout.astro';
       </aside>
 
       <!-- Settings Content -->
-      <div class="flex-1 min-h-[400px] relative">
+      <div class="flex-1">
         
         <!-- Profile Card -->
-        <section id="section-profile" class="settings-section absolute top-0 left-0 w-full transition-all duration-500 opacity-100 translate-y-0 visible bg-surface-container-highest border border-outline-variant rounded-xl p-8 shadow-sm">
+        <section id="section-profile" class="settings-section bg-white border border-[#ddd9d3] rounded-[10px] p-8 shadow-sm relative overflow-hidden">
+          <div class="absolute left-0 top-0 bottom-0 w-[3px] bg-[#14422f]"></div>
           <div class="mb-6">
-            <h3 class="font-headline-sm text-headline-sm font-bold text-on-surface">Profil Bilgileri</h3>
-            <p class="text-on-surface-variant text-sm mt-1">Hesap bilgilerinizi güncelleyin.</p>
+            <h3 class="font-headline-sm text-headline-sm font-bold text-[#1b1c1a]">Profil Bilgileri</h3>
+            <p class="text-[#8a8580] text-sm mt-1 font-medium">Hesap bilgilerinizi güncelleyin.</p>
           </div>
 
           <div class="flex flex-col gap-6">
             <!-- Avatar Section -->
             <div class="flex items-center gap-6">
-              <div class="w-20 h-20 rounded-full bg-primary-container text-on-primary-container flex items-center justify-center font-bold text-2xl shadow-[0_0_20px_rgba(124,58,237,0.3)] transition-transform duration-300 hover:scale-105 overflow-hidden bg-cover bg-center" id="avatar-preview">
+              <div class="w-20 h-20 rounded-full bg-[#14422f]/10 text-[#14422f] flex items-center justify-center font-bold text-2xl border border-[#ddd9d3] shadow-sm transition-transform duration-200 hover:scale-105 overflow-hidden bg-cover bg-center" id="avatar-preview">
                 A
               </div>
               <div>
                 <input type="file" id="avatar-input" accept="image/*" class="hidden" />
-                <button type="button" onclick="document.getElementById('avatar-input').click()" class="border border-outline-variant text-on-surface hover:border-primary/50 hover:bg-surface-container-high hover:shadow-md px-4 py-2 rounded-lg font-label-md transition-all duration-300 text-sm active:scale-95">
+                <button type="button" onclick="document.getElementById('avatar-input').click()" class="border border-[#ddd9d3] bg-white text-[#1b1c1a] hover:bg-[#faf9f5] hover:border-[#14422f] hover:shadow-sm px-4 py-2 rounded-[8px] font-semibold transition-all text-sm shadow-sm active:scale-95">
                   Fotoğraf Değiştir
                 </button>
-                <p class="text-xs text-on-surface-variant mt-2">Maksimum 1 MB</p>
+                <p class="text-xs text-[#8a8580] mt-2 font-medium">Maksimum 1 MB</p>
               </div>
             </div>
 
             <!-- Form Grid -->
             <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
               <div class="space-y-2 group">
-                <label class="text-label-md font-bold text-on-surface transition-colors duration-300 group-focus-within:text-primary">Ad Soyad</label>
-                <input type="text" id="profile-name" placeholder="Adınızı girin" class="w-full bg-[#13132b]/50 border border-[#2a2a4a] text-white rounded-lg px-4 py-3 focus:border-[#7c5cfc] focus:ring-1 focus:ring-[#7c5cfc] focus:shadow-[0_0_15px_rgba(124,92,252,0.15)] hover:border-[#7c5cfc]/50 focus:outline-none font-body-md transition-all duration-300 shadow-sm placeholder-[#a3a3c2]/40" />
+                <label class="text-xs font-bold text-[#8a8580] uppercase tracking-wider block">Ad Soyad</label>
+                <input type="text" id="profile-name" placeholder="Adınızı girin" class="w-full bg-[#faf9f5] border border-[#ddd9d3] text-[#1b1c1a] rounded-[10px] px-4 py-3 focus:border-[#14422f] focus:ring-1 focus:ring-[#14422f] focus:outline-none font-body-md transition-all shadow-sm placeholder-[#8a8580]/40" />
               </div>
               <div class="space-y-2 group">
-                <label class="text-label-md font-bold text-on-surface transition-colors duration-300 group-focus-within:text-primary">E-posta</label>
-                <input type="email" id="profile-email" placeholder="ornek@email.com" class="w-full bg-[#13132b]/50 border border-[#2a2a4a] text-white rounded-lg px-4 py-3 focus:border-[#7c5cfc] focus:ring-1 focus:ring-[#7c5cfc] focus:shadow-[0_0_15px_rgba(124,92,252,0.15)] hover:border-[#7c5cfc]/50 focus:outline-none font-body-md transition-all duration-300 shadow-sm placeholder-[#a3a3c2]/40" />
+                <label class="text-xs font-bold text-[#8a8580] uppercase tracking-wider block">E-posta</label>
+                <input type="email" id="profile-email" placeholder="ornek@email.com" class="w-full bg-[#faf9f5] border border-[#ddd9d3] text-[#1b1c1a] rounded-[10px] px-4 py-3 focus:border-[#14422f] focus:ring-1 focus:ring-[#14422f] focus:outline-none font-body-md transition-all shadow-sm placeholder-[#8a8580]/40" />
               </div>
               <div class="space-y-2 group">
-                <label class="text-label-md font-bold text-on-surface transition-colors duration-300 group-focus-within:text-primary">Telefon Numarası</label>
-                <input type="tel" id="profile-phone" placeholder="5xxxxxxxxx" class="w-full bg-[#13132b]/50 border border-[#2a2a4a] text-white rounded-lg px-4 py-3 focus:border-[#7c5cfc] focus:ring-1 focus:ring-[#7c5cfc] focus:shadow-[0_0_15px_rgba(124,92,252,0.15)] hover:border-[#7c5cfc]/50 focus:outline-none font-body-md transition-all duration-300 shadow-sm placeholder-[#a3a3c2]/40" />
+                <label class="text-xs font-bold text-[#8a8580] uppercase tracking-wider block">Telefon Numarası</label>
+                <input type="tel" id="profile-phone" placeholder="5xxxxxxxxx" class="w-full bg-[#faf9f5] border border-[#ddd9d3] text-[#1b1c1a] rounded-[10px] px-4 py-3 focus:border-[#14422f] focus:ring-1 focus:ring-[#14422f] focus:outline-none font-body-md transition-all shadow-sm placeholder-[#8a8580]/40" />
               </div>
             </div>
 
@@ -75,7 +76,7 @@ import AdminLayout from '../../layouts/AdminLayout.astro';
 
             <!-- Actions -->
             <div class="flex justify-end pt-4">
-              <button id="save-profile-btn" class="bg-[#7c3aed] hover:bg-[#6d28d9] hover:-translate-y-0.5 hover:shadow-[0_4px_15px_rgba(124,58,237,0.4)] text-white px-6 py-2.5 rounded-lg font-label-md transition-all duration-300 active:scale-95 active:translate-y-0">
+              <button id="save-profile-btn" class="bg-[#b87333] hover:bg-[#9c612b] text-white px-6 py-2.5 rounded-[10px] text-sm font-semibold transition-colors shadow-sm active:scale-95">
                 Değişiklikleri Kaydet
               </button>
             </div>
@@ -83,37 +84,38 @@ import AdminLayout from '../../layouts/AdminLayout.astro';
         </section>
 
         <!-- Security Card -->
-        <section id="section-security" class="settings-section absolute top-0 left-0 w-full transition-all duration-500 opacity-0 translate-y-4 invisible bg-surface-container-highest border border-outline-variant rounded-xl p-8 shadow-sm">
+        <section id="section-security" class="settings-section bg-white border border-[#ddd9d3] rounded-[10px] p-8 shadow-sm relative overflow-hidden hidden">
+          <div class="absolute left-0 top-0 bottom-0 w-[3px] bg-[#14422f]"></div>
           <div class="mb-6">
-            <h3 class="font-headline-sm text-headline-sm font-bold text-on-surface">Güvenlik</h3>
-            <p class="text-on-surface-variant text-sm mt-1">Şifrenizi güncelleyin.</p>
+            <h3 class="font-headline-sm text-headline-sm font-bold text-[#1b1c1a]">Güvenlik</h3>
+            <p class="text-[#8a8580] text-sm mt-1 font-medium">Şifrenizi güncelleyin.</p>
           </div>
 
           <div class="flex flex-col gap-6">
             <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
               <div class="space-y-2 md:col-span-2 group">
-                <label class="text-label-md font-bold text-on-surface transition-colors duration-300 group-focus-within:text-primary">Mevcut Şifre</label>
+                <label class="text-xs font-bold text-[#8a8580] uppercase tracking-wider block">Mevcut Şifre</label>
                 <div class="relative">
-                  <input type="password" id="current-password" autocomplete="new-password" class="w-full bg-[#13132b]/50 border border-[#2a2a4a] text-white rounded-lg px-4 py-3 pr-12 focus:border-[#7c5cfc] focus:ring-1 focus:ring-[#7c5cfc] focus:shadow-[0_0_15px_rgba(124,92,252,0.15)] hover:border-[#7c5cfc]/50 focus:outline-none font-body-md transition-all duration-300 shadow-sm placeholder-[#a3a3c2]/40" />
-                  <button type="button" class="absolute right-3 top-1/2 -translate-y-1/2 text-gray-500 hover:text-primary transition-colors focus:outline-none" onclick="togglePassVisibility('current-password', this)">
+                  <input type="password" id="current-password" autocomplete="new-password" class="w-full bg-[#faf9f5] border border-[#ddd9d3] text-[#1b1c1a] rounded-[10px] px-4 py-3 pr-12 focus:border-[#14422f] focus:ring-1 focus:ring-[#14422f] focus:outline-none font-body-md transition-all shadow-sm placeholder-[#8a8580]/40" />
+                  <button type="button" class="absolute right-3 top-1/2 -translate-y-1/2 text-[#8a8580] hover:text-[#14422f] transition-colors focus:outline-none" onclick="togglePassVisibility('current-password', this)">
                     <span class="material-symbols-outlined text-[20px]">visibility</span>
                   </button>
                 </div>
               </div>
               <div class="space-y-2 group">
-                <label class="text-label-md font-bold text-on-surface transition-colors duration-300 group-focus-within:text-primary">Yeni Şifre</label>
+                <label class="text-xs font-bold text-[#8a8580] uppercase tracking-wider block">Yeni Şifre</label>
                 <div class="relative">
-                  <input type="password" id="new-password" autocomplete="new-password" class="w-full bg-[#13132b]/50 border border-[#2a2a4a] text-white rounded-lg px-4 py-3 pr-12 focus:border-[#7c5cfc] focus:ring-1 focus:ring-[#7c5cfc] focus:shadow-[0_0_15px_rgba(124,92,252,0.15)] hover:border-[#7c5cfc]/50 focus:outline-none font-body-md transition-all duration-300 shadow-sm placeholder-[#a3a3c2]/40" />
-                  <button type="button" class="absolute right-3 top-1/2 -translate-y-1/2 text-gray-500 hover:text-primary transition-colors focus:outline-none" onclick="togglePassVisibility('new-password', this)">
+                  <input type="password" id="new-password" autocomplete="new-password" class="w-full bg-[#faf9f5] border border-[#ddd9d3] text-[#1b1c1a] rounded-[10px] px-4 py-3 pr-12 focus:border-[#14422f] focus:ring-1 focus:ring-[#14422f] focus:outline-none font-body-md transition-all shadow-sm placeholder-[#8a8580]/40" />
+                  <button type="button" class="absolute right-3 top-1/2 -translate-y-1/2 text-[#8a8580] hover:text-[#14422f] transition-colors focus:outline-none" onclick="togglePassVisibility('new-password', this)">
                     <span class="material-symbols-outlined text-[20px]">visibility</span>
                   </button>
                 </div>
               </div>
               <div class="space-y-2 group">
-                <label class="text-label-md font-bold text-on-surface transition-colors duration-300 group-focus-within:text-primary">Yeni Şifre (Onay)</label>
+                <label class="text-xs font-bold text-[#8a8580] uppercase tracking-wider block">Yeni Şifre (Onay)</label>
                 <div class="relative">
-                  <input type="password" id="confirm-password" autocomplete="new-password" class="w-full bg-[#13132b]/50 border border-[#2a2a4a] text-white rounded-lg px-4 py-3 pr-12 focus:border-[#7c5cfc] focus:ring-1 focus:ring-[#7c5cfc] focus:shadow-[0_0_15px_rgba(124,92,252,0.15)] hover:border-[#7c5cfc]/50 focus:outline-none font-body-md transition-all duration-300 shadow-sm placeholder-[#a3a3c2]/40" />
-                  <button type="button" class="absolute right-3 top-1/2 -translate-y-1/2 text-gray-500 hover:text-primary transition-colors focus:outline-none" onclick="togglePassVisibility('confirm-password', this)">
+                  <input type="password" id="confirm-password" autocomplete="new-password" class="w-full bg-[#faf9f5] border border-[#ddd9d3] text-[#1b1c1a] rounded-[10px] px-4 py-3 pr-12 focus:border-[#14422f] focus:ring-1 focus:ring-[#14422f] focus:outline-none font-body-md transition-all shadow-sm placeholder-[#8a8580]/40" />
+                  <button type="button" class="absolute right-3 top-1/2 -translate-y-1/2 text-[#8a8580] hover:text-[#14422f] transition-colors focus:outline-none" onclick="togglePassVisibility('confirm-password', this)">
                     <span class="material-symbols-outlined text-[20px]">visibility</span>
                   </button>
                 </div>
@@ -125,21 +127,22 @@ import AdminLayout from '../../layouts/AdminLayout.astro';
 
             <!-- Actions -->
             <div class="flex justify-end pt-4">
-              <button id="save-password-btn" class="bg-[#7c3aed] hover:bg-[#6d28d9] hover:-translate-y-0.5 hover:shadow-[0_4px_15px_rgba(124,58,237,0.4)] text-white px-6 py-2.5 rounded-lg font-label-md transition-all duration-300 active:scale-95 active:translate-y-0">
+              <button id="save-password-btn" class="bg-[#b87333] hover:bg-[#9c612b] text-white px-6 py-2.5 rounded-[10px] text-sm font-semibold transition-colors shadow-sm active:scale-95">
                 Şifreyi Güncelle
               </button>
             </div>
           </div>
         </section>
         
-        <!-- Notifications Card (Placeholder) -->
-        <section id="section-notifications" class="settings-section absolute top-0 left-0 w-full transition-all duration-500 opacity-0 translate-y-4 invisible bg-surface-container-highest border border-outline-variant rounded-xl p-8 shadow-sm">
+        <!-- Notifications Card -->
+        <section id="section-notifications" class="settings-section bg-white border border-[#ddd9d3] rounded-[10px] p-8 shadow-sm relative overflow-hidden hidden">
+          <div class="absolute left-0 top-0 bottom-0 w-[3px] bg-[#14422f]"></div>
           <div class="mb-6">
-            <h3 class="font-headline-sm text-headline-sm font-bold text-on-surface">Bildirimler</h3>
-            <p class="text-on-surface-variant text-sm mt-1">E-posta ve sistem bildirim ayarlarını yapılandırın.</p>
+            <h3 class="font-headline-sm text-headline-sm font-bold text-[#1b1c1a]">Bildirimler</h3>
+            <p class="text-[#8a8580] text-sm mt-1 font-medium">E-posta ve sistem bildirim ayarlarını yapılandırın.</p>
           </div>
-          <div class="h-48 flex items-center justify-center border-2 border-dashed border-outline-variant rounded-lg">
-             <span class="text-on-surface-variant">Yapım Aşamasında</span>
+          <div class="h-48 flex items-center justify-center border-2 border-dashed border-[#ddd9d3] bg-[#faf9f5] rounded-[10px]">
+             <span class="text-[#8a8580] font-semibold text-sm">Yapım Aşamasında</span>
           </div>
         </section>
 
@@ -189,33 +192,33 @@ import AdminLayout from '../../layouts/AdminLayout.astro';
           const targetId = tab.getAttribute("data-target");
 
           tabs.forEach(t => {
-            t.classList.remove("bg-secondary-container", "text-on-secondary-container", "border-primary", "shadow-[0_0_10px_rgba(167,139,250,0.1)]");
-            t.classList.add("text-on-surface-variant", "border-transparent");
+            t.classList.remove("bg-white", "text-[#14422f]", "border-[#14422f]", "shadow-sm");
+            t.classList.add("text-[#8a8580]", "border-transparent");
           });
 
-          tab.classList.remove("text-on-surface-variant", "border-transparent");
-          tab.classList.add("bg-secondary-container", "text-on-secondary-container", "border-primary", "shadow-[0_0_10px_rgba(167,139,250,0.1)]");
+          tab.classList.remove("text-[#8a8580]", "border-transparent");
+          tab.classList.add("bg-white", "text-[#14422f]", "border-[#14422f]", "shadow-sm");
 
           sections.forEach((section) => {
-            section.classList.remove("opacity-100", "translate-y-0", "visible");
-            section.classList.add("opacity-0", "translate-y-4", "invisible");
+            section.classList.add("hidden");
           });
 
           const targetSection = document.getElementById(targetId);
           if (targetSection) {
-            targetSection.classList.remove("opacity-0", "translate-y-4", "invisible");
-            targetSection.classList.add("opacity-100", "translate-y-0", "visible");
+            targetSection.classList.remove("hidden");
           }
         });
       });
 
-      // API Interactivity
-      
-      // Fetch initial user data
-      try {
-        const res = await fetch('/api/auth/me');
-        if (res.ok) {
-          const data = await res.json();
+      // Fetch user profile data via SWR cache
+      async function loadUserProfile() {
+        const fetcher = async () => {
+          const res = await fetch('/api/auth/me');
+          if (!res.ok) throw new Error("Fetch user profile error");
+          return res.json();
+        };
+
+        const render = (data) => {
           if (data.user) {
             const nameInput = document.getElementById('profile-name');
             const emailInput = document.getElementById('profile-email');
@@ -234,10 +237,16 @@ import AdminLayout from '../../layouts/AdminLayout.astro';
               avatarPreview.style.backgroundImage = 'none';
             }
           }
+        };
+
+        if (window.__swrCache) {
+          window.__swrCache.query('user-profile', fetcher, render, 30000);
+        } else {
+          fetcher().then(render).catch(err => console.error(err));
         }
-      } catch (err) {
-        console.error("Kullanıcı bilgileri alınamadı:", err);
       }
+
+      await loadUserProfile();
 
       let currentAvatarBase64 = null;
 
@@ -318,6 +327,14 @@ import AdminLayout from '../../layouts/AdminLayout.astro';
             
             if (res.ok) {
               showStatus('profile-status', 'Profil başarıyla güncellendi!');
+              
+              // Clear cache entries so headers and dashboards update instantly
+              if (window.__swrCache) {
+                window.__swrCache.invalidate('user-profile');
+                window.__swrCache.invalidate('dashboard-stats');
+              }
+              sessionStorage.removeItem('user-avatar');
+              
               const avatarPreview = document.getElementById('avatar-preview');
               if (avatarPreview && !currentAvatarBase64 && (name || email)) {
                 if(avatarPreview.style.backgroundImage === '' || avatarPreview.style.backgroundImage === 'none') {
@@ -391,10 +408,10 @@ import AdminLayout from '../../layouts/AdminLayout.astro';
       }
     };
 
-    if (document.readyState === "loading") {
-      document.addEventListener("DOMContentLoaded", initSettings);
-    } else {
-      initSettings();
-    }
+    document.addEventListener("astro:page-load", () => {
+      if (document.getElementById('profile-name')) {
+        initSettings();
+      }
+    });
   </script>
 </AdminLayout>
