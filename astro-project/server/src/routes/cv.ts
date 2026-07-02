@@ -301,6 +301,37 @@ router.get("/list", authMiddleware, async (req: Request, res: Response): Promise
   }
 });
 
+// GET /api/cv/:id/chunks
+router.get("/:id/chunks", authMiddleware, async (req: Request, res: Response): Promise<void> => {
+  if (!req.user) {
+    res.status(401).json({ message: "Yetkisiz erişim." });
+    return;
+  }
+
+  const id = req.params.id as string;
+
+  try {
+    const cv = await prisma.cV.findFirst({
+      where: req.user.role === "ADMIN"
+        ? { id }
+        : { id, userId: req.user.id },
+      include: {
+        chunks: { orderBy: { chunkIndex: "asc" } }
+      }
+    });
+
+    if (!cv) {
+      res.status(404).json({ message: "CV bulunamadı veya yetkiniz yok." });
+      return;
+    }
+
+    res.json({ chunks: cv.chunks, fileName: cv.fileName });
+  } catch (error) {
+    console.error("Chunk listeleme hatası:", error);
+    res.status(500).json({ message: "Chunk listesi alınamadı." });
+  }
+});
+
 // DELETE /api/cv/:id
 router.delete("/:id", authMiddleware, async (req: Request, res: Response): Promise<void> => {
   if (!req.user) {
