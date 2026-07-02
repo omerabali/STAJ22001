@@ -107,30 +107,43 @@ import AdminLayout from '../../layouts/AdminLayout.astro';
 
         <!-- ── TAB: Toplu Yükleme ── -->
         <div id="panel-bulk" class="p-4 hidden">
+
+          <!-- Drop zone -->
           <div
             id="drop-zone-bulk"
-            class="border-2 border-dashed border-[#ddd9d3] rounded-[10px] p-8 flex flex-col items-center justify-center cursor-pointer hover:border-[#14422f]/40 hover:bg-[#14422f]/[0.02] transition-all duration-200"
+            class="border-2 border-dashed border-[#ddd9d3] rounded-[10px] p-6 flex flex-col items-center justify-center cursor-pointer hover:border-[#14422f]/40 hover:bg-[#14422f]/[0.02] transition-all duration-200"
           >
-            <div class="w-12 h-12 rounded-full bg-[#14422f]/8 flex items-center justify-center mb-3 border border-[#14422f]/15">
-              <span class="material-symbols-outlined text-[#14422f] text-2xl">folder_open</span>
+            <div class="w-10 h-10 rounded-full bg-[#14422f]/8 flex items-center justify-center mb-3 border border-[#14422f]/15">
+              <span class="material-symbols-outlined text-[#14422f] text-xl">folder_open</span>
             </div>
             <p class="text-sm font-bold text-[#1b1c1a] mb-1 text-center">Birden fazla dosya seç</p>
-            <p class="text-[11px] text-[#8a8580] font-medium text-center mb-4">Çoklu PDF · Her biri Maks 5MB</p>
+            <p class="text-[11px] text-[#8a8580] font-medium text-center mb-3">Her dosya ayrı bir adaya ait · PDF · Maks 5MB</p>
             <button class="bg-[#14422f] text-white text-xs font-bold px-5 py-2.5 rounded-[8px] hover:opacity-90 transition-opacity">
               Dosyaları Seç
             </button>
             <input type="file" id="cv-file-bulk" accept=".pdf" class="hidden" multiple />
           </div>
 
-          <!-- Bulk queue -->
-          <div id="bulk-queue-wrap" class="hidden mt-3">
+          <!-- Queue: each row has its own candidate dropdown -->
+          <div id="bulk-queue-wrap" class="hidden mt-4">
             <div class="flex items-center justify-between mb-2">
               <p class="text-[10px] font-bold text-[#8a8580] tracking-widest uppercase">Yükleme Kuyruğu</p>
               <button id="clear-done-btn" class="text-[10px] font-bold text-[#8a8580] hover:text-rose-600 transition-colors hidden">
                 Bittileri Temizle
               </button>
             </div>
-            <div id="bulk-progress-list" class="space-y-2"></div>
+
+            <!-- File rows -->
+            <div id="bulk-progress-list" class="space-y-2 mb-3"></div>
+
+            <!-- Upload all button -->
+            <button
+              id="bulk-upload-btn"
+              class="w-full bg-[#14422f] text-white text-xs font-bold py-2.5 rounded-[8px] hover:opacity-90 transition-opacity flex items-center justify-center gap-2"
+            >
+              <span class="material-symbols-outlined text-[16px]">cloud_upload</span>
+              Tümünü Yükle
+            </button>
           </div>
         </div>
 
@@ -443,88 +456,155 @@ import AdminLayout from '../../layouts/AdminLayout.astro';
     input?.addEventListener('change', () => { if (input.files?.[0]) doUpload(input.files[0]); });
   }
 
-  // ─── Toplu Yükleme ─────────────────────────────────────────────────
+  // ─── Toplu Yükleme ───────────────────────────────────────────
+  // Her dosya farklı bir adaya ait — her satır kendi dropdown'ını taşır
   function setupBulkUpload() {
-    const dz    = document.getElementById('drop-zone-bulk');
-    const input = document.getElementById('cv-file-bulk');
-    const wrap  = document.getElementById('bulk-queue-wrap');
-    const list  = document.getElementById('bulk-progress-list');
+    const dz       = document.getElementById('drop-zone-bulk');
+    const input    = document.getElementById('cv-file-bulk');
+    const wrap     = document.getElementById('bulk-queue-wrap');
+    const list     = document.getElementById('bulk-progress-list');
     const clearBtn = document.getElementById('clear-done-btn');
+    const uploadAllBtn = document.getElementById('bulk-upload-btn');
+
+    // Build candidate option HTML (reused in each row)
+    function buildOptions() {
+      let opts = '<option value="">Admin (kendi hesabıma)</option>';
+      allCandidates.forEach(c => {
+        const label = c.name ? `${c.name} — ${c.email}` : c.email;
+        opts += `<option value="${c.id}">${label}</option>`;
+      });
+      return opts;
+    }
 
     clearBtn?.addEventListener('click', () => {
       list?.querySelectorAll('.bulk-item.done').forEach(el => el.remove());
-      if (!list?.children.length) wrap.classList.add('hidden');
-      clearBtn.classList.add('hidden');
+      if (!list?.children.length) { wrap.classList.add('hidden'); clearBtn.classList.add('hidden'); }
     });
 
+    // Add files to queue (without uploading yet)
     function addToQueue(files) {
       wrap.classList.remove('hidden');
+      uploadAllBtn.disabled = false;
+      uploadAllBtn.classList.remove('opacity-50', 'cursor-not-allowed');
+
       Array.from(files).forEach(file => {
         if (!validateFile(file)) return;
 
         const item = document.createElement('div');
-        item.className = 'bulk-item bg-[#faf9f5] border border-[#ddd9d3] rounded-[8px] p-3';
+        item.className = 'bulk-item bg-[#faf9f5] border border-[#ddd9d3] rounded-[10px] overflow-hidden';
+        item.dataset.state = 'queued'; // queued | uploading | done
         item.innerHTML = `
-          <div class="flex items-center justify-between gap-2 mb-2">
-            <div class="flex items-center gap-2 min-w-0">
-              <span class="material-symbols-outlined text-red-500 text-[16px] shrink-0">picture_as_pdf</span>
-              <span class="text-[11px] font-bold text-[#1b1c1a] truncate">${file.name}</span>
-            </div>
-            <div class="flex items-center gap-1.5 shrink-0">
-              <span class="text-[11px] font-mono text-[#8a8580] item-pct">0%</span>
-              <button class="w-5 h-5 rounded-full flex items-center justify-center text-[#8a8580] hover:text-rose-600 hover:bg-rose-50 transition-colors cancel-btn" title="İptal / Kaldır">
-                <span class="material-symbols-outlined text-[14px]">close</span>
-              </button>
+          <!-- File info row -->
+          <div class="flex items-center gap-2 px-3 pt-3 pb-2">
+            <span class="material-symbols-outlined text-red-500 text-[16px] shrink-0">picture_as_pdf</span>
+            <span class="text-[11px] font-bold text-[#1b1c1a] truncate flex-1">${file.name}</span>
+            <button class="remove-btn w-5 h-5 rounded-full flex items-center justify-center text-[#8a8580] hover:text-rose-600 hover:bg-rose-50 transition-colors shrink-0" title="Kuyruğtan çıkar">
+              <span class="material-symbols-outlined text-[14px]">close</span>
+            </button>
+          </div>
+          <!-- Candidate dropdown -->
+          <div class="px-3 pb-2">
+            <div class="relative">
+              <select class="row-candidate w-full appearance-none bg-white border border-[#ddd9d3] rounded-[7px] px-3 py-2 pr-8 text-[11px] font-medium text-[#1b1c1a] focus:outline-none focus:border-[#14422f] cursor-pointer">
+                ${buildOptions()}
+              </select>
+              <span class="material-symbols-outlined absolute right-2.5 top-1/2 -translate-y-1/2 text-[#8a8580] text-[14px] pointer-events-none">expand_more</span>
             </div>
           </div>
-          <div class="w-full bg-white border border-[#ddd9d3] h-1.5 rounded-full overflow-hidden">
-            <div class="h-full w-0 bg-[#14422f] transition-all duration-150 rounded-full item-bar"></div>
+          <!-- Progress (hidden until upload starts) -->
+          <div class="progress-area hidden px-3 pb-3">
+            <div class="w-full bg-white border border-[#ddd9d3] h-1.5 rounded-full overflow-hidden mb-1">
+              <div class="h-full w-0 bg-[#14422f] transition-all duration-150 rounded-full item-bar"></div>
+            </div>
+            <div class="flex items-center justify-between">
+              <p class="text-[10px] font-medium item-msg text-[#8a8580]">Bekliyor...</p>
+              <span class="text-[10px] font-mono text-[#8a8580] item-pct">0%</span>
+            </div>
           </div>
-          <p class="text-[10px] text-[#8a8580] font-medium mt-1.5 item-msg">Bekliyor...</p>
         `;
         list.appendChild(item);
+
+        // Remove from queue
+        item.querySelector('.remove-btn').addEventListener('click', () => {
+          item.remove();
+          if (!list.children.length) { wrap.classList.add('hidden'); uploadAllBtn.disabled = true; }
+        });
+      });
+    }
+
+    // Upload all queued items
+    uploadAllBtn?.addEventListener('click', () => {
+      const queued = Array.from(list.querySelectorAll('.bulk-item[data-state="queued"]'));
+      if (!queued.length) return;
+
+      uploadAllBtn.disabled = true;
+      uploadAllBtn.classList.add('opacity-50', 'cursor-not-allowed');
+
+      // We need to re-get files from the input — we store file refs on the DOM
+      queued.forEach(item => {
+        item.dataset.state = 'uploading';
+        const candidateId = item.querySelector('.row-candidate')?.value || '';
+        item.querySelector('.row-candidate')?.closest('div.px-3')?.classList.add('hidden');
+        item.querySelector('.progress-area')?.classList.remove('hidden');
+        item.querySelector('.remove-btn')?.classList.add('hidden');
 
         const bar = item.querySelector('.item-bar');
         const pct = item.querySelector('.item-pct');
         const msg = item.querySelector('.item-msg');
-        const cancelBtn = item.querySelector('.cancel-btn');
+        const fileObj = item.__file;
 
-        msg.textContent = 'Yükleniyor...';
+        if (!fileObj) { msg.textContent = 'Dosya bulunamadı.'; return; }
 
-        const xhr = uploadXHR(file, {
-          onProgress: p => { bar.style.width = p + '%'; pct.textContent = p + '%'; if (p === 100) msg.textContent = 'Sunucuya ulaştı...'; },
-          onSuccess: () => {
+        const formData = new FormData();
+        formData.append('cv', fileObj);
+        if (candidateId) formData.append('targetUserId', candidateId);
+
+        const xhr = new XMLHttpRequest();
+        xhr.upload.addEventListener('progress', e => {
+          if (!e.lengthComputable) return;
+          const p = Math.round((e.loaded / e.total) * 100);
+          bar.style.width = p + '%';
+          pct.textContent = p + '%';
+          if (p === 100) msg.textContent = 'Sunucuya ulaştı...';
+        });
+        xhr.addEventListener('load', () => {
+          item.dataset.state = 'done';
+          item.classList.add('done');
+          if (xhr.status >= 200 && xhr.status < 300) {
             bar.style.width = '100%'; pct.textContent = '100%';
             msg.textContent = 'Yüklendi!';
-            msg.className = 'text-[10px] font-bold text-emerald-600 mt-1.5 item-msg';
-            item.classList.add('done');
-            cancelBtn.title = 'Kaldır';
+            msg.className = 'text-[10px] font-bold text-emerald-600 item-msg';
             clearBtn.classList.remove('hidden');
             loadCVList();
-          },
-          onError: m => {
+          } else {
+            let m = 'Yükleme başarısız.';
+            try { m = JSON.parse(xhr.responseText).message || m; } catch {}
             msg.textContent = 'Hata: ' + m;
-            msg.className = 'text-[10px] font-bold text-rose-600 mt-1.5 item-msg';
+            msg.className = 'text-[10px] font-bold text-rose-600 item-msg';
             bar.style.backgroundColor = 'rgba(239,68,68,0.5)';
             bar.style.width = '100%';
-            item.classList.add('done');
             clearBtn.classList.remove('hidden');
           }
         });
-
-        cancelBtn.addEventListener('click', () => {
-          xhr.abort();
-          item.remove();
-          if (!list.children.length) wrap.classList.add('hidden');
-        });
+        xhr.open('POST', '/api/cv/upload');
+        xhr.send(formData);
       });
+    });
+
+    // File select & drop handlers — store file refs on DOM nodes
+    function handleFiles(files) {
+      addToQueue(files);
+      // Attach file objects to the newly added rows
+      const rows = Array.from(list.querySelectorAll('.bulk-item[data-state="queued"]'));
+      const newRows = rows.slice(-files.length);
+      Array.from(files).forEach((f, i) => { if (newRows[i]) newRows[i].__file = f; });
     }
 
     dz?.addEventListener('click', () => input?.click());
     dz?.addEventListener('dragover', e => { e.preventDefault(); dz.classList.add('border-[#14422f]','bg-[#14422f]/[0.03]'); });
     dz?.addEventListener('dragleave', () => dz.classList.remove('border-[#14422f]','bg-[#14422f]/[0.03]'));
-    dz?.addEventListener('drop', e => { e.preventDefault(); dz.classList.remove('border-[#14422f]','bg-[#14422f]/[0.03]'); if (e.dataTransfer?.files?.length) addToQueue(e.dataTransfer.files); });
-    input?.addEventListener('change', () => { if (input.files?.length) addToQueue(input.files); });
+    dz?.addEventListener('drop', e => { e.preventDefault(); dz.classList.remove('border-[#14422f]','bg-[#14422f]/[0.03]'); if (e.dataTransfer?.files?.length) handleFiles(e.dataTransfer.files); });
+    input?.addEventListener('change', () => { if (input.files?.length) handleFiles(input.files); });
   }
 
   // ─── Init ──────────────────────────────────────────────────────────
