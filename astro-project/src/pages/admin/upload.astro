@@ -10,12 +10,12 @@ import AdminLayout from '../../layouts/AdminLayout.astro';
     <p class="font-body-lg text-body-lg text-[#8a8580] max-w-2xl font-medium">Platforma aday adına tekli veya toplu CV yükleyin.</p>
   </section>
 
-  <div class="grid grid-cols-1 xl:grid-cols-[340px_1fr] gap-6 items-start">
+  <div class="grid grid-cols-1 xl:grid-cols-[360px_1fr] gap-6 items-start">
 
-    <!-- LEFT COLUMN: Candidate Selector + Upload -->
+    <!-- ─── LEFT COLUMN ─────────────────────────────────────────────── -->
     <div class="flex flex-col gap-4">
 
-      <!-- Candidate Selector Card -->
+      <!-- Candidate Selector -->
       <div class="bg-white border border-[#ddd9d3] rounded-[12px] shadow-sm overflow-hidden">
         <div class="px-5 py-4 border-b border-[#ddd9d3] flex items-center gap-2.5">
           <div class="w-8 h-8 rounded-[8px] bg-[#14422f]/10 flex items-center justify-center shrink-0">
@@ -26,9 +26,7 @@ import AdminLayout from '../../layouts/AdminLayout.astro';
             <p class="text-[10px] text-[#8a8580] font-medium">CV kime yüklensin?</p>
           </div>
         </div>
-
         <div class="px-4 py-4 space-y-3">
-          <!-- Dropdown -->
           <div class="relative">
             <select
               id="admin-candidate-select"
@@ -38,8 +36,6 @@ import AdminLayout from '../../layouts/AdminLayout.astro';
             </select>
             <span class="material-symbols-outlined absolute right-3 top-1/2 -translate-y-1/2 text-[#8a8580] text-[18px] pointer-events-none">expand_more</span>
           </div>
-
-          <!-- Selected user card -->
           <div id="selected-user-card" class="flex items-center gap-3 bg-[#f5f4f0] border border-[#ddd9d3] rounded-[10px] px-3 py-2.5">
             <div id="selected-user-avatar" class="w-8 h-8 rounded-full bg-[#14422f] flex items-center justify-center shrink-0">
               <span class="material-symbols-outlined text-white text-[15px]">admin_panel_settings</span>
@@ -53,33 +49,95 @@ import AdminLayout from '../../layouts/AdminLayout.astro';
         </div>
       </div>
 
-      <!-- Upload Area Card -->
-      <div class="bg-white border border-[#ddd9d3] rounded-[12px] shadow-sm">
-        <div
-          id="drop-zone"
-          class="m-4 border-2 border-dashed border-[#ddd9d3] rounded-[10px] p-8 flex flex-col items-center justify-center cursor-pointer hover:border-[#14422f]/40 hover:bg-[#14422f]/[0.02] transition-all duration-200"
-        >
-          <div class="w-12 h-12 rounded-full bg-[#14422f]/8 flex items-center justify-center mb-3 border border-[#14422f]/15">
-            <span class="material-symbols-outlined text-[#14422f] text-2xl">upload_file</span>
-          </div>
-          <p class="text-sm font-bold text-[#1b1c1a] mb-1 text-center">Dosyaları buraya sürükle</p>
-          <p class="text-[11px] text-[#8a8580] font-medium text-center mb-4">PDF · Çoklu seçim · Maks 5MB</p>
-          <button class="bg-[#14422f] text-white text-xs font-bold px-5 py-2.5 rounded-[8px] hover:opacity-90 transition-opacity">
-            Dosya Seç
+      <!-- Upload Card with Tabs -->
+      <div class="bg-white border border-[#ddd9d3] rounded-[12px] shadow-sm overflow-hidden">
+
+        <!-- Tab Header -->
+        <div class="flex border-b border-[#ddd9d3]">
+          <button
+            id="tab-single"
+            class="upload-tab flex-1 flex items-center justify-center gap-2 px-4 py-3.5 text-xs font-bold transition-all border-b-2 border-[#14422f] text-[#14422f] bg-[#14422f]/[0.03]"
+            data-tab="single"
+          >
+            <span class="material-symbols-outlined text-[16px]">upload_file</span>
+            Tekli Yükleme
           </button>
-          <input type="file" id="cv-file-input" accept=".pdf" class="hidden" multiple />
+          <button
+            id="tab-bulk"
+            class="upload-tab flex-1 flex items-center justify-center gap-2 px-4 py-3.5 text-xs font-bold transition-all border-b-2 border-transparent text-[#8a8580] hover:text-[#1b1c1a] hover:bg-[#f5f4f0]"
+            data-tab="bulk"
+          >
+            <span class="material-symbols-outlined text-[16px]">folder_open</span>
+            Toplu Yükleme
+          </button>
         </div>
 
-        <!-- Upload Queue -->
-        <div class="hidden px-4 pb-4" id="upload-progress-container">
-          <p class="text-[10px] font-bold text-[#8a8580] tracking-widest uppercase mb-2">Yükleme Kuyruğu</p>
-          <div class="space-y-2" id="progress-items-list"></div>
+        <!-- ── TAB: Tekli Yükleme ── -->
+        <div id="panel-single" class="p-4">
+          <div
+            id="drop-zone-single"
+            class="border-2 border-dashed border-[#ddd9d3] rounded-[10px] p-8 flex flex-col items-center justify-center cursor-pointer hover:border-[#14422f]/40 hover:bg-[#14422f]/[0.02] transition-all duration-200"
+          >
+            <div class="w-12 h-12 rounded-full bg-[#14422f]/8 flex items-center justify-center mb-3 border border-[#14422f]/15">
+              <span class="material-symbols-outlined text-[#14422f] text-2xl">upload_file</span>
+            </div>
+            <p class="text-sm font-bold text-[#1b1c1a] mb-1 text-center">Dosyayı buraya sürükle</p>
+            <p class="text-[11px] text-[#8a8580] font-medium text-center mb-4">Tek PDF · Maks 5MB</p>
+            <button class="bg-[#14422f] text-white text-xs font-bold px-5 py-2.5 rounded-[8px] hover:opacity-90 transition-opacity">
+              Dosya Seç
+            </button>
+            <input type="file" id="cv-file-single" accept=".pdf" class="hidden" />
+          </div>
+
+          <!-- Single progress -->
+          <div id="single-progress-wrap" class="hidden mt-3 bg-[#faf9f5] border border-[#ddd9d3] rounded-[8px] p-3">
+            <div class="flex items-center justify-between gap-2 mb-2">
+              <div class="flex items-center gap-2 min-w-0">
+                <span class="material-symbols-outlined text-red-500 text-[16px] shrink-0">picture_as_pdf</span>
+                <span id="single-file-name" class="text-[11px] font-bold text-[#1b1c1a] truncate">—</span>
+              </div>
+              <span id="single-pct" class="text-[11px] font-mono text-[#8a8580] shrink-0">0%</span>
+            </div>
+            <div class="w-full bg-white border border-[#ddd9d3] h-1.5 rounded-full overflow-hidden">
+              <div id="single-bar" class="h-full w-0 bg-[#14422f] transition-all duration-150 rounded-full"></div>
+            </div>
+            <p id="single-msg" class="text-[10px] text-[#8a8580] font-medium mt-1.5">Yükleniyor...</p>
+          </div>
         </div>
+
+        <!-- ── TAB: Toplu Yükleme ── -->
+        <div id="panel-bulk" class="p-4 hidden">
+          <div
+            id="drop-zone-bulk"
+            class="border-2 border-dashed border-[#ddd9d3] rounded-[10px] p-8 flex flex-col items-center justify-center cursor-pointer hover:border-[#14422f]/40 hover:bg-[#14422f]/[0.02] transition-all duration-200"
+          >
+            <div class="w-12 h-12 rounded-full bg-[#14422f]/8 flex items-center justify-center mb-3 border border-[#14422f]/15">
+              <span class="material-symbols-outlined text-[#14422f] text-2xl">folder_open</span>
+            </div>
+            <p class="text-sm font-bold text-[#1b1c1a] mb-1 text-center">Birden fazla dosya seç</p>
+            <p class="text-[11px] text-[#8a8580] font-medium text-center mb-4">Çoklu PDF · Her biri Maks 5MB</p>
+            <button class="bg-[#14422f] text-white text-xs font-bold px-5 py-2.5 rounded-[8px] hover:opacity-90 transition-opacity">
+              Dosyaları Seç
+            </button>
+            <input type="file" id="cv-file-bulk" accept=".pdf" class="hidden" multiple />
+          </div>
+
+          <!-- Bulk queue -->
+          <div id="bulk-queue-wrap" class="hidden mt-3">
+            <div class="flex items-center justify-between mb-2">
+              <p class="text-[10px] font-bold text-[#8a8580] tracking-widest uppercase">Yükleme Kuyruğu</p>
+              <button id="clear-done-btn" class="text-[10px] font-bold text-[#8a8580] hover:text-rose-600 transition-colors hidden">
+                Bittileri Temizle
+              </button>
+            </div>
+            <div id="bulk-progress-list" class="space-y-2"></div>
+          </div>
+        </div>
+
       </div>
-
     </div>
 
-    <!-- RIGHT COLUMN: CV List + Chunk Viewer -->
+    <!-- ─── RIGHT COLUMN ────────────────────────────────────────────── -->
     <div class="flex flex-col gap-6">
 
       <!-- CV List Table -->
@@ -116,13 +174,11 @@ import AdminLayout from '../../layouts/AdminLayout.astro';
               <span class="material-symbols-outlined text-[#14422f] text-[18px]">segment</span>
             </div>
             <div class="min-w-0">
-              <p class="text-xs font-bold text-[#1b1c1a]" id="chunk-viewer-title">CV Parçaları</p>
+              <p class="text-xs font-bold text-[#1b1c1a] truncate" id="chunk-viewer-title">CV Parçaları</p>
               <p class="text-[10px] text-[#8a8580] font-medium" id="chunk-count-label"></p>
             </div>
           </div>
-          <div class="p-4 space-y-3 max-h-[480px] overflow-y-auto custom-scrollbar" id="chunk-list">
-            <!-- Dynamic chunks here -->
-          </div>
+          <div class="p-4 space-y-3 max-h-[480px] overflow-y-auto custom-scrollbar" id="chunk-list"></div>
         </div>
       </div>
 
@@ -135,7 +191,27 @@ import AdminLayout from '../../layouts/AdminLayout.astro';
   let activeInterval = null;
   let allCandidates = [];
 
-  // ─── Candidate Selection ───────────────────────────────────────────
+  // ─── Tab switching ─────────────────────────────────────────────────
+  function switchTab(tabName) {
+    const tabs = document.querySelectorAll('.upload-tab');
+    tabs.forEach(t => {
+      const isActive = t.dataset.tab === tabName;
+      t.classList.toggle('border-[#14422f]', isActive);
+      t.classList.toggle('text-[#14422f]', isActive);
+      t.classList.toggle('bg-[#14422f]/[0.03]', isActive);
+      t.classList.toggle('border-transparent', !isActive);
+      t.classList.toggle('text-[#8a8580]', !isActive);
+      t.classList.toggle('hover:text-[#1b1c1a]', !isActive);
+      t.classList.toggle('hover:bg-[#f5f4f0]', !isActive);
+    });
+    document.getElementById('panel-single')?.classList.toggle('hidden', tabName !== 'single');
+    document.getElementById('panel-bulk')?.classList.toggle('hidden', tabName !== 'bulk');
+  }
+
+  document.getElementById('tab-single')?.addEventListener('click', () => switchTab('single'));
+  document.getElementById('tab-bulk')?.addEventListener('click', () => switchTab('bulk'));
+
+  // ─── Candidate selector ────────────────────────────────────────────
   async function loadCandidates() {
     const select = document.getElementById('admin-candidate-select');
     if (!select) return;
@@ -159,16 +235,13 @@ import AdminLayout from '../../layouts/AdminLayout.astro';
     const nameEl = document.getElementById('selected-user-name');
     const emailEl = document.getElementById('selected-user-email');
     if (!select) return;
-
     const val = select.value;
     if (!val) {
-      // Admin self
       if (avatar) avatar.innerHTML = '<span class="material-symbols-outlined text-white text-[15px]">admin_panel_settings</span>';
       if (nameEl) nameEl.textContent = 'Admin (Ben)';
       if (emailEl) emailEl.textContent = 'Kendi hesabıma yükleniyor';
       return;
     }
-
     const cand = allCandidates.find(c => c.id === val);
     if (!cand) return;
     const initials = ((cand.name || cand.email) || '?').slice(0, 2).toUpperCase();
@@ -179,7 +252,7 @@ import AdminLayout from '../../layouts/AdminLayout.astro';
 
   document.getElementById('admin-candidate-select')?.addEventListener('change', updateSelectedCard);
 
-  // ─── Delete CV ────────────────────────────────────────────────────
+  // ─── Delete CV ─────────────────────────────────────────────────────
   window.deleteCV = async function(cvId) {
     if (!confirm('Bu CV ve tüm ilişkili verileri silmek istediğinize emin misiniz?')) return;
     try {
@@ -190,12 +263,14 @@ import AdminLayout from '../../layouts/AdminLayout.astro';
         document.getElementById('chunk-viewer-section')?.classList.add('hidden');
       }
       await loadCVList();
-    } catch (err) {
-      alert(err.message);
-    }
+    } catch (err) { alert(err.message); }
   };
 
-  // ─── Chunk Viewer ─────────────────────────────────────────────────
+  // ─── Chunk Viewer ──────────────────────────────────────────────────
+  function escapeHtml(str) {
+    return String(str).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+  }
+
   async function showChunks(cvId, fileName) {
     activeCvId = cvId;
     const section = document.getElementById('chunk-viewer-section');
@@ -203,34 +278,20 @@ import AdminLayout from '../../layouts/AdminLayout.astro';
     const countLabel = document.getElementById('chunk-count-label');
     const list = document.getElementById('chunk-list');
     if (!section || !list) return;
-
     title.textContent = fileName;
     countLabel.textContent = 'Yükleniyor...';
-    list.innerHTML = `
-      <div class="flex items-center justify-center py-10 gap-3 text-[#8a8580]">
-        <span class="material-symbols-outlined animate-spin text-2xl">progress_activity</span>
-        <span class="text-sm font-medium">Parçalar getiriliyor...</span>
-      </div>
-    `;
+    list.innerHTML = `<div class="flex items-center justify-center py-10 gap-3 text-[#8a8580]"><span class="material-symbols-outlined animate-spin text-2xl">progress_activity</span><span class="text-sm font-medium">Parçalar getiriliyor...</span></div>`;
     section.classList.remove('hidden');
-
     try {
       const res = await fetch(`/api/cv/${cvId}/chunks`);
-      if (!res.ok) throw new Error('Chunks alınamadı.');
+      if (!res.ok) throw new Error();
       const data = await res.json();
       const chunks = data.chunks || [];
-
       countLabel.textContent = `${chunks.length} parça`;
-
       if (chunks.length === 0) {
-        list.innerHTML = `
-          <div class="py-10 text-center text-[#8a8580] text-sm font-medium">
-            Bu CV için henüz parça oluşturulmamış. Analiz tamamlanınca tekrar deneyin.
-          </div>
-        `;
+        list.innerHTML = `<div class="py-10 text-center text-[#8a8580] text-sm font-medium">Bu CV için henüz parça oluşturulmamış.</div>`;
         return;
       }
-
       list.innerHTML = '';
       chunks.forEach((chunk, i) => {
         const div = document.createElement('div');
@@ -251,64 +312,38 @@ import AdminLayout from '../../layouts/AdminLayout.astro';
     }
   }
 
-  function escapeHtml(str) {
-    return String(str)
-      .replace(/&/g, '&amp;')
-      .replace(/</g, '&lt;')
-      .replace(/>/g, '&gt;')
-      .replace(/"/g, '&quot;');
-  }
-
-  // ─── CV List ──────────────────────────────────────────────────────
+  // ─── CV List ───────────────────────────────────────────────────────
   async function loadCVList() {
     const tbody = document.getElementById('my-cvs-body');
     const countLabel = document.getElementById('cv-count-label');
     if (!tbody) return;
-
     try {
       const res = await fetch('/api/cv/list');
       if (!res.ok) throw new Error();
       const data = await res.json();
       const cvs = data.cvs || [];
-
       if (countLabel) countLabel.textContent = `${cvs.length} kayıt`;
-
       if (cvs.length === 0) {
-        tbody.innerHTML = `
-          <tr>
-            <td colspan="5" class="p-10 text-center text-[#8a8580] font-medium text-sm">
-              Henüz CV yüklenmedi.
-            </td>
-          </tr>
-        `;
-        clearInterval(activeInterval);
-        activeInterval = null;
-        return;
+        tbody.innerHTML = `<tr><td colspan="5" class="p-10 text-center text-[#8a8580] font-medium text-sm">Henüz CV yüklenmedi.</td></tr>`;
+        clearInterval(activeInterval); activeInterval = null; return;
       }
-
       let hasPending = false;
       tbody.innerHTML = '';
-
       cvs.forEach(cv => {
         const analysis = cv.analyses?.[0];
         const status = analysis?.status ?? 'PENDING';
         if (status === 'PENDING' || status === 'PROCESSING') hasPending = true;
-
-        const date = new Date(cv.createdAt).toLocaleDateString('tr-TR', {
-          day: 'numeric', month: 'short', year: 'numeric'
-        });
-
-        const statusBadge = {
-          PENDING: `<span class="inline-flex items-center gap-1.5 px-2 py-1 rounded-[6px] text-[10px] font-bold bg-amber-50 text-amber-700 border border-amber-200"><span class="w-1.5 h-1.5 rounded-full bg-amber-500 animate-pulse"></span>Sırada</span>`,
+        const date = new Date(cv.createdAt).toLocaleDateString('tr-TR', { day: 'numeric', month: 'short', year: 'numeric' });
+        const badges = {
+          PENDING:    `<span class="inline-flex items-center gap-1.5 px-2 py-1 rounded-[6px] text-[10px] font-bold bg-amber-50 text-amber-700 border border-amber-200"><span class="w-1.5 h-1.5 rounded-full bg-amber-500 animate-pulse"></span>Sırada</span>`,
           PROCESSING: `<span class="inline-flex items-center gap-1.5 px-2 py-1 rounded-[6px] text-[10px] font-bold bg-blue-50 text-blue-700 border border-blue-200"><span class="w-1.5 h-1.5 rounded-full bg-blue-500 animate-ping"></span>İşleniyor</span>`,
-          COMPLETED: `<span class="inline-flex items-center gap-1.5 px-2 py-1 rounded-[6px] text-[10px] font-bold bg-emerald-50 text-emerald-700 border border-emerald-200"><span class="w-1.5 h-1.5 rounded-full bg-emerald-500"></span>Hazır</span>`,
-          FAILED: `<span class="inline-flex items-center gap-1.5 px-2 py-1 rounded-[6px] text-[10px] font-bold bg-rose-50 text-rose-700 border border-rose-200"><span class="w-1.5 h-1.5 rounded-full bg-rose-500"></span>Hata</span>`,
-        }[status] ?? '';
-
+          COMPLETED:  `<span class="inline-flex items-center gap-1.5 px-2 py-1 rounded-[6px] text-[10px] font-bold bg-emerald-50 text-emerald-700 border border-emerald-200"><span class="w-1.5 h-1.5 rounded-full bg-emerald-500"></span>Hazır</span>`,
+          FAILED:     `<span class="inline-flex items-center gap-1.5 px-2 py-1 rounded-[6px] text-[10px] font-bold bg-rose-50 text-rose-700 border border-rose-200"><span class="w-1.5 h-1.5 rounded-full bg-rose-500"></span>Hata</span>`,
+        };
+        const statusBadge = badges[status] ?? '';
         const userText = cv.user ? (cv.user.name || cv.user.email) : 'Admin';
-
         const tr = document.createElement('tr');
-        tr.className = `hover:bg-[#f5f4f0]/60 transition-colors cursor-pointer group ${activeCvId === cv.id ? 'bg-[#f5f4f0]' : ''}`;
+        tr.className = `hover:bg-[#f5f4f0]/60 transition-colors cursor-pointer ${activeCvId === cv.id ? 'bg-[#f5f4f0]' : ''}`;
         tr.onclick = () => {
           activeCvId = cv.id;
           document.querySelectorAll('#my-cvs-body tr').forEach(r => r.classList.remove('bg-[#f5f4f0]'));
@@ -316,12 +351,7 @@ import AdminLayout from '../../layouts/AdminLayout.astro';
           showChunks(cv.id, cv.fileName);
         };
         tr.innerHTML = `
-          <td class="px-4 py-3">
-            <div class="flex items-center gap-2.5">
-              <span class="material-symbols-outlined text-red-500 text-[18px] shrink-0">picture_as_pdf</span>
-              <span class="text-xs font-bold text-[#1b1c1a] truncate max-w-[200px]">${cv.fileName}</span>
-            </div>
-          </td>
+          <td class="px-4 py-3"><div class="flex items-center gap-2.5"><span class="material-symbols-outlined text-red-500 text-[18px] shrink-0">picture_as_pdf</span><span class="text-xs font-bold text-[#1b1c1a] truncate max-w-[200px]">${cv.fileName}</span></div></td>
           <td class="px-4 py-3 text-[11px] text-[#8a8580] font-semibold truncate max-w-[130px]">${userText}</td>
           <td class="px-4 py-3 text-[11px] text-[#8a8580] font-medium whitespace-nowrap">${date}</td>
           <td class="px-4 py-3">${statusBadge}</td>
@@ -333,140 +363,179 @@ import AdminLayout from '../../layouts/AdminLayout.astro';
         `;
         tbody.appendChild(tr);
       });
-
-      if (hasPending && !activeInterval) {
-        activeInterval = setInterval(loadCVList, 3000);
-      } else if (!hasPending && activeInterval) {
-        clearInterval(activeInterval);
-        activeInterval = null;
-      }
+      if (hasPending && !activeInterval) activeInterval = setInterval(loadCVList, 3000);
+      else if (!hasPending && activeInterval) { clearInterval(activeInterval); activeInterval = null; }
     } catch {
       tbody.innerHTML = `<tr><td colspan="5" class="p-8 text-center text-rose-600 text-sm font-medium">Liste yüklenirken hata oluştu.</td></tr>`;
     }
   }
 
-  // ─── Upload with per-file progress ────────────────────────────────
-  const dropZone = document.getElementById('drop-zone');
-  const fileInput = document.getElementById('cv-file-input');
-  const progressContainer = document.getElementById('upload-progress-container');
-  const progressList = document.getElementById('progress-items-list');
+  // ─── Upload helpers ─────────────────────────────────────────────────
+  function getTargetUserId() {
+    return document.getElementById('admin-candidate-select')?.value || '';
+  }
 
-  dropZone?.addEventListener('click', () => fileInput?.click());
-  dropZone?.addEventListener('dragover', e => { e.preventDefault(); dropZone.classList.add('border-[#14422f]', 'bg-[#14422f]/[0.03]'); });
-  dropZone?.addEventListener('dragleave', () => { dropZone.classList.remove('border-[#14422f]', 'bg-[#14422f]/[0.03]'); });
-  dropZone?.addEventListener('drop', e => {
-    e.preventDefault();
-    dropZone.classList.remove('border-[#14422f]', 'bg-[#14422f]/[0.03]');
-    if (e.dataTransfer?.files?.length) uploadFiles(e.dataTransfer.files);
-  });
-  fileInput?.addEventListener('change', () => { if (fileInput.files?.length) uploadFiles(fileInput.files); });
+  function validateFile(file) {
+    if (file.type !== 'application/pdf') { alert(`Geçersiz dosya: ${file.name}. Sadece PDF yüklenebilir.`); return false; }
+    if (file.size > 5 * 1024 * 1024) { alert(`Dosya boyutu fazla: ${file.name} (Maks 5MB)`); return false; }
+    return true;
+  }
 
-  function uploadFiles(files) {
-    if (!progressContainer || !progressList) return;
-    progressContainer.classList.remove('hidden');
+  function uploadXHR(file, { onProgress, onSuccess, onError }) {
+    const formData = new FormData();
+    formData.append('cv', file);
+    const uid = getTargetUserId();
+    if (uid) formData.append('targetUserId', uid);
+    const xhr = new XMLHttpRequest();
+    xhr.upload.addEventListener('progress', e => { if (e.lengthComputable) onProgress(Math.round((e.loaded / e.total) * 100)); });
+    xhr.addEventListener('load', () => {
+      if (xhr.status >= 200 && xhr.status < 300) onSuccess(JSON.parse(xhr.responseText));
+      else { let m = 'Yükleme başarısız.'; try { m = JSON.parse(xhr.responseText).message || m; } catch {} onError(m); }
+    });
+    xhr.addEventListener('error', () => onError('Ağ hatası.'));
+    xhr.open('POST', '/api/cv/upload');
+    xhr.send(formData);
+    return xhr;
+  }
 
-    const selectedUserId = document.getElementById('admin-candidate-select')?.value || '';
+  // ─── Tekli Yükleme ─────────────────────────────────────────────────
+  function setupSingleUpload() {
+    const dz = document.getElementById('drop-zone-single');
+    const input = document.getElementById('cv-file-single');
+    const wrap = document.getElementById('single-progress-wrap');
+    const fnEl = document.getElementById('single-file-name');
+    const bar  = document.getElementById('single-bar');
+    const pct  = document.getElementById('single-pct');
+    const msg  = document.getElementById('single-msg');
 
-    Array.from(files).forEach(file => {
-      if (file.type !== 'application/pdf') {
-        alert(`Geçersiz dosya: ${file.name}. Sadece PDF yüklenebilir.`);
-        return;
-      }
-      if (file.size > 5 * 1024 * 1024) {
-        alert(`Dosya boyutu fazla: ${file.name} (Maks 5MB)`);
-        return;
-      }
+    function doUpload(file) {
+      if (!validateFile(file)) return;
+      // Reset UI
+      fnEl.textContent = file.name;
+      bar.style.width = '0%';
+      bar.style.backgroundColor = '';
+      pct.textContent = '0%';
+      msg.textContent = 'Yükleniyor...';
+      msg.className = 'text-[10px] text-[#8a8580] font-medium mt-1.5';
+      wrap.classList.remove('hidden');
 
-      const rowId = 'up-' + Math.random().toString(36).slice(2, 8);
-      const item = document.createElement('div');
-      item.id = rowId;
-      item.className = 'bg-[#faf9f5] border border-[#ddd9d3] rounded-[8px] p-3 text-left';
-      item.innerHTML = `
-        <div class="flex items-center justify-between mb-2 gap-2">
-          <div class="flex items-center gap-2 min-w-0">
-            <span class="material-symbols-outlined text-red-500 text-[16px] shrink-0">picture_as_pdf</span>
-            <span class="text-[11px] font-bold text-[#1b1c1a] truncate">${file.name}</span>
-          </div>
-          <div class="flex items-center gap-1.5 shrink-0">
-            <span class="text-[11px] font-mono text-[#8a8580] progress-pct">0%</span>
-            <button class="w-5 h-5 rounded-full flex items-center justify-center text-[#8a8580] hover:text-rose-600 hover:bg-rose-50 transition-colors remove-btn" title="Kaldır">
-              <span class="material-symbols-outlined text-[14px]">close</span>
-            </button>
-          </div>
-        </div>
-        <div class="w-full bg-white border border-[#ddd9d3] h-1.5 rounded-full overflow-hidden">
-          <div class="h-full w-0 bg-[#14422f] transition-all duration-150 progress-bar rounded-full"></div>
-        </div>
-        <p class="text-[10px] text-[#8a8580] font-medium mt-1.5 status-msg">Yükleniyor...</p>
-      `;
-      progressList.appendChild(item);
-
-      const bar = item.querySelector('.progress-bar');
-      const pct = item.querySelector('.progress-pct');
-      const msg = item.querySelector('.status-msg');
-      const removeBtn = item.querySelector('.remove-btn');
-
-      let xhr = new XMLHttpRequest();
-
-      removeBtn.addEventListener('click', () => {
-        xhr.abort();
-        item.remove();
-        if (progressList.children.length === 0) progressContainer.classList.add('hidden');
-      });
-
-      const formData = new FormData();
-      formData.append('cv', file);
-      if (selectedUserId) formData.append('targetUserId', selectedUserId);
-
-      xhr.upload.addEventListener('progress', e => {
-        if (!e.lengthComputable) return;
-        const p = Math.round((e.loaded / e.total) * 100);
-        bar.style.width = p + '%';
-        pct.textContent = p + '%';
-        if (p === 100) msg.textContent = 'Sunucuya ulaştı, işleniyor...';
-      });
-
-      xhr.addEventListener('load', () => {
-        if (xhr.status >= 200 && xhr.status < 300) {
-          bar.style.width = '100%';
-          pct.textContent = '100%';
-          msg.textContent = 'Yüklendi!';
-          msg.className = 'text-[10px] font-bold text-emerald-600 mt-1.5 status-msg';
-          removeBtn.classList.remove('hidden');
+      uploadXHR(file, {
+        onProgress: p => { bar.style.width = p + '%'; pct.textContent = p + '%'; if (p === 100) msg.textContent = 'Sunucuya ulaştı...'; },
+        onSuccess: () => {
+          bar.style.width = '100%'; pct.textContent = '100%';
+          msg.textContent = 'Yüklendi! Analiz sıraya alındı.';
+          msg.className = 'text-[10px] font-bold text-emerald-600 mt-1.5';
           loadCVList();
-        } else {
-          let errMsg = 'Yükleme başarısız.';
-          try { errMsg = JSON.parse(xhr.responseText).message || errMsg; } catch {}
-          msg.textContent = 'Hata: ' + errMsg;
-          msg.className = 'text-[10px] font-bold text-rose-600 mt-1.5 status-msg';
-          bar.style.backgroundColor = 'rgba(239,68,68,0.6)';
+        },
+        onError: m => {
+          msg.textContent = 'Hata: ' + m;
+          msg.className = 'text-[10px] font-bold text-rose-600 mt-1.5';
+          bar.style.backgroundColor = 'rgba(239,68,68,0.5)';
           bar.style.width = '100%';
         }
       });
+    }
 
-      xhr.addEventListener('error', () => {
-        msg.textContent = 'Ağ hatası.';
-        msg.className = 'text-[10px] font-bold text-rose-600 mt-1.5 status-msg';
-        bar.style.backgroundColor = 'rgba(239,68,68,0.6)';
-        bar.style.width = '100%';
-      });
-
-      xhr.addEventListener('abort', () => {
-        // Item removed by user click
-      });
-
-      xhr.open('POST', '/api/cv/upload');
-      xhr.send(formData);
-    });
+    dz?.addEventListener('click', () => input?.click());
+    dz?.addEventListener('dragover', e => { e.preventDefault(); dz.classList.add('border-[#14422f]','bg-[#14422f]/[0.03]'); });
+    dz?.addEventListener('dragleave', () => dz.classList.remove('border-[#14422f]','bg-[#14422f]/[0.03]'));
+    dz?.addEventListener('drop', e => { e.preventDefault(); dz.classList.remove('border-[#14422f]','bg-[#14422f]/[0.03]'); if (e.dataTransfer?.files?.[0]) doUpload(e.dataTransfer.files[0]); });
+    input?.addEventListener('change', () => { if (input.files?.[0]) doUpload(input.files[0]); });
   }
 
-  // ─── Init ─────────────────────────────────────────────────────────
+  // ─── Toplu Yükleme ─────────────────────────────────────────────────
+  function setupBulkUpload() {
+    const dz    = document.getElementById('drop-zone-bulk');
+    const input = document.getElementById('cv-file-bulk');
+    const wrap  = document.getElementById('bulk-queue-wrap');
+    const list  = document.getElementById('bulk-progress-list');
+    const clearBtn = document.getElementById('clear-done-btn');
+
+    clearBtn?.addEventListener('click', () => {
+      list?.querySelectorAll('.bulk-item.done').forEach(el => el.remove());
+      if (!list?.children.length) wrap.classList.add('hidden');
+      clearBtn.classList.add('hidden');
+    });
+
+    function addToQueue(files) {
+      wrap.classList.remove('hidden');
+      Array.from(files).forEach(file => {
+        if (!validateFile(file)) return;
+
+        const item = document.createElement('div');
+        item.className = 'bulk-item bg-[#faf9f5] border border-[#ddd9d3] rounded-[8px] p-3';
+        item.innerHTML = `
+          <div class="flex items-center justify-between gap-2 mb-2">
+            <div class="flex items-center gap-2 min-w-0">
+              <span class="material-symbols-outlined text-red-500 text-[16px] shrink-0">picture_as_pdf</span>
+              <span class="text-[11px] font-bold text-[#1b1c1a] truncate">${file.name}</span>
+            </div>
+            <div class="flex items-center gap-1.5 shrink-0">
+              <span class="text-[11px] font-mono text-[#8a8580] item-pct">0%</span>
+              <button class="w-5 h-5 rounded-full flex items-center justify-center text-[#8a8580] hover:text-rose-600 hover:bg-rose-50 transition-colors cancel-btn" title="İptal / Kaldır">
+                <span class="material-symbols-outlined text-[14px]">close</span>
+              </button>
+            </div>
+          </div>
+          <div class="w-full bg-white border border-[#ddd9d3] h-1.5 rounded-full overflow-hidden">
+            <div class="h-full w-0 bg-[#14422f] transition-all duration-150 rounded-full item-bar"></div>
+          </div>
+          <p class="text-[10px] text-[#8a8580] font-medium mt-1.5 item-msg">Bekliyor...</p>
+        `;
+        list.appendChild(item);
+
+        const bar = item.querySelector('.item-bar');
+        const pct = item.querySelector('.item-pct');
+        const msg = item.querySelector('.item-msg');
+        const cancelBtn = item.querySelector('.cancel-btn');
+
+        msg.textContent = 'Yükleniyor...';
+
+        const xhr = uploadXHR(file, {
+          onProgress: p => { bar.style.width = p + '%'; pct.textContent = p + '%'; if (p === 100) msg.textContent = 'Sunucuya ulaştı...'; },
+          onSuccess: () => {
+            bar.style.width = '100%'; pct.textContent = '100%';
+            msg.textContent = 'Yüklendi!';
+            msg.className = 'text-[10px] font-bold text-emerald-600 mt-1.5 item-msg';
+            item.classList.add('done');
+            cancelBtn.title = 'Kaldır';
+            clearBtn.classList.remove('hidden');
+            loadCVList();
+          },
+          onError: m => {
+            msg.textContent = 'Hata: ' + m;
+            msg.className = 'text-[10px] font-bold text-rose-600 mt-1.5 item-msg';
+            bar.style.backgroundColor = 'rgba(239,68,68,0.5)';
+            bar.style.width = '100%';
+            item.classList.add('done');
+            clearBtn.classList.remove('hidden');
+          }
+        });
+
+        cancelBtn.addEventListener('click', () => {
+          xhr.abort();
+          item.remove();
+          if (!list.children.length) wrap.classList.add('hidden');
+        });
+      });
+    }
+
+    dz?.addEventListener('click', () => input?.click());
+    dz?.addEventListener('dragover', e => { e.preventDefault(); dz.classList.add('border-[#14422f]','bg-[#14422f]/[0.03]'); });
+    dz?.addEventListener('dragleave', () => dz.classList.remove('border-[#14422f]','bg-[#14422f]/[0.03]'));
+    dz?.addEventListener('drop', e => { e.preventDefault(); dz.classList.remove('border-[#14422f]','bg-[#14422f]/[0.03]'); if (e.dataTransfer?.files?.length) addToQueue(e.dataTransfer.files); });
+    input?.addEventListener('change', () => { if (input.files?.length) addToQueue(input.files); });
+  }
+
+  // ─── Init ──────────────────────────────────────────────────────────
   function init() {
     const body = document.getElementById('my-cvs-body');
     if (body && !body.dataset.initialized) {
       body.dataset.initialized = 'true';
       loadCandidates();
       loadCVList();
+      setupSingleUpload();
+      setupBulkUpload();
     }
   }
 
