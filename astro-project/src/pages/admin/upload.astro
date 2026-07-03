@@ -288,6 +288,15 @@ import AdminLayout from '../../layouts/AdminLayout.astro';
     } catch (err) { alert(err.message); }
   };
 
+  // ─── Retry CV ──────────────────────────────────────────────────────
+  window.retryCV = async function(cvId) {
+    try {
+      const res = await fetch(`/api/cv/${cvId}/retry`, { method: 'POST' });
+      if (!res.ok) throw new Error((await res.json()).message || 'Yeniden deneme başarısız.');
+      await loadCVList();
+    } catch (err) { alert(err.message); }
+  };
+
   // ─── Chunk Viewer ──────────────────────────────────────────────────
   function escapeHtml(str) {
     return String(str).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
@@ -364,6 +373,11 @@ import AdminLayout from '../../layouts/AdminLayout.astro';
         };
         const statusBadge = badges[status] ?? '';
         const userText = cv.user ? (cv.user.name || cv.user.email) : 'Admin';
+        const retryBtn = status === 'FAILED'
+          ? `<button onclick="retryCV('${cv.id}')" class="p-1.5 rounded-[6px] text-amber-600 hover:text-amber-700 hover:bg-amber-50 transition-colors mr-1" title="Tekrar Dene">
+               <span class="material-symbols-outlined text-[16px]">refresh</span>
+             </button>`
+          : '';
         const tr = document.createElement('tr');
         tr.className = `hover:bg-[#f5f4f0]/60 transition-colors cursor-pointer ${activeCvId === cv.id ? 'bg-[#f5f4f0]' : ''}`;
         tr.onclick = () => {
@@ -378,6 +392,7 @@ import AdminLayout from '../../layouts/AdminLayout.astro';
           <td class="px-4 py-3 text-[11px] text-[#8a8580] font-medium whitespace-nowrap">${date}</td>
           <td class="px-4 py-3">${statusBadge}</td>
           <td class="px-4 py-3 text-right" onclick="event.stopPropagation()">
+            ${retryBtn}
             <button onclick="deleteCV('${cv.id}')" class="p-1.5 rounded-[6px] text-[#8a8580] hover:text-rose-600 hover:bg-rose-50 transition-colors" title="Sil">
               <span class="material-symbols-outlined text-[16px]">delete</span>
             </button>

@@ -35,6 +35,7 @@ model CV {
   fileUrl      String
   rawText      String?
   hash         String?
+  metadata     Json?
   createdAt    DateTime     @default(now())
   updatedAt    DateTime     @updatedAt
   analyses     CVAnalysis[]
@@ -72,6 +73,7 @@ model CVChunk {
   cv         CV            @relation(fields: [cvId], references: [id], onDelete: Cascade)
   chunkText  String
   chunkIndex Int
+  metadata   Json?
   createdAt  DateTime      @default(now())
   embeddings CVEmbedding[]
 

@@ -1,5 +1,5 @@
 import { Router, Request, Response } from "express";
-import { PrismaClient, AnalysisStatus } from "@prisma/client";
+import { PrismaClient, AnalysisStatus, Prisma } from "@prisma/client";
 import { PrismaPg } from "@prisma/adapter-pg";
 import pg from "pg";
 import multer from "multer";
@@ -7,7 +7,7 @@ import crypto from "crypto";
 import path from "path";
 import { authMiddleware } from "../middleware/auth.js";
 import { supabase } from "../lib/supabase.js";
-import { extractTextFromPDF, chunkTextBySections } from "../utils/parser.js";
+import { extractTextFromPDF, chunkTextBySections, analyzeWithGemini, extractLocalSkills, detectLanguage, simulateAiAnalysis } from "../utils/parser.js";
 
 const pool = new pg.Pool({
   connectionString: process.env.DATABASE_URL,
@@ -21,12 +21,9 @@ const router = Router();
 const storage = multer.memoryStorage();
 const upload = multer({
   storage: storage,
-  limits: {
-    fileSize: 5 * 1024 * 1024, // 5MB limit
-  },
-  fileFilter: (_req, file, cb) => {
-    const filetypes = /pdf/;
-    const extname = filetypes.test(path.extname(file.originalname).toLowerCase());
+  limits: { fileSize: 5 * 1024 * 1024 }, // 5MB limit
+  fileFilter: (req, file, cb) => {
+    const extname = path.extname(file.originalname).toLowerCase() === ".pdf";
     const mimetype = file.mimetype === "application/pdf";
 
     if (mimetype && extname) {
@@ -39,41 +36,24 @@ const upload = multer({
 // Single file upload handler
 const uploadMiddleware = upload.single("cv");
 
-// Local keyword extractor to show actual skills from PDF text
-const COMMON_SKILLS = [
-  "JavaScript", "TypeScript", "Node.js", "React", "Vue", "Angular", "Python", 
-  "Java", "C++", "C#", "Go", "Rust", "SQL", "PostgreSQL", "MongoDB", 
-  "Docker", "Kubernetes", "AWS", "Azure", "GCP", "HTML", "CSS", "Git",
-  "Tailwind", "Next.js", "Express", "Prisma", "Supabase", "REST API"
-];
-
-function extractLocalSkills(text: string): string[] {
-  const found: string[] = [];
-  const lowerText = text.toLowerCase();
-  for (const skill of COMMON_SKILLS) {
-    const escaped = skill.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
-    const startBoundary = /^\w/.test(skill) ? "\\b" : "";
-    const endBoundary = /\w$/.test(skill) ? "\\b" : "";
-    const regex = new RegExp(startBoundary + escaped + endBoundary, "i");
-    if (regex.test(lowerText)) {
-      found.push(skill);
-    }
-  }
-  return found.slice(0, 6);
-}
-
 // Asynchronous background CV processing pipeline
 async function processCv(cvId: string, analysisId: string, pdfBuffer: Buffer): Promise<void> {
+  const startTime = Date.now();
+  const parserLogs: string[] = [];
+  parserLogs.push("Özgeçmiş analiz süreci başlatıldı.");
+
   try {
     // 1. Transition status to PROCESSING
     await prisma.cVAnalysis.update({
       where: { id: analysisId },
       data: { status: AnalysisStatus.PROCESSING }
     });
+    parserLogs.push("Analiz durumu PROCESSING olarak güncellendi.");
 
     // 2. Extract text from PDF buffer
     console.log(`[Parser] Extracting text from CV: ${cvId}`);
     const text = await extractTextFromPDF(pdfBuffer);
+    parserLogs.push("PDF metni başarıyla çıkarıldı.");
 
     // Save extracted text in rawText column of CV
     await prisma.cV.update({
@@ -81,35 +61,113 @@ async function processCv(cvId: string, analysisId: string, pdfBuffer: Buffer): P
       data: { rawText: text }
     });
 
-    // 3. Generate section-based chunks
+    // 3. Generate section-based chunks with metadata
     console.log(`[Parser] Generating section-based chunks...`);
-    const chunks = chunkTextBySections(text);
+    const chunks = await chunkTextBySections(text);
+    parserLogs.push(`${chunks.length} semantik parça (chunk) oluşturuldu.`);
 
     // 4. Save chunks in the cv_chunks table
     if (chunks.length > 0) {
       console.log(`[Parser] Storing ${chunks.length} chunks in PostgreSQL...`);
       await prisma.cVChunk.createMany({
-        data: chunks.map((chunkContent, index) => ({
+        data: chunks.map((chunk, index) => ({
           cvId: cvId,
-          chunkText: chunkContent,
+          chunkText: chunk.chunkText,
           chunkIndex: index + 1,
+          metadata: chunk.metadata || {},
         }))
       });
+      parserLogs.push("Semantik parçalar veritabanına kaydedildi.");
     }
 
-    // 5. Extract local skills (REAL extracted skills!)
-    const extractedSkills = extractLocalSkills(text);
+    // 5. Detect language
+    const lang = detectLanguage(text);
+    parserLogs.push(`Özgeçmiş dili algılandı: ${lang.toUpperCase()}`);
 
-    // 6. Transition status to COMPLETED and save skills (atsScore remains null)
+    // 6. Threshold-based AI Fallback Decision
+    const avgConfidence = chunks.length > 0 
+      ? Number((chunks.reduce((sum, c) => sum + (c.metadata?.confidence || 0), 0) / chunks.length).toFixed(2)) 
+      : 0.0;
+    
+    let aiFallback = false;
+    let aiFallbackReason = "";
+
+    const hasExperience = chunks.some(c => c.metadata?.section === "Deneyimler");
+    const hasEducation = chunks.some(c => c.metadata?.section === "Eğitim");
+    const missingCritical = !hasExperience || !hasEducation;
+
+    if (chunks.length === 0) {
+      aiFallback = true;
+      aiFallbackReason = "no_chunks_found";
+      parserLogs.push("Hiç chunk bulunamadı. AI Fallback zorunlu tetikleniyor.");
+    } else if (avgConfidence < 0.70) {
+      aiFallback = true;
+      aiFallbackReason = "low_confidence";
+      parserLogs.push(`Ortalama güven skoru çok düşük (${avgConfidence} < 0.70). AI Fallback tetikleniyor.`);
+    } else if (avgConfidence >= 0.70 && avgConfidence < 0.90) {
+      if (missingCritical) {
+        aiFallback = true;
+        aiFallbackReason = "missing_critical_sections";
+        parserLogs.push(`Ortalama güven skoru orta düzeyde (${avgConfidence}). Kritik bölümler (Deneyim/Eğitim) eksik olduğu için AI Fallback tetikleniyor.`);
+      } else {
+        aiFallback = false;
+        aiFallbackReason = "optional_skipped_due_to_critical_sections_present";
+        parserLogs.push(`Ortalama güven skoru orta düzeyde (${avgConfidence}) ve kritik bölümler mevcut. AI Fallback atlandı.`);
+      }
+    } else {
+      aiFallback = false;
+      aiFallbackReason = "high_confidence";
+      parserLogs.push(`Ortalama güven skoru yüksek (${avgConfidence} >= 0.90). AI Fallback atlandı.`);
+    }
+
+    let aiAnalysis;
+    if (aiFallback) {
+      console.log(`[Parser] Running Gemini AI Fallback for CV: ${cvId} (Reason: ${aiFallbackReason})`);
+      aiAnalysis = await analyzeWithGemini(text, lang);
+      parserLogs.push("Gemini AI Analizi başarıyla çalıştırıldı ve doğrulandı.");
+    } else {
+      console.log(`[Parser] Skipping AI call for CV: ${cvId}. Running local rule/hybrid analysis.`);
+      aiAnalysis = simulateAiAnalysis(text, lang);
+      parserLogs.push("Kural tabanlı hibrid analiz başarıyla çalıştırıldı.");
+    }
+
+    // Save parser statistics in CV metadata (detailed report!)
+    const ruleMatches = chunks.filter(c => c.metadata?.source === "RULE").length;
+    const structuralMatches = chunks.filter(c => c.metadata?.source === "STRUCTURAL").length;
+    const processingTimeMs = Date.now() - startTime;
+
+    const parserStats = {
+      chunksCount: chunks.length,
+      language: lang,
+      confidence: avgConfidence,
+      ruleMatches: ruleMatches,
+      structuralMatches: structuralMatches,
+      aiFallback: aiFallback,
+      aiFallbackReason: aiFallbackReason,
+      processingTimeMs: processingTimeMs,
+      parserVersion: "v2.0",
+      logs: parserLogs
+    };
+
+    await prisma.cV.update({
+      where: { id: cvId },
+      data: { metadata: parserStats }
+    });
+
+    // 7. Transition status to COMPLETED and save all details in PostgreSQL
     await prisma.cVAnalysis.update({
       where: { id: analysisId },
       data: {
         status: AnalysisStatus.COMPLETED,
-        skills: extractedSkills
+        atsScore: aiAnalysis.atsScore,
+        skills: aiAnalysis.skills,
+        strengths: aiAnalysis.strengths,
+        weaknesses: aiAnalysis.weaknesses,
+        suggestions: aiAnalysis.suggestions
       }
     });
 
-    console.log(`[Parser] ✅ Successfully parsed and chunked CV: ${cvId}`);
+    console.log(`[Parser] ✅ Successfully parsed, analyzed and chunked CV: ${cvId}`);
 
   } catch (error) {
     console.error(`[Parser] ❌ Error processing CV ${cvId}:`, error);
@@ -378,6 +436,85 @@ router.delete("/:id", authMiddleware, async (req: Request, res: Response): Promi
   } catch (error) {
     console.error("CV silme hatası:", error);
     res.status(500).json({ message: "CV silinemedi." });
+  }
+});
+
+// POST /api/cv/:id/retry
+router.post("/:id/retry", authMiddleware, async (req: Request, res: Response): Promise<void> => {
+  if (!req.user || req.user.role !== "ADMIN") {
+    res.status(403).json({ message: "Bu işlem için admin yetkisi gerekiyor." });
+    return;
+  }
+
+  const id = req.params.id as string;
+
+  try {
+    const cv = await prisma.cV.findUnique({
+      where: { id },
+      include: {
+        analyses: { orderBy: { createdAt: "desc" } }
+      }
+    });
+
+    if (!cv) {
+      res.status(404).json({ message: "CV bulunamadı." });
+      return;
+    }
+
+    const urlParts = cv.fileUrl.split('/cv-files/');
+    const filePath = urlParts[1];
+
+    if (!filePath) {
+      res.status(400).json({ message: "Geçersiz dosya adresi." });
+      return;
+    }
+
+    const { data: fileBlob, error: downloadError } = await supabase.storage
+      .from("cv-files")
+      .download(filePath);
+
+    if (downloadError || !fileBlob) {
+      console.error("Supabase Storage dosya indirme hatası:", downloadError);
+      res.status(500).json({ message: "Dosya depolama sunucusundan indirilemedi." });
+      return;
+    }
+
+    const fileBuffer = Buffer.from(await fileBlob.arrayBuffer());
+
+    let analysis = cv.analyses && cv.analyses[0];
+    if (analysis) {
+      analysis = await prisma.cVAnalysis.update({
+        where: { id: analysis.id },
+        data: {
+          status: AnalysisStatus.PENDING,
+          atsScore: null,
+          skills: Prisma.DbNull,
+          strengths: Prisma.DbNull,
+          weaknesses: Prisma.DbNull,
+          suggestions: Prisma.DbNull
+        }
+      });
+    } else {
+      analysis = await prisma.cVAnalysis.create({
+        data: {
+          cvId: cv.id,
+          status: AnalysisStatus.PENDING
+        }
+      });
+    }
+
+    // Delete chunks to avoid duplicate chunks on reprocessing
+    await prisma.cVChunk.deleteMany({
+      where: { cvId: cv.id }
+    });
+
+    // Run processing asynchronoulsy in the background
+    processCv(cv.id, analysis.id, fileBuffer);
+
+    res.json({ message: "Analiz yeniden başlatıldı.", cv, analysis });
+  } catch (error) {
+    console.error("Yeniden deneme hatası:", error);
+    res.status(500).json({ message: "Analiz yeniden başlatılamadı." });
   }
 });
 
