@@ -27,18 +27,18 @@ const HEADINGS_TR: Record<string, string[]> = {
   summary: [
     "hakkimda", "ozet", "profil", "kisisel ozet", "kariyer hedefi",
     "kariyer ozeti", "ben kimim", "kisisel profil", "kisisel nitelikler",
-    "profesyonel ozet",
+    "profesyonel ozet", "hakknmda",
   ],
   experience: [
     "deneyim", "is deneyimi", "is deneyimleri", "calisma gecmisi",
     "profesyonel deneyim", "kariyer gecmisi", "is tecrubesi", "tecrubeler",
     "tecrube", "staj", "stajlar", "is gecmisi", "mesleki deneyim",
-    "deneyimler",
+    "deneyimler", "nn deneynmn", "deneynmn", "nn deneyim",
   ],
   education: [
     "egitim", "ogrenim", "egitim bilgileri", "egitim gecmisi",
     "akademik gecmis", "okullar", "universite", "lisans",
-    "yuksek lisans", "doktora",
+    "yuksek lisans", "doktora", "enntnm", "egntnm",
   ],
   skills: [
     "yetenekler", "beceriler", "teknik beceriler", "teknik yetenekler",
@@ -53,10 +53,11 @@ const HEADINGS_TR: Record<string, string[]> = {
   certifications: [
     "sertifikalar", "sertifikalarim", "sertifikasyonlar", "belgeler",
     "kurslar", "seminerler", "sertifika & kurslar", "egitim ve sertifikalar",
+    "sertnfnkalar", "sertnfnkalarim",
   ],
   languages: [
     "diller", "yabanci dil", "yabanci diller", "dil bilgisi",
-    "konustugu diller",
+    "konustugu diller", "dnller", "dnllerim",
   ],
   references: [
     "referanslar", "referans", "is referanslari",
@@ -525,7 +526,7 @@ export async function chunkTextBySections(text: string): Promise<{ chunkText: st
     let resolvedKey   = currentSectionKey;
     let resolvedLabel = currentSectionLabel;
 
-    if (sectionConf < AI_FALLBACK_THRESHOLD) {
+    if (sectionConf < AI_FALLBACK_THRESHOLD && currentSectionSource !== "RULE") {
       const aiKey = await classifySectionWithAI(content, currentSectionKey, lang);
       if (aiKey !== currentSectionKey) {
         console.log(`[Parser] AI reclassified "${currentSectionLabel}" → "${SECTION_LABELS[aiKey] ?? aiKey}" (conf was ${sectionConf})`);
