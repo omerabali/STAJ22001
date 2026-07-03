@@ -7,6 +7,7 @@ import crypto from "crypto";
 // ─────────────────────────────────────────────────────────────────────────────
 
 const SECTION_LABELS: Record<string, string> = {
+  personal:       "Kişisel Bilgiler",
   summary:        "Özet",
   experience:     "Deneyimler",
   education:      "Eğitim",
@@ -24,6 +25,10 @@ const SECTION_LABELS: Record<string, string> = {
  * 8-10 most common forms per section — not exhaustive, pragmatic.
  */
 const HEADINGS_TR: Record<string, string[]> = {
+  personal: [
+    "kisisel bilgiler", "kisisel", "iletisim", "iletisim bilgileri",
+    "iletisim & kisisel", "iletisim ve kisisel", "kisisel bilgiler & iletisim",
+  ],
   summary: [
     "hakkimda", "ozet", "profil", "kisisel ozet", "kariyer hedefi",
     "kariyer ozeti", "ben kimim", "kisisel profil", "kisisel nitelikler",
@@ -68,6 +73,10 @@ const HEADINGS_TR: Record<string, string[]> = {
  * English heading variants (lowercase).
  */
 const HEADINGS_EN: Record<string, string[]> = {
+  personal: [
+    "personal info", "personal information", "contact", "contact information",
+    "contact info", "personal details", "personal",
+  ],
   summary: [
     "about", "about me", "summary", "profile", "objective",
     "career objective", "professional summary", "overview",
@@ -102,6 +111,7 @@ const HEADINGS_EN: Record<string, string[]> = {
     "references", "reference", "referees",
   ],
 };
+
 
 // ─────────────────────────────────────────────────────────────────────────────
 // SKILL DICTIONARY
@@ -352,15 +362,28 @@ function computeConfidence(
   return Math.min(1.0, Math.round((headingContrib + contentContrib + signalContrib) * 100) / 100);
 }
 
+/**
+ * Normalizes star characters (e.g. ★★★☆☆) in text to descriptive ratings (e.g. (3/5 Yıldız)).
+ */
+function normalizeStars(text: string): string {
+  return text
+    .replace(/★\s*★\s*★\s*★\s*★/g, " (5/5 Yıldız)")
+    .replace(/★\s*★\s*★\s*★\s*☆/g, " (4/5 Yıldız)")
+    .replace(/★\s*★\s*★\s*☆\s*☆/g, " (3/5 Yıldız)")
+    .replace(/★\s*★\s*☆\s*☆\s*☆/g, " (2/5 Yıldız)")
+    .replace(/★\s*☆\s*☆\s*☆\s*☆/g, " (1/5 Yıldız)");
+}
+
 // ─────────────────────────────────────────────────────────────────────────────
 // ADAPTIVE CHUNK SPLITTING (sentence-boundary sliding window)
 // ─────────────────────────────────────────────────────────────────────────────
 
 function splitTextSlidingWindow(text: string, maxWords = 300, overlap = 50): string[] {
+  const words = text.split(/\s+/).filter((w) => w.length > 0);
+  if (words.length <= maxWords) return [text];
+
   const sentences = text.split(/(?<=[.!?])\s+/);
   if (sentences.length <= 1) {
-    const words = text.split(/\s+/).filter((w) => w.length > 0);
-    if (words.length <= maxWords) return [text];
 
     const chunks: string[] = [];
     const step = maxWords - overlap;
@@ -416,6 +439,8 @@ function subChunkSection(
   parentSource: "RULE" | "STRUCTURAL",
   sectionConfidence: number
 ): SubChunk[] {
+  // Return the entire section as a single chunk to keep experiences unified and avoid header duplication.
+  return [{ text: lines.join("\n"), confidence: sectionConfidence, source: parentSource }];
 
   const SUB_CHUNK_SECTIONS = new Set(["experience", "education", "projects"]);
   if (!SUB_CHUNK_SECTIONS.has(sectionKey)) {
@@ -492,23 +517,18 @@ function subChunkSection(
 const AI_FALLBACK_THRESHOLD = 0.75;
 
 /**
- * Splits a resume text into semantic chunks with section metadata.
- * Pipeline: heading detection → confidence scoring → [AI reclassify if conf < 0.75]
- *           → semantic sub-chunking → adaptive sizing.
- *
- * Now async: low-confidence sections are sent to classifySectionWithAI (gpt-4o-mini)
- * which reclassifies just that section's text (max 600 chars, ~150 tokens → ~$0.0001).
+ * Runs the local rule-based heading dictionary parser.
+ * This is the first pass — fast, synchronous regex and word matching.
  */
-export async function chunkTextBySections(text: string): Promise<{ chunkText: string; metadata: any }[]> {
-  if (!text || text.trim() === "") return [];
-
-  const lang = detectLanguage(text);
+async function runLocalRuleBasedParser(
+  text: string,
+  lang: "tr" | "en"
+): Promise<{ chunkText: string; metadata: any }[]> {
   const lines = text.split("\n");
   const parsedChunks: { chunkText: string; metadata: any }[] = [];
 
-  // Default section: text before the first detected heading
-  let currentSectionKey     = "summary";
-  let currentSectionLabel   = "Özet";
+  let currentSectionKey     = "personal";
+  let currentSectionLabel   = "Kişisel Bilgiler";
   let currentSectionLines: string[] = [];
   let currentSectionSource: "RULE" | "STRUCTURAL" | "DEFAULT" = "DEFAULT";
   let sectionOrder = 1;
@@ -520,9 +540,6 @@ export async function chunkTextBySections(text: string): Promise<{ chunkText: st
 
     const sectionConf = computeConfidence(currentSectionSource, content);
 
-    // ── Per-section AI Fallback ───────────────────────────────────────────────
-    // If confidence is below threshold, ask gpt-4o-mini to reclassify.
-    // Only the section text is sent (max 600 chars) — cheap, targeted.
     let resolvedKey   = currentSectionKey;
     let resolvedLabel = currentSectionLabel;
 
@@ -534,7 +551,6 @@ export async function chunkTextBySections(text: string): Promise<{ chunkText: st
         resolvedLabel = SECTION_LABELS[aiKey] ?? aiKey;
       }
     }
-    // ─────────────────────────────────────────────────────────────────────────
 
     const subSections = subChunkSection(
       resolvedKey,
@@ -548,7 +564,8 @@ export async function chunkTextBySections(text: string): Promise<{ chunkText: st
       wordChunks.forEach((wc_text, idx) => {
         const suffix    = wordChunks.length > 1 ? ` (Kısım ${idx + 1})` : "";
         const wordCount = wc_text.split(/\s+/).filter((w) => w.length > 0).length;
-        const fullText  = `[${resolvedLabel.toUpperCase()}${suffix}]\n${wc_text}`;
+        const normalized_wc = normalizeStars(wc_text);
+        const fullText  = `[${resolvedLabel.toUpperCase()}${suffix}]\n${normalized_wc}`;
         const chunkHash = crypto.createHash("sha256").update(fullText).digest("hex");
 
         parsedChunks.push({
@@ -560,7 +577,7 @@ export async function chunkTextBySections(text: string): Promise<{ chunkText: st
             order:         sectionOrder++,
             wordCount,
             confidence:    sub.confidence,
-            aiFallback:    sectionConf < AI_FALLBACK_THRESHOLD,  // flag: was AI used?
+            aiFallback:    sectionConf < AI_FALLBACK_THRESHOLD,
             createdAt:     new Date().toISOString(),
             parserVersion: "v2.3",
             chunkHash,
@@ -572,7 +589,7 @@ export async function chunkTextBySections(text: string): Promise<{ chunkText: st
 
   for (const rawLine of lines) {
     const line = rawLine.trim();
-    if (line === "") continue; // skip blanks early
+    if (line === "") continue;
 
     const matched = matchHeading(line, lang);
 
@@ -592,19 +609,203 @@ export async function chunkTextBySections(text: string): Promise<{ chunkText: st
   return parsedChunks;
 }
 
+/**
+ * Splits a resume text into semantic chunks with section metadata.
+ * Hybrid Pipeline:
+ *   1. Try local rule-based parsing.
+ *   2. If confidence is low (< 0.70) or too few unique sections are found (< 3)
+ *      meaning layout is scrambled/irregular, fall back to Macro AI Segmentation (gpt-4o-mini).
+ *   3. Run local sub-chunking & sliding-window on segmented blocks.
+ */
+export async function chunkTextBySections(text: string): Promise<{ chunkText: string; metadata: any }[]> {
+  if (!text || text.trim() === "") return [];
+
+  const lang = detectLanguage(text);
+
+  // ── 1. First Pass: Local Rule-Based Dictionary ───────────────────────────
+  const localChunks = await runLocalRuleBasedParser(text, lang);
+
+  const uniqueSections = new Set(localChunks.map(c => c.metadata.section));
+  const avgConfidence = localChunks.length > 0
+    ? localChunks.reduce((sum, c) => sum + c.metadata.confidence, 0) / localChunks.length
+    : 0;
+
+  console.log(`[Parser] Rule-based parser produced ${localChunks.length} chunks. avgConfidence: ${avgConfidence.toFixed(2)}, uniqueSections: ${uniqueSections.size}`);
+
+  // ── 2. Evaluation: Trigger Macro AI Fallback if needed ───────────────────
+  const needsAISegmentation =
+    localChunks.length === 0 ||
+    avgConfidence < 0.75 ||
+    uniqueSections.size < 3;
+
+  const apiKey = process.env.OPENAI_API_KEY;
+
+  if (needsAISegmentation && apiKey) {
+    console.log(`[Parser] ⚡ Triggering Macro AI Segmentation Fallback (avgConf: ${avgConfidence.toFixed(2)}, sections: ${uniqueSections.size})`);
+    const aiSections = await segmentCvWithAI(text, lang);
+
+    if (aiSections.length > 0) {
+      // Merge duplicate section keys to avoid multiple duplicate heading blocks
+      const mergedSections: typeof aiSections = [];
+      for (const section of aiSections) {
+        const existing = mergedSections.find(
+          s => s.sectionKey === section.sectionKey && (s.sectionKey !== "other" || s.customName === section.customName)
+        );
+        if (existing) {
+          existing.text += "\n\n" + section.text;
+        } else {
+          mergedSections.push({ ...section });
+        }
+      }
+
+      const aiChunks: { chunkText: string; metadata: any }[] = [];
+      let sectionOrder = 1;
+
+      for (const section of mergedSections) {
+        const sectionLabel = section.sectionKey === "other" && section.customName
+          ? section.customName
+          : (SECTION_LABELS[section.sectionKey] ?? section.sectionKey);
+
+        // ── Local Semantic Sub-chunking (experience/projects split) ─────────
+        const subSections = subChunkSection(
+          section.sectionKey,
+          section.text.split("\n"),
+          "STRUCTURAL",
+          0.95 // Base high confidence for OpenAI-verified segment
+        );
+
+        for (const sub of subSections) {
+          // ── Local Adaptive Sizing (sliding window) ───────────────────────
+          const wordChunks = splitTextSlidingWindow(sub.text, 300, 50);
+          wordChunks.forEach((wc_text, idx) => {
+            const suffix    = wordChunks.length > 1 ? ` (Kısım ${idx + 1})` : "";
+            const wordCount = wc_text.split(/\s+/).filter((w) => w.length > 0).length;
+            const normalized_wc = normalizeStars(wc_text);
+            const fullText  = `[${sectionLabel.toUpperCase()}${suffix}]\n${normalized_wc}`;
+            const chunkHash = crypto.createHash("sha256").update(fullText).digest("hex");
+
+            aiChunks.push({
+              chunkText: fullText,
+              metadata: {
+                section:       sectionLabel,
+                source:        "AI",
+                language:      lang,
+                order:         sectionOrder++,
+                wordCount,
+                confidence:    0.95,
+                aiFallback:    true,
+                createdAt:     new Date().toISOString(),
+                parserVersion: "v3.0",
+                chunkHash,
+              },
+            });
+          });
+        }
+      }
+
+      console.log(`[Parser] ✅ Macro AI Segmentation successful! Produced ${aiChunks.length} chunks.`);
+      return aiChunks;
+    }
+
+    console.warn(`[Parser] AI segmentation returned empty, falling back to local rule-based chunks.`);
+  }
+
+  return localChunks;
+}
+
 // ─────────────────────────────────────────────────────────────────────────────
 // AI — OpenAI gpt-4o-mini
 //
-// Two separate responsibilities:
-//   1. classifySectionWithAI  — per-section: reclassify a single low-confidence
-//                               section by sending only that section's text.
-//   2. analyzeWithOpenAI      — full CV: produce ATS score, skills, strengths,
-//                               weaknesses, suggestions.
-//
-// Gemini has been removed. simulateAiAnalysis is the offline fallback.
+// Three separate responsibilities:
+//   1. segmentCvWithAI        — macro-segmentation: split entire CV text into sections
+//   2. classifySectionWithAI  — micro-segmentation: reclassify a single low-confidence section
+//   3. analyzeWithOpenAI      — full CV: produce ATS score, skills, strengths, etc.
 // ─────────────────────────────────────────────────────────────────────────────
 
 const OPENAI_SECTION_KEYS = Object.keys(SECTION_LABELS).join(" | ");
+
+/**
+ * Macro-segmentation: splits the entire CV text into section blocks using gpt-4o-mini.
+ * Bypasses reading order scrambling and custom layout issues.
+ */
+export async function segmentCvWithAI(
+  text: string,
+  lang: "tr" | "en"
+): Promise<{ sectionKey: string; customName?: string; text: string }[]> {
+  const apiKey = process.env.OPENAI_API_KEY;
+  if (!apiKey) {
+    console.log("[AI Segment] No OPENAI_API_KEY — skipping AI segmentation.");
+    return [];
+  }
+
+  try {
+    const prompt = [
+      `You are an expert CV parser. Segment the following raw CV text into logical sections.`,
+      `The standard section keys are:`,
+      Object.keys(SECTION_LABELS).map(k => `  - "${k}" (${SECTION_LABELS[k]})`).join("\n"),
+      ``,
+      `Rules:`,
+      `1. Return a JSON object with a single key "sections" which is an array of objects.`,
+      `2. Only extract sections that actually exist in the text. Do not invent missing sections.`,
+      `3. For each section, if it fits one of the standard keys listed above, set "sectionKey" to that key.`,
+      `4. If a section is custom/unrecognized (e.g., "Hobiler", "Askerlik", "Yayınlar", "Sosyal Faaliyetler"), set "sectionKey" to "other" and provide the actual heading title in "customName" (e.g., "Sosyal Sorumluluk Projeleri").`,
+      `5. Put all text of the CV into the most appropriate sections. Do not miss any text.`,
+      `6. CRITICAL: The contact details, email, phone, name, and links at the very top of the CV MUST be classified as "personal" (Kişisel Bilgiler).`,
+      `7. CRITICAL VERBATIM RULE: You MUST copy-paste the text exactly word-for-word as it appears in the raw CV text. Do NOT summarize, paraphrase, rewrite, correct typos, translate, or add/remove any single character or detail. Keep all original sentences completely intact.`,
+      `8. CRITICAL ORDER RULE: The sections in the returned array MUST be in the exact sequential order they appear in the raw CV text from top to bottom. Do not rearrange or sort them in any other way.`,
+      `9. Do not include markdown formatting or backticks in the response.`,
+      ``,
+      `Response JSON format example:`,
+      JSON.stringify({
+        sections: [
+          { sectionKey: "personal", text: "Canberk Yıldız | canberk@email.com..." },
+          { sectionKey: "summary", text: "..." },
+          { sectionKey: "experience", text: "..." },
+          { sectionKey: "other", customName: "Hobiler ve Sosyal Sorumluluk", text: "..." }
+        ]
+      }, null, 2),
+      ``,
+      `Language of CV: ${lang === "tr" ? "Turkish" : "English"}.`,
+      ``,
+      `Raw CV Text:`,
+      text
+    ].join("\n");
+
+    const res = await fetch("https://api.openai.com/v1/chat/completions", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${apiKey}`,
+      },
+      body: JSON.stringify({
+        model: "gpt-4o-mini",
+        messages: [{ role: "user", content: prompt }],
+        response_format: { type: "json_object" },
+        temperature: 0.1,
+      }),
+    });
+
+    if (!res.ok) {
+      throw new Error(`OpenAI returned ${res.status}`);
+    }
+
+    const data = await res.json() as Record<string, any>;
+    const responseText = data.choices?.[0]?.message?.content as string;
+    const parsed = JSON.parse(responseText);
+
+    if (Array.isArray(parsed.sections)) {
+      return parsed.sections.filter(
+        (s: any) => s && typeof s.sectionKey === "string" && typeof s.text === "string"
+      );
+    }
+    return [];
+  } catch (err) {
+    console.error("[AI Segment] segmentCvWithAI failed:", err);
+    return [];
+  }
+}
+
+
 
 /**
  * Per-section AI fallback (Feature 1 — low-cost, targeted).
@@ -681,6 +882,7 @@ export async function classifySectionWithAI(
  */
 export async function analyzeWithOpenAI(text: string, lang: "tr" | "en"): Promise<{
   atsScore: number;
+  role: string;
   skills: string[];
   strengths: string[];
   weaknesses: string[];
@@ -706,6 +908,7 @@ export async function analyzeWithOpenAI(text: string, lang: "tr" | "en"): Promis
       "Return ONLY a valid JSON object (no markdown, no backticks):",
       JSON.stringify({
         atsScore: 85,
+        role: "Frontend Developer",
         skills: ["React", "TypeScript"],
         strengths: ["Strong background."],
         weaknesses: ["Lacks cloud exp."],
@@ -738,6 +941,7 @@ export async function analyzeWithOpenAI(text: string, lang: "tr" | "en"): Promis
     const parsed       = JSON.parse(responseText);
 
     const atsScore    = Number(parsed.atsScore);
+    const role        = parsed.role ? String(parsed.role).trim() : "";
     const skills      = parsed.skills;
     const strengths   = parsed.strengths;
     const weaknesses  = parsed.weaknesses;
@@ -745,6 +949,7 @@ export async function analyzeWithOpenAI(text: string, lang: "tr" | "en"): Promis
 
     if (
       isNaN(atsScore) ||
+      !role ||
       !Array.isArray(skills)      || skills.length === 0 ||
       !Array.isArray(strengths)   || strengths.length === 0 ||
       !Array.isArray(weaknesses)  || weaknesses.length === 0 ||
@@ -760,6 +965,7 @@ export async function analyzeWithOpenAI(text: string, lang: "tr" | "en"): Promis
 
     return {
       atsScore:    Math.min(100, Math.max(0, atsScore)),
+      role:        role,
       skills:      normalizedSkills.slice(0, 6),
       strengths:   strengths.slice(0, 3),
       weaknesses:  weaknesses.slice(0, 3),
@@ -784,6 +990,19 @@ export function simulateAiAnalysis(text: string, lang: "tr" | "en") {
     text.includes("STREAM_BLOCKED_BY_CYPHER")
   ) {
     throw new Error("Geçersiz veya bozuk PDF verisi. AI analizi yapılamaz.");
+  }
+
+  // Simple regex to extract first title/role keyword or fallback
+  let extractedRole = "Yazılım Geliştirici";
+  if (lang === "en") extractedRole = "Software Engineer";
+  const lines = text.split("\n").map(l => l.trim()).filter(l => l.length > 0);
+  for (const line of lines) {
+    if (line.includes("Developer") || line.includes("Mühendisi") || line.includes("Architect") || line.includes("Mimarı") || line.includes("Geliştirici") || line.includes("Designer")) {
+      extractedRole = line.replace(/[🚀📊🛠️💼🎓|]/g, "").trim();
+      if (extractedRole.length > 3 && extractedRole.length < 60) {
+        break;
+      }
+    }
   }
 
   const foundSkills = extractLocalSkills(text);
@@ -831,6 +1050,7 @@ export function simulateAiAnalysis(text: string, lang: "tr" | "en") {
 
   return {
     atsScore,
+    role: extractedRole,
     skills: foundSkills,
     ...(lang === "tr" ? trData : enData),
   };

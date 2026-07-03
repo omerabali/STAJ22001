@@ -324,9 +324,16 @@ router.get("/candidates/:id", authMiddleware, adminMiddleware, async (req: Reque
           console.error(`Error generating signed URL for CV ${cv.id}:`, error);
         }
 
+        const cvMetadata = cv.metadata as any;
+        const mappedAnalyses = cv.analyses.map((analysis) => ({
+          ...analysis,
+          role: cvMetadata?.role || "Özgeçmiş Analizi"
+        }));
+
         return {
           ...cv,
-          fileUrl: data?.signedUrl || cv.fileUrl
+          fileUrl: data?.signedUrl || cv.fileUrl,
+          analyses: mappedAnalyses
         };
       })
     );

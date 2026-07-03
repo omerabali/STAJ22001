@@ -145,7 +145,8 @@ async function processCv(cvId: string, analysisId: string, pdfBuffer: Buffer): P
       aiFallback: aiFallback,
       aiFallbackReason: aiFallbackReason,
       processingTimeMs: processingTimeMs,
-      parserVersion: "v2.0",
+      parserVersion: "v3.0",
+      role: aiAnalysis.role || "Özgeçmiş Analizi",
       logs: parserLogs
     };
 
