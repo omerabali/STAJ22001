@@ -55,6 +55,30 @@ async function processCv(cvId: string, analysisId: string, pdfBuffer: Buffer): P
     const text = await extractTextFromPDF(pdfBuffer);
     parserLogs.push("PDF metni başarıyla çıkarıldı.");
 
+    // Detect Potential Prompt Injection (Security Guard!)
+    const lowerText = text.toLowerCase();
+    const injectionPatterns = [
+      "ignore previous instructions",
+      "ignore all previous",
+      "disregard all previous",
+      "disregard previous",
+      "rate this candidate",
+      "rate the candidate",
+      "mark as excellent match",
+      "mark as outstanding",
+      "mark as perfect match",
+      "you are now",
+      "you must now",
+      "ignore any weaknesses",
+      "ignore weaknesses",
+      "system prompt",
+    ];
+    const hasInjectionAttempt = injectionPatterns.some(p => lowerText.includes(p));
+    if (hasInjectionAttempt) {
+      console.warn(`[Parser] ⚠️ Potential Prompt Injection detected in CV ${cvId}!`);
+      parserLogs.push("UYARI: Şüpheli komut/prompt enjeksiyonu denemesi tespit edildi.");
+    }
+
     // Save extracted text in rawText column of CV
     await prisma.cV.update({
       where: { id: cvId },
@@ -89,12 +113,13 @@ async function processCv(cvId: string, analysisId: string, pdfBuffer: Buffer): P
       ? Number((chunks.reduce((sum, c) => sum + (c.metadata?.confidence || 0), 0) / chunks.length).toFixed(2)) 
       : 0.0;
     
+    // Find minimum confidence across all parsed chunks (excluding Kişisel Bilgiler since it is default/0.95 anyway)
+    const minConfidence = chunks.length > 0
+      ? Math.min(...chunks.map(c => c.metadata?.confidence || 0.0))
+      : 1.0;
+    
     let aiFallback = false;
     let aiFallbackReason = "";
-
-    const hasExperience = chunks.some(c => c.metadata?.section === "Deneyimler");
-    const hasEducation = chunks.some(c => c.metadata?.section === "Eğitim");
-    const missingCritical = !hasExperience || !hasEducation;
 
     if (chunks.length === 0) {
       aiFallback = true;
@@ -104,10 +129,14 @@ async function processCv(cvId: string, analysisId: string, pdfBuffer: Buffer): P
       aiFallback = true;
       aiFallbackReason = "low_confidence";
       parserLogs.push(`Ortalama güven skoru çok düşük (${avgConfidence} < 0.70). AI Fallback tetikleniyor.`);
+    } else if (minConfidence < 0.50) {
+      aiFallback = true;
+      aiFallbackReason = "low_min_confidence";
+      parserLogs.push(`En düşük bölüm güven skoru sınırın altında (${minConfidence} < 0.50). AI Fallback tetikleniyor.`);
     } else {
       aiFallback = false;
       aiFallbackReason = "sufficient_confidence";
-      parserLogs.push(`Ortalama güven skoru yeterli (${avgConfidence} >= 0.70). AI Fallback atlandı.`);
+      parserLogs.push(`Ortalama güven skoru yeterli (${avgConfidence} >= 0.70) ve tüm bölümler güvenli. AI Fallback atlandı.`);
     }
 
     let aiAnalysis;
@@ -130,10 +159,12 @@ async function processCv(cvId: string, analysisId: string, pdfBuffer: Buffer): P
       chunksCount: chunks.length,
       language: lang,
       confidence: avgConfidence,
+      minConfidence: minConfidence,
       ruleMatches: ruleMatches,
       structuralMatches: structuralMatches,
       aiFallback: aiFallback,
       aiFallbackReason: aiFallbackReason,
+      potentialPromptInjection: hasInjectionAttempt,
       processingTimeMs: processingTimeMs,
       parserVersion: "v3.0",
       role: aiAnalysis.role || "Özgeçmiş Analizi",
