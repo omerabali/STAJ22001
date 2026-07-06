@@ -2,6 +2,12 @@ import { PDFParse } from "pdf-parse";
 import crypto from "crypto";
 
 // ─────────────────────────────────────────────────────────────────────────────
+// pdfjs-dist — lazy-loaded to avoid top-level worker initialization issues.
+// We use a dynamic import inside extractTextFromPDF so the module is only
+// loaded when needed and GlobalWorkerOptions can be set before first use.
+// ─────────────────────────────────────────────────────────────────────────────
+
+// ─────────────────────────────────────────────────────────────────────────────
 // SECTION TAXONOMY
 // 8 canonical section types. All heading detection normalizes to these keys.
 // ─────────────────────────────────────────────────────────────────────────────
@@ -32,23 +38,30 @@ const HEADINGS_TR: Record<string, string[]> = {
   summary: [
     "hakkimda", "ozet", "profil", "kisisel ozet", "kariyer hedefi",
     "kariyer ozeti", "ben kimim", "kisisel profil", "kisisel nitelikler",
-    "profesyonel ozet", "hakknmda",
+    "profesyonel ozet", "hakknmda", "ozet bilgi", "genel ozet", "profil ozeti",
   ],
   experience: [
     "deneyim", "is deneyimi", "is deneyimleri", "calisma gecmisi",
     "profesyonel deneyim", "kariyer gecmisi", "is tecrubesi", "tecrubeler",
     "tecrube", "staj", "stajlar", "is gecmisi", "mesleki deneyim",
     "deneyimler", "nn deneynmn", "deneynmn", "nn deneyim",
+    "kronolojik deneyim", "kronolojik is gecmisi", "is kronolojisi",
+    "calisma takvimi", "pozisyonlar",
   ],
   education: [
     "egitim", "ogrenim", "egitim bilgileri", "egitim gecmisi",
     "akademik gecmis", "okullar", "universite", "lisans",
     "yuksek lisans", "doktora", "enntnm", "egntnm",
+    "egitim & akademik", "akademik", "egitim ve akademik", "akademik bilgiler",
   ],
   skills: [
     "yetenekler", "beceriler", "teknik beceriler", "teknik yetenekler",
     "uzmanlik alanlari", "teknolojiler", "diller & teknolojiler",
     "araclar", "yetenekler & araclar", "bilgisayar becerileri",
+    "yetkinlik grafikleri", "yetkinlikler", "teknik yetkinlikler",
+    "skill grafikleri", "beceriler & araclar", "yetkinlik alanlari",
+    "yetkinlikler (barlar)", "teknik beceri grafikleri",
+    "yetkinlik matrisi", "teknik adaptasyon", "beceri matrisi", "yetenek matrisi",
   ],
   projects: [
     "projeler", "projelerim", "proje deneyimi", "kisisel projeler",
@@ -63,6 +76,9 @@ const HEADINGS_TR: Record<string, string[]> = {
   languages: [
     "diller", "yabanci dil", "yabanci diller", "dil bilgisi",
     "konustugu diller", "dnller", "dnllerim",
+    "dil seviyeleri", "yabanci diller (yildizlar)", "dil yetkinligi",
+    "dil bilgisi & seviyeler", "yabanci dil seviyeleri", "dil & seviye",
+    "yabancidiller",
   ],
   references: [
     "referanslar", "referans", "is referanslari",
@@ -85,15 +101,18 @@ const HEADINGS_EN: Record<string, string[]> = {
   experience: [
     "experience", "work experience", "employment", "employment history",
     "professional experience", "career history", "work history", "internships",
+    "chronological experience", "work chronology",
   ],
   education: [
     "education", "academic background", "academic history",
     "educational background", "qualifications", "university",
-    "degrees", "educational qualifications",
+    "degrees", "educational qualifications", "education & academic",
   ],
   skills: [
     "skills", "technical skills", "core competencies", "expertise",
     "technologies", "skills & tools", "key skills",
+    "skill charts", "skill bars", "technical competencies",
+    "competence matrix", "technical adaptation", "skills matrix",
   ],
   projects: [
     "projects", "project experience", "personal projects",
@@ -101,11 +120,12 @@ const HEADINGS_EN: Record<string, string[]> = {
     "recent projects", "project history",
   ],
   certifications: [
-    "certifications", "certificates", "licenses", "courses",
-    "training", "credentials",
+    "certifications", "certificates", "licenses", "credentials",
+    "completed courses", "professional training", "trainings",
   ],
   languages: [
     "languages", "language skills", "languages spoken",
+    "language levels", "foreign languages", "language proficiency",
   ],
   references: [
     "references", "reference", "referees",
@@ -240,19 +260,333 @@ export function extractLocalSkills(text: string): string[] {
   return Array.from(found).slice(0, 6);
 }
 
-/** Extracts raw text from a PDF buffer. */
+/**
+ * Dynamically detects vertical column boundaries on a page using Projection Profile Analysis.
+ * Scans vertical projection of character boundaries and finds low-density zones (gutters).
+ */
+function detectColumns(
+  items: { x: number; y: number; text: string }[],
+  pageWidth: number,
+  pageHeight: number
+): number[] {
+  const steps = Math.floor(pageWidth);
+  const profile = new Array(steps).fill(0);
+  const charWidth = 4.0; // conservative character width estimate in points
+
+  // Filter out top 16% (header) and bottom 10% (footer) to get columns profile
+  const bodyItems = items.filter((i) => i.y > pageHeight * 0.10 && i.y < pageHeight * 0.84);
+
+  // Project item bounding boxes onto the x-axis
+  for (const item of bodyItems) {
+    const startX = Math.max(0, Math.floor(item.x));
+    const endX = Math.min(steps - 1, Math.floor(item.x + item.text.length * charWidth));
+    for (let x = startX; x <= endX; x++) {
+      profile[x]++;
+    }
+  }
+
+  const boundaries: number[] = [];
+  const minGutterWidth = 25; // minimum width of vertical empty space to call it a column gap
+  const maxIntersects = 1;   // strictly tolerate minor overlaps in body
+
+  let gutterStart = -1;
+  for (let x = Math.floor(pageWidth * 0.15); x < Math.floor(pageWidth * 0.85); x++) {
+    if (profile[x] <= maxIntersects) {
+      if (gutterStart === -1) {
+        gutterStart = x;
+      }
+    } else {
+      if (gutterStart !== -1) {
+        const gutterWidth = x - gutterStart;
+        if (gutterWidth >= minGutterWidth) {
+          const boundary = Math.floor((gutterStart + x) / 2);
+          // Verify both sides have meaningful text content
+          const leftCount = items.filter((i) => i.x < boundary).length;
+          const rightCount = items.filter((i) => i.x >= boundary).length;
+          
+          if (leftCount >= 4 && rightCount >= 4) {
+            boundaries.push(boundary);
+          }
+        }
+        gutterStart = -1;
+      }
+    }
+  }
+
+  if (gutterStart !== -1) {
+    const endScan = Math.floor(pageWidth * 0.85);
+    const gutterWidth = endScan - gutterStart;
+    if (gutterWidth >= minGutterWidth) {
+      const boundary = Math.floor((gutterStart + endScan) / 2);
+      const leftCount = items.filter((i) => i.x < boundary).length;
+      const rightCount = items.filter((i) => i.x >= boundary).length;
+      if (leftCount >= 4 && rightCount >= 4) {
+        boundaries.push(boundary);
+      }
+    }
+  }
+
+  return boundaries.sort((a, b) => a - b);
+}
+
+/**
+ * Groups pdfjs text items into lines based on y-coordinate proximity.
+ * Returns a single string with newline-separated lines.
+ */
+function groupItemsIntoText(
+  items: { x: number; y: number; text: string }[],
+  yTolerance = 6
+): string {
+  if (items.length === 0) return "";
+
+  type Line = { y: number; parts: { x: number; text: string }[] };
+  const lines: Line[] = [];
+
+  for (const item of items) {
+    const existing = lines.find((l) => Math.abs(l.y - item.y) <= yTolerance);
+    if (existing) {
+      existing.parts.push({ x: item.x, text: item.text });
+    } else {
+      lines.push({ y: item.y, parts: [{ x: item.x, text: item.text }] });
+    }
+  }
+
+  // Sort lines top-to-bottom
+  lines.sort((a, b) => b.y - a.y);
+
+  return lines
+    .map((line) => {
+      const sorted = line.parts.sort((a, b) => a.x - b.x);
+      let mergedText = "";
+      for (let i = 0; i < sorted.length; i++) {
+        const curr = sorted[i];
+        if (i === 0) {
+          mergedText = curr.text;
+        } else {
+          const prev = sorted[i - 1];
+          const prevLength = prev.text.length;
+          const charWidthEstimate = 3.6;
+          const prevEndPos = prev.x + (prevLength * charWidthEstimate);
+          
+          if (curr.x - prevEndPos < 2.0) {
+            mergedText += curr.text;
+          } else {
+            mergedText += " " + curr.text;
+          }
+        }
+      }
+      return mergedText;
+    })
+    .filter((l) => l.trim().length > 0)
+    .join("\n");
+}
+
+/**
+ * Extracts raw text from a PDF buffer using pdfjs-dist with coordinate awareness.
+ *
+ * Strategy:
+ * 1. For each page, collect all text items with their (x, y) coordinates.
+ * 2. Detect whether the page has a 2-column layout by checking if significant
+ *    text mass exists on both sides of the page midpoint.
+ * 3. If 2-column: emit left column lines first (top→bottom), then right column
+ *    lines — preserving correct reading order for section headings and content.
+ * 4. If single column: emit all items sorted top→bottom, left→right.
+ * 5. Apply the existing preprocessTwoColumnText post-processor.
+ *
+ * Falls back to the legacy pdf-parse extractor on any error.
+ */
 export async function extractTextFromPDF(pdfBuffer: Buffer): Promise<string> {
-  const parser = new PDFParse({ data: pdfBuffer });
   try {
-    const result = await parser.getText();
-    return result.text || "";
+    // Use the legacy build as recommended for Node.js environments
+    const pdfjs = await import("pdfjs-dist/legacy/build/pdf.mjs");
+
+    const uint8 = new Uint8Array(pdfBuffer);
+    const loadingTask = (pdfjs as any).getDocument({
+      data: uint8,
+      useWorkerFetch: false,
+      isEvalSupported: false,
+      useSystemFonts: true,
+      disableFontFace: true,
+      disableWorker: true,   // Run in same thread — no separate worker needed
+    });
+
+    const pdf = await loadingTask.promise;
+    const pageTexts: string[] = [];
+
+    for (let pageNum = 1; pageNum <= pdf.numPages; pageNum++) {
+      const page = await pdf.getPage(pageNum);
+      const viewport = page.getViewport({ scale: 1.0 });
+      const pageWidth = viewport.width;
+      const pageHeight = viewport.height;
+      const textContent = await page.getTextContent();
+
+      // Page boundary cleaning: filter out page numbers, headers, and footers
+      const topBoundary = pageHeight * 0.94;
+      const bottomBoundary = pageHeight * 0.06;
+      
+      const allItems: { x: number; y: number; text: string }[] = [];
+      for (const item of textContent.items as any[]) {
+        if (item.str && item.str.trim()) {
+          const x = item.transform[4];
+          const y = item.transform[5];
+          const txt = item.str.trim();
+          
+          // Skip typical page numbers/footers at boundaries
+          const isAtBoundary = y > topBoundary || y < bottomBoundary;
+          const isPageNumPattern = /^(?:page|sayfa)?\s*\d+\s*(?:\/|of|-)?\s*\d*\s*$/i.test(txt) || /^--\s*\d+\s*of\s*\d+\s*--$/i.test(txt);
+          if (isAtBoundary && isPageNumPattern) {
+            continue;
+          }
+          
+          allItems.push({ x, y, text: item.str });
+        }
+      }
+
+      if (allItems.length === 0) {
+        page.cleanup();
+        continue;
+      }
+
+      // Group items into lines
+      const yTolerance = 6;
+      type Line = { y: number; items: { x: number; text: string }[] };
+      const lines: Line[] = [];
+
+      for (const item of allItems) {
+        const existing = lines.find((l) => Math.abs(l.y - item.y) <= yTolerance);
+        if (existing) {
+          existing.items.push({ x: item.x, text: item.text });
+        } else {
+          lines.push({ y: item.y, items: [{ x: item.x, text: item.text }] });
+        }
+      }
+
+      // Sort lines top-to-bottom
+      lines.sort((a, b) => b.y - a.y);
+      for (const line of lines) {
+        line.items.sort((a, b) => a.x - b.x);
+      }
+
+      // Dynamic Column Detection
+      const boundaries = detectColumns(allItems, pageWidth, pageHeight);
+
+      let pageText: string;
+      if (boundaries.length > 0) {
+        // Multi-column reconstruction with full-width spanning lines (headers/footers) support
+        type PageBlock = 
+          | { type: "spanning"; text: string }
+          | { type: "columns"; cols: { x: number; y: number; text: string }[][] };
+
+        const blocks: PageBlock[] = [];
+        let currentCols: { x: number; y: number; text: string }[][] = Array.from({ length: boundaries.length + 1 }, () => []);
+
+        const flushColumns = () => {
+          const hasContent = currentCols.some((c) => c.length > 0);
+          if (hasContent) {
+            blocks.push({ type: "columns", cols: currentCols });
+            currentCols = Array.from({ length: boundaries.length + 1 }, () => []);
+          }
+        };
+
+        const charWidthEstimate = 3.6;
+
+        for (const line of lines) {
+          if (line.items.length === 0) continue;
+
+          let isSpanning = false;
+
+          // Check if any single item crosses a column boundary
+          for (const item of line.items) {
+            const startX = item.x;
+            const endX = item.x + item.text.length * charWidthEstimate;
+            for (const b of boundaries) {
+              if (startX < b - 8 && endX > b + 8) {
+                isSpanning = true;
+                break;
+              }
+            }
+            if (isSpanning) break;
+          }
+
+          // If not spanning, check if there is a gap at boundaries on this line
+          if (!isSpanning) {
+            for (const b of boundaries) {
+              const leftItems = line.items.filter((item) => item.x < b);
+              const rightItems = line.items.filter((item) => item.x >= b);
+              
+              if (leftItems.length > 0 && rightItems.length > 0) {
+                const rightmostLeft = leftItems[leftItems.length - 1];
+                const leftmostRight = rightItems[0];
+                const leftEnd = rightmostLeft.x + rightmostLeft.text.length * charWidthEstimate;
+                const rightStart = leftmostRight.x;
+                
+                const gap = rightStart - leftEnd;
+                if (gap < 20) { // Gutter is too small on this line -> treat line as spanning/full-width
+                  isSpanning = true;
+                  break;
+                }
+              }
+            }
+          }
+
+          if (isSpanning) {
+            flushColumns();
+            const mappedItems = line.items.map(i => ({ x: i.x, y: line.y, text: i.text }));
+            blocks.push({ type: "spanning", text: groupItemsIntoText(mappedItems) });
+          } else {
+            // Split line parts into respective columns
+            for (let c = 0; c <= boundaries.length; c++) {
+              const prevBound = c === 0 ? 0 : boundaries[c - 1];
+              const nextBound = c < boundaries.length ? boundaries[c] : pageWidth;
+              
+              const colItems = line.items.filter((item) => item.x >= prevBound && item.x < nextBound);
+              if (colItems.length > 0) {
+                const mappedColItems = colItems.map(i => ({ x: i.x, y: line.y, text: i.text }));
+                currentCols[c].push(...mappedColItems);
+              }
+            }
+          }
+        }
+        flushColumns();
+
+        // Assemble page block text
+        const assembledBlocks: string[] = [];
+        for (const block of blocks) {
+          if (block.type === "spanning") {
+            assembledBlocks.push(block.text);
+          } else {
+            for (let c = 0; c < block.cols.length; c++) {
+              const colText = groupItemsIntoText(block.cols[c]);
+              if (colText) assembledBlocks.push(colText);
+            }
+          }
+        }
+        pageText = assembledBlocks.join("\n");
+        console.log(`[PDF] Page ${pageNum}: Block reconstructed multi-column (Columns: ${boundaries.length + 1}, boundaries: ${boundaries.join(", ")})`);
+      } else {
+        pageText = groupItemsIntoText(allItems);
+      }
+
+      page.cleanup();
+      if (pageText.trim()) pageTexts.push(pageText.trim());
+    }
+
+    return preprocessTwoColumnText(pageTexts.join("\n\n"));
+
   } catch (err) {
-    console.error("PDF metin çıkarma hatası:", err);
-    throw new Error("PDF dosyası okunurken hata oluştu.");
-  } finally {
-    await parser.destroy();
+    console.warn("[PDF] pdfjs-dist extraction failed, falling back to pdf-parse:", (err as Error).message);
+
+    // Legacy fallback
+    const parser = new PDFParse({ data: pdfBuffer });
+    try {
+      const result = await parser.getText();
+      return preprocessTwoColumnText(result.text || "");
+    } finally {
+      await parser.destroy();
+    }
   }
 }
+
 
 /** Detects whether resume text is primarily Turkish or English. */
 export function detectLanguage(text: string): "tr" | "en" {
@@ -303,23 +637,27 @@ function matchHeading(
   const norm = normalizeHeading(clean);
   if (norm.split(/\s+/).length > 4) return null;
 
-  const headings = lang === "tr" ? HEADINGS_TR : HEADINGS_EN;
-
-  // 1. Exact match
-  for (const [key, list] of Object.entries(headings)) {
-    if (
-      list.includes(norm) ||
-      list.some((h) => [`${h}ler`, `${h}lar`, `${h}leri`, `${h}lari`].includes(norm))
-    ) {
-      return { sectionKey: key, confidence: 0.98, source: "RULE" };
+  // 1. Exact match across both Turkish and English heading lists
+  const allHeadingsList = [HEADINGS_TR, HEADINGS_EN];
+  
+  for (const headings of allHeadingsList) {
+    for (const [key, list] of Object.entries(headings)) {
+      if (
+        list.includes(norm) ||
+        list.some((h) => [`${h}ler`, `${h}lar`, `${h}leri`, `${h}lari`].includes(norm))
+      ) {
+        return { sectionKey: key, confidence: 0.98, source: "RULE" };
+      }
     }
   }
 
-  // 2. Word-boundary regex match
-  for (const [key, list] of Object.entries(headings)) {
-    for (const phrase of list) {
-      if (new RegExp(`(^|\\s)${phrase}(\\s|$)`, "i").test(norm) && !RX_VERB_PAST.test(norm)) {
-        return { sectionKey: key, confidence: 0.85, source: "RULE" };
+  // 2. Word-boundary regex match across both dictionaries
+  for (const headings of allHeadingsList) {
+    for (const [key, list] of Object.entries(headings)) {
+      for (const phrase of list) {
+        if (new RegExp(`(^|\\s)${phrase}(\\s|$)`, "i").test(norm) && !RX_VERB_PAST.test(norm)) {
+          return { sectionKey: key, confidence: 0.85, source: "RULE" };
+        }
       }
     }
   }
@@ -363,11 +701,158 @@ function computeConfidence(
 }
 
 /**
- * Normalizes star characters (e.g. ★★★☆☆) in text to descriptive ratings (e.g. (3/5 Yıldız)).
+ * Normalizes star characters — currently a no-op (disabled by design).
  */
 function normalizeStars(text: string): string {
   return text;
 }
+
+/**
+ * Normalizes unicode block bar characters (e.g. ████████░░) to percentage text.
+ * e.g. "Python (LLM) ████████░░" → "Python (LLM) (%80)"
+ */
+function normalizeSkillBar(text: string): string {
+  // Match label followed by block/shade chars (at least 3 chars)
+  return text.replace(
+    /([^\n]*?)([▀-▟█-▏░-▓█▉▊▋▌▍▎▏▐░▒▓▔▕■□▪▫◾◽⬛⬜⬢⬡●○\|█\u2589\u258a\u258b\u258c\u258d\u258e\u258f]{3,})/g,
+    (_match, label, bars) => {
+      const filled = (bars.match(/[█▉▊▋▌▍▎▏|]/g) || []).length;
+      const total  = bars.replace(/\s/g, "").length;
+      if (total === 0) return label;
+      const pct = Math.round((filled / total) * 100);
+      return `${label}(%${pct})`;
+    }
+  );
+}
+
+/**
+ * Pre-processes raw PDF text to handle two-column layouts.
+ *
+ * Two-column PDFs often produce lines where left-column and right-column
+ * content are merged on the same line, separated by multiple spaces.
+ * This function detects such merged heading lines and splits them into
+ * separate lines so the heading detector can process them correctly.
+ *
+ * Also strips emoji characters that block heading matching.
+ */
+function preprocessTwoColumnText(text: string): string {
+  const lines = text.split("\n");
+  const processed: string[] = [];
+
+  // Emoji regex (broad — covers most common emoji ranges)
+  const emojiRx = /[\u{1F000}-\u{1FFFF}\u{2600}-\u{27BF}\u{FE00}-\u{FEFF}\u{1F900}-\u{1F9FF}\u{1FA00}-\u{1FA9F}]/gu;
+
+  // Regex to detect "floating" bar percentage lines like:
+  // "%95 (Uzman)", "%90 (İleri Seviye)", "(%80)", "(80%)"
+  const barPctRx = /^%?\d{1,3}(?:\s*\([\w\s\u00c0-\u017e-]+\))?$|^\(\s*%?\d{1,3}\s*\)$/;
+
+  // Collect all stripped lines first for lookahead
+  const strippedLines: string[] = [];
+  for (const line of lines) {
+    const stripped = line
+      .replace(/^[\s]*[\u{1F000}-\u{1FFFF}\u{2600}-\u{27BF}\u{1F900}-\u{1F9FF}\u{1FA00}-\u{1FA9F}]+\s*/gu, "")
+      .replace(emojiRx, "")
+      .trim();
+    strippedLines.push(stripped);
+  }
+
+  // ── Pass 1: detect orphaned bar-pct lines and pair with following skill name ─
+  // Pattern: several consecutive barPct lines followed by the same number of skill names.
+  // We buffer them and reconstruct as "SkillName: %XX (Level)" pairs.
+  const paired: string[] = [];
+  let i = 0;
+  while (i < strippedLines.length) {
+    const line = strippedLines[i];
+
+    if (barPctRx.test(line)) {
+      // Collect consecutive bar-pct lines
+      const barLines: string[] = [line];
+      let j = i + 1;
+      while (j < strippedLines.length && barPctRx.test(strippedLines[j])) {
+        barLines.push(strippedLines[j]);
+        j++;
+      }
+
+      // After bar lines, skip empty/emoji-only lines and collect any
+      // ALL_CAPS headings to re-emit them later (they separate bar values from labels)
+      const skippedHeadings: string[] = [];
+      while (j < strippedLines.length) {
+        const sl = strippedLines[j].replace(emojiRx, "").trim();
+        if (sl === "") { j++; continue; }
+        // ALL_CAPS heading between bars and labels — save to emit, skip for pairing
+        const isHeading = sl === sl.toUpperCase() && sl.length > 3 && sl.length <= 55
+          && !/^%?\d/.test(sl);
+        if (isHeading) { skippedHeadings.push(strippedLines[j]); j++; continue; }
+        break;
+      }
+
+      // Collect subsequent non-bar, non-heading skill label lines
+      const labelLines: string[] = [];
+      let k = j;
+      while (
+        k < strippedLines.length &&
+        labelLines.length < barLines.length &&
+        !barPctRx.test(strippedLines[k]) &&
+        strippedLines[k].length > 0 &&
+        strippedLines[k].length < 80
+      ) {
+        const sl = strippedLines[k].toUpperCase();
+        // If we hit another ALL_CAPS heading, stop
+        if (sl === strippedLines[k] && strippedLines[k].length > 3 && strippedLines[k].length <= 55) break;
+        labelLines.push(strippedLines[k]);
+        k++;
+      }
+
+
+      if (labelLines.length === barLines.length) {
+        // Emit the section heading(s) that were between bars and labels
+        for (const h of skippedHeadings) paired.push(h);
+        // Perfect pairing — emit as "Label: %pct" lines
+        for (let m = 0; m < barLines.length; m++) {
+          paired.push(`${labelLines[m]}: ${barLines[m]}`);
+        }
+        i = k; // skip all consumed lines
+        continue;
+      } else {
+        // Could not pair — emit headings and bar lines as-is
+        for (const h of skippedHeadings) paired.push(h);
+        for (const b of barLines) paired.push(b);
+        i = j;
+        continue;
+      }
+    }
+
+    paired.push(line);
+    i++;
+  }
+
+  // ── Pass 2: two-column heading detection ─────────────────────────────────────
+  for (const line of paired) {
+    const segments = line.split(/\s{4,}/);
+    if (segments.length >= 2) {
+      const headingLike = segments.filter((s) => {
+        const t = s.trim();
+        if (t.length === 0 || t.length > 60) return false;
+        const norm = t.replace(emojiRx, "").trim();
+        return (
+          norm.length > 2 &&
+          (norm === norm.toUpperCase() || /^[A-ZÇĞİÖŞÜ][a-zA-ZçğışöüÇĞİÖŞÜ\s&()]+$/.test(norm))
+        );
+      });
+      if (headingLike.length >= 2) {
+        for (const seg of segments) {
+          const t = seg.trim();
+          if (t) processed.push(t);
+        }
+        continue;
+      }
+    }
+    processed.push(line);
+  }
+
+  return processed.join("\n");
+}
+
 
 // ─────────────────────────────────────────────────────────────────────────────
 // ADAPTIVE CHUNK SPLITTING (sentence-boundary sliding window)
@@ -434,9 +919,6 @@ function subChunkSection(
   parentSource: "RULE" | "STRUCTURAL",
   sectionConfidence: number
 ): SubChunk[] {
-  // Return the entire section as a single chunk to keep experiences unified and avoid header duplication.
-  return [{ text: lines.join("\n"), confidence: sectionConfidence, source: parentSource }];
-
   const SUB_CHUNK_SECTIONS = new Set(["experience", "education", "projects"]);
   if (!SUB_CHUNK_SECTIONS.has(sectionKey)) {
     return [{ text: lines.join("\n"), confidence: sectionConfidence, source: parentSource }];
@@ -473,9 +955,24 @@ function subChunkSection(
   };
 
   for (const line of lines) {
-    if (isBoundary(line.trim())) {
+    const trimmed = line.trim();
+    if (isBoundary(trimmed)) {
+      // Look-back: identify and move the preceding 1-2 short lines (title, company) to the new chunk
+      const poppedLines: string[] = [];
+      while (buf.length > 0 && poppedLines.length < 2) {
+        const lastLine = buf[buf.length - 1].trim();
+        const isList = lastLine.startsWith("•") || lastLine.startsWith("-") || lastLine.startsWith("*");
+        const isLongText = lastLine.split(/\s+/).length > 10;
+        
+        // Stop look-back if we hit a list bullet, long description paragraph, or empty line
+        if (isList || isLongText || lastLine === "") {
+          break;
+        }
+        poppedLines.unshift(buf.pop()!);
+      }
+
       flush();
-      buf = [line];
+      buf = [...poppedLines, line];
     } else {
       buf.push(line);
     }
@@ -987,16 +1484,30 @@ export function simulateAiAnalysis(text: string, lang: "tr" | "en") {
     throw new Error("Geçersiz veya bozuk PDF verisi. AI analizi yapılamaz.");
   }
 
-  // Simple regex to extract first title/role keyword or fallback
-  let extractedRole = "Yazılım Geliştirici";
-  if (lang === "en") extractedRole = "Software Engineer";
-  const lines = text.split("\n").map(l => l.trim()).filter(l => l.length > 0);
-  for (const line of lines) {
-    if (line.includes("Developer") || line.includes("Mühendisi") || line.includes("Architect") || line.includes("Mimarı") || line.includes("Geliştirici") || line.includes("Designer")) {
-      extractedRole = line.replace(/[🚀📊🛠️💼🎓|]/g, "").trim();
-      if (extractedRole.length > 3 && extractedRole.length < 60) {
-        break;
-      }
+  // Extract role/title from first lines — handles emoji prefixes and various title patterns
+  let extractedRole = lang === "en" ? "Software Engineer" : "Yazılım Geliştirici";
+  const lines = text.split("\n").map((l) => l.trim()).filter((l) => l.length > 0);
+
+  // Broad emoji & icon strip regex
+  const emojiStripRx = /[\u{1F000}-\u{1FFFF}\u{2600}-\u{27BF}\u{FE00}-\u{FEFF}\u{1F900}-\u{1F9FF}\u{1FA00}-\u{1FA9F}🚀📊🛠️💼🎓🔧⚙️📌📍✅❌⭐★☆▶►]/gu;
+
+  const titleKeywordsTR = [
+    "mühendis", "muhendis", "geliştirici", "gelistirici", "developer",
+    "mimar", "architect", "tasarımcı", "tasarimci", "designer",
+    "analist", "analyst", "yönetici", "yonetici", "manager",
+    "uzman", "specialist", "lead", "direktör", "direktor", "director",
+    "koordinatör", "koordinator", "koordinatör", "danışman", "danishman",
+    "consultant", "sorumlu", "başkan", "baskan", "stajyer", "intern",
+  ];
+
+  for (const line of lines.slice(0, 20)) { // Check first 20 lines only
+    const cleaned = line.replace(emojiStripRx, "").trim();
+    if (cleaned.length < 4 || cleaned.length > 80) continue;
+    const lower = cleaned.toLowerCase();
+    const isTitle = titleKeywordsTR.some((kw) => lower.includes(kw));
+    if (isTitle) {
+      extractedRole = cleaned;
+      break;
     }
   }
 

@@ -237,16 +237,16 @@ router.post("/upload", authMiddleware, (req: Request, res: Response): void => {
       });
 
       if (existingCv) {
-        console.log(`[Upload] Duplicate CV found for user ${userId} with hash ${fileHash}`);
-        const latestAnalysis = existingCv.analyses && existingCv.analyses[0];
-        
-        res.status(200).json({
-          message: "Bu CV daha önce yüklendi. Mevcut analiz sonucu getiriliyor.",
-          cv: existingCv,
-          analysis: latestAnalysis,
-        });
-        return;
+        console.log(`[Upload] Overwriting existing CV for user ${userId} with hash ${fileHash} to apply parser updates.`);
+        // Delete existing CV (cascade will handle chunks and analyses in DB)
+        await prisma.cV.delete({ where: { id: existingCv.id } });
+        // Delete from Supabase Storage
+        const oldFilePath = existingCv.fileUrl.split("/public/cv-files/")[1];
+        if (oldFilePath) {
+          await supabase.storage.from("cv-files").remove([oldFilePath]);
+        }
       }
+
 
       // Upload file to Supabase Storage
       const { data, error } = await supabase.storage
