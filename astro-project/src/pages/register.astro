@@ -257,12 +257,7 @@ import Layout from '../layouts/Layout.astro';
     }
   });
 
-  // Clear on load
-  window.addEventListener('DOMContentLoaded', () => {
-    const p = document.getElementById('password') as HTMLInputElement;
-    const c = document.getElementById('confirm_password') as HTMLInputElement;
-    if (p) p.value = ''; if (c) c.value = '';
-  });
+
 
   // Toggle Password
   const togglePasswordBtn = document.getElementById('toggle-password');

@@ -321,7 +321,7 @@ router.post("/logout", (req: Request, res: Response): void => {
 router.post("/forgot-password-code", async (req: Request, res: Response): Promise<void> => {
   try {
     const { phone } = req.body;
-    const phoneStr = (phone || "").trim();
+    const phoneStr = (phone || "").trim().replace(/^(\+90|0)/, "");
 
     if (!phoneStr) {
       res.status(400).json({ message: "Telefon numarası zorunludur." });
@@ -361,7 +361,7 @@ router.post("/forgot-password-code", async (req: Request, res: Response): Promis
 router.post("/verify-code", async (req: Request, res: Response): Promise<void> => {
   try {
     const { phone, code } = req.body;
-    const phoneStr = (phone || "").trim();
+    const phoneStr = (phone || "").trim().replace(/^(\+90|0)/, "");
     const codeStr = (code || "").trim();
 
     if (!phoneStr || !codeStr) {
