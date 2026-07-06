@@ -366,12 +366,7 @@ function computeConfidence(
  * Normalizes star characters (e.g. ★★★☆☆) in text to descriptive ratings (e.g. (3/5 Yıldız)).
  */
 function normalizeStars(text: string): string {
-  return text
-    .replace(/★\s*★\s*★\s*★\s*★/g, " (5/5 Yıldız)")
-    .replace(/★\s*★\s*★\s*★\s*☆/g, " (4/5 Yıldız)")
-    .replace(/★\s*★\s*★\s*☆\s*☆/g, " (3/5 Yıldız)")
-    .replace(/★\s*★\s*☆\s*☆\s*☆/g, " (2/5 Yıldız)")
-    .replace(/★\s*☆\s*☆\s*☆\s*☆/g, " (1/5 Yıldız)");
+  return text;
 }
 
 // ─────────────────────────────────────────────────────────────────────────────
