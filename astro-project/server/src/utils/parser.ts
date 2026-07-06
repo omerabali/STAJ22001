@@ -47,7 +47,7 @@ const HEADINGS_TR: Record<string, string[]> = {
     "tecrube", "staj", "stajlar", "is gecmisi", "mesleki deneyim",
     "deneyimler", "nn deneynmn", "deneynmn", "nn deneyim",
     "kronolojik deneyim", "kronolojik is gecmisi", "is kronolojisi",
-    "calisma takvimi", "pozisyonlar",
+    "calisma takvimi", "pozisyonlar", "kronolojik deneyim i", "kronolojik deneyim 1",
   ],
   education: [
     "egitim", "ogrenim", "egitim bilgileri", "egitim gecmisi",
@@ -63,6 +63,7 @@ const HEADINGS_TR: Record<string, string[]> = {
     "skill grafikleri", "beceriler & araclar", "yetkinlik alanlari",
     "yetkinlikler (barlar)", "teknik beceri grafikleri",
     "yetkinlik matrisi", "teknik adaptasyon", "beceri matrisi", "yetenek matrisi",
+    "altyapi metrikleri", "altyapı metrikleri", "metrikler",
   ],
   projects: [
     "projeler", "projelerim", "proje deneyimi", "kisisel projeler",
@@ -72,7 +73,8 @@ const HEADINGS_TR: Record<string, string[]> = {
   certifications: [
     "sertifikalar", "sertifikalarim", "sertifikasyonlar", "belgeler",
     "kurslar", "seminerler", "sertifika & kurslar", "egitim ve sertifikalar",
-    "sertnfnkalar", "sertnfnkalarim",
+    "sertnfnkalar", "sertnfnkalarim", "lisans / sertifikalar", "lisans ve sertifikalar",
+    "sertifikalar ve lisanslar",
   ],
   languages: [
     "diller", "yabanci dil", "yabanci diller", "dil bilgisi",
@@ -84,10 +86,12 @@ const HEADINGS_TR: Record<string, string[]> = {
   publications: [
     "yayinlar", "yayinlarim", "patentler", "yayinlar & patentler",
     "yayinlar ve patentler", "akademik yayinlar", "patentlerim",
-    "eserler", "bilimsel yayinlar",
+    "eserler", "bilimsel yayinlar", "secilmis yayinlar", "patent matrisi",
+    "patent matrisi (structural json tuzagi)",
   ],
   references: [
-    "referanslar", "referans", "is referanslari",
+    "referanslar", "referans", "is referanslari", "kurumsal referanslar",
+    "profesyonel referanslar",
   ],
 };
 
@@ -692,9 +696,9 @@ function computeConfidence(
   content: string,
   sectionKey?: string
 ): number {
-  // If it's a list-based section (skills, languages, certs) and heading was found via RULE,
-  // return high confidence directly to avoid false low-confidence scores on short lists.
-  if (headingSource === "RULE" && sectionKey && ["skills", "languages", "certifications", "publications"].includes(sectionKey)) {
+  // If it's the personal section or list-based section (skills, languages, certs, publications) and heading was found via RULE/DEFAULT,
+  // return high confidence directly to avoid false low-confidence scores.
+  if (sectionKey === "personal" || (headingSource === "RULE" && sectionKey && ["skills", "languages", "certifications", "publications"].includes(sectionKey))) {
     return 0.95;
   }
 
