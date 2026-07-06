@@ -21,6 +21,7 @@ const SECTION_LABELS: Record<string, string> = {
   projects:       "Projeler",
   certifications: "Sertifikalar",
   languages:      "Diller",
+  publications:   "Yayınlar & Patentler",
   references:     "Referanslar",
 };
 
@@ -80,6 +81,11 @@ const HEADINGS_TR: Record<string, string[]> = {
     "dil bilgisi & seviyeler", "yabanci dil seviyeleri", "dil & seviye",
     "yabancidiller",
   ],
+  publications: [
+    "yayinlar", "yayinlarim", "patentler", "yayinlar & patentler",
+    "yayinlar ve patentler", "akademik yayinlar", "patentlerim",
+    "eserler", "bilimsel yayinlar",
+  ],
   references: [
     "referanslar", "referans", "is referanslari",
   ],
@@ -126,6 +132,11 @@ const HEADINGS_EN: Record<string, string[]> = {
   languages: [
     "languages", "language skills", "languages spoken",
     "language levels", "foreign languages", "language proficiency",
+  ],
+  publications: [
+    "publications", "patents", "publications & patents",
+    "publications and patents", "academic publications", "scientific publications",
+    "selected publications",
   ],
   references: [
     "references", "reference", "referees",
@@ -678,8 +689,15 @@ function matchHeading(
 
 function computeConfidence(
   headingSource: "RULE" | "STRUCTURAL" | "DEFAULT",
-  content: string
+  content: string,
+  sectionKey?: string
 ): number {
+  // If it's a list-based section (skills, languages, certs) and heading was found via RULE,
+  // return high confidence directly to avoid false low-confidence scores on short lists.
+  if (headingSource === "RULE" && sectionKey && ["skills", "languages", "certifications", "publications"].includes(sectionKey)) {
+    return 0.95;
+  }
+
   // Heading contribution
   const headingContrib =
     headingSource === "RULE"       ? 0.40 :
@@ -948,7 +966,7 @@ function subChunkSection(
     const content = buf.join("\n").trim();
     if (content) {
       // Each sub-chunk re-evaluates its own confidence signals
-      const subConf = computeConfidence("STRUCTURAL", content);
+      const subConf = computeConfidence("STRUCTURAL", content, sectionKey);
       raw.push({ text: content, confidence: subConf, source: "STRUCTURAL" });
     }
     buf = [];
@@ -1030,7 +1048,7 @@ async function runLocalRuleBasedParser(
     const content = currentSectionLines.join("\n").trim();
     if (!content) return;
 
-    const sectionConf = computeConfidence(currentSectionSource, content);
+    const sectionConf = computeConfidence(currentSectionSource, content, currentSectionKey);
 
     let resolvedKey   = currentSectionKey;
     let resolvedLabel = currentSectionLabel;
@@ -1138,10 +1156,13 @@ export async function chunkTextBySections(text: string): Promise<{ chunkText: st
 
     if (aiSections.length > 0) {
       // Merge duplicate section keys to avoid multiple duplicate heading blocks
+      // Do NOT merge skills, languages or publications blocks so they can remain separate
       const mergedSections: typeof aiSections = [];
       for (const section of aiSections) {
         const existing = mergedSections.find(
-          s => s.sectionKey === section.sectionKey && (s.sectionKey !== "other" || s.customName === section.customName)
+          s => s.sectionKey === section.sectionKey && 
+               !["skills", "languages", "publications"].includes(s.sectionKey) && 
+               (s.sectionKey !== "other" || s.customName === section.customName)
         );
         if (existing) {
           existing.text += "\n\n" + section.text;
