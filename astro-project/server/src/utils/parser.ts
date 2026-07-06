@@ -644,13 +644,13 @@ function matchHeading(
   lang: "tr" | "en"
 ): { sectionKey: string; confidence: number; source: "RULE" | "STRUCTURAL" } | null {
   const trimmed = line.trim();
-  if (trimmed.length === 0 || trimmed.length > 40) return null;
+  if (trimmed.length === 0 || trimmed.length > 60) return null;
 
   const clean = trimmed.replace(/:$/, "").replace(/^[\[(]|[\])]$/g, "").trim();
   if (!clean || RX_SENTENCE_END.test(clean)) return null;
 
   const norm = normalizeHeading(clean);
-  if (norm.split(/\s+/).length > 4) return null;
+  if (norm.split(/\s+/).length > 6) return null;
 
   // 1. Exact match across both Turkish and English heading lists
   const allHeadingsList = [HEADINGS_TR, HEADINGS_EN];

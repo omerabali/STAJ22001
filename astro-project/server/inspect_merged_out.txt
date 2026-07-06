@@ -1,0 +1,108 @@
+﻿Ôùç injected env (10) from .env // tip: Ôîİ enable debugging { debug: true }
+=== LAST CV CHUNKS AFTER FIX ===
+File Name: kivanc_taylan_eren_cv.pdf
+
+=== CHUNKS ===
+
+Chunk 1 [Ki┼şisel Bilgiler]:
+[KI┼ŞISEL BILGILER]
+Prof. Dr. K─▒van├ğ Taylan Eren
+Chief AI Scientist & Quantum Infrastructure Lead
+Maslak Teknokent, ─░stanbul |  k.taylan.eren@quantum-neural.net |  +90 532 999 8877
+
+Chunk 2 [Yetenekler]:
+[YETENEKLER]
+PyTorch / JAX Eksper
+CUDA C++ Opt. ─░leri Seviye
+Kubeflow / Slurm Eksper
+Milvus / Qdrant Eksper
+
+Chunk 3 [Diller]:
+[DILLER]
+─░ngilizce: C2 (Ana Dil Seviyesi)
+Almanca: C1 (Teknik ─░leri)
+
+Chunk 4 [├ûzet]:
+[├ûZET]
+15 y─▒l─▒ a┼şk─▒n derin ├Â─şrenme ve
+da─ş─▒t─▒k sistemler deneyimiyle,
+k├╝resel ├Âl├ğekte yapay zeka
+altyap─▒lar─▒ in┼şa ettim. Model Context
+Protocol (MCP) tabanl─▒ kurumsal
+RAG mimarilerini optimize ederek
+b├╝y├╝k dil modellerinin anl─▒k d├Âk├╝man
+i┼şleme h─▒z─▒n─▒ %65 art─▒rd─▒m.
+
+Chunk 5 [Deneyimler]:
+[DENEYIMLER]
+VP of AI & Cloud Infrastructure
+NeuralScale Automation Inc. - M├╝nih, Almanya
+Haziran 2023 - Halen
+Avrupa genelinde 4 farkl─▒ veri merkezine da─ş─▒t─▒lm─▒┼ş multi-node GPU
+cluster'lar─▒n (1024x NVIDIA H100) orkestrasyonunu ├╝stlendim. LLM
+ajanlar─▒n─▒n bellek y├Ânetimini optimize eden dinamik semantik par├ğalama
+(dynamic semantic chunking) motorunu s─▒f─▒rdan tasarlad─▒m.
+
+Chunk 6 [Deneyimler]:
+[DENEYIMLER]
+Lead Machine Learning Architect
+Anatolia AI Systems - Levent, ─░stanbul
+Ocak 2019 - May─▒s 2023
+G├╝nl├╝k 100 milyondan fazla istek alan ger├ğek zamanl─▒ semantik arama ve
+d├Âk├╝man analiz altyap─▒s─▒n─▒ kurdum. PDF parsing katman─▒nda kural
+tabanl─▒ regex k├╝t├╝phanelerini tamamen devre d─▒┼ş─▒ b─▒rak─▒p, g├Âr├╝nt├╝ i┼şleme
+tabanl─▒ (vision-based layout-aware) yeni bir ingestion pipeline geli┼ştirdim.
+
+Chunk 7 [Sertifikalar]:
+[SERTIFIKALAR]
+ÔÇó NVIDIA Certified CUDA Developer
+ÔÇó AWS Solutions Architect - Pro
+ÔÇó Google Cloud Data Engineer
+
+Chunk 8 [E─şitim]:
+[E─ŞITIM]
+Doktora (Ph.D.) - Bilgisayar M├╝hendisli─şi
+Bo─şazi├ği ├£niversitesi
+2014 - 2018
+Tez Konusu: Da─ş─▒t─▒k Derin ├û─şrenme Mimarilerinde Tens├Âr
+Paralelizasyonu, Gradyan S─▒k─▒┼şt─▒rma Algoritmalar─▒ ve Heterojen GPU
+K├╝melemelerinde Bellek Y├Ânetimi Optimizasyonu.
+
+Chunk 9 [E─şitim]:
+[E─ŞITIM]
+Y├╝ksek Lisans - Veri Bilimi ve Yapay Zeka
+M├╝nih Teknik ├£niversitesi (TUM)
+2012 - 2014
+
+Chunk 10 [E─şitim]:
+[E─ŞITIM]
+Lisans - Bilgisayar M├╝hendisli─şi (├çAP: Matematik)
+Orta Do─şu Teknik ├£niversitesi (ODT├£)
+2008 - 2012
+
+Chunk 11 [Yay─▒nlar & Patentler]:
+[YAYINLAR & PATENTLER]
+[1] Eren, K. T. , "Dinamik Tokenizasyon
+ve Yap─▒sal Olarak Par├ğalanm─▒┼ş
+D├Âk├╝manlarda Semantik B├Âl├╝mleme
+Algoritmalar─▒."IEEE PAMI , 2025.
+[2] "Distributed Retrieval-Augmented
+Generation (RAG) at Terabyte Scale."
+ACM AI Systems , 2024.
+PATENT MATR─░S─░ (STRUCTURAL JSON TUZA─ŞI)
+*Parser'─▒n b├╝t├╝n halinde chunking yapmas─▒ gereken alan:*
+{
+"@context": "https://schema.org",
+"@type":"name": "Hierarchical"Patent", Document Splitting",
+"patentNumber": "PAT-TR-2026-00994-A",
+"status": "Patent Pending",
+"inventor": {
+"@type": "Person",
+"name": "K─▒van├ğ Taylan Eren"
+}
+}
+
+Chunk 12 [Referanslar]:
+[REFERANSLAR]
+Prof. Dr. Ahmet R─▒za Soylu Dr. Marcus Vance
+Bo─şazi├ği ├£ni. Yapay Zeka Enst. NeuralScale Co-Founder
