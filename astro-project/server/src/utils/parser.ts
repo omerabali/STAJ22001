@@ -117,6 +117,7 @@ const HEADINGS_EN: Record<string, string[]> = {
     "education", "academic background", "academic history",
     "educational background", "qualifications", "university",
     "degrees", "educational qualifications", "education & academic",
+    "educational information", "education information",
   ],
   skills: [
     "skills", "technical skills", "core competencies", "expertise",
