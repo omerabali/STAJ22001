@@ -104,20 +104,10 @@ async function processCv(cvId: string, analysisId: string, pdfBuffer: Buffer): P
       aiFallback = true;
       aiFallbackReason = "low_confidence";
       parserLogs.push(`Ortalama güven skoru çok düşük (${avgConfidence} < 0.70). AI Fallback tetikleniyor.`);
-    } else if (avgConfidence >= 0.70 && avgConfidence < 0.90) {
-      if (missingCritical) {
-        aiFallback = true;
-        aiFallbackReason = "missing_critical_sections";
-        parserLogs.push(`Ortalama güven skoru orta düzeyde (${avgConfidence}). Kritik bölümler (Deneyim/Eğitim) eksik olduğu için AI Fallback tetikleniyor.`);
-      } else {
-        aiFallback = false;
-        aiFallbackReason = "optional_skipped_due_to_critical_sections_present";
-        parserLogs.push(`Ortalama güven skoru orta düzeyde (${avgConfidence}) ve kritik bölümler mevcut. AI Fallback atlandı.`);
-      }
     } else {
       aiFallback = false;
-      aiFallbackReason = "high_confidence";
-      parserLogs.push(`Ortalama güven skoru yüksek (${avgConfidence} >= 0.90). AI Fallback atlandı.`);
+      aiFallbackReason = "sufficient_confidence";
+      parserLogs.push(`Ortalama güven skoru yeterli (${avgConfidence} >= 0.70). AI Fallback atlandı.`);
     }
 
     let aiAnalysis;
