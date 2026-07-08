@@ -12,7 +12,9 @@
     "dev:all": "concurrently --kill-others-on-fail --names \"ASTRO,SERVER\" --prefix-colors \"cyan,yellow\" \"npm run dev:astro\" \"npm run dev:server\"",
     "build": "astro build",
     "preview": "astro preview",
-    "astro": "astro"
+    "astro": "astro",
+    "test:gun21": "npm run test:gun21 --prefix server",
+    "test:verify_gun21": "npm run test:verify_gun21 --prefix server"
   },
   "dependencies": {
     "@astrojs/node": "^11.0.0",
