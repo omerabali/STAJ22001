@@ -1040,7 +1040,8 @@ const AI_FALLBACK_THRESHOLD = 0.75;
  */
 async function runLocalRuleBasedParser(
   text: string,
-  lang: "tr" | "en"
+  lang: "tr" | "en",
+  prisma?: any
 ): Promise<{ chunkText: string; metadata: any }[]> {
   const lines = text.split("\n");
   const parsedChunks: { chunkText: string; metadata: any }[] = [];
@@ -1062,7 +1063,7 @@ async function runLocalRuleBasedParser(
     let resolvedLabel = currentSectionLabel;
 
     if (sectionConf < AI_FALLBACK_THRESHOLD && currentSectionSource !== "RULE") {
-      const aiKey = await classifySectionWithAI(content, currentSectionKey, lang);
+      const aiKey = await classifySectionWithAI(content, currentSectionKey, lang, prisma);
       if (aiKey !== currentSectionKey) {
         console.log(`[Parser] AI reclassified "${currentSectionLabel}" → "${SECTION_LABELS[aiKey] ?? aiKey}" (conf was ${sectionConf})`);
         resolvedKey   = aiKey;
@@ -1135,13 +1136,13 @@ async function runLocalRuleBasedParser(
  *      meaning layout is scrambled/irregular, fall back to Macro AI Segmentation (gpt-4o-mini).
  *   3. Run local sub-chunking & sliding-window on segmented blocks.
  */
-export async function chunkTextBySections(text: string): Promise<{ chunkText: string; metadata: any }[]> {
+export async function chunkTextBySections(text: string, prisma?: any): Promise<{ chunkText: string; metadata: any }[]> {
   if (!text || text.trim() === "") return [];
 
   const lang = detectLanguage(text);
 
   // ── 1. First Pass: Local Rule-Based Dictionary ───────────────────────────
-  const localChunks = await runLocalRuleBasedParser(text, lang);
+  const localChunks = await runLocalRuleBasedParser(text, lang, prisma);
 
   const uniqueSections = new Set(localChunks.map(c => c.metadata.section));
   const avgConfidence = localChunks.length > 0
@@ -1160,7 +1161,7 @@ export async function chunkTextBySections(text: string): Promise<{ chunkText: st
 
   if (needsAISegmentation && apiKey) {
     console.log(`[Parser] ⚡ Triggering Macro AI Segmentation Fallback (avgConf: ${avgConfidence.toFixed(2)}, sections: ${uniqueSections.size})`);
-    const aiSections = await segmentCvWithAI(text, lang);
+    const aiSections = await segmentCvWithAI(text, lang, prisma);
 
     if (aiSections.length > 0) {
       // Merge duplicate section keys to avoid multiple duplicate heading blocks
@@ -1251,7 +1252,8 @@ const OPENAI_SECTION_KEYS = Object.keys(SECTION_LABELS).join(" | ");
  */
 export async function segmentCvWithAI(
   text: string,
-  lang: "tr" | "en"
+  lang: "tr" | "en",
+  prisma?: any
 ): Promise<{ sectionKey: string; customName?: string; text: string }[]> {
   const apiKey = process.env.OPENAI_API_KEY;
   if (!apiKey) {
@@ -1312,6 +1314,23 @@ export async function segmentCvWithAI(
     }
 
     const data = await res.json() as Record<string, any>;
+    const promptTokens = data.usage?.prompt_tokens || 0;
+    const completionTokens = data.usage?.completion_tokens || 0;
+    const costUsd = (promptTokens * 0.00000015) + (completionTokens * 0.00000060);
+
+    if (prisma) {
+      await prisma.aPICall.create({
+        data: {
+          model: "gpt-4o-mini",
+          tokensIn: promptTokens,
+          tokensOut: completionTokens,
+          costUsd,
+          endpoint: "chat",
+          status: "SUCCESS"
+        }
+      }).catch((e: any) => console.error("[AI Segment] Failed to log API call:", e));
+    }
+
     const responseText = data.choices?.[0]?.message?.content as string;
     const parsed = JSON.parse(responseText);
 
@@ -1321,8 +1340,20 @@ export async function segmentCvWithAI(
       );
     }
     return [];
-  } catch (err) {
+  } catch (err: any) {
     console.error("[AI Segment] segmentCvWithAI failed:", err);
+    if (prisma) {
+      await prisma.aPICall.create({
+        data: {
+          model: "gpt-4o-mini",
+          tokensIn: 0,
+          tokensOut: 0,
+          costUsd: 0,
+          endpoint: "chat",
+          status: "FAILED"
+        }
+      }).catch((e: any) => console.error("[AI Segment] Failed to log API call failure:", e));
+    }
     return [];
   }
 }
@@ -1342,7 +1373,8 @@ export async function segmentCvWithAI(
 export async function classifySectionWithAI(
   sectionText: string,
   currentKey: string,
-  lang: "tr" | "en"
+  lang: "tr" | "en",
+  prisma?: any
 ): Promise<string> {
   const apiKey = process.env.OPENAI_API_KEY;
   if (!apiKey) {
@@ -1375,11 +1407,27 @@ export async function classifySectionWithAI(
     });
 
     if (!res.ok) {
-      console.warn(`[AI Section] OpenAI returned ${res.status} — keeping original key.`);
-      return currentKey;
+      throw new Error(`OpenAI returned ${res.status}`);
     }
 
     const data = await res.json() as Record<string, any>;
+    const promptTokens = data.usage?.prompt_tokens || 0;
+    const completionTokens = data.usage?.completion_tokens || 0;
+    const costUsd = (promptTokens * 0.00000015) + (completionTokens * 0.00000060);
+
+    if (prisma) {
+      await prisma.aPICall.create({
+        data: {
+          model: "gpt-4o-mini",
+          tokensIn: promptTokens,
+          tokensOut: completionTokens,
+          costUsd,
+          endpoint: "chat",
+          status: "SUCCESS"
+        }
+      }).catch((e: any) => console.error("[AI Section] Failed to log API call:", e));
+    }
+
     const reply = ((data.choices?.[0]?.message?.content as string) ?? "").trim().toLowerCase();
 
     // Accept only known section keys
@@ -1391,8 +1439,20 @@ export async function classifySectionWithAI(
 
     console.warn(`[AI Section] Unexpected reply "${reply}" — keeping "${currentKey}".`);
     return currentKey;
-  } catch (err) {
+  } catch (err: any) {
     console.error("[AI Section] classifySectionWithAI failed:", err);
+    if (prisma) {
+      await prisma.aPICall.create({
+        data: {
+          model: "gpt-4o-mini",
+          tokensIn: 0,
+          tokensOut: 0,
+          costUsd: 0,
+          endpoint: "chat",
+          status: "FAILED"
+        }
+      }).catch((e: any) => console.error("[AI Section] Failed to log API call failure:", e));
+    }
     return currentKey;
   }
 }
@@ -1402,7 +1462,11 @@ export async function classifySectionWithAI(
  * Replaces the former analyzeWithGemini.
  * Called once per CV upload for ATS scoring.
  */
-export async function analyzeWithOpenAI(text: string, lang: "tr" | "en"): Promise<{
+export async function analyzeWithOpenAI(
+  text: string,
+  lang: "tr" | "en",
+  prisma?: any
+): Promise<{
   atsScore: number;
   role: string;
   skills: string[];
@@ -1460,6 +1524,23 @@ export async function analyzeWithOpenAI(text: string, lang: "tr" | "en"): Promis
     if (!res.ok) throw new Error(`OpenAI returned status ${res.status}`);
 
     const data         = await res.json() as Record<string, any>;
+    const promptTokens = data.usage?.prompt_tokens || 0;
+    const completionTokens = data.usage?.completion_tokens || 0;
+    const costUsd = (promptTokens * 0.00000015) + (completionTokens * 0.00000060);
+
+    if (prisma) {
+      await prisma.aPICall.create({
+        data: {
+          model: "gpt-4o-mini",
+          tokensIn: promptTokens,
+          tokensOut: completionTokens,
+          costUsd,
+          endpoint: "chat",
+          status: "SUCCESS"
+        }
+      }).catch((e: any) => console.error("[OpenAI] Failed to log API call:", e));
+    }
+
     const responseText = data.choices?.[0]?.message?.content as string;
     const parsed       = JSON.parse(responseText);
 
@@ -1494,8 +1575,20 @@ export async function analyzeWithOpenAI(text: string, lang: "tr" | "en"): Promis
       weaknesses:  weaknesses.slice(0, 3),
       suggestions: suggestions.slice(0, 3),
     };
-  } catch (err) {
+  } catch (err: any) {
     console.error("[OpenAI] analyzeWithOpenAI failed — using local fallback:", err);
+    if (prisma) {
+      await prisma.aPICall.create({
+        data: {
+          model: "gpt-4o-mini",
+          tokensIn: 0,
+          tokensOut: 0,
+          costUsd: 0,
+          endpoint: "chat",
+          status: "FAILED"
+        }
+      }).catch((e: any) => console.error("[OpenAI] Failed to log API call failure:", e));
+    }
     return simulateAiAnalysis(text, lang);
   }
 }

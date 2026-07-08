@@ -88,7 +88,7 @@ async function processCv(cvId: string, analysisId: string, pdfBuffer: Buffer): P
 
     // 3. Generate section-based chunks with metadata
     console.log(`[Parser] Generating section-based chunks...`);
-    const chunks = await chunkTextBySections(text);
+    const chunks = await chunkTextBySections(text, prisma);
     parserLogs.push(`${chunks.length} semantik parça (chunk) oluşturuldu.`);
 
     // 4. Save chunks in the cv_chunks table
@@ -143,7 +143,7 @@ async function processCv(cvId: string, analysisId: string, pdfBuffer: Buffer): P
     let aiAnalysis;
     if (aiFallback) {
       console.log(`[Parser] Running Gemini AI Fallback for CV: ${cvId} (Reason: ${aiFallbackReason})`);
-      aiAnalysis = await analyzeWithGemini(text, lang);
+      aiAnalysis = await analyzeWithGemini(text, lang, prisma);
       parserLogs.push("Gemini AI Analizi başarıyla çalıştırıldı ve doğrulandı.");
     } else {
       console.log(`[Parser] Skipping AI call for CV: ${cvId}. Running local rule/hybrid analysis.`);
@@ -567,7 +567,8 @@ router.get("/search", authMiddleware, async (req: Request, res: Response): Promi
   }
 
   try {
-    const results = await searchSimilarChunks(query, limit, prisma);
+    // Pass userId so search is scoped to the requesting user's own embeddings only
+    const results = await searchSimilarChunks(query, limit, prisma, undefined, req.user.id);
     res.json({ results });
   } catch (error: any) {
     console.error("Semantic search endpoint error:", error);

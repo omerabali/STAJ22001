@@ -23,9 +23,10 @@ export class EmbeddingService {
    * Uses the text-embedding-3-small model.
    *
    * @param text The input string to embed.
+   * @param prisma Optional PrismaClient instance to log API call usage.
    * @returns A promise resolving to an array of 1536 floats.
    */
-  public static async generateEmbedding(text: string): Promise<number[]> {
+  public static async generateEmbedding(text: string, prisma?: any): Promise<number[]> {
     if (!text || text.trim().length === 0) {
       throw new Error("[EmbeddingService] Input text cannot be empty.");
     }
@@ -33,27 +34,78 @@ export class EmbeddingService {
     this.apiCallCount++; // Increment local API call counter
     const client = this.getClient();
 
-    try {
-      const response = await client.embeddings.create({
-        model: "text-embedding-3-small",
-        input: text,
-      });
+    let attempt = 0;
+    const maxAttempts = 4;
+    let delay = 1000; // Start with 1 second
 
-      if (!response.data || response.data.length === 0) {
-        throw new Error("[EmbeddingService] Received empty data array from OpenAI API.");
+    while (attempt < maxAttempts) {
+      attempt++;
+      try {
+        const response = await client.embeddings.create({
+          model: "text-embedding-3-small",
+          input: text,
+        }, { timeout: 30000 }); // 30-second timeout
+
+        if (!response.data || response.data.length === 0) {
+          throw new Error("Received empty data array from OpenAI API.");
+        }
+
+        const promptTokens = response.usage?.prompt_tokens || 0;
+        const totalTokens = response.usage?.total_tokens || 0;
+        const tokensIn = promptTokens;
+        const tokensOut = totalTokens - promptTokens;
+        const costUsd = tokensIn * 0.00000002; // $0.02 / 1M tokens
+
+        if (prisma) {
+          await prisma.aPICall.create({
+            data: {
+              model: "text-embedding-3-small",
+              tokensIn,
+              tokensOut,
+              costUsd,
+              endpoint: "embedding",
+              status: "SUCCESS"
+            }
+          }).catch((err: any) => console.error("[EmbeddingService] Failed to log API call to database:", err));
+        }
+
+        return response.data[0].embedding;
+      } catch (error: any) {
+        console.error(`[EmbeddingService] Attempt ${attempt} failed:`, error);
+
+        const isRateLimit = error.status === 429 || error.message?.includes("429") || error.message?.includes("Rate limit");
+        const isTimeout = error.name === "APITimeoutError" || error.code === "ETIMEDOUT" || error.message?.includes("timeout");
+
+        // If this was the final attempt or a non-retryable error, log FAILED and throw
+        if (attempt >= maxAttempts || (!isRateLimit && !isTimeout)) {
+          if (prisma) {
+            await prisma.aPICall.create({
+              data: {
+                model: "text-embedding-3-small",
+                tokensIn: 0,
+                tokensOut: 0,
+                costUsd: 0,
+                endpoint: "embedding",
+                status: "FAILED"
+              }
+            }).catch((err: any) => console.error("[EmbeddingService] Failed to log failed API call to database:", err));
+          }
+
+          if (isRateLimit) {
+            throw new Error("[EmbeddingService] OpenAI Rate Limit exceeded after retries. Please slow down requests.");
+          } else if (isTimeout) {
+            throw new Error("[EmbeddingService] OpenAI API request timed out after retries. Please try again.");
+          }
+          throw new Error(`[EmbeddingService] OpenAI API Error: ${error.message || error}`);
+        }
+
+        // Retry with exponential backoff
+        console.log(`[EmbeddingService] Retrying in ${delay}ms...`);
+        await new Promise(resolve => setTimeout(resolve, delay));
+        delay *= 2;
       }
-
-      return response.data[0].embedding;
-    } catch (error: any) {
-      console.error("[EmbeddingService] Error generating embedding:", error);
-
-      if (error.status === 429) {
-        throw new Error("[EmbeddingService] OpenAI Rate Limit exceeded. Please slow down requests.");
-      } else if (error.name === "APITimeoutError" || error.code === "ETIMEDOUT") {
-        throw new Error("[EmbeddingService] OpenAI API request timed out. Please try again.");
-      }
-
-      throw new Error(`[EmbeddingService] OpenAI API Error: ${error.message || error}`);
     }
+
+    throw new Error("[EmbeddingService] Unknown error occurred during execution.");
   }
 }

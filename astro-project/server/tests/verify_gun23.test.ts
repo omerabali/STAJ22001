@@ -75,6 +75,25 @@ describe("Gün 23 - Jest: Embedding Pipeline, Önbellek ve E2E HTTP Testleri", (
 
 
 
+    // Enable RLS and create policy for cv_embeddings
+    const rlsSql = `
+      ALTER TABLE cv_embeddings ENABLE ROW LEVEL SECURITY;
+      DROP POLICY IF EXISTS "Users can only access their own embeddings" ON cv_embeddings;
+      CREATE POLICY "Users can only access their own embeddings" ON cv_embeddings
+        FOR ALL
+        USING (
+          EXISTS (
+            SELECT 1 FROM cv_chunks
+            JOIN cvs ON cv_chunks."cvId" = cvs.id
+            WHERE cv_embeddings."chunkId" = cv_chunks.id
+              AND cvs."userId" = auth.uid()
+          )
+        );
+    `;
+    await prisma.$executeRawUnsafe(rlsSql).catch((err) => {
+      console.warn("[Test] Failed to apply RLS policy:", err.message);
+    });
+
     // Load PDF file
     const pdfPath = path.resolve(__dirname, "fixtures/test_cv.pdf");
     expect(fs.existsSync(pdfPath)).toBe(true);
@@ -144,7 +163,7 @@ describe("Gün 23 - Jest: Embedding Pipeline, Önbellek ve E2E HTTP Testleri", (
     }
   });
 
-  test("OpenAI hata döndürdüğünde embedAllChunks() fırlatılan exception'ı iletmelidir", async () => {
+  test("OpenAI hata döndürdüğünde embedAllChunks() chunk'ı FAILED işaretleyip devam etmelidir (Gün 24 graceful handling)", async () => {
     const tempCv = await prisma.cV.create({
       data: {
         userId: tempUser1.id,
@@ -155,7 +174,7 @@ describe("Gün 23 - Jest: Embedding Pipeline, Önbellek ve E2E HTTP Testleri", (
     });
     tempCvIds.push(tempCv.id);
 
-    await prisma.cVChunk.create({
+    const failChunk = await prisma.cVChunk.create({
       data: {
         cvId: tempCv.id,
         chunkText: "some test text chunk error",
@@ -163,9 +182,22 @@ describe("Gün 23 - Jest: Embedding Pipeline, Önbellek ve E2E HTTP Testleri", (
       }
     });
 
+    // Mock generateEmbedding to fail once
     apiSpy.mockRejectedValueOnce(new Error("OpenAI Rate Limit Exceeded"));
 
-    await expect(embedAllChunks(tempCv.id, prisma)).rejects.toThrow("OpenAI Rate Limit Exceeded");
+    // Gün 24 davranışı: hata fırlatmaz, chunk'ı FAILED işaretler ve devam eder
+    const result = await embedAllChunks(tempCv.id, prisma);
+
+    // Pipeline RESOLVE olmalı (throw değil)
+    expect(result).toBeDefined();
+    expect(result.embedded).toBe(0); // Başarılı embed yok
+    expect(result.copied).toBe(0);
+
+    // Chunk'ın metadata'sında status: FAILED yazılmış olmalı
+    const updatedChunk = await prisma.cVChunk.findUnique({ where: { id: failChunk.id } });
+    const meta = updatedChunk?.metadata as any;
+    expect(meta?.status).toBe("FAILED");
+    expect(meta?.error).toContain("OpenAI Rate Limit Exceeded");
   });
 
   test("embedAllChunks() normal başarı akışı için izole unit test çalışmalıdır (Mocked OpenAI)", async () => {

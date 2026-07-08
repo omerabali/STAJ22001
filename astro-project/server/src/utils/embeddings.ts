@@ -155,9 +155,24 @@ export async function embedAllChunks(
 
     // ── OpenAI API Entegrasyonu (Cache Miss) ──
     if (!vector) {
-      vector = await EmbeddingService.generateEmbedding(chunk.chunkText);
-      cacheSource = "none";
-      embedded++;
+      try {
+        vector = await EmbeddingService.generateEmbedding(chunk.chunkText, prisma);
+        cacheSource = "none";
+        embedded++;
+      } catch (err: any) {
+        console.error(`[EmbeddingPipeline] Failed to embed chunk ${chunk.id}:`, err);
+        await prisma.cVChunk.update({
+          where: { id: chunk.id },
+          data: {
+            metadata: {
+              ...(chunk.metadata as any || {}),
+              status: "FAILED",
+              error: err.message || String(err)
+            }
+          }
+        }).catch(updateErr => console.error(`[EmbeddingPipeline] Failed to update chunk metadata:`, updateErr));
+        continue;
+      }
     } else {
       copied++;
     }
@@ -197,10 +212,11 @@ export async function searchSimilarChunks(
   queryText: string,
   limit: number,
   prisma: PrismaClient,
-  cvId?: string
+  cvId?: string,
+  userId?: string  // Security: filter results to a specific user's CVs
 ): Promise<{ chunkId: string; chunkText: string; similarity: number; cvId: string }[]> {
   // 1. Generate query embedding
-  const queryVector = await EmbeddingService.generateEmbedding(queryText);
+  const queryVector = await EmbeddingService.generateEmbedding(queryText, prisma);
   const queryVectorStr = `[${queryVector.join(",")}]`;
 
   // 2. Perform Cosine Similarity raw SQL query using '<=>' (cosine distance)
@@ -223,20 +239,36 @@ export async function searchSimilarChunks(
       LIMIT ${limit}
     `;
   } else {
-    // Global search - Retrieve more matches and filter unique in memory to preserve limit count
-    const rawMatches = await prisma.$queryRaw<
-      { chunkId: string; chunkText: string; similarity: number; cvId: string }[]
-    >`
-      SELECT 
-        e."chunkId",
-        c."chunkText",
-        c."cvId",
-        (1 - (e.embedding <=> ${queryVectorStr}::vector))::float as similarity
-      FROM cv_embeddings e
-      JOIN cv_chunks c ON e."chunkId" = c.id
-      ORDER BY similarity DESC
-      LIMIT ${limit * 3}
-    `;
+    // Global search - scoped to userId if provided (security: users only see their own data)
+    const rawMatches = userId
+      ? await prisma.$queryRaw<
+          { chunkId: string; chunkText: string; similarity: number; cvId: string }[]
+        >`
+          SELECT 
+            e."chunkId",
+            c."chunkText",
+            c."cvId",
+            (1 - (e.embedding <=> ${queryVectorStr}::vector))::float as similarity
+          FROM cv_embeddings e
+          JOIN cv_chunks c ON e."chunkId" = c.id
+          JOIN cvs ON c."cvId" = cvs.id
+          WHERE cvs."userId" = ${userId}
+          ORDER BY similarity DESC
+          LIMIT ${limit * 3}
+        `
+      : await prisma.$queryRaw<
+          { chunkId: string; chunkText: string; similarity: number; cvId: string }[]
+        >`
+          SELECT 
+            e."chunkId",
+            c."chunkText",
+            c."cvId",
+            (1 - (e.embedding <=> ${queryVectorStr}::vector))::float as similarity
+          FROM cv_embeddings e
+          JOIN cv_chunks c ON e."chunkId" = c.id
+          ORDER BY similarity DESC
+          LIMIT ${limit * 3}
+        `;
 
     // Filter by unique chunkText
     const seen = new Set<string>();
@@ -276,7 +308,8 @@ export function clearInMemoryCache(): void {
  * Uses a SHA-256 hash cache on local Map to avoid duplicate API calls.
  */
 export async function embedAllChunksInMemory(
-  chunks: string[]
+  chunks: string[],
+  prisma?: any
 ): Promise<{ embedded: number; copied: number; skipped: number }> {
   let embedded = 0;
   let copied = 0;
@@ -286,7 +319,7 @@ export async function embedAllChunksInMemory(
     if (inMemoryCache.has(hash)) {
       copied++;
     } else {
-      const vector = await EmbeddingService.generateEmbedding(text);
+      const vector = await EmbeddingService.generateEmbedding(text, prisma);
       validateEmbedding(vector);
       inMemoryCache.set(hash, vector);
       embedded++;

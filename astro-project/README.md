@@ -84,3 +84,51 @@ Astro projeniz **http://localhost:4321**, Express backend sunucunuz ise **http:/
 
 ## 🛡️ Güvenlik ve Git Kuralları
 Kök dizindeki `.gitignore` dosyası, yerelde oluşturulan `.env` dosyalarının ve `node_modules` klasörlerinin yanlışlıkla git repolarına yüklenmesini engeller. Sunucu şifrenizi barındıran hassas veriler asla GitHub'a sızmaz.
+
+---
+
+## 🧠 Embedding Pipeline (Vektörel Arama Akışı)
+
+Projemizde özgeçmiş (CV) yükleme, bölümleme (chunking), OpenAI API ile vektörleştirme (embedding) ve semantik arama adımları aşağıdaki mimari akış şemasına göre yürütülmektedir:
+
+```mermaid
+graph TD
+    A[Kullanıcı CV Yükler] --> B[Multer & Supabase Storage'a Kaydet]
+    B --> C[PDF Text Extraction & Dil Algılama]
+    C --> D[Döküman Hash Hesabı - SHA-256]
+    D --> E{Veritabanında Aynı Hash Var mı?}
+    E -- Evet (Cache Hit) --> F[Mevcut CV'nin Embedding'lerini Kopyala]
+    E -- Hayır (Cache Miss) --> G[Metni Bölümlere Ayır - Chunking]
+    G --> H{Her Chunk için Text Bazlı Cache Var mı?}
+    H -- Evet --> I[Mevcut Vektörü Kopyala]
+    H -- Hayır --> J[OpenAI text-embedding-3-small Çağır]
+    J --> K[Vektörü PostgreSQL pgvector'a Kaydet]
+    F --> L[İşlemi Tamamla - COMPLETED]
+    I --> K
+    K --> L
+    L --> M[HNSW Endeksli Vektörel Arama - Cosine Similarity]
+```
+
+### Teknik Detaylar
+- **Yapay Zeka Modeli:** OpenAI `text-embedding-3-small` (1536-boyutlu vektörler üretir).
+- **Maliyet Takibi:** Yapılan her API çağrısı, token kullanım miktarları ve hesaplanan tahmini maliyet (`tokensIn * $0.00000002` ve `chat` için `gpt-4o-mini` tarifesiyle) ile birlikte `api_calls` tablosuna `SUCCESS` veya `FAILED` durumuyla kaydedilir.
+- **Hata ve Retry Politikası:** OpenAI ağ hataları ile 429 (Rate Limit) sınırlandırmalarında katlanarak artan bekleme süreli (Exponential Backoff) 4 denemelik otomatik retry mekanizması uygulanır. 30 saniye aşımında ilgili chunk `FAILED` olarak işaretlenir ancak dökümanın kalan kısımları işlenmeye devam eder.
+- **Güvenlik (RLS — Mimari Notu):** Supabase `cv_embeddings` tablosunda RLS policy tanımlanmış olsa da, backend Prisma + `pg.Pool` ile doğrudan PostgreSQL'e bağlandığı ve Supabase native Auth (GoTrue) kullanılmadığı için `auth.uid()` session context'i bu bağlantılarda set edilmemektedir. **Asıl veri izolasyonu Express katmanında sağlanmaktadır** (bkz. aşağıdaki güvenlik denetimi). RLS policy, ileride Supabase native auth'a geçilmesi durumunda hazır olmak amacıyla tutulmaktadır. Bu durum bir yanıltıcı güvenlik hissi yaratmaması için açıkça belgelenmiştir.
+
+---
+
+## 🔐 Uygulama Katmanı Güvenlik Denetimi (Manuel Audit — 2026-07-08)
+
+Projenin tek gerçek güvenlik katmanı Express middleware + Prisma `WHERE userId` filtresidir. Aşağıda `cvs`, `cv_chunks` ve `cv_embeddings` tablolarına erişen tüm route'ların denetim sonuçları listelenmiştir:
+
+| Route | Metot | Tablo | Kullanıcı Filtresi | Sonuç |
+|---|---|---|---|---|
+| `POST /api/cv/upload` | `cV.create` | cvs | `userId: req.user.id` ile oluşturuluyor | ✅ |
+| `GET /api/cv/` | `cV.findMany` | cvs | `WHERE userId = req.user.id` (ADMIN hariç tümünü görür) | ✅ |
+| `GET /api/cv/:id` | `cV.findFirst` | cvs + chunks | `WHERE id = :id AND userId = req.user.id` | ✅ |
+| `DELETE /api/cv/:id` | `cV.findFirst` → `cV.delete` | cvs | `WHERE id = :id AND userId = req.user.id` ile sahiplik doğrulanıyor | ✅ |
+| `GET /api/cv/search` | `searchSimilarChunks` | cv_embeddings | `JOIN cvs WHERE userId = req.user.id` (userId parametresiyle) | ✅ |
+| `POST /api/cv/:id/retry` | `cV.findUnique` | cvs | Sadece `ADMIN` rolü erişebilir (`role !== "ADMIN"` → 403) | ✅ |
+| `GET /api/admin/*` | çeşitli | cvs | Sadece `ADMIN` rolü erişebilir (adminMiddleware) | ✅ |
+
+> **Not:** `GET /api/cv/search` endpoint'inde `searchSimilarChunks` fonksiyonu, `userId` parametresi ile çağrılmaktadır. Bu parametre, ham SQL sorgusunda `JOIN cvs WHERE cvs."userId" = $userId` filtresi olarak uygulanarak başka kullanıcılara ait embedding'lerin arama sonuçlarına dahil edilmesi engellenmektedir. Bu güvenlik açığı 2026-07-08 tarihinde tespit edilip düzeltilmiştir.

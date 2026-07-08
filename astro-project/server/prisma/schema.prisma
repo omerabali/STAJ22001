@@ -91,3 +91,16 @@ model CVEmbedding {
 
   @@map("cv_embeddings")
 }
+
+model APICall {
+  id        String   @id @default(uuid())
+  model     String
+  tokensIn  Int
+  tokensOut Int
+  costUsd   Decimal  @db.Decimal(12, 10)
+  endpoint  String
+  status    String
+  createdAt DateTime @default(now())
+
+  @@map("api_calls")
+}
