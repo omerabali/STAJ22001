@@ -118,7 +118,7 @@ async function run() {
       `${c.gray}Önbellekten     : ${c.bold}${c.green}${result2.copied} adet (Beklenen: ${mockChunks.length})${c.reset}`,
       `${c.gray}Yapılan API İst.: ${c.bold}${c.white}${apiCallDiff} kez (Beklenen: 0)${c.reset}`,
       `${c.gray}İlk Chunk Hash  : ${c.white}${firstChunkHash.slice(0, 24)}...${c.reset}`,
-      `${c.gray}Önbellek Durumu : ${result2.copied === mockChunks.length && apiCallDiff === 0 ? c.green + "🎉 %100 CACHE HIT (Bütçe Dostu)" : c.yellow + "❌ HATA"}${c.reset}`
+      `${c.gray}Önbellek Durumu : ${result2.copied === mockChunks.length && apiCallDiff === 0 ? c.green + "🎉 BAŞARILI (Tüm Veriler Önbellekten Alındı)" : c.yellow + "❌ HATA"}${c.reset}`
     ]);
 
   } catch (error) {

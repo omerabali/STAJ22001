@@ -84,7 +84,9 @@ model CVEmbedding {
   id        String   @id @default(uuid())
   chunkId   String
   chunk     CVChunk  @relation(fields: [chunkId], references: [id], onDelete: Cascade)
-  embedding Json
+  embedding Unsupported("vector(1536)")
+  model     String
+  metadata  Json?
   createdAt DateTime @default(now())
 
   @@map("cv_embeddings")

@@ -1,18 +1,6 @@
+import { PrismaClient } from "@prisma/client";
 import crypto from "crypto";
 import { EmbeddingService } from "../services/EmbeddingService.js";
-
-// In-memory cache to store SHA-256 hashes of chunks mapped to their 1536-dimensional vectors
-const inMemoryCache = new Map<string, number[]>();
-
-/**
- * Helper to compute SHA-256 hash of a string.
- *
- * @param text Input text.
- * @returns SHA-256 hex string.
- */
-export function computeHash(text: string): string {
-  return crypto.createHash("sha256").update(text).digest("hex");
-}
 
 /**
  * Validates the generated or retrieved vector to guarantee dimension and type integrity.
@@ -33,73 +21,235 @@ export function validateEmbedding(vector: number[]): void {
 }
 
 /**
- * Clears the local in-memory cache. Used mainly for testing.
- */
-export function clearInMemoryCache(): void {
-  inMemoryCache.clear();
-}
-
-/**
- * In-Memory Pipeline:
- * Iterates through all chunk texts, computes hashes, and manages in-memory caching.
- * Bypasses database operations entirely.
+ * Iterates through all chunks of a CV and stores their embeddings in the database.
+ * Supports dual cache layer:
+ * 1. CV-level file hash lookup: copies embeddings from an identical CV hash.
+ * 2. Chunk-level text lookup: copies vector if the exact text was embedded previously.
  *
- * @param chunks List of text chunks from the CV.
- * @returns Embeddings list with caching metadata.
+ * @param cvId Unique ID of the target CV.
+ * @param prisma PrismaClient instance.
  */
-export async function embedAllChunksInMemory(
-  chunks: string[]
-): Promise<{
-  results: { text: string; hash: string; vector: number[]; cacheSource: "memory" | "none" }[];
-  embedded: number;
-  copied: number;
-  totalTimeMs: number;
-}> {
+export async function embedAllChunks(
+  cvId: string,
+  prisma: PrismaClient
+): Promise<{ embedded: number; copied: number; skipped: number; totalTimeMs: number }> {
   const startTime = Date.now();
-  const results: { text: string; hash: string; vector: number[]; cacheSource: "memory" | "none" }[] = [];
+  console.log(`[EmbeddingPipeline] Starting pipeline for CV: ${cvId}`);
+
+  // 1. Fetch CV details and its chunks
+  const cv = await prisma.cV.findUnique({
+    where: { id: cvId },
+    include: {
+      chunks: {
+        orderBy: { chunkIndex: "asc" }
+      }
+    }
+  });
+
+  if (!cv) {
+    throw new Error(`[EmbeddingPipeline] CV not found with ID: ${cvId}`);
+  }
+
+  if (cv.chunks.length === 0) {
+    console.log(`[EmbeddingPipeline] CV has no chunks to process. Skipping.`);
+    return { embedded: 0, copied: 0, skipped: 0, totalTimeMs: Date.now() - startTime };
+  }
+
   let embedded = 0;
   let copied = 0;
+  let skipped = 0;
 
-  for (const text of chunks) {
-    if (!text || text.trim().length === 0) {
+  // Pre-load CV-level cache map if another CV has the same hash and has embeddings
+  const sourceChunksMap = new Map<number, { id: string }>();
+  if (cv.hash) {
+    const matchingCv = await prisma.cV.findFirst({
+      where: {
+        hash: cv.hash,
+        id: { not: cvId },
+        chunks: {
+          some: {
+            embeddings: { some: {} }
+          }
+        }
+      },
+      include: {
+        chunks: {
+          include: {
+            embeddings: true
+          },
+          orderBy: { chunkIndex: "asc" }
+        }
+      }
+    });
+
+    if (matchingCv) {
+      console.log(`[EmbeddingPipeline] Found matching CV hash: ${cv.hash} (${matchingCv.fileName}). Fetching copy maps.`);
+      for (const sc of matchingCv.chunks) {
+        if (sc.embeddings && sc.embeddings.length > 0) {
+          sourceChunksMap.set(sc.chunkIndex, sc.embeddings[0]);
+        }
+      }
+    }
+  }
+
+  // 2. Loop and embed chunks
+  for (const chunk of cv.chunks) {
+    const chunkStartTime = Date.now();
+    let vector: number[] | null = null;
+    let cacheSource: "file-hash" | "chunk-text" | "none" = "none";
+    let originalEmbeddingId: string | null = null;
+
+    // Check if embedding already exists for THIS specific chunk
+    const alreadyExists = await prisma.cVEmbedding.findFirst({
+      where: { chunkId: chunk.id }
+    });
+
+    if (alreadyExists) {
+      skipped++;
       continue;
     }
 
-    const hash = computeHash(text);
-    let vector: number[] | undefined;
-    let cacheSource: "memory" | "none" = "none";
-
-    // ── Cache Layer: In-Memory SHA-256 Hash Matching ──
-    if (inMemoryCache.has(hash)) {
-      vector = inMemoryCache.get(hash)!;
-      cacheSource = "memory";
-      copied++;
-    } else {
-      // ── OpenAI API call (Cache Miss) ──
-      vector = await EmbeddingService.generateEmbedding(text);
-      cacheSource = "none";
-      embedded++;
-
-      // Store in memory cache
-      inMemoryCache.set(hash, vector);
+    // ── Cache Seviyesi 1: CV-Level File Hash Copy ──
+    if (sourceChunksMap.has(chunk.chunkIndex)) {
+      const sourceEmbed = sourceChunksMap.get(chunk.chunkIndex)!;
+      const rawVectorResult = await prisma.$queryRaw<{ embedding_text: string }[]>`
+        SELECT embedding::text as embedding_text 
+        FROM cv_embeddings 
+        WHERE id = ${sourceEmbed.id} 
+        LIMIT 1
+      `;
+      if (rawVectorResult[0]) {
+        const cleanArr = rawVectorResult[0].embedding_text.replace(/[{}\[\]]/g, "").split(",");
+        vector = cleanArr.map(v => parseFloat(v));
+        cacheSource = "file-hash";
+        originalEmbeddingId = sourceEmbed.id;
+      }
     }
 
-    // Validate size & integrity
+    // ── Cache Seviyesi 2: Chunk-Level Text Copy ──
+    if (!vector) {
+      const existingEmbed = await prisma.cVEmbedding.findFirst({
+        where: {
+          chunk: {
+            chunkText: chunk.chunkText
+          }
+        },
+        select: { id: true }
+      });
+
+      if (existingEmbed) {
+        const rawVectorResult = await prisma.$queryRaw<{ embedding_text: string }[]>`
+          SELECT embedding::text as embedding_text 
+          FROM cv_embeddings 
+          WHERE id = ${existingEmbed.id} 
+          LIMIT 1
+        `;
+        if (rawVectorResult[0]) {
+          const cleanArr = rawVectorResult[0].embedding_text.replace(/[{}\[\]]/g, "").split(",");
+          vector = cleanArr.map(v => parseFloat(v));
+          cacheSource = "chunk-text";
+          originalEmbeddingId = existingEmbed.id;
+        }
+      }
+    }
+
+    // ── OpenAI API Entegrasyonu (Cache Miss) ──
+    if (!vector) {
+      vector = await EmbeddingService.generateEmbedding(chunk.chunkText);
+      cacheSource = "none";
+      embedded++;
+    } else {
+      copied++;
+    }
+
+    // Validate structure
     validateEmbedding(vector);
 
-    results.push({
-      text,
-      hash,
-      vector,
+    // Save embedding using raw SQL insert
+    const embedId = `embed-${crypto.randomUUID()}`;
+    const vectorStr = `[${vector.join(",")}]`;
+    const latency = Date.now() - chunkStartTime;
+    const metadata = {
       cacheSource,
-    });
+      latencyMs: latency,
+      originalEmbeddingId,
+      processedAt: new Date().toISOString()
+    };
+
+    await prisma.$executeRaw`
+      INSERT INTO cv_embeddings (id, "chunkId", embedding, model, metadata, "createdAt")
+      VALUES (${embedId}, ${chunk.id}, ${vectorStr}::vector, 'text-embedding-3-small', ${JSON.stringify(metadata)}::jsonb, NOW())
+    `;
   }
 
   const duration = Date.now() - startTime;
+  console.log(`[EmbeddingPipeline] Finished. Embedded: ${embedded}, Copied: ${copied}, Skipped: ${skipped}, Time: ${duration}ms`);
+
   return {
-    results,
     embedded,
     copied,
-    totalTimeMs: duration,
+    skipped,
+    totalTimeMs: duration
   };
+}
+
+export async function searchSimilarChunks(
+  queryText: string,
+  limit: number,
+  prisma: PrismaClient,
+  cvId?: string
+): Promise<{ chunkId: string; chunkText: string; similarity: number; cvId: string }[]> {
+  // 1. Generate query embedding
+  const queryVector = await EmbeddingService.generateEmbedding(queryText);
+  const queryVectorStr = `[${queryVector.join(",")}]`;
+
+  // 2. Perform Cosine Similarity raw SQL query using '<=>' (cosine distance)
+  // Cosine Similarity = 1 - Cosine Distance
+  let matches: { chunkId: string; chunkText: string; similarity: number; cvId: string }[] = [];
+
+  if (cvId) {
+    matches = await prisma.$queryRaw<
+      { chunkId: string; chunkText: string; similarity: number; cvId: string }[]
+    >`
+      SELECT 
+        e."chunkId",
+        c."chunkText",
+        c."cvId",
+        (1 - (e.embedding <=> ${queryVectorStr}::vector))::float as similarity
+      FROM cv_embeddings e
+      JOIN cv_chunks c ON e."chunkId" = c.id
+      WHERE c."cvId" = ${cvId}
+      ORDER BY similarity DESC
+      LIMIT ${limit}
+    `;
+  } else {
+    // Global search - Retrieve more matches and filter unique in memory to preserve limit count
+    const rawMatches = await prisma.$queryRaw<
+      { chunkId: string; chunkText: string; similarity: number; cvId: string }[]
+    >`
+      SELECT 
+        e."chunkId",
+        c."chunkText",
+        c."cvId",
+        (1 - (e.embedding <=> ${queryVectorStr}::vector))::float as similarity
+      FROM cv_embeddings e
+      JOIN cv_chunks c ON e."chunkId" = c.id
+      ORDER BY similarity DESC
+      LIMIT ${limit * 3}
+    `;
+
+    // Filter by unique chunkText
+    const seen = new Set<string>();
+    for (const match of rawMatches) {
+      if (!seen.has(match.chunkText)) {
+        seen.add(match.chunkText);
+        matches.push(match);
+        if (matches.length >= limit) {
+          break;
+        }
+      }
+    }
+  }
+
+  return matches;
 }

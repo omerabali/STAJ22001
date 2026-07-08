@@ -8,6 +8,7 @@ import path from "path";
 import { authMiddleware } from "../middleware/auth.js";
 import { supabase } from "../lib/supabase.js";
 import { extractTextFromPDF, chunkTextBySections, analyzeWithGemini, extractLocalSkills, detectLanguage, simulateAiAnalysis } from "../utils/parser.js";
+import { embedAllChunks, searchSimilarChunks } from "../utils/embeddings.js";
 
 const pool = new pg.Pool({
   connectionString: process.env.DATABASE_URL,
@@ -188,6 +189,25 @@ async function processCv(cvId: string, analysisId: string, pdfBuffer: Buffer): P
         suggestions: aiAnalysis.suggestions
       }
     });
+
+    // 8. Generate & Save Embeddings for all chunks
+    try {
+      const embedResult = await embedAllChunks(cvId, prisma);
+      parserLogs.push(`Semantik vektörler oluşturuldu (Yeni: ${embedResult.embedded}, Cache: ${embedResult.copied}).`);
+      
+      // Update parserStats logs
+      await prisma.cV.update({
+        where: { id: cvId },
+        data: { metadata: { ...parserStats, logs: parserLogs } }
+      });
+    } catch (embedErr: any) {
+      console.error(`[Parser] ❌ Error generating embeddings for CV ${cvId}:`, embedErr);
+      parserLogs.push(`HATA: Embedding oluşturulamadı: ${embedErr.message}`);
+      await prisma.cV.update({
+        where: { id: cvId },
+        data: { metadata: { ...parserStats, logs: parserLogs } }
+      });
+    }
 
     console.log(`[Parser] ✅ Successfully parsed, analyzed and chunked CV: ${cvId}`);
 
@@ -537,6 +557,25 @@ router.post("/:id/retry", authMiddleware, async (req: Request, res: Response): P
   } catch (error) {
     console.error("Yeniden deneme hatası:", error);
     res.status(500).json({ message: "Analiz yeniden başlatılamadı." });
+  }
+});
+
+// GET /api/cv/search - Semantic Search endpoint
+router.get("/search", authMiddleware, async (req: Request, res: Response): Promise<void> => {
+  const query = req.query.q as string;
+  const limit = parseInt(req.query.limit as string || "5", 10);
+
+  if (!query || query.trim() === "") {
+    res.status(400).json({ message: "Arama sorgusu boş olamaz." });
+    return;
+  }
+
+  try {
+    const results = await searchSimilarChunks(query, limit, prisma);
+    res.json({ results });
+  } catch (error: any) {
+    console.error("Semantic search endpoint error:", error);
+    res.status(500).json({ message: `Arama sırasında hata oluştu: ${error.message}` });
   }
 });
 
