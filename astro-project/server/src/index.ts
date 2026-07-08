@@ -61,6 +61,10 @@ app.get("/api/health", async (_req, res) => {
 });
 
 // Sunucuyu başlat
-app.listen(PORT, () => {
-  console.log(`✅ Sunucu http://localhost:${PORT} adresinde çalışıyor`);
-});
+if (process.env.NODE_ENV !== "test") {
+  app.listen(PORT, () => {
+    console.log(`✅ Sunucu http://localhost:${PORT} adresinde çalışıyor`);
+  });
+}
+
+export { app, pool };

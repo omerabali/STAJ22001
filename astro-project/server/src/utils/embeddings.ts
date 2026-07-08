@@ -253,3 +253,49 @@ export async function searchSimilarChunks(
 
   return matches;
 }
+
+// Local cache Map for in-memory caching
+const inMemoryCache = new Map<string, number[]>();
+
+/**
+ * Computes SHA-256 hash of a string.
+ */
+export function computeHash(text: string): string {
+  return crypto.createHash("sha256").update(text).digest("hex");
+}
+
+/**
+ * Clears the in-memory cache.
+ */
+export function clearInMemoryCache(): void {
+  inMemoryCache.clear();
+}
+
+/**
+ * In-memory pipeline that converts text chunks into embeddings.
+ * Uses a SHA-256 hash cache on local Map to avoid duplicate API calls.
+ */
+export async function embedAllChunksInMemory(
+  chunks: string[]
+): Promise<{ embedded: number; copied: number; skipped: number }> {
+  let embedded = 0;
+  let copied = 0;
+
+  for (const text of chunks) {
+    const hash = computeHash(text);
+    if (inMemoryCache.has(hash)) {
+      copied++;
+    } else {
+      const vector = await EmbeddingService.generateEmbedding(text);
+      validateEmbedding(vector);
+      inMemoryCache.set(hash, vector);
+      embedded++;
+    }
+  }
+
+  return {
+    embedded,
+    copied,
+    skipped: 0
+  };
+}

@@ -177,7 +177,22 @@ async function processCv(cvId: string, analysisId: string, pdfBuffer: Buffer): P
       data: { metadata: parserStats }
     });
 
-    // 7. Transition status to COMPLETED and save all details in PostgreSQL
+    // 7. Generate & Save Embeddings for all chunks
+    try {
+      const embedResult = await embedAllChunks(cvId, prisma);
+      parserLogs.push(`Semantik vektörler oluşturuldu (Yeni: ${embedResult.embedded}, Cache: ${embedResult.copied}).`);
+    } catch (embedErr: any) {
+      console.error(`[Parser] ❌ Error generating embeddings for CV ${cvId}:`, embedErr);
+      parserLogs.push(`HATA: Embedding oluşturulamadı: ${embedErr.message}`);
+    }
+
+    // Update parserStats logs and metadata
+    await prisma.cV.update({
+      where: { id: cvId },
+      data: { metadata: { ...parserStats, logs: parserLogs } }
+    });
+
+    // 8. Transition status to COMPLETED and save all details in PostgreSQL
     await prisma.cVAnalysis.update({
       where: { id: analysisId },
       data: {
@@ -189,25 +204,6 @@ async function processCv(cvId: string, analysisId: string, pdfBuffer: Buffer): P
         suggestions: aiAnalysis.suggestions
       }
     });
-
-    // 8. Generate & Save Embeddings for all chunks
-    try {
-      const embedResult = await embedAllChunks(cvId, prisma);
-      parserLogs.push(`Semantik vektörler oluşturuldu (Yeni: ${embedResult.embedded}, Cache: ${embedResult.copied}).`);
-      
-      // Update parserStats logs
-      await prisma.cV.update({
-        where: { id: cvId },
-        data: { metadata: { ...parserStats, logs: parserLogs } }
-      });
-    } catch (embedErr: any) {
-      console.error(`[Parser] ❌ Error generating embeddings for CV ${cvId}:`, embedErr);
-      parserLogs.push(`HATA: Embedding oluşturulamadı: ${embedErr.message}`);
-      await prisma.cV.update({
-        where: { id: cvId },
-        data: { metadata: { ...parserStats, logs: parserLogs } }
-      });
-    }
 
     console.log(`[Parser] ✅ Successfully parsed, analyzed and chunked CV: ${cvId}`);
 
