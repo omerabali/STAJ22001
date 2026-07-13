@@ -8,6 +8,7 @@ import pg from "pg";
 import authRouter from "./routes/auth.js";
 import adminRouter from "./routes/admin.js";
 import cvRouter from "./routes/cv.js";
+import searchRouter from "./routes/search.js";
 
 const app = express();
 const pool = new pg.Pool({
@@ -33,6 +34,9 @@ app.use("/api/admin", adminRouter);
 
 // CV routes
 app.use("/api/cv", cvRouter);
+
+// Search routes
+app.use("/api/search", searchRouter);
 
 // GET / — Ana sayfa karşılama mesajı
 app.get("/", (_req, res) => {

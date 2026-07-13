@@ -332,3 +332,70 @@ export async function embedAllChunksInMemory(
     skipped: 0
   };
 }
+
+/**
+ * Performs Cosine Similarity raw SQL query over cv_embeddings to find matching CVs.
+ * Uses a CTE to first get the top 300 chunks to avoid scanning/grouping the entire database.
+ * Partitions by cv.id to return unique CVs with their highest matching chunk score (MAX) and matchedChunkId.
+ * Similarity threshold is read from environment variable SIMILARITY_THRESHOLD (default: 0.30).
+ *
+ * @param queryText Search query metni
+ * @param limit Maksimum getirilecek CV sayısı
+ * @param prisma PrismaClient instance
+ */
+export async function searchSimilarCVs(
+  queryText: string,
+  limit: number,
+  prisma: PrismaClient
+): Promise<{ cvId: string; candidateName: string | null; candidateEmail: string | null; score: number; matchedChunkId: string }[]> {
+  const queryVector = await EmbeddingService.generateEmbedding(queryText, prisma);
+  const queryVectorStr = `[${queryVector.join(",")}]`;
+
+  // Read threshold from environment variables (default: 0.30)
+  const threshold = parseFloat(process.env.SIMILARITY_THRESHOLD || "0.30");
+
+  const matches = await prisma.$queryRaw<
+    { cvId: string; candidateName: string | null; candidateEmail: string | null; score: number; matchedChunkId: string }[]
+  >`
+    WITH similarity_scores AS (
+      SELECT 
+        c."cvId",
+        c.id as "chunkId",
+        u.name as "candidateName",
+        u.email as "candidateEmail",
+        (1 - (e.embedding <=> ${queryVectorStr}::vector))::float as similarity
+      FROM cv_embeddings e
+      JOIN cv_chunks c ON e."chunkId" = c.id
+      JOIN cvs cv ON c."cvId" = cv.id
+      LEFT JOIN users u ON cv."userId" = u.id
+      ORDER BY similarity DESC
+      LIMIT 300
+    ),
+    ranked_chunks AS (
+      SELECT 
+        "cvId",
+        "chunkId" as "matchedChunkId",
+        "candidateName",
+        "candidateEmail",
+        similarity as score,
+        ROW_NUMBER() OVER(PARTITION BY "cvId" ORDER BY similarity DESC) as rn
+      FROM similarity_scores
+      WHERE similarity > ${threshold}
+    )
+    SELECT 
+      "cvId",
+      "matchedChunkId",
+      "candidateName",
+      "candidateEmail",
+      score
+    FROM ranked_chunks
+    WHERE rn = 1
+    ORDER BY score DESC
+    LIMIT ${limit}
+  `;
+
+  return matches;
+}
+
+
+

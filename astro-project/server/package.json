@@ -16,6 +16,8 @@
     "test:verify_gun23": "node --experimental-vm-modules node_modules/jest/bin/jest.js tests/verify_gun23.test.ts --forceExit",
     "test:gun24": "node --experimental-vm-modules node_modules/jest/bin/jest.js tests/verify_gun24.test.ts --forceExit",
     "test:verify_gun24": "node --experimental-vm-modules node_modules/jest/bin/jest.js tests/verify_gun24.test.ts --forceExit",
+    "test:gun25": "node --experimental-vm-modules node_modules/jest/bin/jest.js tests/verify_gun25.test.ts --forceExit",
+    "test:verify_gun25": "node --experimental-vm-modules node_modules/jest/bin/jest.js tests/verify_gun25.test.ts --forceExit",
     "test:jest": "node --experimental-vm-modules node_modules/jest/bin/jest.js --forceExit"
   },
   "keywords": [],
