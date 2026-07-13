@@ -23,6 +23,7 @@ model User {
   resetCodeExpires DateTime?
   createdAt    DateTime @default(now())
   cvs          CV[]
+  searchLogs   SearchLog[]
 
   @@map("users")
 }
@@ -103,4 +104,14 @@ model APICall {
   createdAt DateTime @default(now())
 
   @@map("api_calls")
+}
+
+model SearchLog {
+  id        String   @id @default(uuid())
+  userId    String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  query     String
+  createdAt DateTime @default(now())
+
+  @@map("search_logs")
 }

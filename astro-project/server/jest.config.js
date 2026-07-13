@@ -14,5 +14,5 @@ export default {
     "^(\\.{1,2}/.*)\\.js$": "$1",
   },
   extensionsToTreatAsEsm: [".ts"],
-  testTimeout: 40000, // extend timeout to 40 seconds for HTTP requests, Supabase, and parsing
+  testTimeout: 120000, // 120s for HTTP + Supabase + parsing + OpenAI chains
 };

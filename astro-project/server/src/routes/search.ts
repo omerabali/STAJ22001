@@ -44,6 +44,16 @@ router.post("/", authMiddleware, adminMiddleware, async (req: Request, res: Resp
     // 3. Rank and score matches using GPT-4o-mini suitability analysis
     const rankedResults = await RankingService.scoreAndRankCVs(query, vectorMatches, prisma);
 
+    // 4. Log the search query in SearchLog table
+    if (req.user) {
+      await prisma.searchLog.create({
+        data: {
+          userId: req.user.id,
+          query: query.trim()
+        }
+      }).catch(err => console.error("[SearchRoute] Failed to save search log:", err));
+    }
+
     const duration = Date.now() - startTime;
 
     console.log(`[SearchRoute] Semantic search and ranking for "${query}" completed in ${duration}ms. Results count: ${rankedResults.length}`);
@@ -57,6 +67,28 @@ router.post("/", authMiddleware, adminMiddleware, async (req: Request, res: Resp
     res.status(500).json({
       message: "Arama işlemi gerçekleştirilirken bir sunucu hatası oluştu.",
       error: error.message || String(error),
+    });
+  }
+});
+
+/**
+ * GET /api/search/logs
+ * Son yapılan 10 semantik arama geçmişini döndürür.
+ * Sadece yöneticiler (ADMIN) erişebilir.
+ */
+router.get("/logs", authMiddleware, adminMiddleware, async (req: Request, res: Response): Promise<void> => {
+  try {
+    const logs = await prisma.searchLog.findMany({
+      where: { userId: req.user!.id },
+      orderBy: { createdAt: "desc" },
+      take: 10
+    });
+    res.json(logs);
+  } catch (error: any) {
+    console.error("[SearchRoute] Error getting search logs:", error);
+    res.status(500).json({
+      message: "Arama geçmişi alınırken bir sunucu hatası oluştu.",
+      error: error.message || String(error)
     });
   }
 });

@@ -18,6 +18,7 @@ import jwt from "jsonwebtoken";
 import { jest, describe, test, expect, beforeAll, afterAll } from "@jest/globals";
 import { app, pool as appPool } from "../src/index.js";
 import { EmbeddingService } from "../src/services/EmbeddingService.js";
+import { RankingService } from "../src/services/RankingService.js";
 
 // ── Prisma Setup ──────────────────────────────────────────────────────────────
 const pool = new pg.Pool({
@@ -47,9 +48,9 @@ describe("Gün 25 - Jest: POST /api/search Semantik Arama ve İzolasyon Testleri
     // 1. Kullanıcıları oluştur
     const admin = await prisma.user.create({
       data: {
-        email: `jest-search-admin-${Date.now()}@example.com`,
+        email: `jest-search-admin-${Date.now()}-${Math.floor(Math.random() * 1000000)}@example.com`,
         passwordHash: "pass",
-        phone: `admin-${Date.now()}`,
+        phone: `admin-${Date.now()}-${Math.floor(Math.random() * 1000000)}`,
         name: "Search Admin",
         role: "ADMIN"
       }
@@ -59,9 +60,9 @@ describe("Gün 25 - Jest: POST /api/search Semantik Arama ve İzolasyon Testleri
 
     const userA = await prisma.user.create({
       data: {
-        email: `jest-search-userA-${Date.now()}@example.com`,
+        email: `jest-search-userA-${Date.now()}-${Math.floor(Math.random() * 1000000)}@example.com`,
         passwordHash: "pass",
-        phone: `usera-${Date.now()}`,
+        phone: `usera-${Date.now()}-${Math.floor(Math.random() * 1000000)}`,
         name: "Search Candidate A",
         role: "CANDIDATE"
       }
@@ -71,9 +72,9 @@ describe("Gün 25 - Jest: POST /api/search Semantik Arama ve İzolasyon Testleri
 
     const userB = await prisma.user.create({
       data: {
-        email: `jest-search-userB-${Date.now()}@example.com`,
+        email: `jest-search-userB-${Date.now()}-${Math.floor(Math.random() * 1000000)}@example.com`,
         passwordHash: "pass",
-        phone: `userb-${Date.now()}`,
+        phone: `userb-${Date.now()}-${Math.floor(Math.random() * 1000000)}`,
         name: "Search Candidate B",
         role: "CANDIDATE"
       }
@@ -241,6 +242,21 @@ describe("Gün 25 - Jest: POST /api/search Semantik Arama ve İzolasyon Testleri
     const searchSpy = jest.spyOn(EmbeddingService, "generateEmbedding")
       .mockResolvedValue(queryVector);
 
+    const rankingSpy = jest.spyOn(RankingService, "scoreAndRankCVs")
+      .mockImplementation(async (query, matches, prisma) => {
+        return matches.map(m => ({
+          cvId: m.cvId,
+          userId: m.userId,
+          matchedChunkId: m.matchedChunkId,
+          candidateName: m.candidateName,
+          candidateEmail: m.candidateEmail,
+          score: m.score * 100, // 0-100 scale (vector similarity * 100)
+          vectorScore: m.score * 100,
+          gptScore: null,
+          matchExplanation: "Mocked"
+        })).sort((a, b) => b.score - a.score);
+      });
+
     const response = await request(app)
       .post("/api/search")
       .set("Cookie", `token=${adminToken}`)
@@ -253,7 +269,7 @@ describe("Gün 25 - Jest: POST /api/search Semantik Arama ve İzolasyon Testleri
 
     // CV A skoru en yüksek olmalı ve ilk sırada yer almalı
     expect(results[0].cvId).toBe(cvAId);
-    expect(results[0].score).toBeCloseTo(1.0, 5);
+    expect(results[0].score).toBeCloseTo(100.0, 1);
 
     // İkinci sırada CV B yer almalı ve skoru daha düşük olmalı
     expect(results[1].cvId).toBe(cvBId);
@@ -265,6 +281,7 @@ describe("Gün 25 - Jest: POST /api/search Semantik Arama ve İzolasyon Testleri
     }
 
     searchSpy.mockRestore();
+    rankingSpy.mockRestore();
   });
 
   // ── Test 6: Eşik Değeri (> 0.3) Kontrolü ──────────────────────────────────

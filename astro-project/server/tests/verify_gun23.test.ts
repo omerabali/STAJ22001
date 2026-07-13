@@ -100,8 +100,9 @@ describe("Gün 23 - Jest: Embedding Pipeline, Önbellek ve E2E HTTP Testleri", (
     fileBuffer = fs.readFileSync(pdfPath);
     fileHash = crypto.createHash("sha256").update(fileBuffer).digest("hex");
 
-    // Spy on generateEmbedding
-    apiSpy = jest.spyOn(EmbeddingService, "generateEmbedding");
+    // Spy and mock generateEmbedding by default to prevent real API requests during E2E tests
+    apiSpy = jest.spyOn(EmbeddingService, "generateEmbedding")
+      .mockImplementation(async () => Array(1536).fill(0.1));
   });
 
   beforeEach(() => {
@@ -169,7 +170,7 @@ describe("Gün 23 - Jest: Embedding Pipeline, Önbellek ve E2E HTTP Testleri", (
         userId: tempUser1.id,
         fileName: "error_test.pdf",
         fileUrl: "https://example.com/error_test.pdf",
-        hash: "random-hash-error"
+        hash: `random-hash-error-${Date.now()}-${Math.random()}`
       }
     });
     tempCvIds.push(tempCv.id);
@@ -206,7 +207,7 @@ describe("Gün 23 - Jest: Embedding Pipeline, Önbellek ve E2E HTTP Testleri", (
         userId: tempUser1.id,
         fileName: "mock_success_test.pdf",
         fileUrl: "https://example.com/mock_success_test.pdf",
-        hash: "random-hash-mock-success"
+        hash: `random-hash-mock-success-${Date.now()}-${Math.random()}`
       }
     });
     tempCvIds.push(tempCv.id);

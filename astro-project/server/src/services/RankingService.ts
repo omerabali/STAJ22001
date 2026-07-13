@@ -2,6 +2,7 @@ import { PrismaClient } from "@prisma/client";
 
 export interface CandidateSearchMatch {
   cvId: string;
+  userId: string;
   matchedChunkId: string;
   candidateName: string | null;
   candidateEmail: string | null;
@@ -11,6 +12,7 @@ export interface CandidateSearchMatch {
 
 export interface RankedResult {
   cvId: string;
+  userId: string;
   matchedChunkId: string;
   candidateName: string | null;
   candidateEmail: string | null;
@@ -165,6 +167,7 @@ ${JSON.stringify(candidatesPayload, null, 2)}`;
 
       return {
         cvId: c.cvId,
+        userId: c.userId,
         matchedChunkId: c.matchedChunkId,
         candidateName: c.candidateName,
         candidateEmail: c.candidateEmail,
@@ -180,6 +183,7 @@ ${JSON.stringify(candidatesPayload, null, 2)}`;
       const vectorScoreNormalized = c.score * 100;
       return {
         cvId: c.cvId,
+        userId: c.userId,
         matchedChunkId: c.matchedChunkId,
         candidateName: c.candidateName,
         candidateEmail: c.candidateEmail,

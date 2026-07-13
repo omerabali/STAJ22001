@@ -74,14 +74,15 @@ const HEADINGS_TR: Record<string, string[]> = {
     "sertifikalar", "sertifikalarim", "sertifikasyonlar", "belgeler",
     "kurslar", "seminerler", "sertifika & kurslar", "egitim ve sertifikalar",
     "sertnfnkalar", "sertnfnkalarim", "lisans / sertifikalar", "lisans ve sertifikalar",
-    "sertifikalar ve lisanslar",
+    "sertifikalar ve lisanslar", "oduller", "odul", "basarilar", "basari", "odullerim",
+    "basarilarim", "oduller & sertifikalar", "sertifikalar & oduller", "sertifikalar ve oduller",
   ],
   languages: [
     "diller", "yabanci dil", "yabanci diller", "dil bilgisi",
     "konustugu diller", "dnller", "dnllerim",
     "dil seviyeleri", "yabanci diller (yildizlar)", "dil yetkinligi",
     "dil bilgisi & seviyeler", "yabanci dil seviyeleri", "dil & seviye",
-    "yabancidiller",
+    "yabancidiller", "dil",
   ],
   publications: [
     "yayinlar", "yayinlarim", "patentler", "yayinlar & patentler",
@@ -133,10 +134,12 @@ const HEADINGS_EN: Record<string, string[]> = {
   certifications: [
     "certifications", "certificates", "licenses", "credentials",
     "completed courses", "professional training", "trainings",
+    "awards", "award", "achievements", "achievement", "honors & awards", "honors", "awards & honors",
+    "key achievements", "selected achievements",
   ],
   languages: [
     "languages", "language skills", "languages spoken",
-    "language levels", "foreign languages", "language proficiency",
+    "language levels", "foreign languages", "language proficiency", "language",
   ],
   publications: [
     "publications", "patents", "publications & patents",
@@ -202,12 +205,12 @@ const COMMON_SKILL_REGEXES = COMMON_SKILLS.map((skill) => {
 // Boundary detection — sub-chunking signals
 /** Signal 1: numeric year range  "2022 – 2024", "2020 - present" */
 const RX_NUM_DATE =
-  /\b(19|20)\d{2}\s*[-–—]\s*(20\d{2}|günümüz|present|halen|hâlen|devam)\b/i;
+  /\b(19|20)\d{2}\s*[-–—/.to\s]+\s*(20\d{2}|günümüz|present|halen|hâlen|devam)\b/i;
 
 /** Signal 2: Turkish month + year range  "Ocak 2022 - Mart 2024" */
 const _TR_M = "ocak|şubat|mart|nisan|mayıs|haziran|temmuz|ağustos|eylül|ekim|kasım|aralık";
 const RX_TR_MONTH = new RegExp(
-  `(?:${_TR_M})\\s+(19|20)\\d{2}\\s*[-–—]\\s*(?:(?:${_TR_M})\\s+)?(19|20)\\d{2}|(günümüz|present|halen)`,
+  `(?:${_TR_M})\\s+(19|20)\\d{2}\\s*[-–—/.to\\s]+\\s*(?:(?:${_TR_M})\\s+)?(19|20)\\d{2}|(günümüz|present|halen)`,
   "i"
 );
 
@@ -228,7 +231,7 @@ const RX_COMPANY =
   /a\.ş\.|ltd\.|holding|holdingi|şirketi|company|inc\.|corp\./i;
 
 // detectSectionByStructure regexes
-const RX_DATE_STRUCT = /\b(19|20)\d{2}\s*[-–—]\s*(20\d{2}|günümüz|present)\b/i;
+const RX_DATE_STRUCT = /\b(19|20)\d{2}\s*[-–—/.to\s]+\s*(20\d{2}|günümüz|present)\b/i;
 const RX_EDU_STRUCT  =
   /üniversite|universite|lise|fakülte|lisans|yüksek lisans|bachelor|master|phd|school|college/i;
 const RX_EXP_STRUCT  =
@@ -348,22 +351,24 @@ function detectColumns(
 /**
  * Groups pdfjs text items into lines based on y-coordinate proximity.
  * Returns a single string with newline-separated lines.
+ * Items may carry an optional `fontSize` field for accurate gap detection.
  */
 function groupItemsIntoText(
-  items: { x: number; y: number; text: string }[],
+  items: { x: number; y: number; text: string; fontSize?: number }[],
   yTolerance = 6
 ): string {
   if (items.length === 0) return "";
 
-  type Line = { y: number; parts: { x: number; text: string }[] };
+  type Line = { y: number; parts: { x: number; text: string; fontSize: number }[] };
   const lines: Line[] = [];
 
   for (const item of items) {
     const existing = lines.find((l) => Math.abs(l.y - item.y) <= yTolerance);
+    const fs = item.fontSize ?? 10;
     if (existing) {
-      existing.parts.push({ x: item.x, text: item.text });
+      existing.parts.push({ x: item.x, text: item.text, fontSize: fs });
     } else {
-      lines.push({ y: item.y, parts: [{ x: item.x, text: item.text }] });
+      lines.push({ y: item.y, parts: [{ x: item.x, text: item.text, fontSize: fs }] });
     }
   }
 
@@ -380,9 +385,9 @@ function groupItemsIntoText(
           mergedText = curr.text;
         } else {
           const prev = sorted[i - 1];
-          const prevLength = prev.text.length;
-          const charWidthEstimate = 3.6;
-          const prevEndPos = prev.x + (prevLength * charWidthEstimate);
+          // Use font-size-aware char width: 0.55 * fontSize, min 3.6pt
+          const prevCharWidth = Math.max(3.6, prev.fontSize * 0.55);
+          const prevEndPos = prev.x + (prev.text.length * prevCharWidth);
           
           if (curr.x - prevEndPos < 2.0) {
             mergedText += curr.text;
@@ -440,11 +445,15 @@ export async function extractTextFromPDF(pdfBuffer: Buffer): Promise<string> {
       const topBoundary = pageHeight * 0.94;
       const bottomBoundary = pageHeight * 0.06;
       
-      const allItems: { x: number; y: number; text: string }[] = [];
+      // Store font size alongside items — pdfjs provides it in the transform matrix
+      // transform = [scaleX, skewX, skewY, scaleY, translateX, translateY]
+      // Font size ≈ Math.abs(transform[3]) (scaleY)
+      const allItems: { x: number; y: number; text: string; fontSize: number }[] = [];
       for (const item of textContent.items as any[]) {
         if (item.str && item.str.trim()) {
           const x = item.transform[4];
           const y = item.transform[5];
+          const fontSize = Math.abs(item.transform[3]) || 10; // fallback 10pt
           const txt = item.str.trim();
           
           // Skip typical page numbers/footers at boundaries
@@ -454,7 +463,7 @@ export async function extractTextFromPDF(pdfBuffer: Buffer): Promise<string> {
             continue;
           }
           
-          allItems.push({ x, y, text: item.str });
+          allItems.push({ x, y, text: item.str, fontSize });
         }
       }
 
@@ -463,17 +472,18 @@ export async function extractTextFromPDF(pdfBuffer: Buffer): Promise<string> {
         continue;
       }
 
-      // Group items into lines
+      // Group items into lines — carry font size per item
       const yTolerance = 6;
-      type Line = { y: number; items: { x: number; text: string }[] };
+      type LineItem = { x: number; text: string; fontSize: number };
+      type Line = { y: number; items: LineItem[] };
       const lines: Line[] = [];
 
       for (const item of allItems) {
         const existing = lines.find((l) => Math.abs(l.y - item.y) <= yTolerance);
         if (existing) {
-          existing.items.push({ x: item.x, text: item.text });
+          existing.items.push({ x: item.x, text: item.text, fontSize: item.fontSize });
         } else {
-          lines.push({ y: item.y, items: [{ x: item.x, text: item.text }] });
+          lines.push({ y: item.y, items: [{ x: item.x, text: item.text, fontSize: item.fontSize }] });
         }
       }
 
@@ -484,17 +494,44 @@ export async function extractTextFromPDF(pdfBuffer: Buffer): Promise<string> {
       }
 
       // Dynamic Column Detection
-      const boundaries = detectColumns(allItems, pageWidth, pageHeight);
+      let boundaries = detectColumns(allItems, pageWidth, pageHeight);
+
+      // Post-process boundaries to keep at most 1 boundary (typically sidebar vs main body separator)
+      if (boundaries.length > 1) {
+        const leftSidebarBoundary = boundaries.find(b => b >= pageWidth * 0.18 && b <= pageWidth * 0.44);
+        const rightSidebarBoundary = [...boundaries].reverse().find(b => b >= pageWidth * 0.56 && b <= pageWidth * 0.82);
+
+        if (leftSidebarBoundary !== undefined) {
+          boundaries = [leftSidebarBoundary];
+        } else if (rightSidebarBoundary !== undefined) {
+          boundaries = [rightSidebarBoundary];
+        } else {
+          // Keep the one closest to a typical 30% width sidebar
+          const target = pageWidth * 0.30;
+          let best = boundaries[0];
+          let minDiff = Math.abs(best - target);
+          for (const b of boundaries) {
+            const diff = Math.abs(b - target);
+            if (diff < minDiff) {
+              minDiff = diff;
+              best = b;
+            }
+          }
+          boundaries = [best];
+        }
+        console.log(`[PDF] Filtered multiple column boundaries. Kept: ${boundaries[0]} from original: [${boundaries.join(", ")}]`);
+      }
 
       let pageText: string;
       if (boundaries.length > 0) {
         // Multi-column reconstruction with full-width spanning lines (headers/footers) support
+        type ColItem = { x: number; y: number; text: string; fontSize: number };
         type PageBlock = 
           | { type: "spanning"; text: string }
-          | { type: "columns"; cols: { x: number; y: number; text: string }[][] };
+          | { type: "columns"; cols: ColItem[][] };
 
         const blocks: PageBlock[] = [];
-        let currentCols: { x: number; y: number; text: string }[][] = Array.from({ length: boundaries.length + 1 }, () => []);
+        let currentCols: ColItem[][] = Array.from({ length: boundaries.length + 1 }, () => []);
 
         const flushColumns = () => {
           const hasContent = currentCols.some((c) => c.length > 0);
@@ -504,27 +541,35 @@ export async function extractTextFromPDF(pdfBuffer: Buffer): Promise<string> {
           }
         };
 
-        const charWidthEstimate = 3.6;
-
         for (const line of lines) {
           if (line.items.length === 0) continue;
 
-          let isSpanning = false;
+          // Compute average font size for this line — large font = name/title = spanning
+          const avgFontSize = line.items.reduce((sum, i) => sum + i.fontSize, 0) / line.items.length;
+          // Font-size-aware character width: roughly 0.55 * fontSize for proportional fonts
+          const charWidthEstimate = Math.max(3.6, avgFontSize * 0.55);
 
-          // Check if any single item crosses a column boundary
-          for (const item of line.items) {
-            const startX = item.x;
-            const endX = item.x + item.text.length * charWidthEstimate;
-            for (const b of boundaries) {
-              if (startX < b - 8 && endX > b + 8) {
-                isSpanning = true;
-                break;
+          // Rule 1: Top 20% of page is always the header — force spanning
+          // Rule 2: Large font lines (≥14pt) anywhere on the page are likely name/title headers
+          let isSpanning = line.y > pageHeight * 0.80 || avgFontSize >= 14;
+
+          if (!isSpanning) {
+            // Rule 3: Check if any single item physically crosses a column boundary
+            for (const item of line.items) {
+              const startX = item.x;
+              const itemCharWidth = Math.max(3.6, item.fontSize * 0.55);
+              const endX = item.x + item.text.length * itemCharWidth;
+              for (const b of boundaries) {
+                if (startX < b - 8 && endX > b + 8) {
+                  isSpanning = true;
+                  break;
+                }
               }
+              if (isSpanning) break;
             }
-            if (isSpanning) break;
           }
 
-          // If not spanning, check if there is a gap at boundaries on this line
+          // Rule 4: If not spanning, check if there is a gap at boundaries on this line
           if (!isSpanning) {
             for (const b of boundaries) {
               const leftItems = line.items.filter((item) => item.x < b);
@@ -533,7 +578,8 @@ export async function extractTextFromPDF(pdfBuffer: Buffer): Promise<string> {
               if (leftItems.length > 0 && rightItems.length > 0) {
                 const rightmostLeft = leftItems[leftItems.length - 1];
                 const leftmostRight = rightItems[0];
-                const leftEnd = rightmostLeft.x + rightmostLeft.text.length * charWidthEstimate;
+                const leftCharWidth = Math.max(3.6, rightmostLeft.fontSize * 0.55);
+                const leftEnd = rightmostLeft.x + rightmostLeft.text.length * leftCharWidth;
                 const rightStart = leftmostRight.x;
                 
                 const gap = rightStart - leftEnd;
@@ -547,7 +593,8 @@ export async function extractTextFromPDF(pdfBuffer: Buffer): Promise<string> {
 
           if (isSpanning) {
             flushColumns();
-            const mappedItems = line.items.map(i => ({ x: i.x, y: line.y, text: i.text }));
+            // Pass fontSize through so groupItemsIntoText can use accurate gap detection
+            const mappedItems = line.items.map(i => ({ x: i.x, y: line.y, text: i.text, fontSize: i.fontSize }));
             blocks.push({ type: "spanning", text: groupItemsIntoText(mappedItems) });
           } else {
             // Split line parts into respective columns
@@ -557,7 +604,7 @@ export async function extractTextFromPDF(pdfBuffer: Buffer): Promise<string> {
               
               const colItems = line.items.filter((item) => item.x >= prevBound && item.x < nextBound);
               if (colItems.length > 0) {
-                const mappedColItems = colItems.map(i => ({ x: i.x, y: line.y, text: i.text }));
+                const mappedColItems = colItems.map(i => ({ x: i.x, y: line.y, text: i.text, fontSize: i.fontSize }));
                 currentCols[c].push(...mappedColItems);
               }
             }
@@ -640,6 +687,11 @@ function detectSectionByStructure(line: string): string | null {
  *   0.85 — word-boundary regex hit
  *   0.75 — structural pattern guess
  */
+const EXACT_MATCH_ONLY_WORDS = new Set([
+  "university", "universite", "lisans", "lisanslar", "staj", "stajlar", 
+  "degrees", "qualifications", "okullar", "lise", "doktora", "referans"
+]);
+
 function matchHeading(
   line: string,
   lang: "tr" | "en"
@@ -649,6 +701,11 @@ function matchHeading(
 
   const clean = trimmed.replace(/:$/, "").replace(/^[\[(]|[\])]$/g, "").trim();
   if (!clean || RX_SENTENCE_END.test(clean)) return null;
+
+  // If the line contains a numeric date range, it is a sub-entry, not a section heading.
+  if (RX_NUM_DATE.test(clean) || RX_DATE_STRUCT.test(clean)) {
+    return null;
+  }
 
   const norm = normalizeHeading(clean);
   if (norm.split(/\s+/).length > 6) return null;
@@ -671,6 +728,8 @@ function matchHeading(
   for (const headings of allHeadingsList) {
     for (const [key, list] of Object.entries(headings)) {
       for (const phrase of list) {
+        if (EXACT_MATCH_ONLY_WORDS.has(phrase)) continue;
+
         if (new RegExp(`(^|\\s)${phrase}(\\s|$)`, "i").test(norm) && !RX_VERB_PAST.test(norm)) {
           return { sectionKey: key, confidence: 0.85, source: "RULE" };
         }

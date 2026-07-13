@@ -47,9 +47,9 @@ describe("Gün 26 - Jest: GPT Uyum Değerlendirmesi Detaylı Doğrulama Testleri
     // 1. Kullanıcıları oluştur
     const admin = await prisma.user.create({
       data: {
-        email: `jest-rank-admin-${Date.now()}@example.com`,
+        email: `jest-rank-admin-${Date.now()}-${Math.floor(Math.random() * 1000000)}@example.com`,
         passwordHash: "pass",
-        phone: `admin-${Date.now()}`,
+        phone: `admin-${Date.now()}-${Math.floor(Math.random() * 1000000)}`,
         name: "Rank Admin",
         role: "ADMIN"
       }
@@ -59,9 +59,9 @@ describe("Gün 26 - Jest: GPT Uyum Değerlendirmesi Detaylı Doğrulama Testleri
 
     const userA = await prisma.user.create({
       data: {
-        email: `jest-rank-userA-${Date.now()}@example.com`,
+        email: `jest-rank-userA-${Date.now()}-${Math.floor(Math.random() * 1000000)}@example.com`,
         passwordHash: "pass",
-        phone: `usera-${Date.now()}`,
+        phone: `usera-${Date.now()}-${Math.floor(Math.random() * 1000000)}`,
         name: "Aday A",
         role: "CANDIDATE"
       }
@@ -71,9 +71,9 @@ describe("Gün 26 - Jest: GPT Uyum Değerlendirmesi Detaylı Doğrulama Testleri
 
     const userB = await prisma.user.create({
       data: {
-        email: `jest-rank-userB-${Date.now()}@example.com`,
+        email: `jest-rank-userB-${Date.now()}-${Math.floor(Math.random() * 1000000)}@example.com`,
         passwordHash: "pass",
-        phone: `userb-${Date.now()}`,
+        phone: `userb-${Date.now()}-${Math.floor(Math.random() * 1000000)}`,
         name: "Aday B",
         role: "CANDIDATE"
       }
@@ -363,6 +363,47 @@ describe("Gün 26 - Jest: GPT Uyum Değerlendirmesi Detaylı Doğrulama Testleri
 
     // Maliyet hesabı: 300 * 0.00000015 + 150 * 0.00000060 = 0.000045 + 0.000090 = 0.000135
     expect(Number(apiCall!.costUsd)).toBeCloseTo(0.000135, 8);
+
+    vectorSpy.mockRestore();
+    mockFetch.mockRestore();
+  });
+
+  // ── Test 6: Arama Geçmişi (SearchLog) Doğrulaması ───────────────────────────
+  test("Arama yapıldığında arama geçmişi kaydedilmeli ve logs rotasından son aramalar listelenmelidir", async () => {
+    const queryVector = Array(1536).fill(0.1);
+    queryVector[0] = 0.5;
+
+    const vectorSpy = jest.spyOn(EmbeddingService, "generateEmbedding")
+      .mockResolvedValue(queryVector);
+
+    const mockFetch = jest.spyOn(global, "fetch") as any;
+    mockFetch.mockResolvedValue({
+      ok: true,
+      json: async () => ({
+        choices: [{ message: { content: JSON.stringify({ evaluations: [] }) } }]
+      })
+    });
+
+    const uniqueQuery = `ozel-kriter-sorgusu-${Date.now()}`;
+    const responsePost = await request(app)
+      .post("/api/search")
+      .set("Cookie", `token=${adminToken}`)
+      .send({ query: uniqueQuery });
+
+    expect(responsePost.status).toBe(200);
+
+    // Logs rotasını çağırıp geçmişi çekiyoruz
+    const responseGet = await request(app)
+      .get("/api/search/logs")
+      .set("Cookie", `token=${adminToken}`);
+
+    expect(responseGet.status).toBe(200);
+    expect(Array.isArray(responseGet.body)).toBe(true);
+    expect(responseGet.body.length).toBeGreaterThanOrEqual(1);
+
+    // Son arama en başta ve bizim arattığımız uniqueQuery olmalı
+    expect(responseGet.body[0].query).toBe(uniqueQuery);
+    expect(responseGet.body[0].userId).toBe(adminId);
 
     vectorSpy.mockRestore();
     mockFetch.mockRestore();
