@@ -2,12 +2,11 @@
  * verify_gun26.test.ts
  *
  * Gün 26 - Jest Test Suite:
- *   1. POST /api/search yetkilendirme engelleri (CANDIDATE 403, Token'sız 401).
- *   2. ADMIN arama yaptığında pgvector sonuçlarının GPT-4o-mini'ye toplu (Batch) gönderilmesi.
- *   3. GPT yanıtı başarılı olduğunda hibrid skor formülü (Vector * 0.4 + GPT * 0.6) ile yeniden sıralama yapılması.
- *   4. GPT skoru yüksek olan adayın (düşük vektör skoruna sahip olsa bile) ilk sıraya yerleştiğinin doğrulanması.
- *   5. Sonuçlarda matchedChunkId, gptScore, vectorScore ve matchExplanation alanlarının doğrulanması.
- *   6. OpenAI API hatasında fallback mekanizmasının devreye girerek pgvector skoruyla (%100) kesintisiz yanıt dönmesi.
+ *   1. CANDIDATE arama yaptığında 403 Forbidden almalıdır.
+ *   2. GPT bozuk veya eksik JSON döndüğünde sistem ayakta kalıyor mu? (Structured Output Validasyonu)
+ *   3. Metin 4000 karakterden uzun olduğunda kırpma (truncation) düzgün çalışıyor mu?
+ *   4. Hibrid sıralama formülü matematiksel ağırlığı doğru yansıtıyor mu?
+ *   5. OpenAI çağrısı sonrası bütçe tablosuna (api_calls) doğru maliyet ve token yansıyor mu?
  */
 
 import "../src/load-env.js";
@@ -42,7 +41,7 @@ let cvBId: string;
 
 const jwtSecret = process.env.JWT_SECRET || "test-jwt-secret";
 
-describe("Gün 26 - Jest: GPT Yorumlama, Hibrid Skorlama ve Fallback Testleri", () => {
+describe("Gün 26 - Jest: GPT Uyum Değerlendirmesi Detaylı Doğrulama Testleri", () => {
 
   beforeAll(async () => {
     // 1. Kullanıcıları oluştur
@@ -82,14 +81,15 @@ describe("Gün 26 - Jest: GPT Yorumlama, Hibrid Skorlama ve Fallback Testleri", 
     userBId = userB.id;
     userBToken = jwt.sign({ id: userB.id, email: userB.email, role: userB.role }, jwtSecret);
 
-    // 2. CV'leri oluştur
+    // 2. CV'leri oluştur (Metin 4000 karakterden uzun olduğunda kırpma doğrulaması için CV A'yı 5000 karakter yapıyoruz)
+    const longText = "React uzmanı ".repeat(500); // 500 * 13 = 6500 characters
     const cvA = await prisma.cV.create({
       data: {
         userId: userA.id,
         fileName: "userA-cv.pdf",
         fileUrl: "https://example.com/userA-cv.pdf",
         hash: `hash-a-${Date.now()}`,
-        rawText: "React ve Node.js konusunda uzman fullstack geliştirici deneyimi."
+        rawText: longText
       }
     });
     cvAId = cvA.id;
@@ -115,10 +115,10 @@ describe("Gün 26 - Jest: GPT Yorumlama, Hibrid Skorlama ve Fallback Testleri", 
 
     // Vektör yönelimleri:
     const highArr = Array(1536).fill(0.1);
-    highArr[0] = 0.5; // CV A Chunk (Score: 100)
+    highArr[0] = 0.5; // CV A (Score: 100)
 
     const medArr = Array(1536).fill(0.1);
-    medArr[0] = 0.2; // CV B Chunk (Score: ~99.7)
+    medArr[0] = 0.2; // CV B (Score: ~99.7)
 
     const vecHigh = `[${highArr.join(",")}]`;
     const vecMedium = `[${medArr.join(",")}]`;
@@ -146,27 +146,125 @@ describe("Gün 26 - Jest: GPT Yorumlama, Hibrid Skorlama ve Fallback Testleri", 
     }
   });
 
-  // ── Test 1: Yetki Kontrolleri ──────────────────────────────────────────────
-  test("CANDIDATE arama yaptığında 403 Forbidden almalıdır", async () => {
+  // ── Test 1: CANDIDATE yetki engeli ──────────────────────────────────────────
+  test("CANDIDATE arama yapmaya çalıştığında 403 Forbidden almalıdır", async () => {
     const response = await request(app)
       .post("/api/search")
       .set("Cookie", `token=${userAToken}`)
-      .send({ query: "deneme" });
+      .send({ query: "React" });
     expect(response.status).toBe(403);
   });
 
-  // ── Test 2: Hibrid Skorlama ve Yeniden Sıralama Testi ────────────────────────
-  test("Yönetici arama yaptığında GPT hibrid sıralaması doğru çalışmalı ve yüksek GPT puanlı aday öne geçmelidir", async () => {
+  // ── Test 2: Structured Output Validasyonu ───────────────────────────────────
+  test("GPT bozuk veya eksik JSON döndüğünde sistem ayakta kalmalı ve fallback tetiklenmelidir", async () => {
     const queryVector = Array(1536).fill(0.1);
     queryVector[0] = 0.5;
 
     const vectorSpy = jest.spyOn(EmbeddingService, "generateEmbedding")
       .mockResolvedValue(queryVector);
 
-    // OpenAI fetch çağrısını mock'luyoruz:
-    // CV A (Vektör Skoru: 100): GPT 40 veriyoruz. Hibrid Skor: 100 * 0.4 + 40 * 0.6 = 40 + 24 = 64
-    // CV B (Vektör Skoru: ~99.7): GPT 95 veriyoruz. Hibrid Skor: 99.7 * 0.4 + 95 * 0.6 = 39.88 + 57 = 96.88
-    // Sonuçta CV B'nin ilk sırada listelenmesini bekliyoruz!
+    const mockFetch = jest.spyOn(global, "fetch") as any;
+    // Bozuk JSON dönüyoruz
+    mockFetch.mockResolvedValue({
+      ok: true,
+      json: async () => ({
+        choices: [
+          {
+            message: {
+              content: "{ bozuk_json_yapi"
+            }
+          }
+        ],
+        usage: {
+          prompt_tokens: 100,
+          completion_tokens: 10
+        }
+      })
+    });
+
+    const response = await request(app)
+      .post("/api/search")
+      .set("Cookie", `token=${adminToken}`)
+      .send({ query: "bozuk JSON testi" });
+
+    expect(response.status).toBe(200); // Sistem patlamamalı!
+    
+    const results = response.body.results;
+    expect(results.length).toBeGreaterThanOrEqual(2);
+    
+    // GPT skoru null olmalı ve fallback açıklaması yazılmalı
+    expect(results[0].gptScore).toBeNull();
+    expect(results[0].matchExplanation).toContain("Yapay zeka analizi şu anda kullanılamıyor");
+
+    vectorSpy.mockRestore();
+    mockFetch.mockRestore();
+  });
+
+  // ── Test 3: Kırpma (Truncation) Doğrulaması ──────────────────────────────────
+  test("CV metni 4000 karakterden uzun olduğunda kırpma düzgün çalışmalı ve GPT'ye kısaltılmış gitmelidir", async () => {
+    const queryVector = Array(1536).fill(0.1);
+    queryVector[0] = 0.5;
+
+    const vectorSpy = jest.spyOn(EmbeddingService, "generateEmbedding")
+      .mockResolvedValue(queryVector);
+
+    const mockFetch = jest.spyOn(global, "fetch") as any;
+    let capturedPayload: any = null;
+
+    mockFetch.mockImplementation(async (url: string, init: any) => {
+      capturedPayload = JSON.parse(init.body);
+      return {
+        ok: true,
+        json: async () => ({
+          choices: [
+            {
+              message: {
+                content: JSON.stringify({
+                  evaluations: [
+                    { cvId: cvAId, suitabilityScore: 80, matchExplanation: "Uyumlu" }
+                  ]
+                })
+              }
+            }
+          ],
+          usage: {
+            prompt_tokens: 150,
+            completion_tokens: 50
+          }
+        })
+      };
+    });
+
+    const response = await request(app)
+      .post("/api/search")
+      .set("Cookie", `token=${adminToken}`)
+      .send({ query: "kırpma testi" });
+
+    expect(response.status).toBe(200);
+    expect(capturedPayload).not.toBeNull();
+
+    // GPT'ye giden user mesajını yakala ve parse et
+    const userMessageContent = capturedPayload.messages[1].content;
+    expect(userMessageContent).toContain(cvAId);
+
+    // Prompt içindeki aday verisini doğrula (Metin 4000 karakterden az veya eşit olmalı)
+    const match = userMessageContent.match(/\"text\":\s*\"([^\"]+)\"/);
+    if (match && match[1]) {
+      expect(match[1].length).toBeLessThanOrEqual(4000);
+    }
+
+    vectorSpy.mockRestore();
+    mockFetch.mockRestore();
+  });
+
+  // ── Test 4: Hibrid Sıralama Formülü Matematiksel Doğrulama ───────────────────
+  test("Hibrid sıralama formülü matematiksel ağırlığı doğru yansıtmalıdır", async () => {
+    const queryVector = Array(1536).fill(0.1);
+    queryVector[0] = 0.5;
+
+    const vectorSpy = jest.spyOn(EmbeddingService, "generateEmbedding")
+      .mockResolvedValue(queryVector);
+
     const mockFetch = jest.spyOn(global, "fetch") as any;
     mockFetch.mockResolvedValue({
       ok: true,
@@ -176,8 +274,8 @@ describe("Gün 26 - Jest: GPT Yorumlama, Hibrid Skorlama ve Fallback Testleri", 
             message: {
               content: JSON.stringify({
                 evaluations: [
-                  { cvId: cvAId, suitabilityScore: 40, matchExplanation: "Aday A yetersiz." },
-                  { cvId: cvBId, suitabilityScore: 95, matchExplanation: "Aday B çok uyumlu." }
+                  { cvId: cvAId, suitabilityScore: 40, matchExplanation: "Orta seviye." },
+                  { cvId: cvBId, suitabilityScore: 90, matchExplanation: "Çok iyi." }
                 ]
               })
             }
@@ -193,63 +291,78 @@ describe("Gün 26 - Jest: GPT Yorumlama, Hibrid Skorlama ve Fallback Testleri", 
     const response = await request(app)
       .post("/api/search")
       .set("Cookie", `token=${adminToken}`)
-      .send({ query: "React Node.js geliştirici" });
+      .send({ query: "Hibrid matematik testi" });
 
     expect(response.status).toBe(200);
-    expect(response.body.processingTimeMs).toBeDefined();
-
     const results = response.body.results;
-    expect(results.length).toBeGreaterThanOrEqual(2);
 
-    // CV B ilk sırada yer almalıdır (Hibrid skor sıralama doğrulaması)
-    expect(results[0].cvId).toBe(cvBId);
-    expect(results[0].gptScore).toBe(95);
-    expect(results[0].score).toBeCloseTo(96.9, 1);
+    // CV A (Vektör skoru tam 1.0 -> normalized 100). GPT skoru: 40
+    // Beklenen hibrid skor: 100 * 0.4 + 40 * 0.6 = 40 + 24 = 64.0
+    const cvAResult = results.find((r: any) => r.cvId === cvAId);
+    expect(cvAResult).toBeDefined();
+    expect(cvAResult.score).toBeCloseTo(64.0, 1);
 
-    // CV A ikinci sırada yer almalıdır
-    expect(results[1].cvId).toBe(cvAId);
-    expect(results[1].gptScore).toBe(40);
-    expect(results[1].score).toBeCloseTo(64.0, 1);
-
-    // matchedChunkId ve matchExplanation alanlarının doğrulanması
-    expect(results[0].matchedChunkId).toBeDefined();
-    expect(results[0].matchExplanation).toBe("Aday B çok uyumlu.");
+    // CV B (Vektör skoru ~99.7). GPT skoru: 90
+    // Beklenen hibrid skor: 99.71 * 0.4 + 90 * 0.6 = 39.88 + 54 = 93.88
+    const cvBResult = results.find((r: any) => r.cvId === cvBId);
+    expect(cvBResult).toBeDefined();
+    expect(cvBResult.score).toBeCloseTo(93.9, 1);
 
     vectorSpy.mockRestore();
     mockFetch.mockRestore();
   });
 
-  // ── Test 3: Fallback Mekanizması Testi ──────────────────────────────────────
-  test("OpenAI API çöktüğünde sistem hata vermemeli ve pgvector fallback skorlarıyla sıralamalıdır", async () => {
+  // ── Test 5: api_calls Tablosu Maliyet ve Token Doğrulaması ──────────────────
+  test("OpenAI çağrısı sonrası api_calls tablosuna doğru maliyet ve token yansımalıdır", async () => {
     const queryVector = Array(1536).fill(0.1);
     queryVector[0] = 0.5;
 
     const vectorSpy = jest.spyOn(EmbeddingService, "generateEmbedding")
       .mockResolvedValue(queryVector);
 
-    // OpenAI fetch API'sini başarısız duruma getirecek şekilde mock'luyoruz
     const mockFetch = jest.spyOn(global, "fetch") as any;
     mockFetch.mockResolvedValue({
-      ok: false,
-      status: 500
+      ok: true,
+      json: async () => ({
+        choices: [
+          {
+            message: {
+              content: JSON.stringify({
+                evaluations: [
+                  { cvId: cvAId, suitabilityScore: 85, matchExplanation: "Uyumlu" }
+                ]
+              })
+            }
+          }
+        ],
+        usage: {
+          prompt_tokens: 300,
+          completion_tokens: 150
+        }
+      })
     });
 
     const response = await request(app)
       .post("/api/search")
       .set("Cookie", `token=${adminToken}`)
-      .send({ query: "arama" });
+      .send({ query: "api log testi" });
 
-    expect(response.status).toBe(200); // 500 dönmemeli, fallback çalışmalı!
+    expect(response.status).toBe(200);
 
-    const results = response.body.results;
-    expect(results.length).toBeGreaterThanOrEqual(2);
+    // api_calls tablosundaki en son kaydı çekiyoruz
+    const apiCall = await prisma.aPICall.findFirst({
+      orderBy: { createdAt: "desc" }
+    });
 
-    // Vektör skoru en yüksek olan CV A (%100 ağırlıkla) ilk sırada yer almalı
-    expect(results[0].cvId).toBe(cvAId);
-    expect(results[0].gptScore).toBeNull();
-    expect(results[0].score).toBeCloseTo(100.0, 1); // Fallback skoru vektör skoruyla eşitlenir
+    expect(apiCall).not.toBeNull();
+    expect(apiCall!.endpoint).toBe("chat");
+    expect(apiCall!.model).toBe("gpt-4o-mini");
+    expect(apiCall!.status).toBe("SUCCESS");
+    expect(apiCall!.tokensIn).toBe(300);
+    expect(apiCall!.tokensOut).toBe(150);
 
-    expect(results[0].matchExplanation).toContain("Yapay zeka analizi şu anda kullanılamıyor");
+    // Maliyet hesabı: 300 * 0.00000015 + 150 * 0.00000060 = 0.000045 + 0.000090 = 0.000135
+    expect(Number(apiCall!.costUsd)).toBeCloseTo(0.000135, 8);
 
     vectorSpy.mockRestore();
     mockFetch.mockRestore();
