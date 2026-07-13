@@ -32,12 +32,21 @@ import AdminLayout from '../../layouts/AdminLayout.astro';
             id="semantic-search-input"
             type="text" 
             placeholder="Python ve veri analizi bilen, en az 3 yıl deneyimli backend geliştirici..." 
-            class="w-full bg-[#faf9f5] border border-[#ddd9d3] text-[#1b1c1a] rounded-[10px] pl-12 pr-[120px] py-4 focus:border-[#14422f] focus:ring-1 focus:ring-[#14422f] focus:outline-none font-body-md transition-all"
+            class="w-full bg-[#faf9f5] border border-[#ddd9d3] text-[#1b1c1a] rounded-[10px] pl-12 pr-[170px] py-4 focus:border-[#14422f] focus:ring-1 focus:ring-[#14422f] focus:outline-none font-body-md transition-all"
           />
-          <button id="semantic-search-btn" class="absolute right-2 bg-[#14422f] hover:bg-[#0f3223] text-white rounded-[8px] px-6 py-2.5 font-label-md flex items-center gap-2 transition-colors">
-            <span class="material-symbols-outlined text-sm">bolt</span>
-            AI Ara
-          </button>
+          <div class="absolute right-2 flex items-center gap-2">
+            <button 
+              id="clear-semantic-search-btn" 
+              class="text-[#8a8580] hover:text-red-500 hover:bg-red-50 p-2 rounded-lg transition-colors cursor-pointer flex items-center justify-center"
+              title="Temizle"
+            >
+              <span class="material-symbols-outlined text-lg">close</span>
+            </button>
+            <button id="semantic-search-btn" class="bg-[#14422f] hover:bg-[#0f3223] text-white rounded-[8px] px-6 py-2.5 font-label-md flex items-center gap-2 transition-colors">
+              <span class="material-symbols-outlined text-sm">bolt</span>
+              AI Ara
+            </button>
+          </div>
         </div>
 
         <!-- Recent Searches Logs -->
@@ -329,6 +338,30 @@ import AdminLayout from '../../layouts/AdminLayout.astro';
           </div>
         `;
       }).join('');
+    }
+
+    function clearSemanticSearch() {
+      const input = document.getElementById('semantic-search-input');
+      if (input) input.value = '';
+
+      // Clear sessionStorage search state
+      sessionStorage.removeItem('beacon_search_semantic_query');
+      sessionStorage.removeItem('beacon_search_semantic_results');
+      sessionStorage.removeItem('beacon_search_semantic_count');
+
+      // Reset count text
+      const countEl = document.getElementById('semantic-result-count');
+      if (countEl) countEl.textContent = 'Arama bekleniyor...';
+
+      // Reset candidates grid to initial placeholder state
+      const grid = document.getElementById('semantic-candidates-grid');
+      if (grid) {
+        grid.innerHTML = `
+          <div class="col-span-1 bg-white border border-[#ddd9d3] rounded-[10px] p-12 flex flex-col items-center justify-center text-center shadow-sm">
+            <span class="material-symbols-outlined text-5xl text-[#14422f]/20 mb-4">search_spark</span>
+            <p class="text-[#8a8580] font-body-md font-medium">Semantik AI aramasını başlatmak için yukarıya bir kriter yazıp "AI Ara" butonuna basın.</p>
+          </div>`;
+      }
     }
 
     async function executeSemanticSearch() {
@@ -638,6 +671,11 @@ import AdminLayout from '../../layouts/AdminLayout.astro';
         semanticSearchInput.addEventListener('keydown', (e) => {
           if (e.key === 'Enter') executeSemanticSearch();
         });
+      }
+
+      const clearSemanticBtn = document.getElementById('clear-semantic-search-btn');
+      if (clearSemanticBtn) {
+        clearSemanticBtn.addEventListener('click', clearSemanticSearch);
       }
 
       // 5. Bind action event listeners for basic search
