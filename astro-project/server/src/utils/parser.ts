@@ -549,9 +549,13 @@ export async function extractTextFromPDF(pdfBuffer: Buffer): Promise<string> {
           // Font-size-aware character width: roughly 0.55 * fontSize for proportional fonts
           const charWidthEstimate = Math.max(3.6, avgFontSize * 0.55);
 
-          // Rule 1: Top 20% of page is always the header — force spanning
-          // Rule 2: Large font lines (≥14pt) anywhere on the page are likely name/title headers
-          let isSpanning = line.y > pageHeight * 0.80 || avgFontSize >= 14;
+          // Rule 1: Top 20% of page OR large font — but ONLY if items don't straddle a column boundary.
+          // If items exist on BOTH sides of a boundary (e.g. "Contact" left + "Experience" right at same Y),
+          // we must NOT force-span — they belong to separate columns.
+          const allOnOneSide = boundaries.every(b => 
+            line.items.every(i => i.x < b) || line.items.every(i => i.x >= b)
+          );
+          let isSpanning = allOnOneSide && (line.y > pageHeight * 0.80 || avgFontSize >= 14);
 
           if (!isSpanning) {
             // Rule 3: Check if any single item physically crosses a column boundary

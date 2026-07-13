@@ -93,5 +93,30 @@ router.get("/logs", authMiddleware, adminMiddleware, async (req: Request, res: R
   }
 });
 
+/**
+ * DELETE /api/search/logs/:id
+ * Belirtilen arama geçmişi kaydını siler.
+ * Sadece yöneticiler (ADMIN) erişebilir.
+ */
+router.delete("/logs/:id", authMiddleware, adminMiddleware, async (req: Request, res: Response): Promise<void> => {
+  const id = req.params.id as string;
+  try {
+    const deleted = await prisma.searchLog.deleteMany({
+      where: { id: id, userId: req.user!.id }
+    });
+    if (deleted.count === 0) {
+      res.status(404).json({ message: "Arama kaydı bulunamadı." });
+      return;
+    }
+    res.json({ message: "Arama kaydı silindi." });
+  } catch (error: any) {
+    console.error("[SearchRoute] Error deleting search log:", error);
+    res.status(500).json({
+      message: "Arama kaydı silinirken sunucu hatası oluştu.",
+      error: error.message || String(error)
+    });
+  }
+});
+
 export default router;
 

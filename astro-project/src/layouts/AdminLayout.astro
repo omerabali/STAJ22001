@@ -70,7 +70,7 @@ const { user } = Astro.locals;
          *  3. Hem (1) hem (2) varsa ve TTL dolmamışsa yeniden fetch etme
          *  4. TTL dolmuşsa veya hiç yoksa fetch et, cache'i güncelle
          */
-        function query(key, fetcher, onData, ttl) {
+        function query(key, fetcher, onData, ttl, onError) {
           ttl = ttl || 30000; // default 30 saniye
 
           // 1. In-memory kontrol
@@ -95,6 +95,7 @@ const { user } = Astro.locals;
             onData(data);
           }).catch(err => {
             console.warn('[SWR] Fetch hatası (' + key + '):', err);
+            if (onError) onError(err);
           });
         }
 

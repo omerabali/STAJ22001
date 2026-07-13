@@ -15,7 +15,7 @@ const bottomItems = [
 ];
 ---
 
-<nav id="admin-sidebar" class="w-[280px] h-screen fixed left-0 top-0 bg-[#f5f4f0] border-r border-[#ddd9d3] flex flex-col z-50 transform -translate-x-full md:translate-x-0 transition-transform duration-300 ease-in-out">
+<nav id="admin-sidebar" class="w-[280px] fixed left-0 top-0 bottom-0 bg-[#f5f4f0] border-r border-[#ddd9d3] flex flex-col z-50 transform -translate-x-full md:translate-x-0 transition-transform duration-300 ease-in-out">
     <!-- Brand / Logo Area -->
     <div class="p-6 border-b border-[#ddd9d3] relative overflow-hidden">
         <div class="flex items-center gap-3 mb-1.5 relative z-10">
@@ -28,7 +28,14 @@ const bottomItems = [
     <!-- Menu items -->
     <div class="flex-1 flex flex-col gap-1 mt-6 px-3">
         {menuItems.map((item) => {
-            const isActive = currentPath === item.path || (currentPath.startsWith(item.path) && item.path !== '/admin/dashboard');
+        // Child sayfaları üst menüye bağla:
+        // /admin/profile → Aday Ara aktif görünsün
+        const parentMap = {
+            '/admin/search': ['/admin/profile'],
+        };
+        const isActive = currentPath === item.path || 
+            (currentPath.startsWith(item.path) && item.path !== '/admin/dashboard') ||
+            (parentMap[item.path] || []).includes(currentPath);
             return (
                 <a 
                     href={item.path}

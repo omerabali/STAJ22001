@@ -284,7 +284,7 @@ router.get("/candidates/:id", authMiddleware, adminMiddleware, async (req: Reque
   const id = req.params.id as string;
   try {
     const candidate = await prisma.user.findFirst({
-      where: { id: id, role: "CANDIDATE" },
+      where: { id: id },
       select: {
         id: true,
         email: true,
