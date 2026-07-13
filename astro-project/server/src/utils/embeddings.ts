@@ -343,11 +343,21 @@ export async function embedAllChunksInMemory(
  * @param limit Maksimum getirilecek CV sayısı
  * @param prisma PrismaClient instance
  */
+/**
+ * Performs Cosine Similarity raw SQL query over cv_embeddings to find matching CVs.
+ * Uses a CTE to first get the top 300 chunks to avoid scanning/grouping the entire database.
+ * Partitions by cv.id to return unique CVs with their highest matching chunk score (MAX) and matchedChunkId.
+ * Similarity threshold is read from environment variable SIMILARITY_THRESHOLD (default: 0.30).
+ *
+ * @param queryText Search query metni
+ * @param limit Maksimum getirilecek CV sayısı
+ * @param prisma PrismaClient instance
+ */
 export async function searchSimilarCVs(
   queryText: string,
   limit: number,
   prisma: PrismaClient
-): Promise<{ cvId: string; candidateName: string | null; candidateEmail: string | null; score: number; matchedChunkId: string }[]> {
+): Promise<{ cvId: string; candidateName: string | null; candidateEmail: string | null; score: number; matchedChunkId: string; rawText: string | null }[]> {
   const queryVector = await EmbeddingService.generateEmbedding(queryText, prisma);
   const queryVectorStr = `[${queryVector.join(",")}]`;
 
@@ -355,12 +365,13 @@ export async function searchSimilarCVs(
   const threshold = parseFloat(process.env.SIMILARITY_THRESHOLD || "0.30");
 
   const matches = await prisma.$queryRaw<
-    { cvId: string; candidateName: string | null; candidateEmail: string | null; score: number; matchedChunkId: string }[]
+    { cvId: string; matchedChunkId: string; rawText: string | null; candidateName: string | null; candidateEmail: string | null; score: number }[]
   >`
     WITH similarity_scores AS (
       SELECT 
         c."cvId",
         c.id as "chunkId",
+        cv."rawText" as "rawText",
         u.name as "candidateName",
         u.email as "candidateEmail",
         (1 - (e.embedding <=> ${queryVectorStr}::vector))::float as similarity
@@ -375,6 +386,7 @@ export async function searchSimilarCVs(
       SELECT 
         "cvId",
         "chunkId" as "matchedChunkId",
+        "rawText",
         "candidateName",
         "candidateEmail",
         similarity as score,
@@ -385,6 +397,7 @@ export async function searchSimilarCVs(
     SELECT 
       "cvId",
       "matchedChunkId",
+      "rawText",
       "candidateName",
       "candidateEmail",
       score
@@ -396,6 +409,8 @@ export async function searchSimilarCVs(
 
   return matches;
 }
+
+
 
 
 

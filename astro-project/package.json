@@ -22,7 +22,9 @@
     "test:gun24": "npm run test:gun24 --prefix server",
     "test:verify_gun24": "npm run test:verify_gun24 --prefix server",
     "test:gun25": "npm run test:gun25 --prefix server",
-    "test:verify_gun25": "npm run test:verify_gun25 --prefix server"
+    "test:verify_gun25": "npm run test:verify_gun25 --prefix server",
+    "test:gun26": "npm run test:gun26 --prefix server",
+    "test:verify_gun26": "npm run test:verify_gun26 --prefix server"
   },
   "dependencies": {
     "@astrojs/node": "^11.0.0",

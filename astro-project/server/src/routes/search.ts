@@ -4,6 +4,7 @@ import { PrismaPg } from "@prisma/adapter-pg";
 import pg from "pg";
 import { authMiddleware, adminMiddleware } from "../middleware/auth.js";
 import { searchSimilarCVs } from "../utils/embeddings.js";
+import { RankingService } from "../services/RankingService.js";
 
 const pool = new pg.Pool({
   connectionString: process.env.DATABASE_URL,
@@ -38,13 +39,17 @@ router.post("/", authMiddleware, adminMiddleware, async (req: Request, res: Resp
 
   try {
     // 2. Perform Semantic Search (Global admin search)
-    const results = await searchSimilarCVs(query, searchLimit, prisma);
+    const vectorMatches = await searchSimilarCVs(query, searchLimit, prisma);
+
+    // 3. Rank and score matches using GPT-4o-mini suitability analysis
+    const rankedResults = await RankingService.scoreAndRankCVs(query, vectorMatches, prisma);
+
     const duration = Date.now() - startTime;
 
-    console.log(`[SearchRoute] Semantic search for "${query}" completed in ${duration}ms. Results count: ${results.length}`);
+    console.log(`[SearchRoute] Semantic search and ranking for "${query}" completed in ${duration}ms. Results count: ${rankedResults.length}`);
 
     res.json({
-      results,
+      results: rankedResults,
       processingTimeMs: duration
     });
   } catch (error: any) {
