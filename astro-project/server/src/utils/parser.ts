@@ -35,11 +35,13 @@ const HEADINGS_TR: Record<string, string[]> = {
   personal: [
     "kisisel bilgiler", "kisisel", "iletisim", "iletisim bilgileri",
     "iletisim & kisisel", "iletisim ve kisisel", "kisisel bilgiler & iletisim",
+    "kisisel detaylar", "biyografi", "iletisim kanallari", "adres ve iletisim",
   ],
   summary: [
     "hakkimda", "ozet", "profil", "kisisel ozet", "kariyer hedefi",
     "kariyer ozeti", "ben kimim", "kisisel profil", "kisisel nitelikler",
     "profesyonel ozet", "hakknmda", "ozet bilgi", "genel ozet", "profil ozeti",
+    "mesleki profil", "ozet gecmis", "kariyer vizyonu", "hakkimda & ozet",
   ],
   experience: [
     "deneyim", "is deneyimi", "is deneyimleri", "calisma gecmisi",
@@ -48,12 +50,17 @@ const HEADINGS_TR: Record<string, string[]> = {
     "deneyimler", "nn deneynmn", "deneynmn", "nn deneyim",
     "kronolojik deneyim", "kronolojik is gecmisi", "is kronolojisi",
     "calisma takvimi", "pozisyonlar", "kronolojik deneyim i", "kronolojik deneyim 1",
+    "is tecrubeleri", "mesleki tecrube", "mesleki gecmis", "calisma hayati",
+    "staj tecrubeleri", "deneyimlerim", "is tecrubelerim", "staj deneyimlerim",
+    "is deneyimleri ve stajlar", "calisma gecmisi ve tecrubeler", "is tecrubesi & projeler",
   ],
   education: [
     "egitim", "ogrenim", "egitim bilgileri", "egitim gecmisi",
     "akademik gecmis", "okullar", "universite", "lisans",
     "yuksek lisans", "doktora", "enntnm", "egntnm",
     "egitim & akademik", "akademik", "egitim ve akademik", "akademik bilgiler",
+    "ogrenim bilgileri", "ogrenim gecmisi", "egitim hayatim", "egitim durumu",
+    "akademik nitelikler", "okul ve lisanslar", "egitim nitelikleri", "egitim ve ogretim",
   ],
   skills: [
     "yetenekler", "beceriler", "teknik beceriler", "teknik yetenekler",
@@ -64,11 +71,17 @@ const HEADINGS_TR: Record<string, string[]> = {
     "yetkinlikler (barlar)", "teknik beceri grafikleri",
     "yetkinlik matrisi", "teknik adaptasyon", "beceri matrisi", "yetenek matrisi",
     "altyapi metrikleri", "altyapı metrikleri", "metrikler",
+    "yetenek & beceriler", "yetenekler ve beceriler", "beceriler ve yetenekler",
+    "bilgisayar bilgisi", "teknik yetenekler & araclar", "teknoloji stack",
+    "kullandigi teknolojiler", "yetenekler / beceriler", "teknik nitelikler",
+    "yetenek ve yetkinlikler",
   ],
   projects: [
     "projeler", "projelerim", "proje deneyimi", "kisisel projeler",
     "akademik projeler", "portfolyo", "gelistirilen projeler",
-    "proje gecmisi",
+    "proje gecmisi", "projeler ve uygulamalar", "onemli projeler",
+    "tamamlanan projeler", "proje calismalari", "projeler & uygulamalar",
+    "kisisel ve akademik projeler", "key projects",
   ],
   certifications: [
     "sertifikalar", "sertifikalarim", "sertifikasyonlar", "belgeler",
@@ -76,23 +89,26 @@ const HEADINGS_TR: Record<string, string[]> = {
     "sertnfnkalar", "sertnfnkalarim", "lisans / sertifikalar", "lisans ve sertifikalar",
     "sertifikalar ve lisanslar", "oduller", "odul", "basarilar", "basari", "odullerim",
     "basarilarim", "oduller & sertifikalar", "sertifikalar & oduller", "sertifikalar ve oduller",
+    "sertifikalarim ve basarilarim", "sertifika ve basarilar", "burslar ve oduller",
+    "burs ve oduller", "sertifikalar ve basarilar",
   ],
   languages: [
     "diller", "yabanci dil", "yabanci diller", "dil bilgisi",
     "konustugu diller", "dnller", "dnllerim",
     "dil seviyeleri", "yabanci diller (yildizlar)", "dil yetkinligi",
     "dil bilgisi & seviyeler", "yabanci dil seviyeleri", "dil & seviye",
-    "yabancidiller", "dil",
+    "yabancidiller", "dil", "konusulan diller", "dil yetkinlikleri", "bildigi diller",
   ],
   publications: [
     "yayinlar", "yayinlarim", "patentler", "yayinlar & patentler",
     "yayinlar ve patentler", "akademik yayinlar", "patentlerim",
     "eserler", "bilimsel yayinlar", "secilmis yayinlar", "patent matrisi",
-    "patent matrisi (structural json tuzagi)",
+    "patent matrisi (structural json tuzagi)", "yayinlar ve bildiriler",
+    "makaleler ve bildiriler", "akademik yayinlar ve patentler",
   ],
   references: [
     "referanslar", "referans", "is referanslari", "kurumsal referanslar",
-    "profesyonel referanslar",
+    "profesyonel referanslar", "referanslarim", "referans listesi",
   ],
 };
 
@@ -102,52 +118,63 @@ const HEADINGS_TR: Record<string, string[]> = {
 const HEADINGS_EN: Record<string, string[]> = {
   personal: [
     "personal info", "personal information", "contact", "contact information",
-    "contact info", "personal details", "personal",
+    "contact info", "personal details", "personal", "contact details",
+    "personal profile details", "contact & personal info",
   ],
   summary: [
     "about", "about me", "summary", "profile", "objective",
     "career objective", "professional summary", "overview",
     "introduction", "executive summary", "personal summary",
+    "career summary", "professional profile", "about me & summary",
   ],
   experience: [
     "experience", "work experience", "employment", "employment history",
     "professional experience", "career history", "work history", "internships",
-    "chronological experience", "work chronology",
+    "chronological experience", "work chronology", "work experience & history",
+    "employment background", "work histories", "consulting engagements",
+    "work history & experience",
   ],
   education: [
     "education", "academic background", "academic history",
     "educational background", "qualifications", "university",
     "degrees", "educational qualifications", "education & academic",
-    "educational information", "education information",
+    "educational information", "education information", "academic degrees",
+    "academic background & education", "higher education", "education and training",
   ],
   skills: [
     "skills", "technical skills", "core competencies", "expertise",
     "technologies", "skills & tools", "key skills",
     "skill charts", "skill bars", "technical competencies",
     "competence matrix", "technical adaptation", "skills matrix",
+    "technical proficiencies", "technical skills & tools",
+    "skills and competencies", "core competencies & skills", "technical capabilities",
   ],
   projects: [
     "projects", "project experience", "personal projects",
     "academic projects", "portfolio", "selected projects",
-    "recent projects", "project history",
+    "recent projects", "project history", "projects & applications",
+    "key projects & achievements", "featured projects",
   ],
   certifications: [
     "certifications", "certificates", "licenses", "credentials",
     "completed courses", "professional training", "trainings",
     "awards", "award", "achievements", "achievement", "honors & awards", "honors", "awards & honors",
-    "key achievements", "selected achievements",
+    "key achievements", "selected achievements", "certifications & licenses",
+    "licenses & certifications", "certifications & awards", "grants and honors", "grants & honors",
   ],
   languages: [
     "languages", "language skills", "languages spoken",
     "language levels", "foreign languages", "language proficiency", "language",
+    "spoken languages", "languages & proficiency",
   ],
   publications: [
     "publications", "patents", "publications & patents",
     "publications and patents", "academic publications", "scientific publications",
-    "selected publications",
+    "selected publications", "patents & publications", "publications & papers",
   ],
   references: [
-    "references", "reference", "referees",
+    "references", "reference", "referees", "recommendations", "professional references",
+    "board positions & references", "references & recommendations",
   ],
 };
 
@@ -751,8 +778,12 @@ function matchHeading(
 }
 
 // ─────────────────────────────────────────────────────────────────────────────
-// CONFIDENCE FORMULA
-// User spec: +0.4 (heading found) + 0.3 (≥20 words) + 0.3 (date/company signal)
+// MULTI-SIGNAL CONFIDENCE FORMULA
+// Combines 4 signals:
+//   1. Heading Source & Format (0.35)
+//   2. Content Semantic Domain Fit (0.30)
+//   3. Structural & Entity Signals (0.25)
+//   4. Content Quantity Appropriateness (0.10)
 // ─────────────────────────────────────────────────────────────────────────────
 
 function computeConfidence(
@@ -760,33 +791,114 @@ function computeConfidence(
   content: string,
   sectionKey?: string
 ): number {
-  // If it's the personal section or list-based section (skills, languages, certs, publications) and heading was found via RULE/DEFAULT,
-  // return high confidence directly ONLY if it contains actual content (more than 2 words) to prevent empty lists from masking issues.
-  if (sectionKey === "personal" || (headingSource === "RULE" && sectionKey && ["skills", "languages", "certifications", "publications"].includes(sectionKey))) {
-    const wc = content.split(/\s+/).filter(Boolean).length;
-    if (sectionKey === "personal" || wc > 2) {
-      return 0.95;
+  const trimmedContent = content.trim();
+  const wc = trimmedContent.split(/\s+/).filter(Boolean).length;
+
+  if (wc === 0) return 0.10;
+
+  // 1. Heading Source & Format Signal (0.35 max)
+  let headingScore = 0.10;
+  if (headingSource === "RULE") {
+    headingScore = 0.35;
+  } else if (headingSource === "STRUCTURAL") {
+    headingScore = 0.25;
+  }
+
+  // 2. Content Semantic Fit Signal (0.30 max)
+  let semanticScore = 0.10;
+  if (sectionKey) {
+    const lowerContent = trimmedContent.toLowerCase();
+    switch (sectionKey) {
+      case "personal":
+        if (/@/.test(lowerContent) || /\+?\d[\d\s-]{7,}/.test(lowerContent) || /linkedin|github|email|telefon|adres|phone|doğum|ehliyet|born/i.test(lowerContent)) {
+          semanticScore = 0.30;
+        } else if (wc <= 60) {
+          semanticScore = 0.25;
+        }
+        break;
+
+      case "experience":
+        const hasExpSignals =
+          RX_NUM_DATE.test(trimmedContent) ||
+          RX_TR_MONTH.test(trimmedContent) ||
+          RX_COMPANY.test(trimmedContent) ||
+          /staj|engineer|developer|müdür|uzman|yönetici|manager|analyst|intern|senior|lead|consultant|specialist|officer|head|architect/i.test(lowerContent);
+        semanticScore = hasExpSignals ? 0.30 : (wc >= 10 ? 0.20 : 0.10);
+        break;
+
+      case "education":
+        const hasEduSignals =
+          RX_EDU_STRUCT.test(trimmedContent) ||
+          RX_NUM_DATE.test(trimmedContent) ||
+          /üniversite|university|fakülte|lisans|bachelor|master|doktora|phd|gpa|mezun|high school|lise|school|degree|diploma/i.test(lowerContent);
+        semanticScore = hasEduSignals ? 0.30 : (wc >= 8 ? 0.20 : 0.10);
+        break;
+
+      case "skills":
+        const hasSkillSignals =
+          /javascript|typescript|python|java|react|node|sql|docker|git|aws|figma|css|html|agile|scrum|c\+\+|c#|c1|c2|b1|b2|linux|devops|jira|photoshop|ui\/ux/i.test(lowerContent) ||
+          /[,|•*%]/.test(lowerContent);
+        semanticScore = hasSkillSignals ? 0.30 : (wc >= 3 ? 0.20 : 0.10);
+        break;
+
+      case "languages":
+        const hasLangSignals =
+          /türkçe|ingilizce|almanca|fransızca|ispanyolca|english|turkish|german|french|spanish|c1|c2|b1|b2|a1|a2|ana dil|native|fluent|ileri|orta|b2|c1/i.test(lowerContent);
+        semanticScore = hasLangSignals ? 0.30 : (wc >= 2 ? 0.20 : 0.10);
+        break;
+
+      case "projects":
+        const hasProjSignals =
+          /github|proje|project|app|system|sistem|uygulama|stack|http|api|microservice|database/i.test(lowerContent) ||
+          RX_NUM_DATE.test(trimmedContent);
+        semanticScore = hasProjSignals ? 0.30 : (wc >= 8 ? 0.20 : 0.10);
+        break;
+
+      case "certifications":
+        const hasCertSignals =
+          /sertifika|certif|burs|ödül|award|license|credential|course|bootcamp|completion|dijital|honors|fellowship/i.test(lowerContent) ||
+          /\b(20\d\d|19\d\d)\b/.test(lowerContent);
+        semanticScore = hasCertSignals ? 0.30 : (wc >= 3 ? 0.20 : 0.10);
+        break;
+
+      case "publications":
+        const hasPubSignals = /paper|journal|patent|ieee|nature|conference|article|yayın|bildiri|eser/i.test(lowerContent) || /\b(20\d\d|19\d\d)\b/.test(lowerContent);
+        semanticScore = hasPubSignals ? 0.30 : (wc >= 5 ? 0.20 : 0.10);
+        break;
+
+      case "summary":
+        semanticScore = wc >= 8 ? 0.30 : (wc >= 4 ? 0.20 : 0.10);
+        break;
+
+      default:
+        semanticScore = wc >= 5 ? 0.25 : 0.10;
+        break;
     }
   }
 
-  // Heading contribution
-  const headingContrib =
-    headingSource === "RULE"       ? 0.40 :
-    headingSource === "STRUCTURAL" ? 0.25 :
-    /* DEFAULT */                    0.10;
+  // 3. Structural Signal (0.25 max)
+  const hasStructuralSignal =
+    RX_NUM_DATE.test(trimmedContent) ||
+    RX_TR_MONTH.test(trimmedContent) ||
+    RX_COMPANY.test(trimmedContent) ||
+    /[•*–-]/.test(trimmedContent) ||
+    /[:|]/.test(trimmedContent);
+  const structuralScore = hasStructuralSignal ? 0.25 : 0.10;
 
-  // Content quantity (+0.3 if ≥20 words, +0.15 if ≥10)
-  const wc = content.split(/\s+/).filter(Boolean).length;
-  const contentContrib = wc >= 20 ? 0.30 : wc >= 10 ? 0.15 : 0;
+  // 4. Content Quantity Appropriateness (0.10 max)
+  let sizeScore = 0.10;
+  if (sectionKey === "personal" && wc >= 1 && wc <= 60) {
+    sizeScore = 0.10;
+  } else if (["skills", "languages", "certifications"].includes(sectionKey || "") && wc >= 2 && wc <= 250) {
+    sizeScore = 0.10;
+  } else if (wc >= 10 && wc <= 500) {
+    sizeScore = 0.10;
+  } else if (wc < 3 && sectionKey !== "personal") {
+    sizeScore = 0.02;
+  }
 
-  // Signal presence: date range OR company keyword in content (+0.3)
-  const hasSignal =
-    RX_NUM_DATE.test(content) ||
-    RX_TR_MONTH.test(content) ||
-    RX_COMPANY.test(content);
-  const signalContrib = hasSignal ? 0.30 : 0;
-
-  return Math.min(1.0, Math.round((headingContrib + contentContrib + signalContrib) * 100) / 100);
+  const rawConfidence = headingScore + semanticScore + structuralScore + sizeScore;
+  return Math.min(1.0, Math.max(0.20, Math.round(rawConfidence * 100) / 100));
 }
 
 /**
@@ -1155,19 +1267,22 @@ async function runLocalRuleBasedParser(
           metadata: {
             section:       resolvedLabel,
             source:        sub.source,
+            method:        "rule_based",
             language:      lang,
             order:         sectionOrder++,
             wordCount,
             confidence:    sub.confidence,
-            aiFallback:    sectionConf < AI_FALLBACK_THRESHOLD,
+            aiFallback:    sectionConf < 0.68,
             createdAt:     new Date().toISOString(),
-            parserVersion: "v2.3",
+            parserVersion: "v3.1",
             chunkHash,
           },
         });
       });
     }
   };
+
+  const listSections = new Set(["languages", "skills", "certifications", "publications", "personal", "references"]);
 
   for (const rawLine of lines) {
     const line = rawLine.trim();
@@ -1182,7 +1297,15 @@ async function runLocalRuleBasedParser(
       currentSectionSource = matched.source;
       currentSectionLines  = [];
     } else {
-      currentSectionLines.push(rawLine);
+      if (listSections.has(currentSectionKey) && (RX_NUM_DATE.test(line) || RX_DATE_STRUCT.test(line))) {
+        await saveCurrentSection();
+        currentSectionKey    = "experience";
+        currentSectionLabel  = SECTION_LABELS["experience"];
+        currentSectionSource = "STRUCTURAL";
+        currentSectionLines  = [rawLine];
+      } else {
+        currentSectionLines.push(rawLine);
+      }
     }
   }
 
@@ -1193,18 +1316,17 @@ async function runLocalRuleBasedParser(
 
 /**
  * Splits a resume text into semantic chunks with section metadata.
- * Hybrid Pipeline:
- *   1. Try local rule-based parsing.
- *   2. If confidence is low (< 0.70) or too few unique sections are found (< 3)
- *      meaning layout is scrambled/irregular, fall back to Macro AI Segmentation (gpt-4o-mini).
- *   3. Run local sub-chunking & sliding-window on segmented blocks.
+ * 3-Tier Fallback Pipeline:
+ *   Tier 1 (rule_based): Fast local rule-based heading dictionary parser.
+ *   Tier 2 (ai_fallback): gpt-4o-mini macro-segmentation if Tier 1 confidence < 0.68 or unique sections < 2.
+ *   Tier 3 (hard_fallback): Fixed-size sliding window chunking if Tier 1 & 2 fail/unconfigured.
  */
 export async function chunkTextBySections(text: string, prisma?: any): Promise<{ chunkText: string; metadata: any }[]> {
   if (!text || text.trim() === "") return [];
 
   const lang = detectLanguage(text);
 
-  // ── 1. First Pass: Local Rule-Based Dictionary ───────────────────────────
+  // ── Tier 1: Local Rule-Based Dictionary Parser ────────────────────────────
   const localChunks = await runLocalRuleBasedParser(text, lang, prisma);
 
   const uniqueSections = new Set(localChunks.map(c => c.metadata.section));
@@ -1214,85 +1336,112 @@ export async function chunkTextBySections(text: string, prisma?: any): Promise<{
 
   console.log(`[Parser] Rule-based parser produced ${localChunks.length} chunks. avgConfidence: ${avgConfidence.toFixed(2)}, uniqueSections: ${uniqueSections.size}`);
 
-  // ── 2. Evaluation: Trigger Macro AI Fallback if needed ───────────────────
+  // ── Evaluation: Trigger Tier 2 (Macro AI Fallback) if needed ─────────────
   const needsAISegmentation =
     localChunks.length === 0 ||
-    avgConfidence < 0.75 ||
-    uniqueSections.size < 3;
+    (avgConfidence < 0.68 && uniqueSections.size < 4) ||
+    uniqueSections.size < 2;
 
   const apiKey = process.env.OPENAI_API_KEY;
 
   if (needsAISegmentation && apiKey) {
-    console.log(`[Parser] ⚡ Triggering Macro AI Segmentation Fallback (avgConf: ${avgConfidence.toFixed(2)}, sections: ${uniqueSections.size})`);
-    const aiSections = await segmentCvWithAI(text, lang, prisma);
+    console.log(`[Parser] ⚡ Triggering Tier 2 Macro AI Segmentation Fallback (avgConf: ${avgConfidence.toFixed(2)}, sections: ${uniqueSections.size})`);
+    try {
+      const aiSections = await segmentCvWithAI(text, lang, prisma);
 
-    if (aiSections.length > 0) {
-      // Merge duplicate section keys to avoid multiple duplicate heading blocks
-      // Do NOT merge skills, languages or publications blocks so they can remain separate
-      const mergedSections: typeof aiSections = [];
-      for (const section of aiSections) {
-        const existing = mergedSections.find(
-          s => s.sectionKey === section.sectionKey && 
-               !["skills", "languages", "publications"].includes(s.sectionKey) && 
-               (s.sectionKey !== "other" || s.customName === section.customName)
-        );
-        if (existing) {
-          existing.text += "\n\n" + section.text;
-        } else {
-          mergedSections.push({ ...section });
+      if (aiSections.length > 0) {
+        const mergedSections: typeof aiSections = [];
+        for (const section of aiSections) {
+          const existing = mergedSections.find(
+            s => s.sectionKey === section.sectionKey && 
+                 !["skills", "languages", "publications"].includes(s.sectionKey) && 
+                 (s.sectionKey !== "other" || s.customName === section.customName)
+          );
+          if (existing) {
+            existing.text += "\n\n" + section.text;
+          } else {
+            mergedSections.push({ ...section });
+          }
         }
-      }
 
-      const aiChunks: { chunkText: string; metadata: any }[] = [];
-      let sectionOrder = 1;
+        const aiChunks: { chunkText: string; metadata: any }[] = [];
+        let sectionOrder = 1;
 
-      for (const section of mergedSections) {
-        const sectionLabel = section.sectionKey === "other" && section.customName
-          ? section.customName
-          : (SECTION_LABELS[section.sectionKey] ?? section.sectionKey);
+        for (const section of mergedSections) {
+          const sectionLabel = section.sectionKey === "other" && section.customName
+            ? section.customName
+            : (SECTION_LABELS[section.sectionKey] ?? section.sectionKey);
 
-        // ── Local Semantic Sub-chunking (experience/projects split) ─────────
-        const subSections = subChunkSection(
-          section.sectionKey,
-          section.text.split("\n"),
-          "STRUCTURAL",
-          0.95 // Base high confidence for OpenAI-verified segment
-        );
+          const subSections = subChunkSection(
+            section.sectionKey,
+            section.text.split("\n"),
+            "STRUCTURAL",
+            0.95
+          );
 
-        for (const sub of subSections) {
-          // ── Local Adaptive Sizing (sliding window) ───────────────────────
-          const wordChunks = splitTextSlidingWindow(sub.text, 300, 50);
-          wordChunks.forEach((wc_text, idx) => {
-            const suffix    = wordChunks.length > 1 ? ` (Kısım ${idx + 1})` : "";
-            const wordCount = wc_text.split(/\s+/).filter((w) => w.length > 0).length;
-            const normalized_wc = normalizeStars(wc_text);
-            const fullText  = `[${sectionLabel.toUpperCase()}${suffix}]\n${normalized_wc}`;
-            const chunkHash = crypto.createHash("sha256").update(fullText).digest("hex");
+          for (const sub of subSections) {
+            const wordChunks = splitTextSlidingWindow(sub.text, 300, 50);
+            wordChunks.forEach((wc_text, idx) => {
+              const suffix    = wordChunks.length > 1 ? ` (Kısım ${idx + 1})` : "";
+              const wordCount = wc_text.split(/\s+/).filter((w) => w.length > 0).length;
+              const normalized_wc = normalizeStars(wc_text);
+              const fullText  = `[${sectionLabel.toUpperCase()}${suffix}]\n${normalized_wc}`;
+              const chunkHash = crypto.createHash("sha256").update(fullText).digest("hex");
 
-            aiChunks.push({
-              chunkText: fullText,
-              metadata: {
-                section:       sectionLabel,
-                source:        "AI",
-                language:      lang,
-                order:         sectionOrder++,
-                wordCount,
-                confidence:    0.95,
-                aiFallback:    true,
-                createdAt:     new Date().toISOString(),
-                parserVersion: "v3.0",
-                chunkHash,
-              },
+              aiChunks.push({
+                chunkText: fullText,
+                metadata: {
+                  section:       sectionLabel,
+                  source:        "AI",
+                  method:        "ai_fallback",
+                  language:      lang,
+                  order:         sectionOrder++,
+                  wordCount,
+                  confidence:    0.95,
+                  aiFallback:    true,
+                  createdAt:     new Date().toISOString(),
+                  parserVersion: "v3.1",
+                  chunkHash,
+                },
+              });
             });
-          });
+          }
         }
+
+        console.log(`[Parser] ✅ Macro AI Segmentation successful! Produced ${aiChunks.length} chunks.`);
+        return aiChunks;
       }
-
-      console.log(`[Parser] ✅ Macro AI Segmentation successful! Produced ${aiChunks.length} chunks.`);
-      return aiChunks;
+    } catch (err) {
+      console.warn(`[Parser] AI segmentation failed:`, (err as Error).message);
     }
+  }
 
-    console.warn(`[Parser] AI segmentation returned empty, falling back to local rule-based chunks.`);
+  // ── Tier 3: Hard Fallback (Fixed-size window) ──────────────────────────────
+  if (localChunks.length === 0) {
+    console.log(`[Parser] ⚠️ Triggering Tier 3 Hard Fallback (Fixed-Size Window)`);
+    const hardWordChunks = splitTextSlidingWindow(text, 250, 40);
+    const hardChunks = hardWordChunks.map((wc_text, idx) => {
+      const wordCount = wc_text.split(/\s+/).filter(Boolean).length;
+      const fullText  = `[GENEL İÇERİK (Kısım ${idx + 1})]\n${wc_text}`;
+      const chunkHash = crypto.createHash("sha256").update(fullText).digest("hex");
+      return {
+        chunkText: fullText,
+        metadata: {
+          section:       "Genel İçerik",
+          source:        "STRUCTURAL",
+          method:        "hard_fallback",
+          language:      lang,
+          order:         idx + 1,
+          wordCount,
+          confidence:    0.50,
+          aiFallback:    false,
+          createdAt:     new Date().toISOString(),
+          parserVersion: "v3.1",
+          chunkHash,
+        },
+      };
+    });
+    return hardChunks;
   }
 
   return localChunks;
