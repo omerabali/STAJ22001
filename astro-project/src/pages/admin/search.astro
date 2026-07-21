@@ -69,7 +69,7 @@ import AdminLayout from '../../layouts/AdminLayout.astro';
       <!-- Semantic Results Grid -->
       <div id="semantic-candidates-grid" class="grid grid-cols-1 gap-6">
         <div class="bg-white border border-[#ddd9d3] rounded-[10px] p-12 flex flex-col items-center justify-center text-center shadow-sm">
-          <span class="material-symbols-outlined text-5xl text-[#14422f]/20 mb-4">search_spark</span>
+          <span class="material-symbols-outlined text-5xl text-[#14422f]/20 mb-4">search</span>
           <p class="text-[#8a8580] font-body-md font-medium">Semantik AI aramasını başlatmak için yukarıya bir kriter yazıp "AI Ara" butonuna basın.</p>
         </div>
       </div>
@@ -112,6 +112,21 @@ import AdminLayout from '../../layouts/AdminLayout.astro';
         <div class="bg-white border border-[#ddd9d3] rounded-[10px] p-6 animate-pulse h-[200px] shadow-sm"></div>
         <div class="bg-white border border-[#ddd9d3] rounded-[10px] p-6 animate-pulse h-[200px] shadow-sm"></div>
       </div>
+    </div>
+  </div>
+
+  <!-- Floating Candidate Comparison Selection Bar -->
+  <div id="compare-floating-bar" class="fixed bottom-6 left-1/2 -translate-x-1/2 z-50 bg-[#1b1c1a] text-white px-6 py-3 rounded-full shadow-2xl border border-white/10 hidden items-center gap-6 transition-all duration-300 transform translate-y-12">
+    <div class="flex items-center gap-3">
+      <span class="material-symbols-outlined text-[#14422f] bg-white rounded-full p-1 text-sm font-bold">compare_arrows</span>
+      <span class="text-xs font-semibold" id="compare-bar-text">0 aday seçildi</span>
+    </div>
+    <div class="flex items-center gap-3">
+      <button id="clear-compare-btn" class="text-xs text-[#8a8580] hover:text-white transition-colors underline cursor-pointer">Temizle</button>
+      <button id="start-compare-btn" disabled class="bg-[#14422f] disabled:bg-gray-700 disabled:opacity-60 hover:bg-[#0f3223] text-white px-5 py-2 rounded-full text-xs font-bold transition-all flex items-center gap-1.5 cursor-pointer">
+        <span>Karşılaştır</span>
+        <span class="material-symbols-outlined text-xs">arrow_forward</span>
+      </button>
     </div>
   </div>
 
@@ -267,8 +282,8 @@ import AdminLayout from '../../layouts/AdminLayout.astro';
         const score = c.score; // Hybrid Score (0-100)
         
         // Progress bar color and badge color classes
-        const colorClass = score >= 85 ? 'bg-emerald-600' : score >= 60 ? 'bg-amber-500' : 'bg-rose-500';
-        const badgeClass = score >= 85 ? 'text-emerald-700 bg-emerald-50 border border-emerald-200' : score >= 60 ? 'text-amber-700 bg-amber-50 border border-amber-200' : 'text-rose-700 bg-rose-50 border border-rose-200';
+        const colorClass = score >= 80 ? 'bg-emerald-600' : score >= 60 ? 'bg-amber-500' : 'bg-rose-500';
+        const badgeClass = score >= 80 ? 'text-emerald-700 bg-emerald-50 border border-emerald-200' : score >= 60 ? 'text-amber-700 bg-amber-50 border border-amber-200' : 'text-rose-700 bg-rose-50 border border-rose-200';
         
         const gptScoreText = c.gptScore !== null ? `%${c.gptScore}` : 'N/A';
         const vectorScoreText = c.vectorScore !== null ? `%${c.vectorScore}` : 'N/A';
@@ -330,14 +345,25 @@ import AdminLayout from '../../layouts/AdminLayout.astro';
                 <span class="material-symbols-outlined text-[14px]">pin</span>
                 ID: ${c.cvId.substring(0, 8)}...
               </div>
-              <a href="/admin/profile?userId=${c.userId}" class="border border-[#ddd9d3] text-[#1b1c1a] hover:border-[#14422f] hover:text-[#14422f] px-5 py-2 rounded-[8px] text-xs font-bold transition-colors bg-white flex items-center gap-1">
-                Profili Gör
-                <span class="material-symbols-outlined text-xs">arrow_forward</span>
-              </a>
+              <div class="flex items-center gap-2">
+                <button 
+                  data-compare-id="${c.userId}"
+                  data-compare-name="${(c.candidateName || 'İsimsiz').replace(/"/g, '&quot;')}"
+                  onclick="toggleCompareCandidate('${c.userId}', \`${(c.candidateName || 'İsimsiz').replace(/`/g, '\\`').replace(/'/g, "\\'")}\`, event)"
+                  class="border border-[#ddd9d3] text-[#1b1c1a] hover:border-[#14422f] hover:text-[#14422f] px-3 py-2 rounded-[8px] text-xs font-semibold transition-colors bg-white flex items-center gap-1 cursor-pointer"
+                >
+                  <span class="material-symbols-outlined text-xs">compare_arrows</span> Karşılaştır
+                </button>
+                <a href="/admin/profile?userId=${c.userId}" class="border border-[#ddd9d3] text-[#1b1c1a] hover:border-[#14422f] hover:text-[#14422f] px-4 py-2 rounded-[8px] text-xs font-bold transition-colors bg-white flex items-center gap-1">
+                  Profili Gör
+                  <span class="material-symbols-outlined text-xs">arrow_forward</span>
+                </a>
+              </div>
             </div>
           </div>
         `;
       }).join('');
+      updateCompareButtonsUI();
     }
 
     function clearSemanticSearch() {
@@ -358,7 +384,7 @@ import AdminLayout from '../../layouts/AdminLayout.astro';
       if (grid) {
         grid.innerHTML = `
           <div class="col-span-1 bg-white border border-[#ddd9d3] rounded-[10px] p-12 flex flex-col items-center justify-center text-center shadow-sm">
-            <span class="material-symbols-outlined text-5xl text-[#14422f]/20 mb-4">search_spark</span>
+            <span class="material-symbols-outlined text-5xl text-[#14422f]/20 mb-4">search</span>
             <p class="text-[#8a8580] font-body-md font-medium">Semantik AI aramasını başlatmak için yukarıya bir kriter yazıp "AI Ara" butonuna basın.</p>
           </div>`;
       }
@@ -507,13 +533,24 @@ import AdminLayout from '../../layouts/AdminLayout.astro';
                 <span class="material-symbols-outlined text-[14px]">calendar_today</span>
                 ${date}
               </div>
-              <a href="/admin/profile?userId=${c.id}" class="border border-[#ddd9d3] text-[#1b1c1a] hover:border-[#14422f] hover:text-[#14422f] px-4 py-1.5 rounded-[8px] text-xs font-semibold transition-colors bg-white">
-                Profili Gör
-              </a>
+              <div class="flex items-center gap-2">
+                <button 
+                  data-compare-id="${c.id}"
+                  data-compare-name="${(c.name || 'İsimsiz').replace(/"/g, '&quot;')}"
+                  onclick="toggleCompareCandidate('${c.id}', \`${(c.name || 'İsimsiz').replace(/`/g, '\\`').replace(/'/g, "\\'")}\`, event)"
+                  class="border border-[#ddd9d3] text-[#1b1c1a] hover:border-[#14422f] hover:text-[#14422f] px-3 py-1.5 rounded-[8px] text-xs font-semibold transition-colors bg-white flex items-center gap-1 cursor-pointer"
+                >
+                  <span class="material-symbols-outlined text-xs">compare_arrows</span> Karşılaştır
+                </button>
+                <a href="/admin/profile?userId=${c.id}" class="border border-[#ddd9d3] text-[#1b1c1a] hover:border-[#14422f] hover:text-[#14422f] px-4 py-1.5 rounded-[8px] text-xs font-semibold transition-colors bg-white">
+                  Profili Gör
+                </a>
+              </div>
             </div>
           </div>
         `;
       }).join('');
+      updateCompareButtonsUI();
     }
 
     async function fetchCandidates() {
@@ -701,11 +738,96 @@ import AdminLayout from '../../layouts/AdminLayout.astro';
         searchInput.addEventListener('keydown', (e) => {
           if (e.key === 'Enter') fetchCandidates();
         });
+
         searchInput.addEventListener('input', () => {
           clearTimeout(searchTimeout);
           searchTimeout = setTimeout(fetchCandidates, 500);
         });
       }
+
+      // 6. Bind floating comparison bar action event listeners
+      const startCompareBtn = document.getElementById('start-compare-btn');
+      if (startCompareBtn) {
+        startCompareBtn.addEventListener('click', () => {
+          if (selectedCompareCandidates.length === 2) {
+            const id1 = selectedCompareCandidates[0].id;
+            const id2 = selectedCompareCandidates[1].id;
+            window.location.href = `/admin/compare?candidate1=${id1}&candidate2=${id2}`;
+          }
+        });
+      }
+
+      const clearCompareBtn = document.getElementById('clear-compare-btn');
+      if (clearCompareBtn) {
+        clearCompareBtn.addEventListener('click', () => {
+          selectedCompareCandidates = [];
+          updateCompareFloatingBar();
+          updateCompareButtonsUI();
+        });
+      }
     });
+
+    // CANDIDATE COMPARISON SELECTION STATE & HELPERS
+    let selectedCompareCandidates = []; // Array of { id, name }
+
+    function toggleCompareCandidate(candId, candName, event) {
+      if (event) event.stopPropagation();
+      const existingIdx = selectedCompareCandidates.findIndex(c => c.id === candId);
+
+      if (existingIdx >= 0) {
+        selectedCompareCandidates.splice(existingIdx, 1);
+      } else {
+        if (selectedCompareCandidates.length >= 2) {
+          alert("En fazla 2 aday karşılaştırılabilir. Lütfen önce bir adayın seçimini kaldırın.");
+          return;
+        }
+        selectedCompareCandidates.push({ id: candId, name: candName });
+      }
+
+      updateCompareFloatingBar();
+      updateCompareButtonsUI();
+    }
+
+    function updateCompareFloatingBar() {
+      const bar = document.getElementById('compare-floating-bar');
+      const text = document.getElementById('compare-bar-text');
+      const btn = document.getElementById('start-compare-btn');
+      if (!bar || !text || !btn) return;
+
+      const count = selectedCompareCandidates.length;
+
+      if (count === 0) {
+        bar.classList.add('hidden');
+        bar.classList.remove('flex', 'translate-y-0');
+        bar.classList.add('translate-y-12');
+      } else {
+        bar.classList.remove('hidden', 'translate-y-12');
+        bar.classList.add('flex', 'translate-y-0');
+
+        if (count === 1) {
+          text.textContent = `1/2 Aday Seçildi: ${selectedCompareCandidates[0].name || 'Aday 1'}`;
+          btn.disabled = true;
+        } else if (count === 2) {
+          text.textContent = `2/2 Aday Seçildi: ${selectedCompareCandidates[0].name} vs ${selectedCompareCandidates[1].name}`;
+          btn.disabled = false;
+        }
+      }
+    }
+
+    function updateCompareButtonsUI() {
+      document.querySelectorAll('[data-compare-id]').forEach(btn => {
+        const id = btn.dataset.compareId;
+        const isSelected = selectedCompareCandidates.some(c => c.id === id);
+        if (isSelected) {
+          btn.classList.add('bg-[#14422f]', 'text-white', 'border-[#14422f]');
+          btn.classList.remove('bg-white', 'text-[#1b1c1a]', 'border-[#ddd9d3]');
+          btn.innerHTML = `<span class="material-symbols-outlined text-xs">check</span> Seçildi`;
+        } else {
+          btn.classList.remove('bg-[#14422f]', 'text-white', 'border-[#14422f]');
+          btn.classList.add('bg-white', 'text-[#1b1c1a]', 'border-[#ddd9d3]');
+          btn.innerHTML = `<span class="material-symbols-outlined text-xs">compare_arrows</span> Karşılaştır`;
+        }
+      });
+    }
   </script>
 </AdminLayout>

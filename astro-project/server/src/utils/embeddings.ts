@@ -380,6 +380,7 @@ export async function searchSimilarCVs(
       JOIN cv_chunks c ON e."chunkId" = c.id
       JOIN cvs cv ON c."cvId" = cv.id
       LEFT JOIN users u ON cv."userId" = u.id
+      WHERE (u.role IS NULL OR u.role != 'ADMIN')
       ORDER BY similarity DESC
       LIMIT 300
     ),

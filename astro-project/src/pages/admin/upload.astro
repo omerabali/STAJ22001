@@ -162,26 +162,32 @@ import AdminLayout from '../../layouts/AdminLayout.astro';
     <!-- ─── RIGHT COLUMN ────────────────────────────────────────────── -->
     <div class="flex flex-col gap-6">
 
-      <!-- CV List Table -->
+      <!-- Master CV List Table Card -->
       <div class="bg-white border border-[#ddd9d3] rounded-[12px] shadow-sm overflow-hidden">
-        <div class="px-6 py-4 border-b border-[#ddd9d3] flex items-center justify-between">
-          <h3 class="font-bold text-sm text-[#1b1c1a]">Yüklenen Özgeçmişler</h3>
-          <span class="text-[10px] text-[#8a8580] font-medium" id="cv-count-label"></span>
+        <div class="px-5 py-4 border-b border-[#ddd9d3] flex justify-between items-center bg-[#faf9f5]">
+          <div>
+            <div class="flex items-center gap-2">
+              <span class="material-symbols-outlined text-[#14422f] text-[18px]">folder_shared</span>
+              <h3 class="text-sm font-bold text-[#1b1c1a]">Sistemdeki Tüm Özgeçmişler</h3>
+            </div>
+            <p class="text-[11px] text-[#8a8580] font-medium mt-0.5">Platform genelinde tüm adaylar tarafından yüklenen CV'lerin listesi (Admin Yönetim Paneli)</p>
+          </div>
+          <span class="text-xs font-bold text-[#14422f] bg-[#14422f]/10 border border-[#14422f]/20 px-3 py-1 rounded-full shrink-0" id="cv-count-label">0 kayıt</span>
         </div>
         <div class="overflow-x-auto">
-          <table class="w-full text-left border-collapse">
-            <thead>
-              <tr class="bg-[#f5f4f0] border-b border-[#ddd9d3] text-[10px] text-[#8a8580] uppercase font-bold tracking-wider">
-                <th class="px-4 py-3">Dosya</th>
-                <th class="px-4 py-3">Aday</th>
-                <th class="px-4 py-3">Tarih</th>
-                <th class="px-4 py-3">Durum</th>
-                <th class="px-4 py-3 text-right">İşlem</th>
+          <table class="w-full text-left text-xs whitespace-nowrap">
+            <thead class="text-[10px] text-[#8a8580] uppercase bg-[#f5f4f0] border-b border-[#ddd9d3] tracking-wider">
+              <tr>
+                <th class="px-4 py-3 font-bold">DOSYA ADI</th>
+                <th class="px-4 py-3 font-bold">AİT OLDUĞU ADAY</th>
+                <th class="px-4 py-3 font-bold">YÜKLEME TARİHİ</th>
+                <th class="px-4 py-3 font-bold">DURUM</th>
+                <th class="px-4 py-3 font-bold text-right">İŞLEM</th>
               </tr>
             </thead>
-            <tbody class="text-sm text-[#1b1c1a] divide-y divide-[#ddd9d3]" id="my-cvs-body">
+            <tbody class="divide-y divide-[#ddd9d3] text-[#1b1c1a]" id="my-cvs-body">
               <tr>
-                <td colspan="5" class="p-8 text-center text-[#8a8580] font-medium text-sm">Yüklemeler sorgulanıyor...</td>
+                <td colspan="5" class="p-8 text-center text-[#8a8580] font-medium text-xs">Yüklemeler getiriliyor...</td>
               </tr>
             </tbody>
           </table>

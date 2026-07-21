@@ -29,3 +29,7 @@ server/.env.*
 
 # Prisma generated
 server/node_modules/.prisma/
+
+# Local OAuth token
+server/.canva_token.json
+

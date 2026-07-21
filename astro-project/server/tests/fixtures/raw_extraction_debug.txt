@@ -1,0 +1,51 @@
+=== RAW EXTRACTION BEFORE CHUNKING & AI CLASSIFIER (LAYOUT-AWARE PDFJS-DIST) ===
+File: tests/cv_test/canva_real_cv_omer_abali.pdf
+Length: 2847 chars
+
+ÖMER ABALI
+Y A Z I L I M M Ü H E N D İ S İ
++90 5333781734 omerabali09@gmail.com
+https://github.com/omerabali www.linkedin.com/in/omerabali
+H A K K I M D A
+Ölçeklenebilir SaaS platformları, LLM entegre sistemler ve full-stack uygulamalar geliştirme
+konusunda deneyimli, yapay zeka odaklı bir Yazılım Mühendisliği öğrencisiyim. Makine öğrenmesi,
+bilgisayarlı görüşü ve yapay zeka destekli otomasyon alanlarında güçlü bir altyapıya sahibim; sistem
+tasarımı, temiz mimari ve ürün odaklı geliştirme konularında sağlam bir temelim bulunmaktadır.
+Python, C#, Java, React, Flutter ve TypeScript dillerinde yetkin olup teorik bilgiyi gerçek dünya
+uygulamalarıyla birleştiren üretime hazır çözümler sunmaktayım. Halihazırda ticari açıdan
+sürdürülebilir Üretken Yapay Zeka sistemlerine odaklanarak yapay zeka destekli içerik otomasyonu ve
+akıllı iletişim platformları geliştirmekteyim.
+EĞİTİM BİLGİLERİ
+KırklareliUniversity–Kırklareli 2023-2027
+Genel Not Ortalaması : Yazılım Mühendisliği | GPA: 3.62 / 4.0-
+P R O J E D E N E Y İ M L E R İ
+•Skill-Identity-Engine (Yapay zeka destekli kariyer platformu; CV ve GitHub analizi, yetenek açığı tespiti, AI koç ve yol haritasıiçeren SaaS sistemi.)
+• Health Insurance Pricing (Makine öğrenmesi ile regresyon modelleme, tahmine dayalı analiz ve veri ön işleme süreçleri, Python))
+• AI Home Design (Üretken yapay zeka ile görüntüden görüntüye dönüşüm, iç mekan görselleştirme ve bilgisayarlı görü tabanlı SaaS
+platformu.)
+• Farm AI (Tarım teknolojileri odaklı SaaS çözümü; yapay zeka asistanı, çiftlik yönetim ve karar destek sistemi içeren mobil uygulama.)
+• Java Hotel Reservation System ( Nesne yönelimli programlama ve tasarım desenleri kullanılarak geliştirilmiş rezervasyon sistemi ve
+backend mimarisi.)
+• AI Medium Design (Üretken yapay zeka ile içerik otomasyonu, Gemini API entegrasyonu, trend veri çekme ve otomatik yayınlama
+sistemi.)
+• Lexis App (Yapay zeka destekli dil öğrenme uygulaması; kişiselleştirilmiş öğrenme akışı ve mobil kullanıcı deneyimi.)
+• Chatter Stream (WebSocket mimarisi ile geliştirilmiş gerçek zamanlı iletişim sağlayan full-stack ve event-driven sistem.)
+B E C E R İ L E R
+Programlama Dilleri: Python, Java, C#, JavaScript, TypeScript, C, C++,Dart
+Frontend Teknolojileri: React, TailwindCSS, HTML, CSS, Bootstrap
+Mobile: Flutter, Kotlin
+AI / Machine Learning: Pandas, NumPy
+Databases: MySQL, PostgreSQL, Firebase, DynamoDB
+Tools & DevOps: Docker, AWS, Git,Node.js,Linux
+YABANCI DİLLER
+Türkçe :Ana Dil
+İngilizce:İleri Seviye
+Almanca:Başlangıç Seviyesi
+S E R T İ F İ K L A R V E E Ğ İ T İ M L E R
+Sıfırdan C++ ve Programlama - Udemy
+İleri Seviye Algoritmalar ve Veri Yapıları – BTK Akademi
+Veri Modelleme – BTK Akademi
+Algoritma Tasarımı – BTK Akademi
+LinkedIn’de Etkili Profil Oluşturma – BTK Akademi
+BilgiTeknolojilerine Giriş – BTK Akademi
+Machine Learning Bootcamp – Tech Istanbul

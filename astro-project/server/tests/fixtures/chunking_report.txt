@@ -1,0 +1,1092 @@
+CANVA CV CHUNKING REPORT (LAYOUT-AWARE PDFJS-DIST)
+Oluşturulma: 2026-07-21T11:29:45.922Z
+Toplam PDF: 11
+
+================================================================
+CV: test_cv.pdf
+Toplam Chunk Sayısı: 7
+Ortalama Confidence: 0.95
+================================================================
+
+[Chunk 1] originalTitle: KİŞİSEL BİLGİLER | type: personal | Confidence: 0.98
+extractionMethod: layout_aware | chunkingMethod: primary_ai
+Reasoning: Üst bilgi bloğu ve iletişim detayları net
+------------------------------------------------------------
+[KİŞİSEL BİLGİLER]
+ÖMER ABALI
+SOFTWARE ENGINEER
++90 5333781734
+omerabali09@gmail.com
+https://github.com/omerabali
+www.linkedin.com/in/omerabali
+
+[Chunk 2] originalTitle: HAKKIMDA | type: summary | Confidence: 0.95
+extractionMethod: layout_aware | chunkingMethod: primary_ai
+Reasoning: Özet bölümü net tanımlı
+------------------------------------------------------------
+[HAKKIMDA]
+AI-focused Software Engineering student experienced in building scalable SaaS platforms, LLM-integrated systems, and full-stack applications. Skilled in machine learning, computer vision, and AI driven automation, with a strong foundation in system design, clean architecture, and product-oriented development.
+Proficient in Python, C#, Java, React, Flutter, and TypeScript, delivering production-ready solutions that bridge theoretical knowledge with real-world applications. Currently developing AI-powered content automation and intelligent communication platforms with a focus on commercially viable Generative AI systems.
+
+[Chunk 3] originalTitle: EĞİTİM BİLGİLERİ | type: education | Confidence: 0.95
+extractionMethod: layout_aware | chunkingMethod: primary_ai
+Reasoning: Eğitim bilgileri tek chunk
+------------------------------------------------------------
+[EĞİTİM BİLGİLERİ]
+Kırklareli University– Kırklareli 2023-2027
+B.Sc. in Software Engineering | GPA: 3.62 / 4.00
+
+[Chunk 4] originalTitle: PROJE DENEYİMİ | type: projects | Confidence: 0.95
+extractionMethod: layout_aware | chunkingMethod: primary_ai
+Reasoning: Projeler net bir şekilde listelenmiş
+------------------------------------------------------------
+[PROJE DENEYİMİ]
+• Skill-Identity-Engine(AI Career Platform · CV & GitHub Analysis · Skill Gap Detection · AI Coach · Roadmap Engine · SaaS)
+• Health Insurance Pricing(Machine Learning · Regression Modeling · Predictive Analytics · Data Preprocessing · Python)
+• AI Home Design(Generative AI · Image-to-Image Transformation · Interior Visualization · SaaS Platform · Computer Vision)
+• Farm AI(AgriTech SaaS · AI Assistant · Farm Management System · Decision Support System · Mobile Application)
+• Java Hotel Reservation System ( Java OOP · Design Patterns · Reservation System · Backend Architecture)
+• AI Medium Design(Generative AI · Content Automation · Gemini API · Trend Data Scraping · Automated Publishing System)
+• Lexis App(AI-Supported Learning App · Flutter · Language Practice System · Personalized Study Flow · Mobile UX)
+• Chatter Stream(Real-Time Communication · WebSocket Architecture · Full-Stack Application · Event-Driven System)
+
+[Chunk 5] originalTitle: BECERİLER | type: skills | Confidence: 0.95
+extractionMethod: layout_aware | chunkingMethod: primary_ai
+Reasoning: Teknik beceriler alt kategorileriyle birlikte korundu
+------------------------------------------------------------
+[BECERİLER]
+Languages: Python, Java, C#, JavaScript, TypeScript, C, C++, Dart
+Frontend: React, TailwindCSS, HTML, CSS, Bootstrap
+Mobile: Flutter, Kotlin
+AI / Machine Learning: Pandas, NumPy
+Databases: MySQL, PostgreSQL, Firebase, DynamoDB
+Tools & DevOps: Docker, AWS, Git, Node.js, Linux
+
+[Chunk 6] originalTitle: YABANCI DİLLER | type: languages | Confidence: 0.95
+extractionMethod: layout_aware | chunkingMethod: primary_ai
+Reasoning: Konuşulan doğal diller
+------------------------------------------------------------
+[YABANCI DİLLER]
+Turkish: Main Language
+English: Advanced Level
+Deutsch: Beginning Level
+
+[Chunk 7] originalTitle: SERTİFİKALAR VE EĞİTİMLER | type: certifications | Confidence: 0.95
+extractionMethod: layout_aware | chunkingMethod: primary_ai
+Reasoning: Sertifikalar ve eğitimler net bir şekilde listelenmiş
+------------------------------------------------------------
+[SERTİFİKALAR VE EĞİTİMLER]
+Learn C++ and programming from scratch, Udemy
+Advanced Level Algorithms and Data Structures, BTK Academy
+Data Modeling, BTK Academy
+Algorithm Design, BTK Academy
+Creating an Effective Profile on LinkedIn, BTK Academy
+Introduction to Information Technology, BTK Academy
+Machine Learning Bootcamp, Tech Istanbul
+
+
+>>> BİR SONRAKİ CV'YE GEÇ
+
+
+================================================================
+CV: canva_real_cv_06.pdf
+Toplam Chunk Sayısı: 9
+Ortalama Confidence: 0.95
+================================================================
+
+[Chunk 1] originalTitle: KİŞİSEL BİLGİLER | type: personal | Confidence: 0.98
+extractionMethod: layout_aware | chunkingMethod: primary_ai
+Reasoning: Üst bilgi bloğu ve iletişim detayları net
+------------------------------------------------------------
+[KİŞİSEL BİLGİLER]
+Mariana Anderson
+Marketing Manager
+123-456-7890
+hello@reallygreatsite.com
+123 Anywhere St., Any City
+
+[Chunk 2] originalTitle: HAKKIMDA | type: summary | Confidence: 0.95
+extractionMethod: layout_aware | chunkingMethod: primary_ai
+Reasoning: Özet bölümü net tanımlı
+------------------------------------------------------------
+[HAKKIMDA]
+Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nunc sit amet sem nec risus egestas accumsan. In enim nunc, tincidunt ut quam eget, luctus sollicitudin neque. Sed leo nisl, semper ac hendrerit a, sollicitudin in arcu.
+
+[Chunk 3] originalTitle: Marketing Manager @ Ginyard International (2022-2025) | type: experience | Confidence: 0.95
+extractionMethod: layout_aware | chunkingMethod: primary_ai
+Reasoning: Birinci iş deneyimi bloğu
+------------------------------------------------------------
+[İŞ DENEYİMİ]
+2022 - 2025
+Ginyard International Co.l 123 Anywhere St., Any City
+Marketing Manager
+Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nullam pharetra in lorem at laoreet.Donec hendreritliberoeget est tempor, quis tempus arcu elementum. In elementum elit at dui tristique feugiat. Mauris convallis, mi at mattis malesuada, neque nulla volutpat dolor, hendrerit faucibus eros nibh ut nunc. Proin luctus urna id nunc sagittis dignissim. Sed in libero sed libero dictum dapibus. Vivamus fermentum est eget lorem aliquet, vel tempus metus dignissim. Donec risus arcu, tristique et sollicitudin blandit, iaculis ut nisl. Integer rutrum ultricies fringilla.
+
+[Chunk 4] originalTitle: Inside Sales Representative @ Ginyard International (2020-2022) | type: experience | Confidence: 0.95
+extractionMethod: layout_aware | chunkingMethod: primary_ai
+Reasoning: İkinci iş deneyimi bloğu
+------------------------------------------------------------
+[İŞ DENEYİMİ]
+2020 - 2022
+Ginyard International Co.l 123 Anywhere St., Any City
+Inside Sales Representative
+Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nullam pharetra in lorem at laoreet.Donec hendreritliberoeget est tempor, quis tempus arcu elementum. In elementum elit at dui tristique feugiat. Mauris convallis, mi at mattis malesuada, neque nulla volutpat dolor, hendrerit faucibus eros nibh ut nunc. Proin luctus urna id nunc sagittis dignissim. Sed in libero sed libero dictum dapibus. Vivamus fermentum est eget lorem aliquet, vel tempus metus dignissim. Donec risus arcu, tristique et sollicitudin blandit, iaculis ut nisl. Integer rutrum ultricies fringilla.
+
+[Chunk 5] originalTitle: Inside Sales Representative @ Ginyard International (2018-2020) | type: experience | Confidence: 0.95
+extractionMethod: layout_aware | chunkingMethod: primary_ai
+Reasoning: Üçüncü iş deneyimi bloğu
+------------------------------------------------------------
+[İŞ DENEYİMİ]
+2018 - 2020
+Ginyard International Co.l 123 Anywhere St., Any City
+Inside Sales Representative
+Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nullam pharetra in lorem at laoreet.Donec hendreritliberoeget est tempor, quis tempus arcu elementum. In elementum elit at dui tristique feugiat. Mauris convallis, mi at mattis malesuada, neque nulla volutpat dolor, hendrerit faucibus eros nibh ut nunc. Proin luctus urna id nunc sagittis dignissim. Sed in libero sed libero dictum dapibus. Vivamus fermentum est eget lorem aliquet, vel tempus metus dignissim. Donec risus arcu, tristique et sollicitudin blandit, iaculis ut nisl. Integer rutrum ultricies fringilla.
+
+[Chunk 6] originalTitle: EĞİTİM | type: education | Confidence: 0.95
+extractionMethod: layout_aware | chunkingMethod: primary_ai
+Reasoning: Eğitim bilgileri tek chunk
+------------------------------------------------------------
+[EĞİTİM]
+2020 - 2023
+Bachelor of Business Management
+Borcelle University
+2012 - 2016
+Bachelor of Business Management
+Borcelle University
+
+[Chunk 7] originalTitle: UZMANLIK ALANLARI | type: skills | Confidence: 0.95
+extractionMethod: layout_aware | chunkingMethod: primary_ai
+Reasoning: Teknik beceriler alt kategorileriyle birlikte korundu
+------------------------------------------------------------
+[UZMANLIK ALANLARI]
+UI/UX
+Visual Design
+Wireframes
+Storyboards
+User Flows
+Process Flows
+
+[Chunk 8] originalTitle: DİLLER | type: languages | Confidence: 0.95
+extractionMethod: layout_aware | chunkingMethod: primary_ai
+Reasoning: Konuşulan doğal diller
+------------------------------------------------------------
+[DİLLER]
+English
+Spanish
+
+[Chunk 9] originalTitle: REFERANSLAR | type: references | Confidence: 0.95
+extractionMethod: layout_aware | chunkingMethod: primary_ai
+Reasoning: Referanslar net bir şekilde belirtilmiş
+------------------------------------------------------------
+[REFERANSLAR]
+Harumi Kobayashi
+Bailey Dupont
+Wardiere Inc. / CEO
+Phone: 123-456-7890
+Email: hello@reallygreatsite.com
+
+
+>>> BİR SONRAKİ CV'YE GEÇ
+
+
+================================================================
+CV: canva_real_cv_07.pdf
+Toplam Chunk Sayısı: 8
+Ortalama Confidence: 0.95
+================================================================
+
+[Chunk 1] originalTitle: KİŞİSEL BİLGİLER | type: personal | Confidence: 0.98
+extractionMethod: layout_aware | chunkingMethod: primary_ai
+Reasoning: Üst bilgi bloğu ve iletişim detayları net
+------------------------------------------------------------
+[KİŞİSEL BİLGİLER]
+Isabel Mercado
+Marketing Manager
+123-456-7890
+hello@reallygreatsite.com
+123 Anywhere St., Any City
+
+[Chunk 2] originalTitle: Product Design Manager @ Arowwai Industries (2020-2023) | type: experience | Confidence: 0.95
+extractionMethod: layout_aware | chunkingMethod: primary_ai
+Reasoning: Birinci iş deneyimi bloğu
+------------------------------------------------------------
+[İŞ DENEYİMİ]
+2020 – 2023
+Arowwai Industries
+Product Design Manager
+Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nunc sit amet sem nec risus egestas accumsan. In enim nunc, tincidunt ut quam eget, luctus sollicitudin neque.
+
+[Chunk 3] originalTitle: Product Design Manager @ Ingoude Company (2019-2020) | type: experience | Confidence: 0.95
+extractionMethod: layout_aware | chunkingMethod: primary_ai
+Reasoning: İkinci iş deneyimi bloğu
+------------------------------------------------------------
+[İŞ DENEYİMİ]
+2019 - 2020
+Ingoude Company
+Product Design Manager
+Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nunc sit amet sem nec risus egestas accumsan. In enim nunc, tincidunt ut quam eget, luctus sollicitudin neque.
+
+[Chunk 4] originalTitle: Product Design Manager @ Timmerman Industries (2017-2019) | type: experience | Confidence: 0.95
+extractionMethod: layout_aware | chunkingMethod: primary_ai
+Reasoning: Üçüncü iş deneyimi bloğu
+------------------------------------------------------------
+[İŞ DENEYİMİ]
+2017- 2019
+Timmerman Industries
+Product Design Manager
+Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nunc sit amet sem nec risus egestas accumsan. In enim nunc, tincidunt ut quam eget, luctus sollicitudin neque.
+
+[Chunk 5] originalTitle: EĞİTİM | type: education | Confidence: 0.95
+extractionMethod: layout_aware | chunkingMethod: primary_ai
+Reasoning: Eğitim bilgileri tek chunk
+------------------------------------------------------------
+[EĞİTİM]
+2020 - 2023 Bachelor of Business Management
+Wardiere University
+Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nunc sit amet sem nec risus egestas accumsan. In enim nunc, tincidunt ut quam eget, luctus sollicitudin neque.
+2016 - 2020 Bachelor of Business Management
+Wardiere University
+Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nunc sit amet sem nec risus egestas accumsan. In enim nunc, tincidunt ut quam eget, luctus sollicitudin neque.
+2012 - 2016 Bachelor of Business Management
+Wardiere University
+Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nunc sit amet sem nec risus egestas accumsan. In enim nunc, tincidunt ut quam eget, luctus sollicitudin neque.
+
+[Chunk 6] originalTitle: DİLLER | type: languages | Confidence: 0.95
+extractionMethod: layout_aware | chunkingMethod: primary_ai
+Reasoning: Konuşulan doğal diller
+------------------------------------------------------------
+[DİLLER]
+Spanish
+Arabic
+English
+
+[Chunk 7] originalTitle: ÖDÜLLER | type: certifications | Confidence: 0.95
+extractionMethod: layout_aware | chunkingMethod: primary_ai
+Reasoning: Sertifikalar ve ödüller
+------------------------------------------------------------
+[ÖDÜLLER]
+Oct 2019 | Ingoude Company
+The Best Employee of the Year
+May 2015 | Timmerman Industries
+The Best Employee of the Year
+
+[Chunk 8] originalTitle: REFERANSLAR | type: references | Confidence: 0.95
+extractionMethod: layout_aware | chunkingMethod: primary_ai
+Reasoning: Referanslar net bir şekilde belirtilmiş
+------------------------------------------------------------
+[REFERANSLAR]
+Harumi Kobayashi
+Wardiere Inc. / CEO
+Phone: 123-456-7890
+Email : hello@reallygreatsite.com
+Bailey Dupont
+Wardiere Inc. / CEO
+Phone: 123-456-7890
+Email : hello@reallygreatsite.com
+
+
+>>> BİR SONRAKİ CV'YE GEÇ
+
+
+================================================================
+CV: canva_real_cv_08.pdf
+Toplam Chunk Sayısı: 8
+Ortalama Confidence: 0.95
+================================================================
+
+[Chunk 1] originalTitle: KİŞİSEL BİLGİLER | type: personal | Confidence: 0.98
+extractionMethod: layout_aware | chunkingMethod: primary_ai
+Reasoning: Üst bilgi bloğu ve iletişim detayları net
+------------------------------------------------------------
+[KİŞİSEL BİLGİLER]
+DONNA STROUPE
+Sales Representative
++123-456-7890
+hello@reallygreatsite.com
+123 Anywhere St., Any City, ST 12345
+
+[Chunk 2] originalTitle: HAKKIMDA | type: summary | Confidence: 0.95
+extractionMethod: layout_aware | chunkingMethod: primary_ai
+Reasoning: Özet bölümü net tanımlı
+------------------------------------------------------------
+[HAKKIMDA]
+Lorem ipsum dolor sitamet, consectetur adipiscing elit,sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitationullamco laboris nisi ut aliquip ex ea commodo consequat.
+
+[Chunk 3] originalTitle: Consumer Goods Seller @ Timmerman Industries (2018-Now) | type: experience | Confidence: 0.95
+extractionMethod: layout_aware | chunkingMethod: primary_ai
+Reasoning: Birinci iş deneyimi bloğu
+------------------------------------------------------------
+[İŞ DENEYİMİ]
+Aug 2018 - present
+Timmerman Industries
+Consumer Goods Seller
+Offer consumer goods packages to corporate and clients
+Meet with clients every quarter to update or renew services
+Train junior sales agents
+
+[Chunk 4] originalTitle: FMCG Sales Agent @ Timmerman Industries (2015-2018) | type: experience | Confidence: 0.95
+extractionMethod: layout_aware | chunkingMethod: primary_ai
+Reasoning: İkinci iş deneyimi bloğu
+------------------------------------------------------------
+[İŞ DENEYİMİ]
+Jul 2015 - Aug 2018
+Timmerman Industries
+FMCG Sales Agent
+Visited corporate client offices to offer latest products
+Built relationships with clients to maintain sales goals and create new opportunities
+
+[Chunk 5] originalTitle: Sales Agent @ Timmerman Industries (2014-2015) | type: experience | Confidence: 0.95
+extractionMethod: layout_aware | chunkingMethod: primary_ai
+Reasoning: Üçüncü iş deneyimi bloğu
+------------------------------------------------------------
+[İŞ DENEYİMİ]
+Aug 2014 - Jul 2015
+Timmerman Industries
+Sales Agent
+Offer consumer goods packages to corporate and clients
+Meet with clients every quarter to update or renew services
+Train junior sales agents
+
+[Chunk 6] originalTitle: EĞİTİM BİLGİLERİ | type: education | Confidence: 0.95
+extractionMethod: layout_aware | chunkingMethod: primary_ai
+Reasoning: Eğitim bilgileri tek chunk
+------------------------------------------------------------
+[EĞİTİM BİLGİLERİ]
+Wardiere University
+Bachelor of Business Management (2011 - 2015)
+Wardiere University
+BA Sales and Commerce (2008 - 2011)
+
+[Chunk 7] originalTitle: BECERİLER | type: skills | Confidence: 0.95
+extractionMethod: layout_aware | chunkingMethod: primary_ai
+Reasoning: Teknik beceriler alt kategorileriyle birlikte korundu
+------------------------------------------------------------
+[BECERİLER]
+Project Management
+Public Relations
+Teamwork
+Time Management
+Leadership
+Effective Communication
+Critical Thinking
+Digital Marketing
+
+[Chunk 8] originalTitle: DİLLER | type: languages | Confidence: 0.95
+extractionMethod: layout_aware | chunkingMethod: primary_ai
+Reasoning: Konuşulan doğal diller
+------------------------------------------------------------
+[DİLLER]
+English
+French
+
+
+>>> BİR SONRAKİ CV'YE GEÇ
+
+
+================================================================
+CV: canva_real_cv_11.pdf
+Toplam Chunk Sayısı: 10
+Ortalama Confidence: 0.95
+================================================================
+
+[Chunk 1] originalTitle: KİŞİSEL BİLGİLER | type: personal | Confidence: 0.98
+extractionMethod: layout_aware | chunkingMethod: primary_ai
+Reasoning: Üst bilgi bloğu ve iletişim detayları net
+------------------------------------------------------------
+[KİŞİSEL BİLGİLER]
+Baki Yenilmez
+YAZILIM GELİŞTİRİCİ
++0 212 123 24 25
+merhaba@harikasite.web.tr
+www.harikasite.web.tr
+Atatürk Mah. Gazi Bulvarı
+No: 12 10100
+Karesi/Balıkesir
+
+[Chunk 2] originalTitle: HAKKIMDA | type: summary | Confidence: 0.95
+extractionMethod: layout_aware | chunkingMethod: primary_ai
+Reasoning: Özet bölümü net tanımlı
+------------------------------------------------------------
+[HAKKIMDA]
+5 yılı aşkın süredir web tabanlı yazılım projelerinde görev alıyor, hem kullanıcı arayüzü hem de sunucu tarafı geliştirme alanlarında aktif olarak çalışıyorum. Modern geliştirme yaklaşımlarına hakim, modüler yapı kurma ve veri işleme konusunda deneyimliyim. Ekip çalışmasına uyumlu, çözüm odaklı ve analitik düşünebilen bir yapım var. Kod kalitesine ve sürdürülebilirliğe önem verir, sürekli öğrenmeyi ve teknik gelişimi mesleğimin ayrılmaz bir parçası olarak görürüm.
+
+[Chunk 3] originalTitle: Yazılım Geliştirici @ Çözüm Teknoloji Şirketi (2021-2024) | type: experience | Confidence: 0.95
+extractionMethod: layout_aware | chunkingMethod: primary_ai
+Reasoning: Birinci iş deneyimi bloğu
+------------------------------------------------------------
+[İŞ DENEYİMİ]
+Ocak 2021 – Mayıs 2024
+Çözüm Teknoloji Şirketi
+Yazılım Geliştirici
+
+[Chunk 4] originalTitle: Frontend Geliştirici @ Çekirdek Yazılım Laboratuvarı (2018-2020) | type: experience | Confidence: 0.95
+extractionMethod: layout_aware | chunkingMethod: primary_ai
+Reasoning: İkinci iş deneyimi bloğu
+------------------------------------------------------------
+[İŞ DENEYİMİ]
+Temmuz 2018 – Aralık 2020
+Çekirdek Yazılım Laboratuvarı
+Frontend Geliştirici
+
+[Chunk 5] originalTitle: Stajyer Yazılım Geliştirici @ Ajans Dijital Medya A.Ş. (2017) | type: experience | Confidence: 0.95
+extractionMethod: layout_aware | chunkingMethod: primary_ai
+Reasoning: Üçüncü iş deneyimi bloğu
+------------------------------------------------------------
+[İŞ DENEYİMİ]
+Haziran 2017 – Ağustos 2017
+Ajans Dijital Medya A.Ş.
+Stajyer Yazılım Geliştirici
+
+[Chunk 6] originalTitle: EĞİTİM | type: education | Confidence: 0.95
+extractionMethod: layout_aware | chunkingMethod: primary_ai
+Reasoning: Eğitim bilgileri tek chunk
+------------------------------------------------------------
+[EĞİTİM]
+Deryalar Üniversitesi
+Bilgisayar Mühendisliği (Lisans)
+2013 – 2017
+
+[Chunk 7] originalTitle: YETENEKLER | type: skills | Confidence: 0.95
+extractionMethod: layout_aware | chunkingMethod: primary_ai
+Reasoning: Teknik beceriler alt kategorileriyle birlikte korundu
+------------------------------------------------------------
+[YETENEKLER]
+Algoritma ve Problem Çözme
+Veri Yapıları ve Mantıksal Düşünme
+Kullanıcı Deneyimi Odaklı Geliştirme:
+Test ve Hata Ayıklama
+Proje Yönetimi Yaklaşımları
+Dokümantasyon ve Teknik İletişim
+
+[Chunk 8] originalTitle: DİL BİLGİSİ | type: languages | Confidence: 0.95
+extractionMethod: layout_aware | chunkingMethod: primary_ai
+Reasoning: Konuşulan doğal diller
+------------------------------------------------------------
+[DİL BİLGİSİ]
+İngilizce: İleri Seviye (C1)
+Almanca: Başlangıç (A2)
+
+[Chunk 9] originalTitle: SERTİFİKALAR | type: certifications | Confidence: 0.95
+extractionMethod: layout_aware | chunkingMethod: primary_ai
+Reasoning: Sertifikalar net bir şekilde belirtilmiş
+------------------------------------------------------------
+[SERTİFİKALAR]
+Modern Programlama - 2021
+Full Stack Web Developer Programı – 2023
+
+[Chunk 10] originalTitle: REFERANSLAR | type: references | Confidence: 0.95
+extractionMethod: layout_aware | chunkingMethod: primary_ai
+Reasoning: Referanslar net bir şekilde belirtilmiş
+------------------------------------------------------------
+[REFERANSLAR]
+Can Pekmezci
++0 212 123 24 25
+merhaba@harikasite.web.tr
+Rasim Sarı
++0 212 123 24 25
+merhaba@harikasite.web.tr
+
+
+>>> BİR SONRAKİ CV'YE GEÇ
+
+
+================================================================
+CV: canva_real_cv_12.pdf
+Toplam Chunk Sayısı: 10
+Ortalama Confidence: 0.94
+================================================================
+
+[Chunk 1] originalTitle: KİŞİSEL BİLGİLER | type: personal | Confidence: 0.98
+extractionMethod: layout_aware | chunkingMethod: primary_ai
+Reasoning: Üst bilgi bloğu ve iletişim detayları net
+------------------------------------------------------------
+[KİŞİSEL BİLGİLER]
+Lorna Alvarado
+Marketing Manager
++123-456-7890
+hello@reallygreatsite.com
+www.reallygreatsite.com
+123 Anywhere St.,
+Any City, ST 12345
+
+[Chunk 2] originalTitle: HAKKIMDA | type: summary | Confidence: 0.85
+extractionMethod: layout_aware | chunkingMethod: primary_ai
+Reasoning: Özet bölümü net tanımlı ancak içerik karmaşık
+------------------------------------------------------------
+[HAKKIMDA]
+Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nunc sit amet
+sem nec risus egestas accumsan. In enim nunc, tincidunt ut quam eget,
+luctus sollicitudin neque. Sed leo nisl, semper ac hendrerit a, sollicitudin
+in arcu.
+
+[Chunk 3] originalTitle: Product Design Manager @ Arowwai Industries (2020-2023) | type: experience | Confidence: 0.95
+extractionMethod: layout_aware | chunkingMethod: primary_ai
+Reasoning: Birinci iş deneyimi bloğu
+------------------------------------------------------------
+[İŞ DENEYİMİ]
+2020 – 2023
+Arowwai Industries l 123 Anywhere St., Any City
+Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nunc sit amet
+sem nec risus egestas accumsan. In enim nunc, tincidunt ut quam eget,
+luctus sollicitudin neque. Sed leo nisl, semper ac hendrerit a, sollicitudin
+in arcu.
+
+[Chunk 4] originalTitle: Marketing Manager @ Arowwai Industries (2019-2020) | type: experience | Confidence: 0.95
+extractionMethod: layout_aware | chunkingMethod: primary_ai
+Reasoning: İkinci iş deneyimi bloğu
+------------------------------------------------------------
+[İŞ DENEYİMİ]
+2019 - 2020
+Arowwai Industries l 123 Anywhere St., Any City
+
+[Chunk 5] originalTitle: Marketing Manager @ Arowwai Industries (2017-2019) | type: experience | Confidence: 0.95
+extractionMethod: layout_aware | chunkingMethod: primary_ai
+Reasoning: Üçüncü iş deneyimi bloğu
+------------------------------------------------------------
+[İŞ DENEYİMİ]
+2017- 2019
+Arowwai Industries l 123 Anywhere St., Any City
+Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nunc sit amet
+sem nec risus egestas accumsan. In enim nunc, tincidunt ut quam eget,
+luctus sollicitudin neque. Sed leo nisl, semper ac hendrerit a, sollicitudin
+in arcu.
+
+[Chunk 6] originalTitle: Marketing Manager @ Arowwai Industries (2016-2017) | type: experience | Confidence: 0.95
+extractionMethod: layout_aware | chunkingMethod: primary_ai
+Reasoning: Dördüncü iş deneyimi bloğu
+------------------------------------------------------------
+[İŞ DENEYİMİ]
+2016- 2017
+Arowwai Industries l 123 Anywhere St., Any City
+Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nunc sit amet
+sem nec risus egestas accumsan. In enim nunc, tincidunt ut quam eget,
+luctus sollicitudin neque. Sed leo nisl, semper ac hendrerit a, sollicitudin
+in arcu.
+
+[Chunk 7] originalTitle: EĞİTİM | type: education | Confidence: 0.95
+extractionMethod: layout_aware | chunkingMethod: primary_ai
+Reasoning: Eğitim bilgileri tek chunk
+------------------------------------------------------------
+[EĞİTİM]
+Bachelor of Business Management
+Wardiere University
+2016 - 2020
+Bachelor of Business Management
+Wardiere University
+2020 - 2023
+
+[Chunk 8] originalTitle: BECERİLER | type: skills | Confidence: 0.95
+extractionMethod: layout_aware | chunkingMethod: primary_ai
+Reasoning: Teknik beceriler alt kategorileriyle birlikte korundu
+------------------------------------------------------------
+[BECERİLER]
+Management Skills
+Creativity
+Digital Marketing
+Negotiation
+Critical Thinking
+Leadership
+
+[Chunk 9] originalTitle: DİLLER | type: languages | Confidence: 0.95
+extractionMethod: layout_aware | chunkingMethod: primary_ai
+Reasoning: Konuşulan doğal diller
+------------------------------------------------------------
+[DİLLER]
+English: Ana Dil
+Spanish: Orta Seviye
+
+[Chunk 10] originalTitle: REFERANSLAR | type: references | Confidence: 0.95
+extractionMethod: layout_aware | chunkingMethod: primary_ai
+Reasoning: Referans bilgileri net
+------------------------------------------------------------
+[REFERANSLAR]
+Harumi Kobayashi Bailey Dupont
+Wardiere Inc. / CEO
+Phone: 123-456-7890
+Email : hello@reallygreatsite.com
+
+
+>>> BİR SONRAKİ CV'YE GEÇ
+
+
+================================================================
+CV: canva_real_cv_new_01_blue_and_gray_simple_professio.pdf
+Toplam Chunk Sayısı: 9
+Ortalama Confidence: 0.95
+================================================================
+
+[Chunk 1] originalTitle: KİŞİSEL BİLGİLER | type: personal | Confidence: 0.98
+extractionMethod: layout_aware | chunkingMethod: primary_ai
+Reasoning: Üst bilgi bloğu ve iletişim detayları net
+------------------------------------------------------------
+[KİŞİSEL BİLGİLER]
+RICHARD SANCHEZ
+MARKETING MANAGER
++123-456-7890
+hello@reallygreatsite.com
+123 Anywhere St., Any City
+www.reallygreatsite.com
+
+[Chunk 2] originalTitle: PROFİL | type: summary | Confidence: 0.95
+extractionMethod: layout_aware | chunkingMethod: primary_ai
+Reasoning: Özet bölümü net tanımlı
+------------------------------------------------------------
+[PROFİL]
+Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam quis nostrud exercitation.Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam quis nostrud exercitation.
+
+[Chunk 3] originalTitle: Marketing Manager & Specialist @ Borcelle Studio (2030-PRESENT) | type: experience | Confidence: 0.95
+extractionMethod: layout_aware | chunkingMethod: primary_ai
+Reasoning: Birinci iş deneyimi bloğu
+------------------------------------------------------------
+[İŞ DENEYİMİ]
+Borcelle Studio 2030 - PRESENT
+Marketing Manager & Specialist
+Develop and execute comprehensive marketing strategiesand campaigns that align with the company's goals and objectives.
+Lead, mentor, and manage a high-performingmarketing team, fostering a collaborative and results-driven work environment.
+Monitor brand consistency across marketing channels and materials.
+
+[Chunk 4] originalTitle: Marketing Manager & Specialist @ Fauget Studio (2025-2029) | type: experience | Confidence: 0.95
+extractionMethod: layout_aware | chunkingMethod: primary_ai
+Reasoning: İkinci iş deneyimi bloğu
+------------------------------------------------------------
+[İŞ DENEYİMİ]
+Fauget Studio 2025 -2029
+Marketing Manager & Specialist
+Create and manage the marketing budget, ensuring efficient allocation of resources and optimizing ROI.
+Oversee market researchto identifyemerging trends,customer needs, and competitor strategies.
+
+[Chunk 5] originalTitle: Marketing Manager & Specialist @ Studio Shodwe (2024-2025) | type: experience | Confidence: 0.95
+extractionMethod: layout_aware | chunkingMethod: primary_ai
+Reasoning: Üçüncü iş deneyimi bloğu
+------------------------------------------------------------
+[İŞ DENEYİMİ]
+Studio Shodwe 2024 - 2025
+Marketing Manager & Specialist
+Develop and maintain strong relationships with partners, agencies, and vendors to support marketing initiatives.
+Monitor and maintain brand consistencyacross allmarketing channels and materials.
+
+[Chunk 6] originalTitle: EĞİTİM | type: education | Confidence: 0.95
+extractionMethod: layout_aware | chunkingMethod: primary_ai
+Reasoning: Eğitim bilgileri tek chunk
+------------------------------------------------------------
+[EĞİTİM]
+Master of Business Management 2029 - 2031
+School of business | Wardiere University
+GPA: 3.8 / 4.0
+Bachelor of Business Management 2025 - 2029
+School of business | Wardiere University
+GPA: 3.8 / 4.0
+
+[Chunk 7] originalTitle: BECERİLER | type: skills | Confidence: 0.95
+extractionMethod: layout_aware | chunkingMethod: primary_ai
+Reasoning: Teknik beceriler alt kategorileriyle birlikte korundu
+------------------------------------------------------------
+[BECERİLER]
+Project Management
+Public Relations
+Teamwork
+Time Management
+Leadership
+Effective Communication
+Critical Thinking
+Digital Marketing
+
+[Chunk 8] originalTitle: DİLLER | type: languages | Confidence: 0.95
+extractionMethod: layout_aware | chunkingMethod: primary_ai
+Reasoning: Konuşulan doğal diller
+------------------------------------------------------------
+[DİLLER]
+English (Fluent)
+French (Fluent)
+German (Basic)
+Spanish (Intermediate)
+
+[Chunk 9] originalTitle: REFERANSLAR | type: references | Confidence: 0.95
+extractionMethod: layout_aware | chunkingMethod: primary_ai
+Reasoning: Referans bilgileri net
+------------------------------------------------------------
+[REFERANSLAR]
+Estelle Darcy
+Wardiere Inc. / CTO
+Phone:123-456-7890
+Email :hello@reallygreatsite.com
+
+
+>>> BİR SONRAKİ CV'YE GEÇ
+
+
+================================================================
+CV: canva_real_cv_new_02_dahbjtcvf8i.pdf
+Toplam Chunk Sayısı: 7
+Ortalama Confidence: 0.95
+================================================================
+
+[Chunk 1] originalTitle: KİŞİSEL BİLGİLER | type: personal | Confidence: 0.98
+extractionMethod: layout_aware | chunkingMethod: primary_ai
+Reasoning: Üst bilgi bloğu ve iletişim detayları net
+------------------------------------------------------------
+[KİŞİSEL BİLGİLER]
+Alberto Navarro
+Gestor Administrativo
+911-234-567 www.unsitiogenial.es
+hola@unsitiogenial.es
+Calle cualquiera 123, Cualquier lugar, CP:12345
+
+[Chunk 2] originalTitle: Mİ PERFİL | type: summary | Confidence: 0.95
+extractionMethod: layout_aware | chunkingMethod: primary_ai
+Reasoning: Özet bölümü net tanımlı
+------------------------------------------------------------
+[Mİ PERFİL]
+Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam quis nostrud exercitation ullamco laboris nisi.
+
+[Chunk 3] originalTitle: AMİNİSTRATİVO @ Soto y Ochoa (2012-2021) | type: experience | Confidence: 0.95
+extractionMethod: layout_aware | chunkingMethod: primary_ai
+Reasoning: Birinci iş deneyimi bloğu
+------------------------------------------------------------
+[İŞ DENEYİMİ]
+Coordinación y supervisión todas las tareas administrativas, asegurando que los procesos internos se desarrollen de manera eficiente y ordenada.
+Gestión de la comunicación con clientes y proveedores.
+Soporte al equipo de dirección.
+
+[Chunk 4] originalTitle: ADMİNİSTRATİVO @ Borcelle (2012-2021) | type: experience | Confidence: 0.95
+extractionMethod: layout_aware | chunkingMethod: primary_ai
+Reasoning: İkinci iş deneyimi bloğu
+------------------------------------------------------------
+[İŞ DENEYİMİ]
+Coordinación y supervisión todas las tareas administrativas, asegurando que los procesos internos se desarrollen de manera eficiente y ordenada.
+Gestión de la comunicación con clientes y proveedores.
+Soporte al equipo de dirección.
+
+[Chunk 5] originalTitle: FORMACIÓN | type: education | Confidence: 0.95
+extractionMethod: layout_aware | chunkingMethod: primary_ai
+Reasoning: Eğitim bilgileri tek chunk
+------------------------------------------------------------
+[FORMACIÓN]
+UNİVERSİDAD BORCELLE (2010 - 2013)
+Administración de Empresas
+FORMACİÓN PROFESİONAL (2009 - 2010)
+Administración de Empresas
+
+[Chunk 6] originalTitle: HERRAMIENTAS Y IDIOMAS | type: skills | Confidence: 0.95
+extractionMethod: layout_aware | chunkingMethod: primary_ai
+Reasoning: Teknik beceriler alt kategorileriyle birlikte korundu
+------------------------------------------------------------
+[HERRAMIENTAS Y IDIOMAS]
+Software de Gestión Administrativa
+Español: Nativo
+Hojas de Cálculo
+Inglés: Nivel Medio
+Software de Contabilidad
+Francés: Nivel Medio
+
+[Chunk 7] originalTitle: CERTIFICACIONES | type: certifications | Confidence: 0.95
+extractionMethod: layout_aware | chunkingMethod: primary_ai
+Reasoning: Sertifikalar ve kurslar
+------------------------------------------------------------
+[CERTIFICACIONES]
+Asesoría Laboral Título Borcelle 2020
+Gestión de Nóminas
+
+
+>>> BİR SONRAKİ CV'YE GEÇ
+
+
+================================================================
+CV: canva_real_cv_new_05_blue_and_white_clean_professio.pdf
+Toplam Chunk Sayısı: 8
+Ortalama Confidence: 0.95
+================================================================
+
+[Chunk 1] originalTitle: KİŞİSEL BİLGİLER | type: personal | Confidence: 0.98
+extractionMethod: layout_aware | chunkingMethod: primary_ai
+Reasoning: Üst bilgi bloğu ve iletişim detayları net
+------------------------------------------------------------
+[KİŞİSEL BİLGİLER]
+JYOTI MAJILA
+Web Designer
++123-456-7890
+hello@reallygreatsite.com
+123 Anywhere St., Any City
+
+[Chunk 2] originalTitle: HAKKIMDA | type: summary | Confidence: 0.95
+extractionMethod: layout_aware | chunkingMethod: primary_ai
+Reasoning: Özet bölümü net tanımlı
+------------------------------------------------------------
+[HAKKIMDA]
+Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate
+
+[Chunk 3] originalTitle: Web Designer @ Borcelle Company (2030-PRESENT) | type: experience | Confidence: 0.95
+extractionMethod: layout_aware | chunkingMethod: primary_ai
+Reasoning: Birinci iş deneyimi bloğu
+------------------------------------------------------------
+[İŞ DENEYİMİ]
+2030 - PRESENT
+Borcelle Company
+Web Designer
+Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.
+
+[Chunk 4] originalTitle: Web Designer @ Wardiere Company (2025-2029) | type: experience | Confidence: 0.95
+extractionMethod: layout_aware | chunkingMethod: primary_ai
+Reasoning: İkinci iş deneyimi bloğu
+------------------------------------------------------------
+[İŞ DENEYİMİ]
+2025 - 2029
+Wardiere Company
+Web Designer
+E D U C A T I O N
+
+[Chunk 5] originalTitle: EĞİTİM | type: education | Confidence: 0.95
+extractionMethod: layout_aware | chunkingMethod: primary_ai
+Reasoning: Eğitim bilgileri tek chunk
+------------------------------------------------------------
+[EĞİTİM]
+2029 - 2030
+Wardiere University
+Master of IT Management
+2025 - 2029
+Borcelle High School
+Major of Business Management
+
+[Chunk 6] originalTitle: BECERİLER | type: skills | Confidence: 0.95
+extractionMethod: layout_aware | chunkingMethod: primary_ai
+Reasoning: Teknik beceriler alt kategorileriyle birlikte korundu
+------------------------------------------------------------
+[BECERİLER]
+Design Tools
+Development
+UX/UI Design
+Wireframing
+Prototyping
+Responsive Web Design
+SEO Best Practices
+Problem-Solving
+Team Collaboration
+Project Management
+
+[Chunk 7] originalTitle: ÖDÜLLER | type: certifications | Confidence: 0.95
+extractionMethod: layout_aware | chunkingMethod: primary_ai
+Reasoning: Sertifikalar ve ödüller tek chunk
+------------------------------------------------------------
+[ÖDÜLLER]
+Gold Winner for Website Design 2030
+Award of Excellence in Web Design 2029
+
+[Chunk 8] originalTitle: REFERANSLAR | type: references | Confidence: 0.95
+extractionMethod: layout_aware | chunkingMethod: primary_ai
+Reasoning: Referans bilgileri net
+------------------------------------------------------------
+[REFERANSLAR]
+Niranjan Devi Prasha Anand
+Phone: 123-456-7890
+Email: hello@reallygreatsite.com
+
+
+>>> BİR SONRAKİ CV'YE GEÇ
+
+
+================================================================
+CV: canva_real_cv_omer_abali.pdf
+Toplam Chunk Sayısı: 7
+Ortalama Confidence: 0.95
+================================================================
+
+[Chunk 1] originalTitle: KİŞİSEL BİLGİLER | type: personal | Confidence: 0.98
+extractionMethod: layout_aware | chunkingMethod: primary_ai
+Reasoning: Üst bilgi bloğu ve iletişim detayları net
+------------------------------------------------------------
+[KİŞİSEL BİLGİLER]
+ÖMER ABALI
+Y A Z I L I M M Ü H E N D İ S İ
++90 5333781734
+omerabali09@gmail.com
+https://github.com/omerabali
+www.linkedin.com/in/omerabali
+
+[Chunk 2] originalTitle: H A K K I M D A | type: summary | Confidence: 0.95
+extractionMethod: layout_aware | chunkingMethod: primary_ai
+Reasoning: Özet bölümü net tanımlı
+------------------------------------------------------------
+[H A K K I M D A]
+Ölçeklenebilir SaaS platformları, LLM entegre sistemler ve full-stack uygulamalar geliştirme konusunda deneyimli, yapay zeka odaklı bir Yazılım Mühendisliği öğrencisiyim. Makine öğrenmesi, bilgisayarlı görüşü ve yapay zeka destekli otomasyon alanlarında güçlü bir altyapıya sahibim; sistem tasarımı, temiz mimari ve ürün odaklı geliştirme konularında sağlam bir temelim bulunmaktadır. Python, C#, Java, React, Flutter ve TypeScript dillerinde yetkin olup teorik bilgiyi gerçek dünya uygulamalarıyla birleştiren üretime hazır çözümler sunmaktayım. Halihazırda ticari açıdan sürdürülebilir Üretken Yapay Zeka sistemlerine odaklanarak yapay zeka destekli içerik otomasyonu ve akıllı iletişim platformları geliştirmekteyim.
+
+[Chunk 3] originalTitle: EĞİTİM BİLGİLERİ | type: education | Confidence: 0.95
+extractionMethod: layout_aware | chunkingMethod: primary_ai
+Reasoning: Eğitim bilgileri tek chunk
+------------------------------------------------------------
+[EĞİTİM BİLGİLERİ]
+Kırklareli University – Kırklareli 2023-2027
+Genel Not Ortalaması : Yazılım Mühendisliği | GPA: 3.62 / 4.0-
+
+[Chunk 4] originalTitle: P R O J E D E N E Y İ M L E R İ | type: projects | Confidence: 0.95
+extractionMethod: layout_aware | chunkingMethod: primary_ai
+Reasoning: Projeler net bir şekilde listelenmiş
+------------------------------------------------------------
+[P R O J E D E N E Y İ M L E R İ]
+• Skill-Identity-Engine (Yapay zeka destekli kariyer platformu; CV ve GitHub analizi, yetenek açığı tespiti, AI koç ve yol haritası içeren SaaS sistemi.)
+• Health Insurance Pricing (Makine öğrenmesi ile regresyon modelleme, tahmine dayalı analiz ve veri ön işleme süreçleri, Python)
+• AI Home Design (Üretken yapay zeka ile görüntüden görüntüye dönüşüm, iç mekan görselleştirme ve bilgisayarlı görü tabanlı SaaS platformu.)
+• Farm AI (Tarım teknolojileri odaklı SaaS çözümü; yapay zeka asistanı, çiftlik yönetim ve karar destek sistemi içeren mobil uygulama.)
+• Java Hotel Reservation System (Nesne yönelimli programlama ve tasarım desenleri kullanılarak geliştirilmiş rezervasyon sistemi ve backend mimarisi.)
+• AI Medium Design (Üretken yapay zeka ile içerik otomasyonu, Gemini API entegrasyonu, trend veri çekme ve otomatik yayınlama sistemi.)
+• Lexis App (Yapay zeka destekli dil öğrenme uygulaması; kişiselleştirilmiş öğrenme akışı ve mobil kullanıcı deneyimi.)
+• Chatter Stream (WebSocket mimarisi ile geliştirilmiş gerçek zamanlı iletişim sağlayan full-stack ve event-driven sistem.)
+
+[Chunk 5] originalTitle: B E C E R İ L E R | type: skills | Confidence: 0.95
+extractionMethod: layout_aware | chunkingMethod: primary_ai
+Reasoning: Teknik beceriler alt kategorileriyle birlikte korundu
+------------------------------------------------------------
+[B E C E R İ L E R]
+Programlama Dilleri: Python, Java, C#, JavaScript, TypeScript, C, C++, Dart
+Frontend Teknolojileri: React, TailwindCSS, HTML, CSS, Bootstrap
+Mobile: Flutter, Kotlin
+AI / Machine Learning: Pandas, NumPy
+Databases: MySQL, PostgreSQL, Firebase, DynamoDB
+Tools & DevOps: Docker, AWS, Git, Node.js, Linux
+
+[Chunk 6] originalTitle: YABANCI DİLLER | type: languages | Confidence: 0.95
+extractionMethod: layout_aware | chunkingMethod: primary_ai
+Reasoning: Konuşulan doğal diller
+------------------------------------------------------------
+[YABANCI DİLLER]
+Türkçe : Ana Dil
+İngilizce: İleri Seviye
+Almanca: Başlangıç Seviyesi
+
+[Chunk 7] originalTitle: S E R T İ F İ K A R V E E Ğ İ T İ M L E R | type: certifications | Confidence: 0.95
+extractionMethod: layout_aware | chunkingMethod: primary_ai
+Reasoning: Sertifikalar ve eğitimler net bir şekilde listelenmiş
+------------------------------------------------------------
+[S E R T İ F İ K A R V E E Ğ İ T İ M L E R]
+Sıfırdan C++ ve Programlama - Udemy
+İleri Seviye Algoritmalar ve Veri Yapıları – BTK Akademi
+Veri Modelleme – BTK Akademi
+Algoritma Tasarımı – BTK Akademi
+LinkedIn’de Etkili Profil Oluşturma – BTK Akademi
+Bilgi Teknolojilerine Giriş – BTK Akademi
+Machine Learning Bootcamp – Tech Istanbul
+
+
+>>> BİR SONRAKİ CV'YE GEÇ
+
+
+================================================================
+CV: canva_real_design_10.pdf
+Toplam Chunk Sayısı: 10
+Ortalama Confidence: 0.95
+================================================================
+
+[Chunk 1] originalTitle: KİŞİSEL BİLGİLER | type: personal | Confidence: 0.98
+extractionMethod: layout_aware | chunkingMethod: primary_ai
+Reasoning: Üst bilgi bloğu ve iletişim detayları net
+------------------------------------------------------------
+[KİŞİSEL BİLGİLER]
+DONNA STROUPE
+Marketing Manager
+123-456-7890
+hello@reallygreatsite.com
+123 Anywhere St., Any City
+
+[Chunk 2] originalTitle: HAKKIMDA | type: summary | Confidence: 0.95
+extractionMethod: layout_aware | chunkingMethod: primary_ai
+Reasoning: Özet bölümü net tanımlı
+------------------------------------------------------------
+[HAKKIMDA]
+Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.
+
+[Chunk 3] originalTitle: Product Design Manager @ Arowwai Industries (2020-2023) | type: experience | Confidence: 0.95
+extractionMethod: layout_aware | chunkingMethod: primary_ai
+Reasoning: Birinci iş deneyimi bloğu
+------------------------------------------------------------
+[İŞ DENEYİMİ]
+2020 – 2023
+Arowwai Industries l 123 Anywhere St., Any City
+Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nunc sit amet sem nec risus egestas accumsan. In enim nunc, tincidunt ut quam eget, luctus sollicitudin neque. Sed leo nisl, semper ac hendrerit a, sollicitudin in arcu.
+
+[Chunk 4] originalTitle: Marketing Manager @ Arowwai Industries (2019-2020) | type: experience | Confidence: 0.95
+extractionMethod: layout_aware | chunkingMethod: primary_ai
+Reasoning: İkinci iş deneyimi bloğu
+------------------------------------------------------------
+[İŞ DENEYİMİ]
+2019 - 2020
+Arowwai Industries l 123 Anywhere St., Any City
+Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nunc sit amet sem nec risus egestas accumsan. In enim nunc, tincidunt ut quam eget, luctus sollicitudin neque. Sed leo nisl, semper ac hendrerit a, sollicitudin in arcu.
+
+[Chunk 5] originalTitle: Marketing Manager @ Arowwai Industries (2017-2019) | type: experience | Confidence: 0.95
+extractionMethod: layout_aware | chunkingMethod: primary_ai
+Reasoning: Üçüncü iş deneyimi bloğu
+------------------------------------------------------------
+[İŞ DENEYİMİ]
+2017- 2019
+Arowwai Industries l 123 Anywhere St., Any City
+Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nunc sit amet sem nec risus egestas accumsan. In enim nunc, tincidunt ut quam eget, luctus sollicitudin neque. Sed leo nisl, semper ac hendrerit a, sollicitudin in arcu.
+
+[Chunk 6] originalTitle: Marketing Manager @ Arowwai Industries (2016-2018) | type: experience | Confidence: 0.95
+extractionMethod: layout_aware | chunkingMethod: primary_ai
+Reasoning: Dördüncü iş deneyimi bloğu
+------------------------------------------------------------
+[İŞ DENEYİMİ]
+2016- 2018
+Arowwai Industries l 123 Anywhere St., Any City
+Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nunc sit amet sem nec risus egestas accumsan. In enim nunc, tincidunt ut quam eget, luctus sollicitudin neque. Sed leo nisl, semper ac hendrerit a, sollicitudin in arcu.
+
+[Chunk 7] originalTitle: EĞİTİM | type: education | Confidence: 0.95
+extractionMethod: layout_aware | chunkingMethod: primary_ai
+Reasoning: Eğitim bilgileri tek chunk
+------------------------------------------------------------
+[EĞİTİM]
+Borcelle University
+Bachelor of Business Management
+2020 - 2023
+Wardiere University
+Bachelor of Business Management
+2016 - 2020
+Borcelle University
+Bachelor of Business Management
+2012 - 2016
+
+[Chunk 8] originalTitle: BECERİLER | type: skills | Confidence: 0.95
+extractionMethod: layout_aware | chunkingMethod: primary_ai
+Reasoning: Teknik beceriler alt kategorileriyle birlikte korundu
+------------------------------------------------------------
+[BECERİLER]
+Management Skills
+Creativity
+Digital Marketing
+Negotiation
+Critical Thinking
+Leadership
+
+[Chunk 9] originalTitle: DİLLER | type: languages | Confidence: 0.95
+extractionMethod: layout_aware | chunkingMethod: primary_ai
+Reasoning: Konuşulan doğal diller
+------------------------------------------------------------
+[DİLLER]
+English
+Spain
+
+[Chunk 10] originalTitle: REFERANSLAR | type: references | Confidence: 0.95
+extractionMethod: layout_aware | chunkingMethod: primary_ai
+Reasoning: Referanslar net bir şekilde belirtilmiş
+------------------------------------------------------------
+[REFERANSLAR]
+Harumi Kobayashi
+Bailey Dupont
+Wardiere Inc. / CEO
+Wardiere Inc. / CEO
+Phone: 123-456-7890
+Phone: 123-456-7890
+Email : hello@reallygreatsite.com
+Email :hello@reallygreatsite.com
+
+
+>>> BİR SONRAKİ CV'YE GEÇ
+
+
+================================================================
+GENEL ÖZET
+================================================================
+Toplam İşlenen CV: 11
+En Düşük Ortalama Confidence: canva_real_cv_12.pdf (0.94)
+En Yüksek Ortalama Confidence: canva_real_cv_omer_abali.pdf (0.95)
+0.6 Altı Confidence'lı Chunk Sayısı: 0
+================================================================

@@ -11,9 +11,9 @@ import Layout from '../layouts/Layout.astro';
   <span class="font-headline-md text-headline-md font-bold text-on-surface">Beacon</span>
 </a>
 <div class="hidden md:flex items-center gap-8">
-<a class="font-body-sm text-body-sm font-semibold text-primary border-b-2 border-primary pb-1 transition-colors duration-200" href="/login">Özellikler</a>
-<a class="font-body-sm text-body-sm font-semibold text-on-surface-variant hover:text-primary transition-colors duration-200" href="/login">Nasıl Çalışır</a>
-<a class="font-body-sm text-body-sm font-semibold text-on-surface-variant hover:text-primary transition-colors duration-200" href="/login">SSS</a>
+<a class="font-body-sm text-body-sm font-semibold text-on-surface-variant hover:text-primary transition-colors duration-200" href="#ozellikler">Özellikler</a>
+<a class="font-body-sm text-body-sm font-semibold text-on-surface-variant hover:text-primary transition-colors duration-200" href="#nasil-calisir">Nasıl Çalışır</a>
+<a class="font-body-sm text-body-sm font-semibold text-on-surface-variant hover:text-primary transition-colors duration-200" href="#sss">SSS</a>
 </div>
 <div class="flex items-center gap-4">
 <a href="/login" class="hidden md:block font-body-sm text-body-sm font-semibold text-on-surface hover:text-primary transition-colors duration-200">Giriş Yap</a>
@@ -71,41 +71,41 @@ import Layout from '../layouts/Layout.astro';
 <h2 class="font-headline-lg text-headline-lg text-on-surface">Beacon CV'ni anlayan bir asistan.</h2>
 </div>
 <div class="space-y-24">
-<!-- Block 1 -->
-<div class="flex flex-col md:flex-row items-center gap-12">
-<div class="flex-1 md:pr-12">
-<h3 class="font-headline-md text-headline-md text-on-surface mb-4">Anında Analiz</h3>
-<p class="font-body-md text-body-md text-on-surface-variant">Yapay zeka motorumuz CV'nizi saniyeler içinde tarar ve derinlemesine bir analiz raporu sunar. Beklemek yok, anında sonuç.</p>
-</div>
-<div class="flex-1 w-full">
-<img alt="Anında Analiz" class="w-full aspect-video md:aspect-[4/3] object-cover rounded-xl shadow-md border border-outline-variant" src="https://lh3.googleusercontent.com/aida/AP1WRLs4-LeZi60cjZhN6_3aqfifupcVu1rvdez586xxayLcosjhdYahD08yxwcfAMw3iS2MrZkoi9xXofav0Uy2Fsvn4ato7_SFi0iJ2BZknDo8YfzYm0Bz7Guc0HG5UDPGQJqO8mEIPS5SSoN3oFye7j9nMUdc6Fq6lyDBiuXxWtqdK5kLC_JS-_GTYbFcqGjo09-4KwsL55JIWum0xJzrFkeWxTyZoTEj6D0P_XKDLcqbwSsxgEFwYty3esu0">
-</div>
-</div>
-<!-- Block 2 -->
-<div class="flex flex-col md:flex-row-reverse items-center gap-12">
-<div class="flex-1 md:pl-12">
-<h3 class="font-headline-md text-headline-md text-on-surface mb-4">Güçlü ve Zayıf Yönler</h3>
-<p class="font-body-md text-body-md text-on-surface-variant">Hangi konularda öne çıktığınızı ve hangi alanlarda eksik olduğunuzu net bir şekilde görün. Rakiplerinizin bir adım önüne geçin.</p>
-</div>
-<div class="flex-1 w-full">
-<img alt="Güçlü ve Zayıf Yönler" class="w-full aspect-video md:aspect-[4/3] object-cover rounded-xl shadow-md border border-outline-variant" src="https://lh3.googleusercontent.com/aida/AP1WRLsspW7GAYdA-trt9gOFAxKVm8pYHyu65M8cEDZ_-8tRebKrQEvyqijx-peo6GFdOwO6FKII5sr9sUvsD6hYq76Vbbke_9tsd1AxWKzpqedvjMeW9p_K1MPYbbJTEeezA9ExDYJ9a05QlEUuag39soleGpxn9RCMg-pLiH5Q_tMMKga3uLe81-fjPSfIzMp30_A_0kvGmWRmkv5UWdHWH21oXOb2pAA_WUbkOL9vtml8IeGDIVSv4cqz7gzb">
-</div>
-</div>
-<!-- Block 3 -->
-<div class="flex flex-col md:flex-row items-center gap-12">
-<div class="flex-1 md:pr-12">
-<h3 class="font-headline-md text-headline-md text-on-surface mb-4">Kişisel Gelişim Önerileri</h3>
-<p class="font-body-md text-body-md text-on-surface-variant">Sadece eleştirmez, yol gösteririz. Eksik yönlerinizi nasıl geliştirebileceğinize dair kişiselleştirilmiş, eyleme geçirilebilir tavsiyeler alın.</p>
-</div>
-<div class="flex-1 w-full">
-<img alt="Kişisel Gelişim Önerileri" class="w-full aspect-video md:aspect-[4/3] object-cover rounded-xl shadow-md border border-outline-variant" src="https://lh3.googleusercontent.com/aida/AP1WRLvyJDWF0_vI8dpL9WO4jA7xMqIkhRB_NF121WEKlqxxFmUtJgqzNAoVw2WJNPJRVHae5q65-IKR0kOLpHYQcGvtLIuD5JxhX3IF-n57RZceg6epEF_ePotbapO6lJmoyNjMK9BqvBa7j-uY1y-lBEeTzBI63kUXbsmcF_4TGzlzhTRz7vPcdW8Ycdd7CCcTa9eZdKvyfRJVgbnhQ9MvrwzUAKY5y_8B4al8FxVI6ef5AzZPB1RCDc8GaMX3">
-</div>
-</div>
+      <!-- Block 1 -->
+      <div class="flex flex-col md:flex-row items-center gap-12">
+        <div class="flex-1 md:pr-12">
+          <h3 class="font-headline-md text-headline-md text-on-surface mb-4 font-bold">Anında Analiz</h3>
+          <p class="font-body-md text-body-md text-on-surface-variant leading-relaxed">Yapay zeka motorumuz CV'nizi saniyeler içinde tarar ve derinlemesine bir analiz raporu sunar. Beklemek yok, anında sonuç.</p>
+        </div>
+        <div class="flex-1 w-full">
+          <img src="/photo-1551288049-bebda4e38f71.avif" alt="Anında Analiz" class="w-full aspect-video md:aspect-[4/3] object-cover rounded-xl shadow-lg border border-outline-variant" />
+        </div>
+      </div>
+      <!-- Block 2 -->
+      <div class="flex flex-col md:flex-row-reverse items-center gap-12">
+        <div class="flex-1 md:pl-12">
+          <h3 class="font-headline-md text-headline-md text-on-surface mb-4 font-bold">Güçlü ve Zayıf Yönler</h3>
+          <p class="font-body-md text-body-md text-on-surface-variant leading-relaxed">Hangi konularda öne çıktığınızı ve hangi alanlarda eksik olduğunuzu net bir şekilde görün. Rakiplerinizin bir adım önüne geçin.</p>
+        </div>
+        <div class="flex-1 w-full">
+          <img src="/photo-1460925895917-afdab827c52f.avif" alt="Güçlü ve Zayıf Yönler" class="w-full aspect-video md:aspect-[4/3] object-cover rounded-xl shadow-lg border border-outline-variant" />
+        </div>
+      </div>
+      <!-- Block 3 -->
+      <div class="flex flex-col md:flex-row items-center gap-12">
+        <div class="flex-1 md:pr-12">
+          <h3 class="font-headline-md text-headline-md text-on-surface mb-4 font-bold">Kişisel Gelişim Önerileri</h3>
+          <p class="font-body-md text-body-md text-on-surface-variant leading-relaxed">Sadece eleştirmez, yol gösteririz. Eksik yönlerinizi nasıl geliştirebileceğinize dair kişiselleştirilmiş, eyleme geçirilebilir tavsiyeler alın.</p>
+        </div>
+        <div class="flex-1 w-full">
+          <img src="/photo-1522071820081-009f0129c71c.avif" alt="Kişisel Gelişim Önerileri" class="w-full aspect-video md:aspect-[4/3] object-cover rounded-xl shadow-lg border border-outline-variant" />
+        </div>
+      </div>
 </div>
 </div>
 </section>
 <!-- 5. HOW IT WORKS -->
-<section class="bg-surface-container-lowest py-24 px-margin-mobile md:px-margin-desktop relative overflow-hidden">
+<section id="nasil-calisir" class="bg-surface-container-lowest py-24 px-margin-mobile md:px-margin-desktop relative overflow-hidden scroll-mt-20">
 <div class="max-w-max-width mx-auto relative z-10">
 <h2 class="font-headline-lg text-headline-lg text-on-surface mb-16 text-center">3 adımda CV analizin hazır.</h2>
 <div class="flex flex-col md:flex-row justify-between items-center relative">
@@ -130,7 +130,7 @@ import Layout from '../layouts/Layout.astro';
 </div>
 </section>
 <!-- 6. FEATURES -->
-<section class="py-24 px-margin-mobile md:px-margin-desktop bg-surface">
+<section id="ozellikler" class="py-24 px-margin-mobile md:px-margin-desktop bg-surface scroll-mt-20">
 <div class="max-w-max-width mx-auto">
 <h2 class="font-headline-lg text-headline-lg text-on-surface mb-12 text-center">CV analizinin ötesinde.</h2>
 <div class="grid md:grid-cols-3 gap-8">
@@ -209,7 +209,7 @@ import Layout from '../layouts/Layout.astro';
 </div>
 </section>
 <!-- 8. FAQ -->
-<section class="py-24 px-margin-mobile md:px-margin-desktop bg-surface">
+<section id="sss" class="py-24 px-margin-mobile md:px-margin-desktop bg-surface scroll-mt-20">
 <div class="max-w-3xl mx-auto">
 <h2 class="font-headline-lg text-headline-lg text-on-surface mb-12 text-center">Sık sorulan sorular.</h2>
 <div class="space-y-4">

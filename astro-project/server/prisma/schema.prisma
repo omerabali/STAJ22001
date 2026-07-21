@@ -37,6 +37,7 @@ model CV {
   rawText      String?
   hash         String?
   metadata     Json?
+  extractionMethod String   @default("layout_aware")
   createdAt    DateTime     @default(now())
   updatedAt    DateTime     @updatedAt
   analyses     CVAnalysis[]

@@ -281,7 +281,12 @@ router.get("/reports/stats", authMiddleware, adminMiddleware, async (_req: Reque
 
 // GET /api/admin/candidates/:id
 router.get("/candidates/:id", authMiddleware, adminMiddleware, async (req: Request, res: Response): Promise<void> => {
-  const id = req.params.id as string;
+  let id = req.params.id as string;
+  if (id) {
+    try { id = decodeURIComponent(id).trim(); } catch {}
+    id = id.replace(/\s+/g, '-');
+  }
+
   try {
     const candidate = await prisma.user.findFirst({
       where: { id: id },
@@ -311,30 +316,35 @@ router.get("/candidates/:id", authMiddleware, adminMiddleware, async (req: Reque
     // Generate signed URLs for CVs
     const cvsWithSignedUrls = await Promise.all(
       candidate.cvs.map(async (cv) => {
-        const urlParts = cv.fileUrl.split('/cv-files/');
-        const filePath = urlParts[1];
+        try {
+          const urlParts = cv.fileUrl.split('/cv-files/');
+          const filePath = urlParts[1];
 
-        if (!filePath) return cv;
+          if (!filePath) return cv;
 
-        const { data, error } = await supabase.storage
-          .from("cv-files")
-          .createSignedUrl(filePath, 3600); // 1 hour expiration
+          const { data, error } = await supabase.storage
+            .from("cv-files")
+            .createSignedUrl(filePath, 3600); // 1 hour expiration
 
-        if (error) {
-          console.error(`Error generating signed URL for CV ${cv.id}:`, error);
+          if (error) {
+            console.error(`Error generating signed URL for CV ${cv.id}:`, error);
+          }
+
+          const cvMetadata = cv.metadata as any;
+          const mappedAnalyses = cv.analyses.map((analysis) => ({
+            ...analysis,
+            role: cvMetadata?.role || "Özgeçmiş Analizi"
+          }));
+
+          return {
+            ...cv,
+            fileUrl: data?.signedUrl || cv.fileUrl,
+            analyses: mappedAnalyses
+          };
+        } catch (storageErr) {
+          console.error(`Supabase storage signed URL exception for CV ${cv.id}:`, storageErr);
+          return cv;
         }
-
-        const cvMetadata = cv.metadata as any;
-        const mappedAnalyses = cv.analyses.map((analysis) => ({
-          ...analysis,
-          role: cvMetadata?.role || "Özgeçmiş Analizi"
-        }));
-
-        return {
-          ...cv,
-          fileUrl: data?.signedUrl || cv.fileUrl,
-          analyses: mappedAnalyses
-        };
       })
     );
 
