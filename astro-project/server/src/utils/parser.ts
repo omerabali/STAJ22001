@@ -1414,70 +1414,142 @@ async function runLocalRuleBasedParser(
  * Splits a resume text into semantic chunks with section metadata.
  * Primary AI-Driven Engine via GPT-4o-mini with structured JSON mode.
  */
+/**
+ * Splits a resume text into semantic chunks using a 3-Layer Architecture:
+ *   Layer 1: Primary AI Chunking via gpt-4o-mini (endpoint: "chunking")
+ *   Layer 2: AI Quality Inspection + Fix + Scoring (endpoint: "quality_check", temp: 0)
+ *   Layer 3: Targeted Retry for score < 70 (endpoint: "targeted_retry", temp: 0)
+ *   Rule-Based Fallback: For score < 70 after Layer 3 (No 4th AI call)
+ */
 export async function chunkTextBySections(text: string, prisma?: any): Promise<{ chunkText: string; metadata: any }[]> {
   if (!text || text.trim() === "") return [];
 
   const lang = detectLanguage(text);
   const apiKey = process.env.OPENAI_API_KEY;
 
-  // ── Tier 1 (PRIMARY): AI-Driven Chunking Engine via GPT-4o-Mini ───────────
   if (apiKey) {
-    console.log(`[Parser] 🤖 Running Primary AI-Driven Chunking Engine (gpt-4o-mini)...`);
+    console.log(`[Parser] 🤖 [Katman 1] Running Primary AI-Driven Chunking Engine (gpt-4o-mini)...`);
     try {
+      const { inspectAndCorrectChunks, retryTargetedChunk } = await import("../services/ChunkQualityService.js");
+
+      // ── Layer 1: Macro-segmentation ──────────────────────────────────────────
       const aiSections = await segmentCvWithAI(text, lang, prisma);
+
       if (aiSections.length > 0) {
-        const aiChunks: { chunkText: string; metadata: any }[] = [];
+        console.log(`[Parser] 🔍 [Katman 2] Inspecting & Scoring ${aiSections.length} chunks (temp: 0)...`);
+        
+        // ── Layer 2: Quality Inspection + Fix + Scoring ───────────────────────
+        const layer2Chunks = await inspectAndCorrectChunks(aiSections, text, lang, prisma);
+
+        const finalChunks: { chunkText: string; metadata: any }[] = [];
         let sectionOrder = 1;
 
-        for (const section of aiSections) {
-          // Preserve the EXACT originalTitle returned by GPT (from CV text)
-          const originalTitleFromCV = section.originalTitle || "";
-          // Canonical label used only as fallback
-          const sectionLabel = originalTitleFromCV || (SECTION_LABELS[section.sectionKey] ?? section.sectionKey);
-          const rawText = section.text || "";
-          if (!rawText.trim()) continue;
+        for (let i = 0; i < layer2Chunks.length; i++) {
+          const l1 = aiSections[i] || { sectionKey: "other", originalTitle: "Bölüm", confidence: 0.95, reasoning: "Layer 1" };
+          let l2 = layer2Chunks[i];
+          let l3Result: any = null;
+          let finalSource: "layer2" | "layer3" | "rule_based_final" = "layer2";
+          let finalScore = l2.confidence_score;
 
-          const wordCount = rawText.split(/\s+/).filter((w) => w.length > 0).length;
-          const normalizedText = normalizeStars(rawText);
-          // For experience sub-chunks use canonical header to keep structure readable
-          const headerLabel = section.sectionKey === "experience"
-            ? `İŞ DENEYİMİ`
-            : sectionLabel.toUpperCase();
-          const fullText  = `[${headerLabel}]\n${normalizedText}`;
+          // ── Layer 3: Targeted Retry if Layer 2 confidence_score < 65 ────────
+          if (l2.confidence_score < 65) {
+            console.log(`[Parser] ⚠️ Chunk ${i + 1} (${l2.originalTitle}) score=${l2.confidence_score} < 65. [Katman 3] Retrying targeted chunk...`);
+            l3Result = await retryTargetedChunk(
+              l2,
+              text,
+              lang,
+              l2.duzeltme_aciklamasi || "Layer 2 low confidence score",
+              prisma
+            );
+
+            if (l3Result.confidence_score >= 65) {
+              console.log(`[Parser] ✅ [Katman 3] Retry successful! New score=${l3Result.confidence_score}`);
+              l2 = {
+                originalTitle: l3Result.originalTitle,
+                type: l3Result.type,
+                text: l3Result.text,
+                duzeltildi: true,
+                duzeltme_aciklamasi: l3Result.aciklama,
+                confidence_score: l3Result.confidence_score,
+              };
+              finalSource = "layer3";
+              finalScore = l3Result.confidence_score;
+            } else {
+              console.log(`[Parser] ⛔ [Katman 3] Retry score=${l3Result.confidence_score} still < 65. Falling back to Rule-Based for this segment (NO 4TH AI CALL).`);
+              finalSource = "rule_based_final";
+              finalScore = l3Result.confidence_score;
+            }
+          }
+
+          const rawChunkText = l2.text || l1.text || "";
+          if (!rawChunkText.trim()) continue;
+
+          const sectionType = l2.type || l1.sectionKey || "other";
+          const originalTitle = l2.originalTitle || l1.originalTitle || SECTION_LABELS[sectionType] || "Bölüm";
+          const wordCount = rawChunkText.split(/\s+/).filter((w) => w.length > 0).length;
+          const normalizedText = normalizeStars(rawChunkText);
+          const headerLabel = sectionType === "experience" ? `İŞ DENEYİMİ` : originalTitle.toUpperCase();
+          const fullText = `[${headerLabel}]\n${normalizedText}`;
           const chunkHash = crypto.createHash("sha256").update(fullText).digest("hex");
 
-          aiChunks.push({
+          const qualityTraceLog = {
+            layer1: {
+              type: l1.sectionKey,
+              originalTitle: l1.originalTitle,
+              confidence: l1.confidence,
+              reasoning: l1.reasoning,
+            },
+            layer2: {
+              type: layer2Chunks[i].type,
+              originalTitle: layer2Chunks[i].originalTitle,
+              confidence_score: layer2Chunks[i].confidence_score,
+              duzeltildi: layer2Chunks[i].duzeltildi,
+              duzeltme_aciklamasi: layer2Chunks[i].duzeltme_aciklamasi,
+            },
+            layer3: l3Result ? {
+              type: l3Result.type,
+              originalTitle: l3Result.originalTitle,
+              confidence_score: l3Result.confidence_score,
+              aciklama: l3Result.aciklama,
+            } : undefined,
+            finalSource,
+            finalScore,
+          };
+
+          finalChunks.push({
             chunkText: fullText,
             metadata: {
-              section:       sectionLabel,
-              originalTitle: originalTitleFromCV || sectionLabel,
-              type:          section.sectionKey,
-              source:        "AI",
-              method:        "primary_ai",
+              section: originalTitle,
+              originalTitle: originalTitle,
+              type: sectionType,
+              source: finalSource === "rule_based_final" ? "STRUCTURAL" : "AI",
+              method: finalSource === "layer2" ? "primary_ai" : (finalSource === "layer3" ? "ai_fallback" : "rule_based"),
               extractionMethod: "layout_aware",
-              language:      lang,
-              order:         sectionOrder++,
+              language: lang,
+              order: sectionOrder++,
               wordCount,
-              confidence:    section.confidence ?? 0.95,
-              reasoning:     section.reasoning ?? "Primary AI section chunking",
-              aiFallback:    false,
-              createdAt:     new Date().toISOString(),
-              parserVersion: "v4.0-ai",
+              confidence: Number((finalScore / 100).toFixed(2)),
+              confidence_score: finalScore,
+              reasoning: l2.duzeltme_aciklamasi || l1.reasoning || "3-Layer AI Chunking Pipeline",
+              chunkQualityLog: qualityTraceLog,
+              aiFallback: finalSource === "layer3",
+              createdAt: new Date().toISOString(),
+              parserVersion: "v4.0-ai-3layer",
               chunkHash,
             },
           });
         }
 
-
-        if (aiChunks.length > 0) {
-          console.log(`[Parser] ✅ Primary AI successfully produced ${aiChunks.length} chunks.`);
-          return aiChunks;
+        if (finalChunks.length > 0) {
+          console.log(`[Parser] 🎉 3-Layer Pipeline completed with ${finalChunks.length} final chunks.`);
+          return finalChunks;
         }
       }
     } catch (err) {
-      console.warn(`[Parser] Primary AI chunking failed, falling back to local rule-based parser:`, (err as Error).message);
+      console.warn(`[Parser] 3-Layer AI Pipeline failed, falling back to local rule-based parser:`, (err as Error).message);
     }
   }
+
 
   // ── Tier 2 (FALLBACK): Local Rule-Based Dictionary Parser ─────────────────
   const localChunks = await runLocalRuleBasedParser(text, lang, prisma);
