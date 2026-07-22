@@ -46,6 +46,7 @@ const currentPath = Astro.url.pathname;
     } catch (e) {
       console.error(e);
     }
+    try { sessionStorage.clear(); localStorage.clear(); } catch(err) {}
     window.location.href = '/';
   }
 </script>

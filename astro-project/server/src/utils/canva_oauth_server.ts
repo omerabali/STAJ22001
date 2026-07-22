@@ -66,7 +66,7 @@ const server = http.createServer(async (req, res) => {
         })
       });
 
-      const tokenData = await tokenRes.json();
+      const tokenData: any = await tokenRes.json();
       console.log("\n🎉 Canva Access Token Result:", JSON.stringify(tokenData, null, 2));
 
       if (tokenData.access_token) {

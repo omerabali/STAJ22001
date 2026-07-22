@@ -17,18 +17,61 @@ const candidate2Id = Astro.url.searchParams.get('candidate2') || '';
     </div>
   </header>
 
+  <!-- Candidate Selector Header Card -->
+  <div class="bg-white border border-[#ddd9d3] rounded-[12px] p-5 mb-8 shadow-sm">
+    <div class="flex flex-col md:flex-row items-center gap-4">
+      <div class="flex-1 w-full">
+        <label class="text-[10px] font-bold text-[#8a8580] uppercase tracking-wider block mb-1.5">1. ADAY</label>
+        <div class="relative">
+          <select id="select-cand-1" class="w-full appearance-none bg-[#faf9f5] border border-[#ddd9d3] rounded-[8px] px-3.5 py-2.5 pr-9 text-xs font-bold text-[#1b1c1a] focus:outline-none focus:ring-2 focus:ring-[#14422f]/20 focus:border-[#14422f] cursor-pointer">
+            <option value="">1. Adayı Seçin...</option>
+          </select>
+          <span class="material-symbols-outlined absolute right-3 top-1/2 -translate-y-1/2 text-[#8a8580] text-[18px] pointer-events-none">expand_more</span>
+        </div>
+      </div>
+
+      <div class="hidden md:flex items-center justify-center w-10 h-10 rounded-full bg-[#14422f]/10 text-[#14422f] shrink-0 mt-5 border border-[#14422f]/20">
+        <span class="material-symbols-outlined text-[20px]">compare_arrows</span>
+      </div>
+
+      <div class="flex-1 w-full">
+        <label class="text-[10px] font-bold text-[#8a8580] uppercase tracking-wider block mb-1.5">2. ADAY</label>
+        <div class="relative">
+          <select id="select-cand-2" class="w-full appearance-none bg-[#faf9f5] border border-[#ddd9d3] rounded-[8px] px-3.5 py-2.5 pr-9 text-xs font-bold text-[#1b1c1a] focus:outline-none focus:ring-2 focus:ring-[#14422f]/20 focus:border-[#14422f] cursor-pointer">
+            <option value="">2. Adayı Seçin...</option>
+          </select>
+          <span class="material-symbols-outlined absolute right-3 top-1/2 -translate-y-1/2 text-[#8a8580] text-[18px] pointer-events-none">expand_more</span>
+        </div>
+      </div>
+
+      <button id="run-compare-btn" class="w-full md:w-auto mt-2 md:mt-5 bg-[#14422f] hover:bg-[#0f3223] text-white px-6 py-2.5 rounded-[8px] text-xs font-bold transition-all shadow-sm flex items-center justify-center gap-2 shrink-0 cursor-pointer">
+        <span class="material-symbols-outlined text-[16px]">bolt</span>
+        Kıyasla
+      </button>
+    </div>
+  </div>
+
   <!-- Loading State -->
-  <div id="compare-loading" class="bg-white border border-[#ddd9d3] rounded-[10px] p-16 flex flex-col items-center justify-center text-center shadow-sm">
+  <div id="compare-loading" class="hidden w-full bg-white border border-[#ddd9d3] rounded-[10px] p-16 flex-col items-center justify-center text-center shadow-sm">
     <span class="material-symbols-outlined text-4xl text-[#14422f] animate-spin mb-4">progress_activity</span>
     <h3 class="font-bold text-[#1b1c1a] text-lg">Aday Bilgileri Kıyaslanıyor...</h3>
     <p class="text-xs text-[#8a8580] max-w-sm mt-1">Seçilen adayların verileri ve yapay zeka analizleri hazırlanıyor.</p>
   </div>
 
+  <!-- Empty / Select Prompt State -->
+  <div id="compare-prompt" class="w-full bg-white border border-[#ddd9d3] rounded-[10px] p-16 flex flex-col items-center justify-center text-center shadow-sm">
+    <div class="w-16 h-16 rounded-full bg-[#14422f]/10 text-[#14422f] flex items-center justify-center mb-4 border border-[#14422f]/20">
+      <span class="material-symbols-outlined text-3xl">compare_arrows</span>
+    </div>
+    <h3 class="font-bold text-[#1b1c1a] text-lg mb-1">Karşılaştırma İçin Adayları Seçin</h3>
+    <p class="text-xs text-[#8a8580] max-w-md leading-relaxed">Yukarıdaki seçim menüsünden kıyaslamak istediğiniz 2 adayı seçin veya <a href="/admin/search" class="text-[#14422f] font-bold underline">Arama Sayfasından</a> seçim yapın.</p>
+  </div>
+
   <!-- Error State -->
-  <div id="compare-error" class="hidden bg-rose-50 border border-rose-200 rounded-[10px] p-12 text-center text-rose-800 shadow-sm flex-col items-center justify-center">
+  <div id="compare-error" class="hidden w-full bg-rose-50 border border-rose-200 rounded-[10px] p-12 text-center text-rose-800 shadow-sm flex flex-col items-center justify-center">
     <span class="material-symbols-outlined text-5xl text-rose-600 mb-3">group_off</span>
     <h3 class="font-bold text-lg text-rose-900" id="compare-error-title">Karşılaştırma Yapılamadı</h3>
-    <p class="text-xs text-rose-600 max-w-md mt-1" id="compare-error-desc">Karşılaştırılacak geçerli 2 aday seçilmedi veya aday verileri okunamadı.</p>
+    <p class="text-xs text-rose-600 max-w-md mt-1 font-medium" id="compare-error-desc">Karşılaştırılacak geçerli 2 aday seçilmedi veya aday verileri okunamadı.</p>
     <a href="/admin/search" class="mt-6 bg-[#14422f] text-white px-6 py-2.5 rounded-lg text-xs font-bold hover:bg-[#0f3223] transition-colors inline-flex items-center gap-2">
       <span class="material-symbols-outlined text-sm">search</span> Aday Listesine Git
     </a>
@@ -49,19 +92,98 @@ const candidate2Id = Astro.url.searchParams.get('candidate2') || '';
     async function loadComparisonData() {
       const grid = document.getElementById('compare-grid');
       const loading = document.getElementById('compare-loading');
+      const promptDiv = document.getElementById('compare-prompt');
       const errorDiv = document.getElementById('compare-error');
-      if (!grid || !loading || !errorDiv) return;
+      const select1 = document.getElementById('select-cand-1');
+      const select2 = document.getElementById('select-cand-2');
+      const runBtn = document.getElementById('run-compare-btn');
+
+      if (!grid || !loading || !errorDiv || !promptDiv) return;
 
       const c1Id = grid.dataset.c1;
       const c2Id = grid.dataset.c2;
 
+      // Populate candidate dropdowns from API
+      try {
+        const cRes = await fetch('/api/admin/candidates');
+        if (cRes.ok) {
+          const cData = await cRes.json();
+          const candidates = cData.candidates || [];
+
+          if (select1 && select2) {
+            select1.innerHTML = '<option value="">1. Adayı Seçin...</option>';
+            select2.innerHTML = '<option value="">2. Adayı Seçin...</option>';
+
+            candidates.forEach(c => {
+              const opt1 = document.createElement('option');
+              opt1.value = c.id;
+              opt1.textContent = c.name ? `${c.name} (${c.email})` : c.email;
+              if (c.id === c1Id) opt1.selected = true;
+              select1.appendChild(opt1);
+
+              const opt2 = document.createElement('option');
+              opt2.value = c.id;
+              opt2.textContent = c.name ? `${c.name} (${c.email})` : c.email;
+              if (c.id === c2Id) opt2.selected = true;
+              select2.appendChild(opt2);
+            });
+          }
+        }
+      } catch (err) {
+        console.error("Failed to load candidates list for dropdowns:", err);
+      }
+
+      // Bind run compare button & dropdown auto-trigger
+      const executeCompare = () => {
+        const val1 = select1 ? select1.value : '';
+        const val2 = select2 ? select2.value : '';
+        if (!val1 || !val2) return;
+        if (val1 === val2) {
+          alert("Lütfen 2 farklı aday seçin.");
+          return;
+        }
+        window.location.href = `/admin/compare?candidate1=${val1}&candidate2=${val2}`;
+      };
+
+      if (runBtn) {
+        runBtn.onclick = () => {
+          const val1 = select1 ? select1.value : '';
+          const val2 = select2 ? select2.value : '';
+          if (!val1 || !val2) {
+            alert("Lütfen karşılaştırmak için 2 aday seçin.");
+            return;
+          }
+          executeCompare();
+        };
+      }
+
+      if (select1) select1.onchange = executeCompare;
+      if (select2) select2.onchange = executeCompare;
+
       if (!c1Id || !c2Id) {
         loading.classList.add('hidden');
-        errorDiv.classList.remove('hidden');
-        errorDiv.classList.add('flex');
-        document.getElementById('compare-error-desc').textContent = 'Karşılaştırma yapabilmek için lütfen arama sayfasından 2 adet aday seçin.';
+        grid.classList.add('hidden');
+        errorDiv.classList.add('hidden');
+        promptDiv.classList.remove('hidden');
+        promptDiv.classList.add('flex');
         return;
       }
+
+      if (c1Id === c2Id) {
+        loading.classList.add('hidden');
+        grid.classList.add('hidden');
+        promptDiv.classList.add('hidden');
+        errorDiv.classList.remove('hidden');
+        errorDiv.classList.add('flex');
+        document.getElementById('compare-error-title').textContent = 'Aynı Aday Seçildi';
+        document.getElementById('compare-error-desc').textContent = 'Karşılaştırma yapabilmek için lütfen 2 farklı aday seçin.';
+        return;
+      }
+
+      promptDiv.classList.add('hidden');
+      errorDiv.classList.add('hidden');
+      loading.classList.remove('hidden');
+      loading.classList.add('flex');
 
       try {
         const [res1, res2] = await Promise.all([
@@ -80,6 +202,7 @@ const candidate2Id = Astro.url.searchParams.get('candidate2') || '';
         const cand2 = data2.candidate;
 
         loading.classList.add('hidden');
+        loading.classList.remove('flex');
         grid.classList.remove('hidden');
         grid.classList.add('grid');
 
@@ -89,6 +212,8 @@ const candidate2Id = Astro.url.searchParams.get('candidate2') || '';
       } catch (err) {
         console.error("Comparison load error:", err);
         loading.classList.add('hidden');
+        loading.classList.remove('flex');
+        grid.classList.add('hidden');
         errorDiv.classList.remove('hidden');
         errorDiv.classList.add('flex');
       }
@@ -108,6 +233,7 @@ const candidate2Id = Astro.url.searchParams.get('candidate2') || '';
       const score = latestAnalysis && latestAnalysis.atsScore !== null ? latestAnalysis.atsScore : null;
       const strengths = latestAnalysis && latestAnalysis.strengths ? latestAnalysis.strengths : [];
       const weaknesses = latestAnalysis && latestAnalysis.weaknesses ? latestAnalysis.weaknesses : [];
+      const suggestions = latestAnalysis && latestAnalysis.suggestions ? latestAnalysis.suggestions : [];
       const skills = (latestAnalysis && latestAnalysis.skills) || candidate.skills || [];
 
       // Color themes based on score

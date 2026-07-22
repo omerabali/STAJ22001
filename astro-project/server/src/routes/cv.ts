@@ -7,7 +7,7 @@ import crypto from "crypto";
 import path from "path";
 import { authMiddleware } from "../middleware/auth.js";
 import { supabase } from "../lib/supabase.js";
-import { extractTextFromPDF, chunkTextBySections, analyzeWithGemini, extractLocalSkills, detectLanguage, simulateAiAnalysis } from "../utils/parser.js";
+import { extractTextFromPDF, chunkTextBySections, analyzeWithOpenAI, analyzeWithGemini, extractLocalSkills, detectLanguage, simulateAiAnalysis } from "../utils/parser.js";
 import { embedAllChunks, searchSimilarChunks } from "../utils/embeddings.js";
 
 const pool = new pg.Pool({
@@ -141,14 +141,14 @@ async function processCv(cvId: string, analysisId: string, pdfBuffer: Buffer): P
     }
 
     let aiAnalysis;
-    if (aiFallback) {
-      console.log(`[Parser] Running Gemini AI Fallback for CV: ${cvId} (Reason: ${aiFallbackReason})`);
-      aiAnalysis = await analyzeWithGemini(text, lang, prisma);
-      parserLogs.push("Gemini AI Analizi başarıyla çalıştırıldı ve doğrulandı.");
+    if (process.env.OPENAI_API_KEY) {
+      console.log(`[Parser] 🤖 Running OpenAI ATS & SWOT Analysis for CV: ${cvId}...`);
+      aiAnalysis = await analyzeWithOpenAI(text, lang, prisma);
+      parserLogs.push("OpenAI ATS & SWOT Analizi başarıyla çalıştırıldı.");
     } else {
-      console.log(`[Parser] Skipping AI call for CV: ${cvId}. Running local rule/hybrid analysis.`);
+      console.log(`[Parser] No OPENAI_API_KEY found. Running local rule/hybrid analysis.`);
       aiAnalysis = simulateAiAnalysis(text, lang);
-      parserLogs.push("Kural tabanlı hibrid analiz başarıyla çalıştırıldı.");
+      parserLogs.push("Kural tabanlı hibrid analiz çalıştırıldı.");
     }
 
     // Save parser statistics in CV metadata (detailed report!)
@@ -568,7 +568,7 @@ router.get("/search", authMiddleware, async (req: Request, res: Response): Promi
 
   try {
     // Pass userId so search is scoped to the requesting user's own embeddings only
-    const results = await searchSimilarChunks(query, limit, prisma, undefined, req.user.id);
+    const results = await searchSimilarChunks(query, limit, prisma, undefined, req.user?.id);
     res.json({ results });
   } catch (error: any) {
     console.error("Semantic search endpoint error:", error);

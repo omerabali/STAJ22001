@@ -6,6 +6,7 @@ const menuItems = [
     { name: 'Aday Ara', path: '/admin/search', icon: 'search' },
     { name: 'CV Yükle', path: '/admin/upload', icon: 'upload_file' },
     { name: 'Kullanıcı Yönetimi', path: '/admin/users', icon: 'group' },
+    { name: 'Aday Karşılaştırma', path: '/admin/compare', icon: 'compare_arrows' },
     { name: 'Sistem Ayarları', path: '/admin/settings', icon: 'settings' },
     { name: 'Raporlar', path: '/admin/reports', icon: 'analytics' }
 ];
@@ -76,11 +77,11 @@ const bottomItems = [
 <script is:inline>
     async function handleLogout() {
         try {
-            await fetch('/api/auth/logout', { method: 'POST' });
-            window.location.href = '/';
+            await fetch('/api/auth/logout', { method: 'POST', credentials: 'include' });
         } catch (err) {
             console.error("Çıkış yapılırken hata oluştu:", err);
-            window.location.href = '/';
         }
+        try { sessionStorage.clear(); localStorage.clear(); } catch(e) {}
+        window.location.href = '/';
     }
 </script>

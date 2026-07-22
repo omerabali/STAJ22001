@@ -64,8 +64,13 @@ const userId = Astro.url.searchParams.get('userId') || '';
               <p class="text-[11px] text-[#8a8580] font-medium" id="swot-cv-name">Seçilen CV için SWOT Değerlendirmesi</p>
             </div>
           </div>
-          <div id="swot-score-badge">
-            <span class="px-3 py-1 rounded-full text-xs font-bold bg-gray-100 text-gray-700">Analiz Bekleniyor</span>
+          <div class="flex items-center gap-3">
+            <button id="reanalyze-cv-btn" class="hidden px-2.5 py-1.5 text-xs font-bold text-[#14422f] bg-[#14422f]/10 border border-[#14422f]/20 rounded-md hover:bg-[#14422f]/20 transition-all items-center gap-1 cursor-pointer" title="Yeni AI Motoru ile CV'yi Yeniden Analiz Et">
+              <span class="material-symbols-outlined text-[15px]">refresh</span> Yeniden AI Analiz Et
+            </button>
+            <div id="swot-score-badge">
+              <span class="px-3 py-1 rounded-full text-xs font-bold bg-gray-100 text-gray-700">Analiz Bekleniyor</span>
+            </div>
           </div>
         </div>
 
@@ -375,6 +380,32 @@ const userId = Astro.url.searchParams.get('userId') || '';
       const weaknessesEl = document.getElementById('swot-weaknesses-container');
       const suggestionsEl = document.getElementById('swot-suggestions-container');
 
+      const reanalyzeBtn = document.getElementById('reanalyze-cv-btn');
+      if (reanalyzeBtn) {
+        reanalyzeBtn.classList.remove('hidden');
+        reanalyzeBtn.classList.add('flex');
+        reanalyzeBtn.onclick = async () => {
+          if (!confirm(`${cv.fileName} isimli özgeçmişi yeni Türkçe AI motoru ile yeniden analiz etmek istiyor musunuz?`)) return;
+          reanalyzeBtn.disabled = true;
+          reanalyzeBtn.innerHTML = `<span class="material-symbols-outlined text-[15px] animate-spin">progress_activity</span> Analiz Ediliyor...`;
+          try {
+            const res = await fetch(`/api/cv/${cv.id}/reanalyze`, { method: 'POST' });
+            if (res.ok) {
+              alert("AI Analizi yeniden başlatıldı! 3-5 saniye sonra sayfa otomatik yenileniyor.");
+              setTimeout(() => { window.location.reload(); }, 3000);
+            } else {
+              alert("Yeniden analiz başlatılamadı.");
+              reanalyzeBtn.disabled = false;
+              reanalyzeBtn.innerHTML = `<span class="material-symbols-outlined text-[15px]">refresh</span> Yeniden AI Analiz Et`;
+            }
+          } catch(e) {
+            console.error(e);
+            reanalyzeBtn.disabled = false;
+            reanalyzeBtn.innerHTML = `<span class="material-symbols-outlined text-[15px]">refresh</span> Yeniden AI Analiz Et`;
+          }
+        };
+      }
+
       if (!cvNameEl) return;
       cvNameEl.textContent = `${cv.fileName} - Yapay Zeka Değerlendirmesi`;
 
@@ -544,7 +575,7 @@ const userId = Astro.url.searchParams.get('userId') || '';
                 navigator.clipboard.writeText(window.__currentCvText);
                 const label = document.getElementById('copy-cv-text-label');
                 if (label) {
-                  label.textContent = 'Kopyalandı!';
+                  label.textContent = 'Kopyalandı! ✅';
                   setTimeout(() => { label.textContent = 'Metni Kopyala'; }, 2000);
                 }
               }

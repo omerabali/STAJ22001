@@ -232,6 +232,7 @@ import Layout from '../layouts/Layout.astro';
       });
       const data = await response.json();
       if (!response.ok) throw new Error(data.message || 'Kimlik doğrulama başarısız.');
+      try { sessionStorage.clear(); localStorage.clear(); } catch(e) {}
       if (data.user && data.user.role === 'ADMIN') {
         window.location.href = '/admin/dashboard';
       } else {
