@@ -123,22 +123,41 @@ const { user } = Astro.locals;
       })();
       // ─────────────────────────────────────────────────────────────────────
 
-      document.addEventListener("DOMContentLoaded", () => {
+      function initAdminMobileMenu() {
         const mobileBtn = document.getElementById('admin-mobile-menu-btn');
         const sidebar = document.getElementById('admin-sidebar');
         const overlay = document.getElementById('admin-sidebar-overlay');
 
         if (mobileBtn && sidebar && overlay) {
-          mobileBtn.addEventListener('click', () => {
+          const newBtn = mobileBtn.cloneNode(true);
+          mobileBtn.parentNode.replaceChild(newBtn, mobileBtn);
+
+          const newOverlay = overlay.cloneNode(true);
+          overlay.parentNode.replaceChild(newOverlay, overlay);
+
+          newBtn.addEventListener('click', (e) => {
+            e.preventDefault();
+            e.stopPropagation();
             sidebar.classList.toggle('-translate-x-full');
-            overlay.classList.toggle('hidden');
+            newOverlay.classList.toggle('hidden');
           });
-          overlay.addEventListener('click', () => {
+
+          newOverlay.addEventListener('click', () => {
             sidebar.classList.add('-translate-x-full');
-            overlay.classList.add('hidden');
+            newOverlay.classList.add('hidden');
+          });
+
+          sidebar.querySelectorAll('a').forEach(link => {
+            link.addEventListener('click', () => {
+              sidebar.classList.add('-translate-x-full');
+              newOverlay.classList.add('hidden');
+            });
           });
         }
-      });
+      }
+
+      document.addEventListener("DOMContentLoaded", initAdminMobileMenu);
+      document.addEventListener("astro:page-load", initAdminMobileMenu);
     </script>
 
     <style is:global>

@@ -41,23 +41,42 @@ const { user } = Astro.locals;
     </main>
 
     <script is:inline>
-      // Mobile sidebar toggle
-      document.addEventListener("DOMContentLoaded", () => {
+      function initUserMobileMenu() {
         const mobileBtn = document.getElementById('mobile-menu-btn');
         const sidebar = document.getElementById('user-sidebar');
         const overlay = document.getElementById('sidebar-overlay');
 
         if (mobileBtn && sidebar && overlay) {
-          mobileBtn.addEventListener('click', () => {
+          // Remove duplicate listeners if re-initialized
+          const newBtn = mobileBtn.cloneNode(true);
+          mobileBtn.parentNode.replaceChild(newBtn, mobileBtn);
+
+          const newOverlay = overlay.cloneNode(true);
+          overlay.parentNode.replaceChild(newOverlay, overlay);
+
+          newBtn.addEventListener('click', (e) => {
+            e.preventDefault();
+            e.stopPropagation();
             sidebar.classList.toggle('-translate-x-full');
-            overlay.classList.toggle('hidden');
+            newOverlay.classList.toggle('hidden');
           });
-          overlay.addEventListener('click', () => {
+
+          newOverlay.addEventListener('click', () => {
             sidebar.classList.add('-translate-x-full');
-            overlay.classList.add('hidden');
+            newOverlay.classList.add('hidden');
+          });
+
+          sidebar.querySelectorAll('a').forEach(link => {
+            link.addEventListener('click', () => {
+              sidebar.classList.add('-translate-x-full');
+              newOverlay.classList.add('hidden');
+            });
           });
         }
-      });
+      }
+
+      document.addEventListener("DOMContentLoaded", initUserMobileMenu);
+      document.addEventListener("astro:page-load", initUserMobileMenu);
     </script>
   </body>
 </html>
