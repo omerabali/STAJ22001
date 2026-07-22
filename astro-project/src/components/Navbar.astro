@@ -31,19 +31,19 @@ const displayRole = user ? (user.role === 'ADMIN' ? 'YÖNETİCİ' : 'KULLANICI')
       </button>
     </div>
     
-    <div class="flex items-center gap-4 bg-white px-4 py-2 rounded-[10px] border border-[#ddd9d3] shadow-sm transition-all duration-200 hover:border-[#14422f]/50">
+    <a href="/admin/settings" class="flex items-center gap-3 bg-white hover:bg-[#faf9f5] border border-[#ddd9d3] rounded-[10px] py-1.5 pr-2 pl-4 transition-all shadow-sm focus:outline-none focus:ring-2 focus:ring-[#14422f] cursor-pointer group" title="Sistem Ayarlarına Git">
       <div class="text-right hidden sm:block">
-        <p class="font-body-md text-sm text-[#1b1c1a] font-bold" id="header-user-name">{displayLabel}</p>
+        <p class="font-body-md text-sm text-[#1b1c1a] font-bold group-hover:text-[#14422f] transition-colors" id="header-user-name">{displayLabel}</p>
         <p class="font-label-xs text-[10px] text-[#14422f] uppercase tracking-widest font-mono font-bold" id="header-user-role">{displayRole}</p>
       </div>
       
       <div 
         id="header-user-avatar" 
-        class="w-10 h-10 rounded-full bg-[#faf9f5] text-[#14422f] border border-[#ddd9d3] flex items-center justify-center font-bold font-mono bg-cover bg-center cursor-pointer hover:border-[#14422f] hover:scale-105 transition-all duration-200 overflow-hidden"
+        class="w-10 h-10 rounded-full bg-[#faf9f5] text-[#14422f] border border-[#ddd9d3] flex items-center justify-center font-bold font-mono bg-cover bg-center group-hover:border-[#14422f] group-hover:scale-105 transition-all duration-200 overflow-hidden shrink-0"
       >
         <span id="avatar-initial-span">{avatarInitial}</span>
       </div>
-    </div>
+    </a>
   </header>
 ) : (
   <header class="fixed top-0 right-0 w-full md:w-[calc(100%-260px)] h-24 bg-[#faf9f5]/90 backdrop-blur-md border-b border-[#ddd9d3] flex justify-between items-center px-4 md:px-10 z-40 transition-all duration-200">
