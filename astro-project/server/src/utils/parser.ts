@@ -1971,7 +1971,7 @@ export async function analyzeWithOpenAI(
         ],
       }),
       "",
-      `DİL TALİMATI: Tüm analiz açıklamaları, güçlü/zayıf yönler ve mülakat soruları tamamen ${isTr ? "TÜRKÇE" : "İNGİLİZCE"} dilinde, profesyonel, detaylı ve net olmalıdır.`,
+      "DİL TALİMATI: CV hangi dilde yazılmış olursa olsun (İngilizce, Türkçe vb.), tüm analiz açıklamaları, güçlü/zayıf yönler, gelişim alanları ve mülakat soruları İSTİSNASIZ %100 TÜRKÇE DİLİNDE, profesyonel, detaylı ve net yazılmalıdır.",
       "",
       "ÖZGEÇMİŞ METNİ:",
       text,
@@ -2156,7 +2156,7 @@ export function simulateAiAnalysis(text: string, lang: "tr" | "en") {
     atsScore,
     role: extractedRole,
     skills: foundSkills,
-    ...(lang === "tr" ? trData : enData),
+    ...trData,
   };
 }
 

@@ -63,13 +63,14 @@ import UserLayout from '../layouts/UserLayout.astro';
                   <th class="px-6 py-4 font-semibold" scope="col">Belge Adı</th>
                   <th class="px-6 py-4 font-semibold" scope="col">Yükleme Tarihi</th>
                   <th class="px-6 py-4 font-semibold" scope="col">Analiz Durumu</th>
-                  <th class="px-6 py-4 font-semibold text-center" scope="col">Uyum Skoru</th>
+                  <th class="px-6 py-4 font-semibold text-center" scope="col">İşleme Süresi</th>
+                  <th class="px-6 py-4 font-semibold text-center" scope="col">ATS Skoru</th>
                   <th class="px-6 py-4 font-semibold text-right" scope="col">İşlem</th>
                 </tr>
               </thead>
               <tbody class="divide-y divide-[#ddd9d3] text-[#1b1c1a]" id="profile-cvs-body">
                 <tr>
-                  <td colspan="5" class="px-6 py-8 text-center text-[#8a8580] font-medium">Yüklemeler sorgulanıyor...</td>
+                  <td colspan="6" class="px-6 py-8 text-center text-[#8a8580] font-medium">Yüklemeler sorgulanıyor...</td>
                 </tr>
               </tbody>
             </table>
@@ -252,8 +253,13 @@ import UserLayout from '../layouts/UserLayout.astro';
         }
 
         const scoreStr = latestAnalysis && latestAnalysis.atsScore !== null 
-          ? `<span class="font-bold text-emerald-700">%${latestAnalysis.atsScore} Uyum</span>` 
+          ? `<span class="font-bold text-emerald-700">%${latestAnalysis.atsScore} ATS Skoru</span>` 
           : `<span class="text-[#8a8580]">-</span>`;
+
+        const timeMs = cv.metadata?.processingTimeMs;
+        const timeBadge = timeMs 
+          ? `<span class="inline-flex items-center gap-1 px-2.5 py-1 rounded-[6px] text-xs font-mono font-bold bg-[#faf9f5] text-[#14422f] border border-[#ddd9d3]"><span class="material-symbols-outlined text-[13px] text-amber-500">bolt</span>${(timeMs / 1000).toFixed(1)}s</span>` 
+          : `<span class="text-xs text-[#8a8580] italic">-</span>`;
 
         const tr = document.createElement('tr');
         tr.className = `hover:bg-[#f5f4f0]/60 transition-all group cursor-pointer ${selectedCvId === cv.id ? 'bg-[#f5f4f0]' : ''}`;
@@ -274,6 +280,7 @@ import UserLayout from '../layouts/UserLayout.astro';
           </td>
           <td class="px-6 py-5 text-[#8a8580] font-medium text-xs">${dateStr}</td>
           <td class="px-6 py-5">${statusBadge}</td>
+          <td class="px-6 py-5 text-center">${timeBadge}</td>
           <td class="px-6 py-5 text-center text-xs font-bold">${scoreStr}</td>
           <td class="px-6 py-5 text-right" onclick="event.stopPropagation();">
             <button class="text-[#8a8580] hover:text-red-600 p-1.5 rounded-lg hover:bg-red-50 transition-colors animate-pulse-hover" onclick="deleteCV('${cv.id}')" title="Sil">

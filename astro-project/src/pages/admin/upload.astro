@@ -182,6 +182,7 @@ import AdminLayout from '../../layouts/AdminLayout.astro';
                 <th class="px-4 py-3 font-bold">AİT OLDUĞU ADAY</th>
                 <th class="px-4 py-3 font-bold">YÜKLEME TARİHİ</th>
                 <th class="px-4 py-3 font-bold">DURUM</th>
+                <th class="px-4 py-3 font-bold">İŞLEME SÜRESİ</th>
                 <th class="px-4 py-3 font-bold text-right">İŞLEM</th>
               </tr>
             </thead>
@@ -361,7 +362,7 @@ import AdminLayout from '../../layouts/AdminLayout.astro';
       const cvs = data.cvs || [];
       if (countLabel) countLabel.textContent = `${cvs.length} kayıt`;
       if (cvs.length === 0) {
-        tbody.innerHTML = `<tr><td colspan="5" class="p-10 text-center text-[#8a8580] font-medium text-sm">Henüz CV yüklenmedi.</td></tr>`;
+        tbody.innerHTML = `<tr><td colspan="6" class="p-10 text-center text-[#8a8580] font-medium text-sm">Henüz CV yüklenmedi.</td></tr>`;
         clearInterval(activeInterval); activeInterval = null; return;
       }
       let hasPending = false;
@@ -379,6 +380,11 @@ import AdminLayout from '../../layouts/AdminLayout.astro';
         };
         const statusBadge = badges[status] ?? '';
         const userText = cv.user ? (cv.user.name || cv.user.email) : 'Admin';
+        const timeMs = cv.metadata?.processingTimeMs;
+        const timeBadge = timeMs 
+          ? `<span class="inline-flex items-center gap-1 px-2 py-1 rounded-[6px] text-[11px] font-mono font-bold bg-[#faf9f5] text-[#14422f] border border-[#ddd9d3]"><span class="material-symbols-outlined text-[13px] text-amber-500">bolt</span>${(timeMs / 1000).toFixed(1)}s</span>` 
+          : `<span class="text-[11px] text-[#8a8580] italic">-</span>`;
+
         const retryBtn = status === 'FAILED'
           ? `<button onclick="retryCV('${cv.id}')" class="p-1.5 rounded-[6px] text-amber-600 hover:text-amber-700 hover:bg-amber-50 transition-colors mr-1" title="Tekrar Dene">
                <span class="material-symbols-outlined text-[16px]">refresh</span>
@@ -397,6 +403,7 @@ import AdminLayout from '../../layouts/AdminLayout.astro';
           <td class="px-4 py-3 text-[11px] text-[#8a8580] font-semibold truncate max-w-[130px]">${userText}</td>
           <td class="px-4 py-3 text-[11px] text-[#8a8580] font-medium whitespace-nowrap">${date}</td>
           <td class="px-4 py-3">${statusBadge}</td>
+          <td class="px-4 py-3">${timeBadge}</td>
           <td class="px-4 py-3 text-right" onclick="event.stopPropagation()">
             ${retryBtn}
             <button onclick="deleteCV('${cv.id}')" class="p-1.5 rounded-[6px] text-[#8a8580] hover:text-rose-600 hover:bg-rose-50 transition-colors" title="Sil">
@@ -409,7 +416,7 @@ import AdminLayout from '../../layouts/AdminLayout.astro';
       if (hasPending && !activeInterval) activeInterval = setInterval(loadCVList, 3000);
       else if (!hasPending && activeInterval) { clearInterval(activeInterval); activeInterval = null; }
     } catch {
-      tbody.innerHTML = `<tr><td colspan="5" class="p-8 text-center text-rose-600 text-sm font-medium">Liste yüklenirken hata oluştu.</td></tr>`;
+      tbody.innerHTML = `<tr><td colspan="6" class="p-8 text-center text-rose-600 text-sm font-medium">Liste yüklenirken hata oluştu.</td></tr>`;
     }
   }
 

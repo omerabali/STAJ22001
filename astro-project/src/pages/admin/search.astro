@@ -177,7 +177,7 @@ import AdminLayout from '../../layouts/AdminLayout.astro';
       if (status === 'COMPLETED' && score !== null) {
         const color = score >= 80 ? 'text-emerald-700 bg-emerald-50 border border-emerald-200' : score >= 60 ? 'text-amber-700 bg-amber-50 border border-amber-200' : 'text-rose-700 bg-rose-50 border border-rose-200';
         const icon = score >= 80 ? 'check_circle' : score >= 60 ? 'warning' : 'error';
-        return `<div class="flex items-center gap-1 ${color} px-2 py-1 rounded-[6px] font-bold text-xs"><span class="material-symbols-outlined text-[14px]">${icon}</span>%${score} Uyum</div>`;
+        return `<div class="flex items-center gap-1 ${color} px-2 py-1 rounded-[6px] font-bold text-xs"><span class="material-symbols-outlined text-[14px]">${icon}</span>%${score} ATS Skoru</div>`;
       }
       if (status === 'PROCESSING') {
         return '<div class="flex items-center gap-1 text-blue-700 bg-blue-50 border border-blue-200 px-2 py-1 rounded-[6px] text-xs font-medium"><span class="material-symbols-outlined text-[14px] animate-spin">progress_activity</span>İşleniyor</div>';
@@ -326,7 +326,7 @@ import AdminLayout from '../../layouts/AdminLayout.astro';
               <div class="flex flex-col items-end gap-1">
                 <div class="flex items-center gap-1 ${badgeClass} px-2.5 py-1 rounded-[6px] font-bold text-xs">
                   <span class="material-symbols-outlined text-[14px]">bolt</span>
-                  %${score} Genel Uyum
+                  %${score} AI Arama Uyumu
                 </div>
               </div>
             </div>

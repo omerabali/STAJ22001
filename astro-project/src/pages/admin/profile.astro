@@ -309,7 +309,7 @@ const userId = Astro.url.searchParams.get('userId') || '';
           }
 
           const scoreStr = latestAnalysis && latestAnalysis.atsScore !== null 
-            ? `<span class="font-bold text-emerald-700">%${latestAnalysis.atsScore} Uyum</span>` 
+            ? `<span class="font-bold text-emerald-700">%${latestAnalysis.atsScore} ATS Skoru</span>` 
             : `<span class="text-[#8a8580]">-</span>`;
 
           const isSelected = selectedCvId === cv.id || (!selectedCvId && idx === 0);
@@ -426,7 +426,7 @@ const userId = Astro.url.searchParams.get('userId') || '';
         scoreBarEl.style.width = `${score}%`;
 
         const badgeClass = score >= 80 ? 'bg-emerald-50 text-emerald-700 border-emerald-200' : score >= 60 ? 'bg-amber-50 text-amber-700 border-amber-200' : 'bg-rose-50 text-rose-700 border-rose-200';
-        scoreBadgeEl.innerHTML = `<span class="px-3 py-1 rounded-full text-xs font-bold border ${badgeClass}">%${score} Uyum</span>`;
+        scoreBadgeEl.innerHTML = `<span class="px-3 py-1 rounded-full text-xs font-bold border ${badgeClass}">%${score} ATS Skoru</span>`;
       } else {
         progressWrapper.classList.add('hidden');
         scoreBadgeEl.innerHTML = `<span class="px-3 py-1 rounded-full text-xs font-bold bg-gray-100 text-gray-700">Skor Yok</span>`;
