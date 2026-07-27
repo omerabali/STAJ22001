@@ -5,8 +5,8 @@ import UserLayout from '../layouts/UserLayout.astro';
 <UserLayout title="Beacon - Analiz Sonuçlarım" headerTitle="Analiz Sonuçlarım">
   <div class="flex gap-6 h-full min-h-[600px] flex-col lg:flex-row">
     
-    <!-- LEFT COLUMN: CV List -->
-    <div class="w-full lg:flex-1 flex flex-col gap-6 min-w-0">
+    <!-- LEFT COLUMN: CV List (%35) -->
+    <div class="w-full lg:w-[35%] flex flex-col gap-6 min-w-0 shrink-0">
       <div class="bg-white border border-[#ddd9d3] rounded-[10px] shadow-sm overflow-hidden flex flex-col h-full min-h-[500px]">
         <!-- Card Header -->
         <div class="p-6 border-b border-[#ddd9d3] bg-white">
@@ -29,8 +29,8 @@ import UserLayout from '../layouts/UserLayout.astro';
       </div>
     </div>
 
-    <!-- RIGHT COLUMN: Detailed Analysis Panel -->
-    <div class="w-full lg:flex-1 min-w-0">
+    <!-- RIGHT COLUMN: Detailed Analysis Panel (%65) -->
+    <div class="w-full lg:w-[65%] min-w-0 flex-1">
       <div class="bg-white border border-[#ddd9d3] rounded-[10px] shadow-sm p-6 h-full flex flex-col min-h-[500px] relative overflow-hidden" id="analysis-detail-card">
         
         <!-- ─── EMPTY STATE ─── -->
@@ -293,12 +293,128 @@ import UserLayout from '../layouts/UserLayout.astro';
                 <span class="px-3 py-1.5 rounded-full bg-[#14422f]/10 border border-[#14422f]/20 text-[#14422f] text-xs font-semibold shadow-sm cursor-default">${s}</span>
               `).join('')
             : `<span class="text-xs text-[#8a8580]">Yetenek kelimeleri çıkarılamadı.</span>`;
-          const strengthsHtml = Array.isArray(analysis.strengths) && analysis.strengths.length > 0
-            ? analysis.strengths.map(st => `<li>${st}</li>`).join('') : '<li>Veri yok.</li>';
-          const suggestionsHtml = Array.isArray(analysis.suggestions) && analysis.suggestions.length > 0
-            ? analysis.suggestions.map(sg => `<li>${sg}</li>`).join('') : '<li>Veri yok.</li>';
-          const weaknessesHtml = Array.isArray(analysis.weaknesses) && analysis.weaknesses.length > 0
-            ? analysis.weaknesses.map(w => `<li>${w}</li>`).join('') : '<li>Veri yok.</li>';
+
+          // Strengths (Güçlü Yönler)
+          const strengths = analysis.strengths || [];
+          const strengthsHtml = strengths.length > 0
+            ? `
+              <div class="space-y-2">
+                ${strengths.map(s => `
+                  <div class="flex items-start gap-2 text-xs text-[#1b1c1a] leading-relaxed bg-emerald-50/80 border border-emerald-200/80 p-3 rounded-lg shadow-2xs">
+                    <span class="material-symbols-outlined text-emerald-600 text-[16px] shrink-0 mt-0.5">check_circle</span>
+                    <span>${s}</span>
+                  </div>
+                `).join('')}
+              </div>
+            `
+            : `<p class="text-xs text-[#8a8580] italic">Güçlü yön verisi bulunamadı.</p>`;
+
+          // Weaknesses (Eksik Yönler)
+          const weaknesses = analysis.weaknesses || analysis.eksik_yonler || analysis.gelisime_acik_yonler || [];
+          const weaknessesHtml = weaknesses.length > 0
+            ? `
+              <div class="space-y-2">
+                ${weaknesses.map(w => `
+                  <div class="flex items-start gap-2 text-xs text-[#1b1c1a] leading-relaxed bg-rose-50/80 border border-rose-200/80 p-3 rounded-lg shadow-2xs">
+                    <span class="material-symbols-outlined text-rose-600 text-[16px] shrink-0 mt-0.5">warning</span>
+                    <span>${w}</span>
+                  </div>
+                `).join('')}
+              </div>
+            `
+            : `<p class="text-xs text-[#8a8580] italic">Eksik yön tespit edilmedi.</p>`;
+
+          // Parse Suggestions (Recommendations & Questions)
+          const rawSuggestions = analysis.suggestions || [];
+          const recList = [];
+          const qList = [];
+
+          rawSuggestions.forEach((item) => {
+            if (typeof item === 'object' && item !== null && item.action) {
+              recList.push({
+                priority: item.priority || 'medium',
+                timeframe: item.timeframe || 'Kısa Vadeli',
+                action: item.action
+              });
+              if (item.question) {
+                qList.push({
+                  priority: item.priority || 'medium',
+                  timeframe: item.timeframe || 'Kısa Vadeli',
+                  question: item.question
+                });
+              }
+            } else if (typeof item === 'string') {
+              let priority = 'medium';
+              if (item.toLowerCase().includes('high') || item.toLowerCase().includes('yüksek')) priority = 'high';
+              else if (item.toLowerCase().includes('low') || item.toLowerCase().includes('düşük')) priority = 'low';
+
+              if (item.includes('❓ Mülakat Sorusu:')) {
+                const parts = item.split('❓ Mülakat Sorusu:');
+                const rec = parts[0].replace('💡 İK Tavsiyesi:', '').trim();
+                const q = parts[1]?.trim() || '';
+                if (rec) recList.push({ priority, timeframe: 'Kısa Vadeli', action: rec });
+                if (q) qList.push({ priority, timeframe: 'Kısa Vadeli', question: q });
+              } else {
+                const rec = item.replace('💡 İK Tavsiyesi:', '').trim();
+                recList.push({ priority, timeframe: 'Kısa Vadeli', action: rec });
+              }
+            }
+          });
+
+          // Recommendations HTML
+          const suggestionsHtml = recList.length > 0
+            ? `
+              <div class="space-y-2">
+                ${recList.map(rec => {
+                  const p = rec.priority || 'medium';
+                  const badgeClass = p === 'high'
+                    ? 'bg-rose-100 text-rose-800 border-rose-200'
+                    : p === 'low'
+                    ? 'bg-blue-100 text-blue-800 border-blue-200'
+                    : 'bg-amber-100 text-amber-800 border-amber-200';
+                  const pLabel = p === 'high' ? 'Yüksek Öncelik' : p === 'low' ? 'Düşük Öncelik' : 'Orta Öncelik';
+
+                  return `
+                    <div class="p-3 rounded-lg border border-[#ddd9d3] bg-[#faf9f5] flex flex-col gap-1.5 shadow-2xs">
+                      <div class="flex items-center justify-between gap-2">
+                        <span class="px-2 py-0.5 rounded-full text-[10px] font-bold border ${badgeClass}">${pLabel}</span>
+                        <span class="text-[10px] text-[#8a8580] font-semibold flex items-center gap-1">
+                          <span class="material-symbols-outlined text-[12px]">schedule</span>
+                          ${rec.timeframe || 'Kısa Vadeli'}
+                        </span>
+                      </div>
+                      <div class="flex items-start gap-2 text-xs text-[#1b1c1a] leading-relaxed">
+                        <span class="material-symbols-outlined text-amber-600 text-[16px] shrink-0 mt-0.5">lightbulb</span>
+                        <span>${rec.action}</span>
+                      </div>
+                    </div>
+                  `;
+                }).join('')}
+              </div>
+            `
+            : `<p class="text-xs text-[#8a8580] italic">Mülakat önerisi bulunamadı.</p>`;
+
+          // Questions HTML
+          const questionsHtml = qList.length > 0
+            ? `
+              <div class="space-y-2">
+                ${qList.map(item => `
+                  <div class="p-3 rounded-lg border border-[#14422f]/20 bg-[#14422f]/5 flex flex-col gap-1.5 shadow-2xs">
+                    <div class="flex items-center justify-between gap-2">
+                      <span class="text-[10px] font-bold text-[#14422f] uppercase tracking-wider flex items-center gap-1">
+                        <span class="material-symbols-outlined text-[12px]">quiz</span> Mülakat Sorusu
+                      </span>
+                      <span class="text-[10px] text-[#14422f]/70 font-semibold">${item.timeframe || 'Görüşme Aşaması'}</span>
+                    </div>
+                    <div class="flex items-start gap-2 text-xs text-[#14422f] font-semibold leading-relaxed italic">
+                      <span class="material-symbols-outlined text-[#14422f] text-[16px] shrink-0 mt-0.5 not-italic">help</span>
+                      <span>${item.question}</span>
+                    </div>
+                  </div>
+                `).join('')}
+              </div>
+            `
+            : `<p class="text-xs text-[#8a8580] italic">Mülakat sorusu bulunamadı.</p>`;
 
           contentArea.innerHTML = `
             <div class="space-y-6 flex flex-col h-full overflow-y-auto pr-2 custom-scrollbar">
@@ -324,27 +440,38 @@ import UserLayout from '../layouts/UserLayout.astro';
                 <div class="flex flex-wrap gap-2 pt-1">${skillsHtml}</div>
               </div>
               
-              <!-- Strengths / Weaknesses Bento -->
-              <div class="grid grid-cols-1 gap-4 pt-1 shrink-0">
-                <div class="bg-emerald-50 border border-emerald-200 p-5 rounded-[10px] space-y-2 text-left">
-                  <span class="text-xs text-emerald-800 font-bold flex items-center gap-1">
-                    <span class="material-symbols-outlined text-sm">thumb_up</span> GÜÇLÜ YÖNLER
+              <!-- Strengths / Weaknesses / Suggestions / Questions Bento -->
+              <div class="grid grid-cols-1 gap-5 pt-1 shrink-0">
+                <!-- Strengths -->
+                <div class="space-y-2 text-left">
+                  <span class="text-xs text-emerald-800 font-bold flex items-center gap-1.5 uppercase tracking-wide">
+                    <span class="material-symbols-outlined text-emerald-600 text-base">thumb_up</span> GÜÇLÜ YÖNLER
                   </span>
-                  <ul class="text-xs text-emerald-700 space-y-1.5 list-disc pl-4">${strengthsHtml}</ul>
+                  ${strengthsHtml}
                 </div>
                 
-                <div class="bg-amber-50 border border-amber-200 p-5 rounded-[10px] space-y-2 text-left">
-                  <span class="text-xs text-amber-800 font-bold flex items-center gap-1">
-                    <span class="material-symbols-outlined text-sm">trending_up</span> GELİŞİM ALANLARI
+                <!-- Weaknesses (Eksik Yönler) -->
+                <div class="space-y-2 text-left">
+                  <span class="text-xs text-rose-800 font-bold flex items-center gap-1.5 uppercase tracking-wide">
+                    <span class="material-symbols-outlined text-rose-600 text-base">warning</span> EKSİK YÖNLER
                   </span>
-                  <ul class="text-xs text-amber-700 space-y-1.5 list-disc pl-4">${suggestionsHtml}</ul>
+                  ${weaknessesHtml}
                 </div>
-                
-                <div class="bg-rose-50 border border-rose-200 p-5 rounded-[10px] space-y-2 text-left">
-                  <span class="text-xs text-rose-800 font-bold flex items-center gap-1">
-                    <span class="material-symbols-outlined text-sm">warning</span> EKSİKLER
+
+                <!-- Recommendations (Mülakat Önerileri) -->
+                <div class="space-y-2 text-left">
+                  <span class="text-xs text-amber-800 font-bold flex items-center gap-1.5 uppercase tracking-wide">
+                    <span class="material-symbols-outlined text-amber-600 text-base">tips_and_updates</span> MÜLAKAT ÖNERİLERİ (TAVSİYELER)
                   </span>
-                  <ul class="text-xs text-rose-700 space-y-1.5 list-disc pl-4">${weaknessesHtml}</ul>
+                  ${suggestionsHtml}
+                </div>
+
+                <!-- Questions (Mülakatta Sorulacak Sorular) -->
+                <div class="space-y-2 text-left">
+                  <span class="text-xs text-[#14422f] font-bold flex items-center gap-1.5 uppercase tracking-wide">
+                    <span class="material-symbols-outlined text-[#14422f] text-base">help_center</span> MÜLAKATTA SORULACAK SORULAR
+                  </span>
+                  ${questionsHtml}
                 </div>
               </div>
             </div>

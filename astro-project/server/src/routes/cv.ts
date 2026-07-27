@@ -9,6 +9,7 @@ import { authMiddleware } from "../middleware/auth.js";
 import { supabase } from "../lib/supabase.js";
 import { extractTextFromPDF, chunkTextBySections, analyzeWithOpenAI, analyzeWithGemini, extractLocalSkills, detectLanguage, simulateAiAnalysis } from "../utils/parser.js";
 import { embedAllChunks, searchSimilarChunks } from "../utils/embeddings.js";
+import { emitAnalysisStatus } from "../index.js";
 
 const pool = new pg.Pool({
   connectionString: process.env.DATABASE_URL,
@@ -52,6 +53,7 @@ async function processCv(cvId: string, analysisId: string, pdfBuffer: Buffer): P
     parserLogs.push("Analiz durumu PROCESSING olarak güncellendi.");
 
     // 2. Extract text from PDF buffer
+    emitAnalysisStatus(cvId, "PROCESSING", "PDF metni çıkarılıyor ve bölümlere ayrılıyor...", 2);
     console.log(`[Parser] Extracting text from CV: ${cvId}`);
     const text = await extractTextFromPDF(pdfBuffer);
     parserLogs.push("PDF metni başarıyla çıkarıldı.");
@@ -141,6 +143,7 @@ async function processCv(cvId: string, analysisId: string, pdfBuffer: Buffer): P
     }
 
     let aiAnalysis;
+    emitAnalysisStatus(cvId, "PROCESSING", "AI analizi başlatılıyor...", 3);
     if (process.env.OPENAI_API_KEY) {
       console.log(`[Parser] 🤖 Running OpenAI ATS & SWOT Analysis for CV: ${cvId}...`);
       aiAnalysis = await analyzeWithOpenAI(text, lang, prisma);
@@ -179,6 +182,7 @@ async function processCv(cvId: string, analysisId: string, pdfBuffer: Buffer): P
 
     // 7. Generate & Save Embeddings for all chunks
     try {
+      // Embedding step is part of AI analysis (step 3), no separate UI step needed
       const embedResult = await embedAllChunks(cvId, prisma);
       parserLogs.push(`Semantik vektörler oluşturuldu (Yeni: ${embedResult.embedded}, Cache: ${embedResult.copied}).`);
     } catch (embedErr: any) {
@@ -206,6 +210,7 @@ async function processCv(cvId: string, analysisId: string, pdfBuffer: Buffer): P
     });
 
     console.log(`[Parser] ✅ Successfully parsed, analyzed and chunked CV: ${cvId}`);
+    emitAnalysisStatus(cvId, "COMPLETED", "Analiz başarıyla tamamlandı.", 4);
 
   } catch (error) {
     console.error(`[Parser] ❌ Error processing CV ${cvId}:`, error);
@@ -326,6 +331,11 @@ router.post("/upload", authMiddleware, (req: Request, res: Response): void => {
           cvId: cv.id,
           status: AnalysisStatus.PENDING,
         }
+      });
+
+      emitAnalysisStatus(cv.id, "CV_UPLOADED", "CV başarıyla yüklendi ve işleme sırasına alındı.", 1, {
+        cvId: cv.id,
+        fileName: cv.fileName
       });
 
       // Asynchronously trigger parsing in the background

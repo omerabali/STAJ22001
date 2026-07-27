@@ -109,10 +109,10 @@ import AdminLayout from '../../layouts/AdminLayout.astro';
                 <span class="material-symbols-outlined text-red-500 text-[15px] shrink-0">picture_as_pdf</span>
                 <span id="single-file-name" class="text-[11px] font-bold text-[#1b1c1a] truncate">—</span>
               </div>
-              <span id="single-pct" class="text-[11px] font-mono text-[#8a8580] shrink-0">0%</span>
+              <span id="single-pct" class="text-[11px] font-mono font-bold text-[#14422f] shrink-0">0%</span>
             </div>
-            <div class="w-full bg-white border border-[#ddd9d3] h-1 rounded-full overflow-hidden">
-              <div id="single-bar" class="h-full w-0 bg-[#14422f] transition-all duration-150 rounded-full"></div>
+            <div class="w-full bg-white border border-[#ddd9d3] h-1.5 rounded-full overflow-hidden">
+              <div id="single-bar" class="h-full w-0 bg-[#14422f] transition-all duration-300 rounded-full"></div>
             </div>
             <p id="single-msg" class="text-[10px] text-[#8a8580] font-medium mt-1">Yükleniyor...</p>
           </div>
@@ -214,11 +214,77 @@ import AdminLayout from '../../layouts/AdminLayout.astro';
     </div>
   </div>
 
+<script is:inline src="https://cdn.socket.io/4.7.5/socket.io.min.js"></script>
+
 <script is:inline>
 {
   let activeCvId = null;
   let activeInterval = null;
   let allCandidates = [];
+  let socket = null;
+
+  // Socket.io initialization for real-time status updates
+  try {
+    const socketUrl = window.location.hostname === 'localhost' ? 'http://localhost:5000' : window.location.origin;
+    socket = io(socketUrl, { withCredentials: true });
+
+    socket.on('connect', () => {
+      console.log('[Admin Upload Socket.io] 🔌 Connected to server:', socket.id);
+    });
+
+    socket.on('analysis:status', (data) => {
+      console.log('[Admin Upload Socket.io] 📡 Received status update:', data);
+
+      const stepNum = typeof data.step === 'number' ? data.step : 1;
+      const pct = Math.min(Math.round((stepNum / 4) * 100), 100);
+
+      const bar = document.getElementById('single-bar');
+      const pctEl = document.getElementById('single-pct');
+      const msg = document.getElementById('single-msg');
+
+      if (bar) bar.style.width = `${pct}%`;
+      if (pctEl) pctEl.textContent = `${pct}%`;
+      if (msg && data.message) msg.textContent = data.message;
+
+      if (data.status === 'COMPLETED' || stepNum >= 4) {
+        if (msg) {
+          msg.textContent = 'Analiz başarıyla tamamlandı!';
+          msg.className = 'text-[10px] font-bold text-emerald-600 mt-1.5';
+        }
+        if (bar) bar.style.width = '100%';
+        if (pctEl) pctEl.textContent = '100%';
+        loadCVList();
+      } else if (data.status === 'FAILED') {
+        if (msg) {
+          msg.textContent = 'Hata: Analiz başarısız oldu.';
+          msg.className = 'text-[10px] font-bold text-rose-600 mt-1.5';
+        }
+        if (bar) bar.style.backgroundColor = 'rgba(239,68,68,0.5)';
+        loadCVList();
+      }
+
+      // Bulk upload items live update
+      if (data.cvId) {
+        const bulkItem = document.querySelector(`.bulk-item[data-cv-id="${data.cvId}"]`);
+        if (bulkItem) {
+          const bBar = bulkItem.querySelector('.item-bar');
+          const bPct = bulkItem.querySelector('.item-pct');
+          const bMsg = bulkItem.querySelector('.item-msg');
+          if (bBar) bBar.style.width = `${pct}%`;
+          if (bPct) bPct.textContent = `${pct}%`;
+          if (bMsg && data.message) bMsg.textContent = data.message;
+          if (data.status === 'COMPLETED') {
+            if (bMsg) {
+              bMsg.textContent = 'Analiz tamamlandı!';
+              bMsg.className = 'text-[10px] font-bold text-emerald-600 item-msg';
+            }
+          }
+        }
+      }
+    });
+  } catch (err) {
+    console.error('[Admin Upload Socket.io] Failed to connect:', err);
+  }
 
   // ─── Tab switching ─────────────────────────────────────────────────
   function switchTab(tabName) {
@@ -370,7 +436,12 @@ import AdminLayout from '../../layouts/AdminLayout.astro';
       cvs.forEach(cv => {
         const analysis = cv.analyses?.[0];
         const status = analysis?.status ?? 'PENDING';
-        if (status === 'PENDING' || status === 'PROCESSING') hasPending = true;
+        if (status === 'PENDING' || status === 'PROCESSING') {
+          hasPending = true;
+          if (socket && cv.id) {
+            socket.emit('join:cv', cv.id);
+          }
+        }
         const date = new Date(cv.createdAt).toLocaleDateString('tr-TR', { day: 'numeric', month: 'short', year: 'numeric' });
         const badges = {
           PENDING:    `<span class="inline-flex items-center gap-1.5 px-2 py-1 rounded-[6px] text-[10px] font-bold bg-amber-50 text-amber-700 border border-amber-200"><span class="w-1.5 h-1.5 rounded-full bg-amber-500 animate-pulse"></span>Sırada</span>`,
@@ -470,11 +541,20 @@ import AdminLayout from '../../layouts/AdminLayout.astro';
       wrap.classList.remove('hidden');
 
       uploadXHR(file, {
-        onProgress: p => { bar.style.width = p + '%'; pct.textContent = p + '%'; if (p === 100) msg.textContent = 'Sunucuya ulaştı...'; },
-        onSuccess: () => {
-          bar.style.width = '100%'; pct.textContent = '100%';
-          msg.textContent = 'Yüklendi! Analiz sıraya alındı.';
-          msg.className = 'text-[10px] font-bold text-emerald-600 mt-1.5';
+        onProgress: p => {
+          // HTTP upload is Phase 1 (0% to 20% of overall progress)
+          const overallPct = Math.round((p / 100) * 20);
+          bar.style.width = overallPct + '%';
+          pct.textContent = overallPct + '%';
+          msg.textContent = p < 100 ? `Dosya sunucuya gönderiliyor... %${p}` : 'Sunucu işliyor, analiz başlatılıyor...';
+        },
+        onSuccess: (data) => {
+          msg.textContent = 'CV başarıyla yüklendi, analiz sıraya alındı...';
+          msg.className = 'text-[10px] font-semibold text-[#14422f] mt-1.5';
+          if (socket && data.cv?.id) {
+            socket.emit('join:cv', data.cv.id);
+            console.log('[Admin Upload] 📡 Joined socket room:', data.cv.id);
+          }
           loadCVList();
         },
         onError: m => {
@@ -676,17 +756,23 @@ import AdminLayout from '../../layouts/AdminLayout.astro';
         xhr.upload.addEventListener('progress', e => {
           if (!e.lengthComputable) return;
           const p = Math.round((e.loaded / e.total) * 100);
-          bar.style.width = p + '%';
-          pct.textContent = p + '%';
-          if (p === 100) msg.textContent = 'Sunucuya ulaştı...';
+          const overallPct = Math.round((p / 100) * 20);
+          bar.style.width = overallPct + '%';
+          pct.textContent = overallPct + '%';
+          msg.textContent = p < 100 ? `Yükleniyor... %${p}` : 'Sunucu işliyor...';
         });
         xhr.addEventListener('load', () => {
           item.dataset.state = 'done';
           item.classList.add('done');
           if (xhr.status >= 200 && xhr.status < 300) {
-            bar.style.width = '100%'; pct.textContent = '100%';
-            msg.textContent = 'Yüklendi!';
-            msg.className = 'text-[10px] font-bold text-emerald-600 item-msg';
+            let resData = null;
+            try { resData = JSON.parse(xhr.responseText); } catch {}
+            if (resData?.cv?.id) {
+              item.dataset.cvId = resData.cv.id;
+              if (socket) socket.emit('join:cv', resData.cv.id);
+            }
+            msg.textContent = 'CV başarıyla yüklendi, analiz sıraya alındı...';
+            msg.className = 'text-[10px] font-semibold text-[#14422f] item-msg';
             clearBtn.classList.remove('hidden');
             loadCVList();
           } else {

@@ -22,6 +22,12 @@
     "test:verify_gun26": "node --experimental-vm-modules node_modules/jest/bin/jest.js tests/verify_gun26.test.ts --forceExit",
     "test:canva_cv_chunking": "node --experimental-vm-modules node_modules/jest/bin/jest.js tests/verify_canva_cv_chunking.test.ts --forceExit --no-coverage",
     "test:bias": "npx tsx -r dotenv/config tests/verify_bias_and_synthesis.ts",
+    "test:gun29": "npx tsx -r dotenv/config tests/verify_gun29.ts",
+    "test:verify_gun29": "npx tsx -r dotenv/config tests/verify_gun29.ts",
+    "test:gun30": "npx tsx -r dotenv/config tests/verify_gun30.ts",
+    "test:verify_gun30": "npx tsx -r dotenv/config tests/verify_gun30.ts",
+    "test:gun31": "npx tsx -r dotenv/config tests/verify_gun31.ts",
+    "test:verify_gun31": "npx tsx -r dotenv/config tests/verify_gun31.ts",
     "test:jest": "node --experimental-vm-modules node_modules/jest/bin/jest.js --forceExit"
   },
   "keywords": [],
@@ -45,7 +51,8 @@
     "pdf-parse": "^2.4.5",
     "pdfjs-dist": "^6.1.200",
     "pg": "^8.22.0",
-    "puppeteer": "^25.3.0"
+    "puppeteer": "^25.3.0",
+    "socket.io": "^4.8.3"
   },
   "devDependencies": {
     "@types/bcrypt": "^6.0.0",
@@ -60,6 +67,7 @@
     "@types/supertest": "^7.2.0",
     "jest": "^30.4.2",
     "prisma": "^7.8.0",
+    "socket.io-client": "^4.8.3",
     "supertest": "^7.2.2",
     "ts-jest": "^29.4.11",
     "tsx": "^4.22.4",
