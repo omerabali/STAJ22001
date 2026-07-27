@@ -477,8 +477,87 @@ router.delete("/:id", authMiddleware, async (req: Request, res: Response): Promi
   }
 });
 
-// POST /api/cv/:id/retry
-router.post("/:id/retry", authMiddleware, async (req: Request, res: Response): Promise<void> => {
+// POST /api/cv/analyze - Standalone CV Analysis endpoint (Admin only)
+router.post("/analyze", authMiddleware, async (req: Request, res: Response): Promise<void> => {
+  if (!req.user || req.user.role !== "ADMIN") {
+    res.status(403).json({ message: "Bu işlem için admin yetkisi gerekiyor." });
+    return;
+  }
+
+  const { cvId } = req.body;
+  if (!cvId) {
+    res.status(400).json({ message: "cvId parametresi zorunludur." });
+    return;
+  }
+
+  try {
+    const cv = await prisma.cV.findUnique({
+      where: { id: cvId },
+      include: {
+        chunks: true,
+        analyses: { orderBy: { createdAt: "desc" } }
+      }
+    });
+
+    if (!cv) {
+      res.status(404).json({ message: "CV bulunamadı." });
+      return;
+    }
+
+    const textToAnalyze = cv.rawText || cv.chunks.map(c => c.chunkText).join("\n");
+    if (!textToAnalyze || textToAnalyze.trim().length === 0) {
+      res.status(400).json({ message: "CV metni boş veya okunamadı." });
+      return;
+    }
+
+    const lang = detectLanguage(textToAnalyze);
+    const aiAnalysis = await analyzeWithOpenAI(textToAnalyze, lang, prisma);
+
+    let analysis = cv.analyses[0];
+    if (analysis) {
+      analysis = await prisma.cVAnalysis.update({
+        where: { id: analysis.id },
+        data: {
+          status: AnalysisStatus.COMPLETED,
+          atsScore: aiAnalysis.atsScore,
+          skills: aiAnalysis.skills,
+          strengths: aiAnalysis.strengths,
+          weaknesses: aiAnalysis.weaknesses,
+          suggestions: aiAnalysis.suggestions
+        }
+      });
+    } else {
+      analysis = await prisma.cVAnalysis.create({
+        data: {
+          cvId: cv.id,
+          status: AnalysisStatus.COMPLETED,
+          atsScore: aiAnalysis.atsScore,
+          skills: aiAnalysis.skills,
+          strengths: aiAnalysis.strengths,
+          weaknesses: aiAnalysis.weaknesses,
+          suggestions: aiAnalysis.suggestions
+        }
+      });
+    }
+
+    res.json({
+      message: "CV analizi başarıyla tamamlandı.",
+      analysis: {
+        guclu_yonler: aiAnalysis.strengths,
+        eksik_yonler: aiAnalysis.weaknesses,
+        gelisim_onerileri: aiAnalysis.suggestions
+      },
+      atsScore: aiAnalysis.atsScore,
+      role: aiAnalysis.role
+    });
+  } catch (error: any) {
+    console.error("CV analiz endpoint hatası:", error);
+    res.status(500).json({ message: `Analiz hatası: ${error.message}` });
+  }
+});
+
+// POST /api/cv/:id/reanalyze & /:id/retry
+const handleReanalyze = async (req: Request, res: Response): Promise<void> => {
   if (!req.user || req.user.role !== "ADMIN") {
     res.status(403).json({ message: "Bu işlem için admin yetkisi gerekiyor." });
     return;
@@ -529,7 +608,8 @@ router.post("/:id/retry", authMiddleware, async (req: Request, res: Response): P
           skills: Prisma.DbNull,
           strengths: Prisma.DbNull,
           weaknesses: Prisma.DbNull,
-          suggestions: Prisma.DbNull
+          suggestions: Prisma.DbNull,
+          positions: Prisma.DbNull
         }
       });
     } else {
@@ -546,15 +626,22 @@ router.post("/:id/retry", authMiddleware, async (req: Request, res: Response): P
       where: { cvId: cv.id }
     });
 
-    // Run processing asynchronoulsy in the background
-    processCv(cv.id, analysis.id, fileBuffer);
+    // Run processing synchronously so reanalyze completes before returning 200 OK
+    await processCv(cv.id, analysis.id, fileBuffer);
 
-    res.json({ message: "Analiz yeniden başlatıldı.", cv, analysis });
+    const updatedAnalysis = await prisma.cVAnalysis.findUnique({
+      where: { id: analysis.id }
+    });
+
+    res.json({ message: "Analiz başarıyla tamamlandı.", cv, analysis: updatedAnalysis });
   } catch (error) {
     console.error("Yeniden deneme hatası:", error);
     res.status(500).json({ message: "Analiz yeniden başlatılamadı." });
   }
-});
+};
+
+router.post("/:id/reanalyze", authMiddleware, handleReanalyze);
+router.post("/:id/retry", authMiddleware, handleReanalyze);
 
 // GET /api/cv/search - Semantic Search endpoint
 router.get("/search", authMiddleware, async (req: Request, res: Response): Promise<void> => {

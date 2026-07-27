@@ -21,6 +21,7 @@
     "test:gun26": "node --experimental-vm-modules node_modules/jest/bin/jest.js tests/verify_gun26.test.ts --forceExit",
     "test:verify_gun26": "node --experimental-vm-modules node_modules/jest/bin/jest.js tests/verify_gun26.test.ts --forceExit",
     "test:canva_cv_chunking": "node --experimental-vm-modules node_modules/jest/bin/jest.js tests/verify_canva_cv_chunking.test.ts --forceExit --no-coverage",
+    "test:bias": "npx tsx -r dotenv/config tests/verify_bias_and_synthesis.ts",
     "test:jest": "node --experimental-vm-modules node_modules/jest/bin/jest.js --forceExit"
   },
   "keywords": [],
