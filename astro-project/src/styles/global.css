@@ -1024,18 +1024,18 @@ input:-webkit-autofill:active {
   font-weight: 600;
 }
 
-/* Right analysis panel: full-width on mobile, fixed 420px on desktop */
+/* Right analysis panel: full-width on mobile, 40% on desktop */
 .analysis-panel-right {
   width: 100%;
   flex-shrink: 0;
 }
 @media (min-width: 1024px) {
   .analysis-panel-right {
-    width: 420px;
+    width: 38%;
   }
 }
 @media (min-width: 1280px) {
   .analysis-panel-right {
-    width: 480px;
+    width: 40%;
   }
 }
