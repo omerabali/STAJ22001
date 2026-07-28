@@ -59,12 +59,11 @@ const candidate2Id = Astro.url.searchParams.get('candidate2') || '';
   </div>
 
   <!-- Empty / Select Prompt State -->
-  <div id="compare-prompt" class="w-full bg-white border border-[#ddd9d3] rounded-[10px] p-16 flex flex-col items-center justify-center text-center shadow-sm">
-    <div class="w-16 h-16 rounded-full bg-[#14422f]/10 text-[#14422f] flex items-center justify-center mb-4 border border-[#14422f]/20">
+  <div id="compare-prompt" class="w-full bg-white border border-[#ddd9d3] rounded-[16px] p-12 md:p-16 flex flex-col items-center justify-center text-center shadow-xs">
+    <div class="w-16 h-16 rounded-2xl bg-[#14422f]/10 text-[#14422f] flex items-center justify-center mb-4 border border-[#14422f]/20 shadow-2xs">
       <span class="material-symbols-outlined text-3xl">compare_arrows</span>
     </div>
-    <h3 class="font-bold text-[#1b1c1a] text-lg mb-1">Karşılaştırma İçin Adayları Seçin</h3>
-    <p class="text-xs text-[#8a8580] max-w-md leading-relaxed">Yukarıdaki seçim menüsünden kıyaslamak istediğiniz 2 adayı seçin veya <a href="/admin/search" class="text-[#14422f] font-bold underline">Arama Sayfasından</a> seçim yapın.</p>
+    <h3 class="font-extrabold text-[#1b1c1a] text-xl tracking-tight">Karşılaştırma İçin Adayları Seçin</h3>
   </div>
 
   <!-- Error State -->
@@ -165,7 +164,7 @@ const candidate2Id = Astro.url.searchParams.get('candidate2') || '';
         grid.classList.add('hidden');
         errorDiv.classList.add('hidden');
         promptDiv.classList.remove('hidden');
-        promptDiv.classList.add('flex');
+        promptDiv.classList.add('flex', 'flex-col');
         return;
       }
 
