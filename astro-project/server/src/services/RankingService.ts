@@ -6,6 +6,7 @@ export interface CandidateSearchMatch {
   matchedChunkId: string;
   candidateName: string | null;
   candidateEmail: string | null;
+  candidateAvatarUrl?: string | null;
   score: number; // This is the vector similarity score (0.0 - 1.0)
   rawText: string | null;
 }
@@ -16,6 +17,7 @@ export interface RankedResult {
   matchedChunkId: string;
   candidateName: string | null;
   candidateEmail: string | null;
+  candidateAvatarUrl?: string | null;
   score: number; // Final hybrid score (0-100)
   vectorScore: number; // pgvector similarity * 100 (0-100)
   gptScore: number | null;
@@ -35,7 +37,8 @@ export class RankingService {
   public static async scoreAndRankCVs(
     queryText: string,
     candidates: CandidateSearchMatch[],
-    prisma: PrismaClient
+    prisma: PrismaClient,
+    hardRequirements: import("../domain/search/HardRequirement.js").HardRequirement[] = []
   ): Promise<RankedResult[]> {
     if (candidates.length === 0) {
       return [];
@@ -49,6 +52,22 @@ export class RankingService {
     const gptEvaluationsMap = new Map<string, { suitabilityScore: number; matchExplanation: string }>();
 
     if (apiKey && topCandidates.length > 0) {
+      // Build hard requirements prompt block if requirements exist (ADIM 4)
+      let hardRequirementsBlock = "";
+      if (hardRequirements && hardRequirements.length > 0) {
+        const reqListStr = hardRequirements
+          .map((r, i) => `${i + 1}. Kriter: "${r.kriter}" (Zorunluluk: ${r.zorunluluk})`)
+          .join("\n");
+
+        hardRequirementsBlock = `\n\nAyrıca şu zorunlu kriterlerin HER BİRİNİN bu adayın CV'sinde AÇIKÇA karşılanıp karşılanmadığını kontrol et:
+${reqListStr}
+
+Sadece CV'de gerçekten yazan bilgiye bak, tahmin/varsayım yapma.
+'zorunluluk: kesin' olan bir kriter karşılanmıyorsa, suitabilityScore'u 0-20 aralığına düşür.
+'zorunluluk: tercih_edilir' olan bir kriter karşılanmıyorsa, suitabilityScore'u orta düzeyde düşür (mevcut değerlendirmenden %20-30 azalt).
+matchExplanation alanında HANGİ kriterin karşılanıp karşılanmadığını açıkça belirt.`;
+      }
+
       // Evaluate top candidates in parallel using Promise.all for maximum speed and zero result mix-ups
       await Promise.all(topCandidates.map(async (c) => {
         try {
@@ -62,7 +81,7 @@ CRITICAL LOGIC RULE FOR OPERATORS (VEYA / OR vs VE / AND):
 - Pay strict attention to "veya" (OR) in search queries!
 - If the search query uses "veya" (e.g. "İspanyolca veya Fransızca"), the candidate ONLY needs to meet AT LEAST ONE of the listed choices (e.g. fluent in French OR fluent in Spanish).
 - A candidate who is fluent in French satisfies a query for "İspanyolca veya Fransızca" FULLY (give high suitability score 85-100). Do NOT penalize or claim "her iki dilde de akıcılık gerekiyor" when "veya" (OR) was used!
-- Only require all conditions if "ve" (AND) is explicitly used in the query.
+- Only require all conditions if "ve" (AND) is explicitly used in the query.${hardRequirementsBlock}
 
 Return ONLY a valid JSON object matching this schema:
 {
@@ -153,6 +172,7 @@ ${candidateText}`;
         matchedChunkId: c.matchedChunkId,
         candidateName: c.candidateName,
         candidateEmail: c.candidateEmail,
+        candidateAvatarUrl: c.candidateAvatarUrl,
         score: Math.round(finalScore * 100) / 100, // round to 2 decimals
         vectorScore: Math.round(vectorScoreNormalized * 100) / 100,
         gptScore,
@@ -169,6 +189,7 @@ ${candidateText}`;
         matchedChunkId: c.matchedChunkId,
         candidateName: c.candidateName,
         candidateEmail: c.candidateEmail,
+        candidateAvatarUrl: c.candidateAvatarUrl,
         score: Math.round(vectorScoreNormalized * 100) / 100,
         vectorScore: Math.round(vectorScoreNormalized * 100) / 100,
         gptScore: null,

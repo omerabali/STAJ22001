@@ -230,7 +230,15 @@ import Layout from '../layouts/Layout.astro';
         body: JSON.stringify({ email, password }),
         credentials: 'include'
       });
-      const data = await response.json();
+      
+      let data;
+      const text = await response.text();
+      try {
+        data = text ? JSON.parse(text) : {};
+      } catch (e) {
+        throw new Error('Sunucudan geçersiz yanıt alındı. Lütfen servisin çalıştığından emin olun.');
+      }
+
       if (!response.ok) throw new Error(data.message || 'Kimlik doğrulama başarısız.');
       try { sessionStorage.clear(); localStorage.clear(); } catch(e) {}
       if (data.user && data.user.role === 'ADMIN') {

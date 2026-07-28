@@ -316,7 +316,10 @@ import AdminLayout from '../../layouts/AdminLayout.astro';
           <div class="bg-white border border-[#ddd9d3] rounded-[10px] p-6 hover:shadow-md transition-shadow flex flex-col gap-4 shadow-sm relative overflow-hidden">
             <div class="flex justify-between items-start">
               <div class="flex gap-4">
-                <div class="w-12 h-12 rounded-full bg-[#14422f]/10 text-[#14422f] flex items-center justify-center font-bold text-lg flex-shrink-0">${initials}</div>
+                ${c.candidateAvatarUrl || c.avatarUrl
+                  ? `<img src="${c.candidateAvatarUrl || c.avatarUrl}" alt="${c.candidateName || 'Aday'}" class="w-12 h-12 rounded-full object-cover shrink-0 border border-[#ddd9d3]" />`
+                  : `<div class="w-12 h-12 rounded-full bg-[#14422f]/10 text-[#14422f] flex items-center justify-center font-bold text-lg flex-shrink-0">${initials}</div>`
+                }
                 <div>
                   <h4 class="font-bold text-[#1b1c1a]">${c.candidateName || 'İsimsiz'}</h4>
                   <p class="text-[#8a8580] text-sm mt-0.5 font-medium">${c.candidateEmail}</p>
@@ -514,7 +517,10 @@ import AdminLayout from '../../layouts/AdminLayout.astro';
           <div class="bg-white border border-[#ddd9d3] rounded-[10px] p-6 hover:shadow-md transition-shadow flex flex-col justify-between min-h-[200px] shadow-sm">
             <div class="flex justify-between items-start">
               <div class="flex gap-4">
-                <div class="w-12 h-12 rounded-full bg-[#14422f]/10 text-[#14422f] flex items-center justify-center font-bold text-lg flex-shrink-0">${initials}</div>
+                ${c.avatarUrl 
+                  ? `<img src="${c.avatarUrl}" alt="${c.name || 'Aday'}" class="w-12 h-12 rounded-full object-cover shrink-0 border border-[#ddd9d3]" />`
+                  : `<div class="w-12 h-12 rounded-full bg-[#14422f]/10 text-[#14422f] flex items-center justify-center font-bold text-lg flex-shrink-0">${initials}</div>`
+                }
                 <div>
                   <h4 class="font-bold text-[#1b1c1a]">${c.name || 'İsimsiz'}</h4>
                   <p class="text-[#8a8580] text-sm mt-0.5 font-medium">${c.email}</p>

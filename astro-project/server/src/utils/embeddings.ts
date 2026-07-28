@@ -357,7 +357,7 @@ export async function searchSimilarCVs(
   queryText: string,
   limit: number,
   prisma: PrismaClient
-): Promise<{ cvId: string; userId: string; candidateName: string | null; candidateEmail: string | null; score: number; matchedChunkId: string; rawText: string | null }[]> {
+): Promise<{ cvId: string; userId: string; candidateName: string | null; candidateEmail: string | null; candidateAvatarUrl?: string | null; score: number; matchedChunkId: string; rawText: string | null }[]> {
   const queryVector = await EmbeddingService.generateEmbedding(queryText, prisma);
   const queryVectorStr = `[${queryVector.join(",")}]`;
 
@@ -375,6 +375,7 @@ export async function searchSimilarCVs(
         cv."userId" as "userId",
         u.name as "candidateName",
         u.email as "candidateEmail",
+        u."avatarUrl" as "candidateAvatarUrl",
         (1 - (e.embedding <=> ${queryVectorStr}::vector))::float as similarity
       FROM cv_embeddings e
       JOIN cv_chunks c ON e."chunkId" = c.id
@@ -392,6 +393,7 @@ export async function searchSimilarCVs(
         "rawText",
         "candidateName",
         "candidateEmail",
+        "candidateAvatarUrl",
         similarity as score,
         ROW_NUMBER() OVER(PARTITION BY "cvId" ORDER BY similarity DESC) as rn
       FROM similarity_scores
@@ -404,6 +406,7 @@ export async function searchSimilarCVs(
       "rawText",
       "candidateName",
       "candidateEmail",
+      "candidateAvatarUrl",
       score
     FROM ranked_chunks
     WHERE rn = 1

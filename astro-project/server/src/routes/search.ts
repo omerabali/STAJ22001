@@ -3,8 +3,7 @@ import { PrismaClient } from "@prisma/client";
 import { PrismaPg } from "@prisma/adapter-pg";
 import pg from "pg";
 import { authMiddleware, adminMiddleware } from "../middleware/auth.js";
-import { searchSimilarCVs } from "../utils/embeddings.js";
-import { RankingService } from "../services/RankingService.js";
+import { VerifyHardRequirementsUseCase } from "../application/search/VerifyHardRequirementsUseCase.js";
 
 const pool = new pg.Pool({
   connectionString: process.env.DATABASE_URL,
@@ -38,13 +37,10 @@ router.post("/", authMiddleware, adminMiddleware, async (req: Request, res: Resp
   const searchLimit = typeof limit === "number" && limit > 0 ? limit : 30;
 
   try {
-    // 2. Perform Semantic Search (Global admin search)
-    const vectorMatches = await searchSimilarCVs(query, searchLimit, prisma);
+    // 2. Delegate search pipeline to VerifyHardRequirementsUseCase
+    const { results, parsedQuery } = await VerifyHardRequirementsUseCase.execute(query, searchLimit, prisma);
 
-    // 3. Rank and score matches using GPT-4o-mini suitability analysis
-    const rankedResults = await RankingService.scoreAndRankCVs(query, vectorMatches, prisma);
-
-    // 4. Log the search query in SearchLog table
+    // 3. Log the search query in SearchLog table
     if (req.user) {
       await prisma.searchLog.create({
         data: {
@@ -56,10 +52,11 @@ router.post("/", authMiddleware, adminMiddleware, async (req: Request, res: Resp
 
     const duration = Date.now() - startTime;
 
-    console.log(`[SearchRoute] Semantic search and ranking for "${query}" completed in ${duration}ms. Results count: ${rankedResults.length}`);
+    console.log(`[SearchRoute] Semantic search for "${query}" completed in ${duration}ms. Hard Requirements Count: ${parsedQuery.hardRequirements.length}`);
 
     res.json({
-      results: rankedResults,
+      results,
+      parsedQuery,
       processingTimeMs: duration
     });
   } catch (error: any) {

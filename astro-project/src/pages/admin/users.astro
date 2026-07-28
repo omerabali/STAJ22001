@@ -469,7 +469,10 @@ const { user } = Astro.locals;
             </td>
             <td class="p-4">
               <div class="flex items-center gap-3">
-                <div class="w-8 h-8 rounded-full bg-[#14422f]/10 text-[#14422f] flex items-center justify-center font-bold text-xs shrink-0">${initials}</div>
+                ${user.avatarUrl 
+                  ? `<img src="${user.avatarUrl}" alt="${userName}" class="w-8 h-8 rounded-full object-cover shrink-0 border border-[#ddd9d3]" />`
+                  : `<div class="w-8 h-8 rounded-full bg-[#14422f]/10 text-[#14422f] flex items-center justify-center font-bold text-xs shrink-0">${initials}</div>`
+                }
                 <span class="font-bold text-[#1b1c1a] text-sm">${user.name || 'İsimsiz'}</span>
                 ${isMe ? '<span class="bg-[#faf9f5] border border-[#ddd9d3] text-[#1b1c1a] px-2 py-0.5 rounded text-xs ml-2 font-medium">Sen</span>' : ''}
               </div>
@@ -632,7 +635,10 @@ const { user } = Astro.locals;
             </td>
             <td class="p-4">
               <div class="flex items-center gap-3">
-                <div class="w-8 h-8 rounded-full bg-[#14422f]/10 text-[#14422f] flex items-center justify-center font-bold text-xs shrink-0">${initials}</div>
+                ${cand.avatarUrl 
+                  ? `<img src="${cand.avatarUrl}" alt="${candName}" class="w-8 h-8 rounded-full object-cover shrink-0 border border-[#ddd9d3]" />`
+                  : `<div class="w-8 h-8 rounded-full bg-[#14422f]/10 text-[#14422f] flex items-center justify-center font-bold text-xs shrink-0">${initials}</div>`
+                }
                 <span class="font-bold text-[#1b1c1a] text-sm">${candName}</span>
               </div>
             </td>
