@@ -116,3 +116,18 @@ model SearchLog {
 
   @@map("search_logs")
 }
+
+model CostLog {
+  id              String   @id @default(uuid())
+  cvId            String?
+  analysisId      String?
+  operation       String   // "CV_ANALYSIS", "EMBEDDING", "SEARCH" etc.
+  durationMs      Int      // İşlem süresi (milisaniye)
+  tokensUsed      Int?     // Kullanılan token sayısı
+  estimatedCostUsd Decimal? @db.Decimal(12, 10)
+  status          String   // "SUCCESS", "FAILED"
+  metadata        Json?    // Ek detaylar (chunk sayısı, model, vs.)
+  createdAt       DateTime @default(now())
+
+  @@map("cost_logs")
+}

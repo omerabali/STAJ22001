@@ -209,12 +209,44 @@ async function processCv(cvId: string, analysisId: string, pdfBuffer: Buffer): P
       }
     });
 
-    console.log(`[Parser] ✅ Successfully parsed, analyzed and chunked CV: ${cvId}`);
+    // 9. Analiz süresini cost_logs tablosuna kaydet
+    const totalDurationMs = Date.now() - startTime;
+    await prisma.costLog.create({
+      data: {
+        cvId,
+        analysisId,
+        operation: "CV_ANALYSIS",
+        durationMs: totalDurationMs,
+        status: "SUCCESS",
+        metadata: {
+          chunksCount: chunks.length,
+          language: lang,
+          atsScore: aiAnalysis.atsScore,
+          aiFallback,
+          processingTimeMs: totalDurationMs
+        }
+      }
+    }).catch(err => console.error("[CostLog] Loglama hatası:", err));
+
+    console.log(`[Parser] ✅ Successfully parsed, analyzed and chunked CV: ${cvId} (${totalDurationMs}ms)`);
     emitAnalysisStatus(cvId, "COMPLETED", "Analiz başarıyla tamamlandı.", 4);
 
   } catch (error) {
     console.error(`[Parser] ❌ Error processing CV ${cvId}:`, error);
     
+    // Başarısız analiz süresini de logla
+    const failDurationMs = Date.now() - startTime;
+    await prisma.costLog.create({
+      data: {
+        cvId,
+        analysisId,
+        operation: "CV_ANALYSIS",
+        durationMs: failDurationMs,
+        status: "FAILED",
+        metadata: { error: String(error) }
+      }
+    }).catch(err => console.error("[CostLog] Failed log hatası:", err));
+
     // Set status to FAILED on error
     await prisma.cVAnalysis.update({
       where: { id: analysisId },
