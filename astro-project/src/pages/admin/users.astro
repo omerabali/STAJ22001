@@ -12,86 +12,45 @@ const { user } = Astro.locals;
     <p class="font-body-md text-body-md text-[#8a8580]">Sistemdeki kullanıcıları listeleyin ve rollerini yönetin.</p>
   </header>
 
-  <!-- Stats Row (Admin Dashboard ile Tam Aynı Birebir Kart Yapısı) -->
+  <!-- Stats Row -->
   <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
-    <!-- Stat Card 1: Aktif Adaylar -->
-    <div class="bg-white rounded-[10px] p-6 shadow-sm border border-[#ddd9d3] border-l-[3px] border-l-[#14422f] hover:shadow-md transition-all duration-200 cursor-pointer group">
-      <div class="flex justify-between items-start mb-4">
-        <div class="flex flex-col">
-          <span class="font-label-md text-xs font-semibold text-[#8a8580] uppercase mb-1">Aktif Adaylar</span>
-          <span id="stat-candidates" class="font-display-lg text-3xl text-[#1b1c1a] font-light tracking-tight group-hover:text-[#14422f] transition-colors">-</span>
-        </div>
-        <div class="w-10 h-10 rounded-full bg-[#14422f]/10 flex items-center justify-center text-[#14422f]">
-          <span class="material-symbols-outlined">person_search</span>
-        </div>
-      </div>
-      <div class="flex items-center gap-2 mt-2">
-        <span class="flex items-center text-[#14422f] font-semibold text-xs bg-[#14422f]/10 px-2 py-0.5 rounded">
-          <span class="material-symbols-outlined text-[14px] mr-1">trending_up</span>
-          +12%
-        </span>
-        <span class="text-xs text-[#8a8580] font-medium">geçen haftaya göre</span>
-      </div>
+    <div class="bg-white border border-[#ddd9d3] rounded-[10px] p-6 shadow-sm hover:shadow-md transition-all duration-200">
+      <span class="font-label-md text-label-md text-[#8a8580] mb-2 uppercase block font-semibold">Toplam Kullanıcı</span>
+      <span id="stat-total" class="font-display-lg text-display-lg text-[#14422f] font-light">-</span>
     </div>
-    
-    <!-- Stat Card 2: Toplam Yöneticiler -->
-    <div class="bg-white rounded-[10px] p-6 shadow-sm border border-[#ddd9d3] hover:shadow-md transition-all duration-200 cursor-pointer group">
-      <div class="flex justify-between items-start mb-4">
-        <div class="flex flex-col">
-          <span class="font-label-md text-xs font-semibold text-[#8a8580] uppercase mb-1">Toplam Yöneticiler</span>
-          <span id="stat-admins" class="font-display-lg text-3xl text-[#1b1c1a] font-light tracking-tight group-hover:text-[#14422f] transition-colors">-</span>
-        </div>
-        <div class="w-10 h-10 rounded-full bg-[#f5f4f0] flex items-center justify-center text-[#8a8580]">
-          <span class="material-symbols-outlined">badge</span>
-        </div>
-      </div>
-      <div class="flex items-center gap-2 mt-2">
-        <span class="text-xs text-[#8a8580] font-medium">Sistemde kayıtlı yetkili kullanıcılar</span>
-      </div>
+    <div class="bg-white border border-[#ddd9d3] rounded-[10px] p-6 shadow-sm hover:shadow-md transition-all duration-200">
+      <span class="font-label-md text-label-md text-[#8a8580] mb-2 uppercase block font-semibold">Aday</span>
+      <span id="stat-candidates" class="font-display-lg text-display-lg text-[#1b1c1a] font-light">-</span>
     </div>
-    
-    <!-- Stat Card 3: Bugün Kayıtlar -->
-    <div class="bg-white rounded-[10px] p-6 shadow-sm border border-[#ddd9d3] hover:shadow-md transition-all duration-200 cursor-pointer group">
-      <div class="flex justify-between items-start mb-4">
-        <div class="flex flex-col">
-          <span class="font-label-md text-xs font-semibold text-[#8a8580] uppercase mb-1">Bugün Kayıtlar</span>
-          <span id="stat-new-users" class="font-display-lg text-3xl text-[#1b1c1a] font-light tracking-tight group-hover:text-[#14422f] transition-colors">-</span>
-        </div>
-        <div class="w-10 h-10 rounded-full bg-[#f5f4f0] flex items-center justify-center text-[#8a8580]">
-          <span class="material-symbols-outlined">how_to_reg</span>
-        </div>
-      </div>
-      <div class="flex items-center gap-2 mt-2">
-        <span class="flex items-center text-[#14422f] font-semibold text-xs bg-[#14422f]/10 px-2 py-0.5 rounded">
-          <span class="material-symbols-outlined text-[14px] mr-1">trending_up</span>
-          +4
-        </span>
-        <span class="text-xs text-[#8a8580] font-medium">düne göre yeni kayıt</span>
-      </div>
+    <div class="bg-white border border-[#ddd9d3] rounded-[10px] p-6 shadow-sm hover:shadow-md transition-all duration-200">
+      <span class="font-label-md text-label-md text-[#8a8580] mb-2 uppercase block font-semibold">Yönetici</span>
+      <span id="stat-admins" class="font-display-lg text-display-lg text-[#1b1c1a] font-light">-</span>
     </div>
   </div>
 
   <!-- Main User Management Header Bar -->
   <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 bg-white border border-[#ddd9d3] rounded-[16px] p-4 mb-6 shadow-xs">
-    <div class="flex items-center gap-3">
-      <div class="w-9 h-9 rounded-xl bg-[#14422f]/10 text-[#14422f] flex items-center justify-center border border-[#14422f]/20 shadow-2xs">
-        <span class="material-symbols-outlined text-lg">group</span>
+      <div class="flex items-center gap-3">
+        <div class="w-9 h-9 rounded-xl bg-[#14422f]/10 text-[#14422f] flex items-center justify-center border border-[#14422f]/20 shadow-2xs">
+          <span class="material-symbols-outlined text-lg">group</span>
+        </div>
+        <div>
+          <h3 class="font-extrabold text-[#1b1c1a] text-sm tracking-tight">Kullanıcı Yönetimi</h3>
+          <span id="total-text" class="text-xs text-[#8a8580] font-medium">Toplam 0 kullanıcı</span>
+        </div>
       </div>
-      <div>
-        <h3 class="font-extrabold text-[#1b1c1a] text-sm tracking-tight">Kullanıcı Yönetimi</h3>
-        <span id="total-text" class="text-xs text-[#8a8580] font-medium">Toplam 0 kullanıcı</span>
-      </div>
-    </div>
 
-    <div class="flex flex-wrap items-center gap-3 w-full sm:w-auto">
-      <!-- Toplu Analiz Butonu -->
-      <button id="bulk-reanalyze-btn" onclick="executeBulkReanalyze()" class="hidden items-center gap-2 bg-[#14422f] hover:bg-[#103425] text-white px-3.5 py-2 rounded-xl transition-all text-xs font-bold shadow-xs">
-        <span class="material-symbols-outlined text-sm animate-spin hidden" id="bulk-reanalyze-spinner">sync</span>
-        <span class="material-symbols-outlined text-sm" id="bulk-reanalyze-icon">analytics</span>
-        <span id="bulk-reanalyze-text">Seçilenleri Yeniden Analiz Et</span>
-      </button>
+      <div class="flex flex-wrap items-center gap-3 w-full sm:w-auto">
+        <!-- Toplu Analiz Butonu -->
+        <button id="bulk-reanalyze-btn" onclick="executeBulkReanalyze()" class="hidden items-center gap-2 bg-[#14422f] hover:bg-[#103425] text-white px-3.5 py-2 rounded-xl transition-all text-xs font-bold shadow-xs">
+          <span class="material-symbols-outlined text-sm animate-spin hidden" id="bulk-reanalyze-spinner">sync</span>
+          <span class="material-symbols-outlined text-sm" id="bulk-reanalyze-icon">analytics</span>
+          <span id="bulk-reanalyze-text">Seçilenleri Yeniden Analiz Et</span>
+        </button>
+
+
+      </div>
     </div>
-  </div>
 
   <!-- User Table with Checkbox Column -->
   <div class="bg-white border border-[#ddd9d3] rounded-[10px] overflow-hidden shadow-sm">
@@ -116,7 +75,7 @@ const { user } = Astro.locals;
     </table>
   </div>
 
-  <!-- Centered Load More / Daha Fazla Göster Button -->
+  <!-- Centered Load More / Daha Fazla Göster Button (Fotodaki oval tasarım) -->
   <div id="load-more-container" class="flex justify-center my-6">
     <button id="load-more-btn" onclick="toggleLoadMoreUsers()" class="px-8 py-2.5 rounded-full border border-[#1b1c1a]/30 hover:border-[#14422f] bg-white hover:bg-[#faf9f5] text-[#1b1c1a] font-bold text-xs transition-all flex items-center gap-2 shadow-xs group">
       <span id="load-more-label">Daha fazla göster</span>
@@ -202,7 +161,7 @@ const { user } = Astro.locals;
             <th class="p-4 font-semibold">Aday Bilgisi</th>
             <th class="p-4 font-semibold">E-posta</th>
             <th class="p-4 font-semibold">Kayıt Tarihi</th>
-            <th class="p-4 font-semibold text-right">Aksiyonlar</th>
+            <th class="p-4 font-semibold text-right">Aksiyolar</th>
           </tr>
         </thead>
         <tbody id="candidate-filter-tbody" class="font-body-sm text-sm text-[#1b1c1a] divide-y divide-[#ddd9d3]">
@@ -220,12 +179,507 @@ const { user } = Astro.locals;
     </div>
   </div>
 
-  <script>
-    import { initUsersPage } from '../../scripts/admin/users/initUsersPage';
 
-    document.addEventListener('astro:page-load', () => {
+  <script is:inline>
+    window.currentUserId = null;
+    window.allUsersList = [];
+    window.filteredUsersList = [];
+    window.isExpandedUserView = false;
+    window.userCurrentPage = 1;
+    window.selectedUserIds = new Set();
+    window.rawCandidateData = [];
+
+    function updateBulkReanalyzeButtonUI() {
+      const btn = document.getElementById('bulk-reanalyze-btn');
+      const text = document.getElementById('bulk-reanalyze-text');
+      if (!btn || !text) return;
+
+      const count = window.selectedUserIds.size;
+      if (count > 0) {
+        btn.classList.remove('hidden');
+        btn.classList.add('flex');
+        text.textContent = `Seçilenleri Yeniden Analiz Et (${count})`;
+      } else {
+        btn.classList.add('hidden');
+        btn.classList.remove('flex');
+      }
+    }
+
+    function toggleSelectAllUsers(masterCheckbox) {
+      const isChecked = masterCheckbox.checked;
+      const visibleCheckboxes = document.querySelectorAll('.user-checkbox');
+      visibleCheckboxes.forEach(cb => {
+        cb.checked = isChecked;
+        if (cb.value) {
+          if (isChecked) window.selectedUserIds.add(cb.value);
+          else window.selectedUserIds.delete(cb.value);
+        }
+      });
+      updateBulkReanalyzeButtonUI();
+    }
+
+    function toggleSelectAllFilteredCandidates(masterCheckbox) {
+      const isChecked = masterCheckbox.checked;
+      const visibleCheckboxes = document.querySelectorAll('.candidate-filter-checkbox');
+      visibleCheckboxes.forEach(cb => {
+        cb.checked = isChecked;
+        if (cb.value) {
+          if (isChecked) window.selectedUserIds.add(cb.value);
+          else window.selectedUserIds.delete(cb.value);
+        }
+      });
+      updateBulkReanalyzeButtonUI();
+    }
+
+    function toggleSelectUser(userId, isChecked) {
+      if (!userId) return;
+      if (isChecked) window.selectedUserIds.add(userId);
+      else window.selectedUserIds.delete(userId);
+      updateBulkReanalyzeButtonUI();
+    }
+
+    async function executeBulkReanalyze() {
+      const selectedIds = Array.from(window.selectedUserIds);
+      if (selectedIds.length === 0) return;
+
+      if (!confirm(`${selectedIds.length} adet kullanıcının CV'sini yeniden analiz etmek istediğinize emin misiniz?`)) return;
+
+      const btn = document.getElementById('bulk-reanalyze-btn');
+      const spinner = document.getElementById('bulk-reanalyze-spinner');
+      const icon = document.getElementById('bulk-reanalyze-icon');
+      const text = document.getElementById('bulk-reanalyze-text');
+
+      try {
+        if (btn) btn.disabled = true;
+        if (spinner) spinner.classList.remove('hidden');
+        if (icon) icon.classList.add('hidden');
+        if (text) text.textContent = `Analiz Ediliyor (${selectedIds.length})...`;
+
+        const token = localStorage.getItem('token');
+        const headers = { 'Content-Type': 'application/json' };
+        if (token) headers['Authorization'] = `Bearer ${token}`;
+
+        const res = await fetch('/api/admin/candidates/reanalyze', {
+          method: 'POST',
+          headers,
+          credentials: 'include',
+          body: JSON.stringify({ userIds: selectedIds })
+        });
+
+        const data = await res.json();
+        if (res.ok) {
+          alert(`✅ İşlem Tamamlandı!\n${data.message}`);
+          window.selectedUserIds.clear();
+          updateBulkReanalyzeButtonUI();
+          fetchUsers();
+        } else {
+          alert(`❌ Hata: ${data.message || 'Toplu analiz başarısız.'}`);
+        }
+      } catch (err) {
+        alert(`❌ Bağlantı Hatası: ${err.message}`);
+      } finally {
+        if (btn) btn.disabled = false;
+        if (spinner) spinner.classList.add('hidden');
+        if (icon) icon.classList.remove('hidden');
+      }
+    }
+
+    function toggleLoadMoreUsers() {
+      window.isExpandedUserView = !window.isExpandedUserView;
+      const loadMoreLabel = document.getElementById('load-more-label');
+      const loadMoreIcon = document.getElementById('load-more-icon');
+      const paginationContainer = document.getElementById('user-pagination-container');
+
+      if (window.isExpandedUserView) {
+        if (loadMoreLabel) loadMoreLabel.textContent = 'Daha az göster';
+        if (loadMoreIcon) loadMoreIcon.textContent = 'expand_less';
+        if (paginationContainer) paginationContainer.classList.remove('hidden');
+        renderUsersPage(1);
+      } else {
+        if (loadMoreLabel) loadMoreLabel.textContent = 'Daha fazla göster';
+        if (loadMoreIcon) loadMoreIcon.textContent = 'expand_more';
+        if (paginationContainer) paginationContainer.classList.add('hidden');
+        renderInitialUsersView();
+      }
+    }
+
+    function handleUserSearch(query) {
+      const q = (query || '').toLowerCase().trim();
+      if (!q) {
+        window.filteredUsersList = [...window.allUsersList];
+      } else {
+        window.filteredUsersList = window.allUsersList.filter(u => 
+          (u.name && u.name.toLowerCase().includes(q)) || 
+          (u.email && u.email.toLowerCase().includes(q))
+        );
+      }
+
+      if (window.isExpandedUserView) {
+        renderUsersPage(1);
+      } else {
+        renderInitialUsersView();
+      }
+    }
+
+    async function changeRole(userId, newRole) {
+      if (!confirm(`Kullanıcı rolünü ${newRole} olarak değiştirmek istediğinize emin misiniz?`)) return;
+      
+      try {
+        const res = await fetch(`/api/admin/users/${userId}/role`, {
+          method: 'PUT',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ role: newRole })
+        });
+        
+        const data = await res.json();
+        if (res.ok) {
+          alert('Rol başarıyla güncellendi!');
+          fetchUsers();
+        } else {
+          alert('Hata: ' + (data.message || 'Bilinmeyen bir hata oluştu.'));
+        }
+      } catch (err) {
+        alert('Sunucuya bağlanılamadı.');
+      }
+    }
+
+    async function fetchUsers() {
+      const tbody = document.getElementById('users-tbody');
+      if (!window.currentUserId) {
+        const container = document.getElementById('users-page-container');
+        window.currentUserId = container ? container.dataset.currentUserId : null;
+      }
+      
+      try {
+        const token = localStorage.getItem('token');
+        const headers = { 'Content-Type': 'application/json' };
+        if (token) headers['Authorization'] = `Bearer ${token}`;
+
+        const res = await fetch('/api/admin/users', { headers, credentials: 'include' });
+        if (!res.ok) throw new Error("Fetch users error");
+        const data = await res.json();
+        
+        const users = data.users || [];
+        users.sort((a, b) => {
+          if (a.role === 'ADMIN' && b.role !== 'ADMIN') return -1;
+          if (a.role !== 'ADMIN' && b.role === 'ADMIN') return 1;
+          return new Date(b.createdAt) - new Date(a.createdAt);
+        });
+
+        window.allUsersList = users;
+        window.filteredUsersList = [...users];
+
+        let candidatesCount = 0;
+        let adminsCount = 0;
+        users.forEach(u => {
+          if (u.role === 'ADMIN') adminsCount++;
+          if (u.role === 'CANDIDATE') candidatesCount++;
+        });
+
+        document.getElementById('stat-total').textContent = users.length;
+        document.getElementById('stat-candidates').textContent = candidatesCount;
+        document.getElementById('stat-admins').textContent = adminsCount;
+        document.getElementById('total-text').textContent = `Toplam ${users.length} kullanıcı`;
+
+        if (window.isExpandedUserView) {
+          renderUsersPage(window.userCurrentPage);
+        } else {
+          renderInitialUsersView();
+        }
+
+        // ADIM 4 için aday filtreleme verisini yükle
+        fetchCandidateFilterData();
+      } catch (err) {
+        tbody.innerHTML = '<tr><td colspan="6" class="p-8 text-center text-red-400">Yükleme hatası</td></tr>';
+      }
+    }
+
+    function renderInitialUsersView() {
+      const list = window.filteredUsersList;
+      const admins = list.filter(u => u.role === 'ADMIN');
+      const candidates = list.filter(u => u.role !== 'ADMIN');
+
+      const displayed = [
+        ...admins.slice(0, 1),
+        ...candidates.slice(0, 2)
+      ];
+
+      renderUserRows(displayed);
+
+      const loadMoreContainer = document.getElementById('load-more-container');
+      if (loadMoreContainer) {
+        if (list.length <= 3) {
+          loadMoreContainer.classList.add('hidden');
+        } else {
+          loadMoreContainer.classList.remove('hidden');
+        }
+      }
+    }
+
+    function renderUsersPage(page = 1) {
+      window.userCurrentPage = page;
+      const limit = 10;
+      const total = window.filteredUsersList.length;
+      const totalPages = Math.ceil(total / limit) || 1;
+      const startIndex = (page - 1) * limit;
+      const displayed = window.filteredUsersList.slice(startIndex, startIndex + limit);
+
+      renderUserRows(displayed);
+
+      const infoEl = document.getElementById('user-pagination-info');
+      if (infoEl) infoEl.textContent = `Gösterilen: ${startIndex + 1} - ${Math.min(startIndex + limit, total)} / Toplam ${total}`;
+
+      const container = document.getElementById('user-pagination-controls');
+      if (container) {
+        let html = `<button ${page <= 1 ? 'disabled' : ''} onclick="renderUsersPage(${page - 1})" class="disabled:opacity-40 px-3 py-1.5 border border-[#ddd9d3] rounded-[6px] text-xs font-semibold bg-white hover:bg-[#faf9f5]">Önceki</button>`;
+
+        for (let p = 1; p <= totalPages; p++) {
+          if (p === page) {
+            html += `<span class="px-3 py-1.5 bg-[#14422f] text-white rounded-[6px] text-xs font-bold">${p}</span>`;
+          } else {
+            html += `<button onclick="renderUsersPage(${p})" class="px-3 py-1.5 border border-[#ddd9d3] rounded-[6px] text-xs font-semibold bg-white hover:bg-[#faf9f5]">${p}</button>`;
+          }
+        }
+
+        html += `<button ${page >= totalPages ? 'disabled' : ''} onclick="renderUsersPage(${page + 1})" class="disabled:opacity-40 px-3 py-1.5 border border-[#ddd9d3] rounded-[6px] text-xs font-semibold bg-white hover:bg-[#faf9f5]">Sonraki</button>`;
+        container.innerHTML = html;
+      }
+    }
+
+    function renderUserRows(users) {
+      const tbody = document.getElementById('users-tbody');
+      if (!tbody) return;
+
+      if (users.length === 0) {
+        tbody.innerHTML = '<tr><td colspan="6" class="p-8 text-center text-[#8a8580] font-medium">Kullanıcı bulunamadı.</td></tr>';
+        return;
+      }
+
+      tbody.innerHTML = users.map((user) => {
+        const date = new Date(user.createdAt).toLocaleDateString('tr-TR');
+        const userName = user.name || user.email || "Kullanıcı";
+        const initials = userName.substring(0, 2).toUpperCase();
+        const isMe = window.currentUserId === user.id;
+        const isChecked = window.selectedUserIds.has(user.id);
+
+        return `
+          <tr class="hover:bg-[#f5f4f0]/40 transition-colors duration-150 group">
+            <td class="p-4">
+              <input type="checkbox" value="${user.id}" ${isChecked ? 'checked' : ''} onchange="toggleSelectUser('${user.id}', this.checked)" class="user-checkbox rounded border-[#ddd9d3] text-[#14422f] focus:ring-[#14422f]" />
+            </td>
+            <td class="p-4">
+              <div class="flex items-center gap-3">
+                ${user.avatarUrl 
+                  ? `<img src="${user.avatarUrl}" alt="${userName}" class="w-8 h-8 rounded-full object-cover shrink-0 border border-[#ddd9d3]" />`
+                  : `<div class="w-8 h-8 rounded-full bg-[#14422f]/10 text-[#14422f] flex items-center justify-center font-bold text-xs shrink-0">${initials}</div>`
+                }
+                <span class="font-bold text-[#1b1c1a] text-sm">${user.name || 'İsimsiz'}</span>
+                ${isMe ? '<span class="bg-[#faf9f5] border border-[#ddd9d3] text-[#1b1c1a] px-2 py-0.5 rounded text-xs ml-2 font-medium">Sen</span>' : ''}
+              </div>
+            </td>
+            <td class="p-4 text-[#8a8580] font-medium">${user.email}</td>
+            <td class="p-4 text-[#8a8580] font-medium">${date}</td>
+            <td class="p-4">
+              ${user.role === 'ADMIN' 
+                ? '<span class="bg-[#14422f] text-white px-2.5 py-1 rounded-[6px] font-bold text-xs">Yönetici</span>' 
+                : '<span class="bg-[#14422f]/10 text-[#14422f] px-2.5 py-1 rounded-[6px] font-semibold text-xs">Aday</span>'}
+            </td>
+            <td class="p-4 text-right">
+              ${isMe
+                ? '<span class="text-[#8a8580] text-xs font-medium">Yetki değiştirilemez</span>'
+                : user.role === 'ADMIN'
+                  ? '<span class="text-[#8a8580] text-xs font-medium italic flex items-center gap-1 justify-end"><span class="material-symbols-outlined text-sm">lock</span>Yönetici korumalı</span>'
+                  : `<button onclick="changeRole('${user.id}', 'ADMIN')" class="px-3 py-1.5 border border-[#ddd9d3] rounded-[8px] bg-white text-[#1b1c1a] hover:border-[#14422f] hover:text-[#14422f] text-xs font-semibold transition-all shadow-sm">Yönetici Yap</button>`
+              }
+            </td>
+          </tr>
+        `;
+      }).join('');
+    }
+
+    // --- ADIM 4: FİLTRELEME MANTIĞI & SONUÇ TABLOSU RENDER ---
+    async function fetchCandidateFilterData() {
+      const tbody = document.getElementById('candidate-filter-tbody');
+      try {
+        const token = localStorage.getItem('token');
+        const headers = { 'Content-Type': 'application/json' };
+        if (token) headers['Authorization'] = `Bearer ${token}`;
+
+        const res = await fetch('/api/admin/candidates?limit=100', { headers, credentials: 'include' });
+        if (!res.ok) throw new Error("Candidates filter fetch error");
+        const data = await res.json();
+        
+        window.rawCandidateData = data.candidates || [];
+        applyCandidateFilters();
+      } catch (err) {
+        if (tbody) tbody.innerHTML = '<tr><td colspan="5" class="p-8 text-center text-red-400">Aday verisi filtreleme yükleme hatası.</td></tr>';
+      }
+    }
+
+    window.candidateFilterCurrentPage = 1;
+    window.candidateFilteredList = [];
+
+    function clearCandidateFilters() {
+      const atsEl = document.getElementById('filter-min-ats');
+      const sortEl = document.getElementById('filter-sort-date');
+      const nameEl = document.getElementById('filter-candidate-name');
+      const emailEl = document.getElementById('filter-candidate-email');
+
+      if (atsEl) atsEl.selectedIndex = 0;
+      if (sortEl) sortEl.value = 'desc';
+      if (nameEl) nameEl.value = '';
+      if (emailEl) emailEl.value = '';
+
+      const container = document.getElementById('candidate-filter-table-container');
+      if (container) container.classList.add('hidden');
+    }
+
+    function applyCandidateFilters(page = 1) {
+      const tbody = document.getElementById('candidate-filter-tbody');
+      const tableContainer = document.getElementById('candidate-filter-table-container');
+      const countBadge = document.getElementById('candidate-filter-count-badge');
+      if (!tbody || !tableContainer) return;
+
+      const minAtsVal = document.getElementById('filter-min-ats')?.value || '';
+      const minAts = (minAtsVal !== '' && minAtsVal !== 'ALL') ? parseInt(minAtsVal, 10) : -1;
+      const sortDate = document.getElementById('filter-sort-date')?.value || 'desc';
+      const nameQuery = (document.getElementById('filter-candidate-name')?.value || '').toLowerCase().trim();
+      const emailQuery = (document.getElementById('filter-candidate-email')?.value || '').toLowerCase().trim();
+
+      const hasActiveFilter = minAts >= 0 || nameQuery !== '' || emailQuery !== '';
+
+      if (!hasActiveFilter) {
+        tableContainer.classList.add('hidden');
+        return;
+      }
+
+      tableContainer.classList.remove('hidden');
+
+      let list = [...window.rawCandidateData];
+
+      // 2. Min ATS Skoru Filtresi
+      if (minAts >= 0) {
+        list = list.filter(c => {
+          const score = (c.atsScore !== undefined && c.atsScore !== null) ? c.atsScore : 0;
+          return score >= minAts;
+        });
+      }
+
+      // 3. Aday İsmi Araması (Sadece İsim ve CV Dosya Adı)
+      if (nameQuery) {
+        list = list.filter(c => {
+          const name = (c.name || c.isim || '').toLowerCase();
+          const fileName = (c.latestCvName || '').toLowerCase();
+          return name.includes(nameQuery) || fileName.includes(nameQuery);
+        });
+      }
+
+      // 4. E-posta Araması (Sadece E-posta)
+      if (emailQuery) {
+        list = list.filter(c => {
+          const email = (c.email || '').toLowerCase();
+          return email.includes(emailQuery);
+        });
+      }
+
+      // 5. Tarih Sıralaması
+      list.sort((a, b) => {
+        const dateA = new Date(a.createdAt || a.yuklemeTarihi || 0);
+        const dateB = new Date(b.createdAt || b.yuklemeTarihi || 0);
+        return sortDate === 'asc' ? dateA - dateB : dateB - dateA;
+      });
+
+      window.candidateFilteredList = list;
+      if (countBadge) {
+        countBadge.textContent = `🎯 Filtreleme Sonuçları (${list.length} Aday Bulundu)`;
+      }
+
+      renderCandidateFilterPage(page);
+    }
+
+    function renderCandidateFilterPage(page = 1) {
+      window.candidateFilterCurrentPage = page;
+      const tbody = document.getElementById('candidate-filter-tbody');
+      const infoEl = document.getElementById('candidate-filter-pagination-info');
+      const controlsEl = document.getElementById('candidate-filter-pagination-controls');
+
+      if (!tbody) return;
+
+      const list = window.candidateFilteredList || [];
+      const limit = 10; // Her sayfada tam 10 aday
+      const total = list.length;
+      const totalPages = Math.ceil(total / limit) || 1;
+      const startIndex = (page - 1) * limit;
+      const displayed = list.slice(startIndex, startIndex + limit);
+
+      if (total === 0) {
+        tbody.innerHTML = '<tr><td colspan="5" class="p-8 text-center text-[#8a8580] font-medium">Filtrelere uygun aday bulunamadı.</td></tr>';
+        if (infoEl) infoEl.textContent = 'Gösterilen: 0 / Toplam 0';
+        if (controlsEl) controlsEl.innerHTML = '';
+        return;
+      }
+
+      // 10'lu Sayfalanmış Liste Render
+      tbody.innerHTML = displayed.map((cand) => {
+        const rawDate = cand.yuklemeTarihi || cand.createdAt;
+        const dateStr = rawDate ? new Date(rawDate).toLocaleDateString('tr-TR') : '-';
+        const candName = cand.isim || cand.name || cand.email || 'Aday';
+        const candId = cand.userId || cand.id;
+        const initials = candName.substring(0, 2).toUpperCase();
+        const isChecked = window.selectedUserIds.has(candId);
+
+        return `
+          <tr class="hover:bg-[#f5f4f0]/40 transition-colors duration-150 group">
+            <td class="p-4">
+              <input type="checkbox" value="${candId}" ${isChecked ? 'checked' : ''} onchange="toggleSelectUser('${candId}', this.checked)" class="candidate-filter-checkbox rounded border-[#ddd9d3] text-[#14422f] focus:ring-[#14422f]" />
+            </td>
+            <td class="p-4">
+              <div class="flex items-center gap-3">
+                ${cand.avatarUrl 
+                  ? `<img src="${cand.avatarUrl}" alt="${candName}" class="w-8 h-8 rounded-full object-cover shrink-0 border border-[#ddd9d3]" />`
+                  : `<div class="w-8 h-8 rounded-full bg-[#14422f]/10 text-[#14422f] flex items-center justify-center font-bold text-xs shrink-0">${initials}</div>`
+                }
+                <span class="font-bold text-[#1b1c1a] text-sm">${candName}</span>
+              </div>
+            </td>
+            <td class="p-4 text-[#8a8580] font-medium">${cand.email || '-'}</td>
+            <td class="p-4 text-[#8a8580] font-medium">${dateStr}</td>
+            <td class="p-4 text-right">
+              <a href="/admin/candidate-profile?id=${candId}&cvId=${cand.cvId || ''}" class="inline-flex items-center gap-1.5 px-3 py-1.5 border border-[#ddd9d3] rounded-[8px] bg-[#14422f] text-white hover:bg-[#103425] text-xs font-bold transition-all shadow-xs">
+                <span class="material-symbols-outlined text-sm">visibility</span>
+                Profili Gör
+              </a>
+            </td>
+          </tr>
+        `;
+      }).join('');
+
+      // Sayfalama Bilgi ve Kontrol Butonları
+      if (infoEl) infoEl.textContent = `Gösterilen: ${startIndex + 1} - ${Math.min(startIndex + limit, total)} / Toplam ${total}`;
+
+      if (controlsEl) {
+        if (totalPages <= 1) {
+          controlsEl.innerHTML = '';
+        } else {
+          let html = `<button ${page <= 1 ? 'disabled' : ''} onclick="renderCandidateFilterPage(${page - 1})" class="disabled:opacity-40 px-3 py-1.5 border border-[#ddd9d3] rounded-[6px] text-xs font-semibold bg-white hover:bg-[#faf9f5]">Önceki</button>`;
+
+          for (let p = 1; p <= totalPages; p++) {
+            if (p === page) {
+              html += `<span class="px-3 py-1.5 bg-[#14422f] text-white rounded-[6px] text-xs font-bold">${p}</span>`;
+            } else {
+              html += `<button onclick="renderCandidateFilterPage(${p})" class="px-3 py-1.5 border border-[#ddd9d3] rounded-[6px] text-xs font-semibold bg-white hover:bg-[#faf9f5]">${p}</button>`;
+            }
+          }
+
+          html += `<button ${page >= totalPages ? 'disabled' : ''} onclick="renderCandidateFilterPage(${page + 1})" class="disabled:opacity-40 px-3 py-1.5 border border-[#ddd9d3] rounded-[6px] text-xs font-semibold bg-white hover:bg-[#faf9f5]">Sonraki</button>`;
+          controlsEl.innerHTML = html;
+        }
+      }
+    }
+
+    document.addEventListener("astro:page-load", () => {
       if (document.getElementById('users-tbody')) {
-        initUsersPage();
+        fetchUsers();
       }
     });
   </script>

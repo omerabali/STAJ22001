@@ -1,0 +1,142 @@
+Date : 2026-07-28 14:11:33
+Directory : c:\Users\MSI\Desktop\STAJ22001\astro-project
+Total : 81 files,  25766 codes, 511 comments, 1557 blanks, all 27834 lines
+
+Languages
++--------------------+------------+------------+------------+------------+------------+
+| language           | files      | code       | comment    | blank      | total      |
++--------------------+------------+------------+------------+------------+------------+
+| JSON               |          5 |     14,298 |          0 |          5 |     14,303 |
+| TypeScript         |         49 |      7,545 |        479 |      1,338 |      9,362 |
+| HTML               |          7 |      2,471 |          0 |          7 |      2,478 |
+| CSS                |          1 |        966 |          0 |         75 |      1,041 |
+| Markdown           |          5 |        195 |          0 |         74 |        269 |
+| JavaScript         |          6 |        159 |          5 |         22 |        186 |
+| MS SQL             |          3 |         96 |         27 |         31 |        154 |
+| JSON with Comments |          2 |         25 |          0 |          2 |         27 |
+| XML                |          3 |         11 |          0 |          3 |         14 |
++--------------------+------------+------------+------------+------------+------------+
+
+Directories
++-------------------------------------------------------------------------------------------------------------------+------------+------------+------------+------------+------------+
+| path                                                                                                              | files      | code       | comment    | blank      | total      |
++-------------------------------------------------------------------------------------------------------------------+------------+------------+------------+------------+------------+
+| .                                                                                                                 |         81 |     25,766 |        511 |      1,557 |     27,834 |
+| . (Files)                                                                                                         |         10 |      5,409 |          3 |         85 |      5,497 |
+| .agents                                                                                                           |          1 |         31 |          0 |          1 |         32 |
+| .agents\skills                                                                                                    |          1 |         31 |          0 |          1 |         32 |
+| public                                                                                                            |          1 |          9 |          0 |          1 |         10 |
+| scripts                                                                                                           |          3 |         79 |          2 |         13 |         94 |
+| server                                                                                                            |         53 |     16,741 |        498 |      1,356 |     18,595 |
+| server (Files)                                                                                                    |          6 |      9,195 |          0 |         11 |      9,206 |
+| server\prisma                                                                                                     |          3 |         96 |         27 |         31 |        154 |
+| server\prisma\migrations                                                                                          |          3 |         96 |         27 |         31 |        154 |
+| server\prisma\migrations (Files)                                                                                  |          2 |         28 |         11 |         10 |         49 |
+| server\prisma\migrations\20260708000000_init_vector_db                                                            |          1 |         68 |         16 |         21 |        105 |
+| server\scratch                                                                                                    |         14 |        550 |          8 |        132 |        690 |
+| server\src                                                                                                        |         17 |      4,553 |        279 |        656 |      5,488 |
+| server\src (Files)                                                                                                |          3 |        130 |          8 |         28 |        166 |
+| server\src\lib                                                                                                    |          1 |         11 |          0 |          4 |         15 |
+| server\src\middleware                                                                                             |          1 |         52 |          2 |         10 |         64 |
+| server\src\routes                                                                                                 |          4 |      1,413 |        107 |        229 |      1,749 |
+| server\src\services                                                                                               |          3 |        572 |          8 |         63 |        643 |
+| server\src\tests                                                                                                  |          1 |         36 |          2 |         11 |         49 |
+| server\src\utils                                                                                                  |          4 |      2,339 |        152 |        311 |      2,802 |
+| server\tests                                                                                                      |         13 |      2,347 |        184 |        526 |      3,057 |
+| server\tests (Files)                                                                                              |         12 |      1,767 |        159 |        383 |      2,309 |
+| server\tests\fixtures                                                                                             |          1 |        580 |         25 |        143 |        748 |
+| src                                                                                                               |         13 |      3,497 |          8 |        101 |      3,606 |
+| src (Files)                                                                                                       |          2 |         51 |          8 |         13 |         72 |
+| src\assets                                                                                                        |          2 |          2 |          0 |          2 |          4 |
+| src\lib                                                                                                           |          1 |          7 |          0 |          4 |         11 |
+| src\stitch-temp                                                                                                   |          7 |      2,471 |          0 |          7 |      2,478 |
+| src\styles                                                                                                        |          1 |        966 |          0 |         75 |      1,041 |
++-------------------------------------------------------------------------------------------------------------------+------------+------------+------------+------------+------------+
+
+Files
++-------------------------------------------------------------------------------------------------------------------+--------------------+------------+------------+------------+------------+
+| filename                                                                                                          | language           | code       | comment    | blank      | total      |
++-------------------------------------------------------------------------------------------------------------------+--------------------+------------+------------+------------+------------+
+| c:\Users\MSI\Desktop\STAJ22001\astro-project\.agents\skills\task.md                                               | Markdown           |         31 |          0 |          1 |         32 |
+| c:\Users\MSI\Desktop\STAJ22001\astro-project\AGENTS.md                                                            | Markdown           |         15 |          0 |          8 |         23 |
+| c:\Users\MSI\Desktop\STAJ22001\astro-project\CLAUDE.md                                                            | Markdown           |         15 |          0 |          8 |         23 |
+| c:\Users\MSI\Desktop\STAJ22001\astro-project\README.md                                                            | Markdown           |        104 |          0 |         31 |        135 |
+| c:\Users\MSI\Desktop\STAJ22001\astro-project\SKILL.md                                                             | Markdown           |         30 |          0 |         26 |         56 |
+| c:\Users\MSI\Desktop\STAJ22001\astro-project\astro.config.mjs                                                     | JavaScript         |         25 |          3 |          5 |         33 |
+| c:\Users\MSI\Desktop\STAJ22001\astro-project\package-lock.json                                                    | JSON               |      5,128 |          0 |          1 |      5,129 |
+| c:\Users\MSI\Desktop\STAJ22001\astro-project\package.json                                                         | JSON               |         39 |          0 |          1 |         40 |
+| c:\Users\MSI\Desktop\STAJ22001\astro-project\public\favicon.svg                                                   | XML                |          9 |          0 |          1 |         10 |
+| c:\Users\MSI\Desktop\STAJ22001\astro-project\rename.js                                                            | JavaScript         |         37 |          0 |          3 |         40 |
+| c:\Users\MSI\Desktop\STAJ22001\astro-project\scripts\check_screens.cjs                                            | JavaScript         |         22 |          1 |          4 |         27 |
+| c:\Users\MSI\Desktop\STAJ22001\astro-project\scripts\check_screens.js                                             | JavaScript         |         24 |          1 |          4 |         29 |
+| c:\Users\MSI\Desktop\STAJ22001\astro-project\scripts\download_screens.cjs                                         | JavaScript         |         33 |          0 |          5 |         38 |
+| c:\Users\MSI\Desktop\STAJ22001\astro-project\server\jest.config.js                                                | JavaScript         |         18 |          0 |          1 |         19 |
+| c:\Users\MSI\Desktop\STAJ22001\astro-project\server\package-lock.json                                             | JSON               |      9,042 |          0 |          1 |      9,043 |
+| c:\Users\MSI\Desktop\STAJ22001\astro-project\server\package.json                                                  | JSON               |         78 |          0 |          1 |         79 |
+| c:\Users\MSI\Desktop\STAJ22001\astro-project\server\prisma.config.ts                                              | TypeScript         |         11 |          0 |          2 |         13 |
+| c:\Users\MSI\Desktop\STAJ22001\astro-project\server\prisma\migrations\02_rls_cv_embeddings.sql                    | MS SQL             |         12 |          3 |          3 |         18 |
+| c:\Users\MSI\Desktop\STAJ22001\astro-project\server\prisma\migrations\03_rls_cv_analyses_cost_logs.sql            | MS SQL             |         16 |          8 |          7 |         31 |
+| c:\Users\MSI\Desktop\STAJ22001\astro-project\server\prisma\migrations\20260708000000_init_vector_db\migration.sql | MS SQL             |         68 |         16 |         21 |        105 |
+| c:\Users\MSI\Desktop\STAJ22001\astro-project\server\scratch\check_analysis_data.ts                                | TypeScript         |         35 |          0 |          7 |         42 |
+| c:\Users\MSI\Desktop\STAJ22001\astro-project\server\scratch\check_api_timings.ts                                  | TypeScript         |         25 |          0 |          8 |         33 |
+| c:\Users\MSI\Desktop\STAJ22001\astro-project\server\scratch\check_db_state.ts                                     | TypeScript         |         18 |          0 |          5 |         23 |
+| c:\Users\MSI\Desktop\STAJ22001\astro-project\server\scratch\check_latest_cv.ts                                    | TypeScript         |         48 |          0 |          9 |         57 |
+| c:\Users\MSI\Desktop\STAJ22001\astro-project\server\scratch\check_latest_vector.ts                                | TypeScript         |         30 |          0 |          9 |         39 |
+| c:\Users\MSI\Desktop\STAJ22001\astro-project\server\scratch\check_users.ts                                        | TypeScript         |         16 |          0 |          4 |         20 |
+| c:\Users\MSI\Desktop\STAJ22001\astro-project\server\scratch\compare_cv_times.ts                                   | TypeScript         |         34 |          0 |          8 |         42 |
+| c:\Users\MSI\Desktop\STAJ22001\astro-project\server\scratch\gun26_search_test.ts                                  | TypeScript         |        116 |          5 |         31 |        152 |
+| c:\Users\MSI\Desktop\STAJ22001\astro-project\server\scratch\inspect_raw_json.ts                                   | TypeScript         |         44 |          2 |          9 |         55 |
+| c:\Users\MSI\Desktop\STAJ22001\astro-project\server\scratch\reanalyze_english_cv.ts                               | TypeScript         |         32 |          0 |          9 |         41 |
+| c:\Users\MSI\Desktop\STAJ22001\astro-project\server\scratch\system_health_check.ts                                | TypeScript         |         23 |          0 |          6 |         29 |
+| c:\Users\MSI\Desktop\STAJ22001\astro-project\server\scratch\update_ahmet.ts                                       | TypeScript         |         16 |          0 |          4 |         20 |
+| c:\Users\MSI\Desktop\STAJ22001\astro-project\server\scratch\verify_pdf_and_users_swot.ts                          | TypeScript         |         70 |          0 |         11 |         81 |
+| c:\Users\MSI\Desktop\STAJ22001\astro-project\server\scratch\verify_user_4_questions.ts                            | TypeScript         |         43 |          1 |         12 |         56 |
+| c:\Users\MSI\Desktop\STAJ22001\astro-project\server\src\index.ts                                                  | TypeScript         |         94 |          8 |         18 |        120 |
+| c:\Users\MSI\Desktop\STAJ22001\astro-project\server\src\inspect_db.ts                                             | TypeScript         |         28 |          0 |          7 |         35 |
+| c:\Users\MSI\Desktop\STAJ22001\astro-project\server\src\lib\supabase.ts                                           | TypeScript         |         11 |          0 |          4 |         15 |
+| c:\Users\MSI\Desktop\STAJ22001\astro-project\server\src\load-env.ts                                               | TypeScript         |          8 |          0 |          3 |         11 |
+| c:\Users\MSI\Desktop\STAJ22001\astro-project\server\src\middleware\auth.ts                                        | TypeScript         |         52 |          2 |         10 |         64 |
+| c:\Users\MSI\Desktop\STAJ22001\astro-project\server\src\routes\admin.ts                                           | TypeScript         |        435 |         19 |         49 |        503 |
+| c:\Users\MSI\Desktop\STAJ22001\astro-project\server\src\routes\auth.ts                                            | TypeScript         |        308 |         41 |         65 |        414 |
+| c:\Users\MSI\Desktop\STAJ22001\astro-project\server\src\routes\cv.ts                                              | TypeScript         |        567 |         43 |         99 |        709 |
+| c:\Users\MSI\Desktop\STAJ22001\astro-project\server\src\routes\search.ts                                          | TypeScript         |        103 |          4 |         16 |        123 |
+| c:\Users\MSI\Desktop\STAJ22001\astro-project\server\src\services\ChunkQualityService.ts                           | TypeScript         |        321 |          0 |         24 |        345 |
+| c:\Users\MSI\Desktop\STAJ22001\astro-project\server\src\services\EmbeddingService.ts                              | TypeScript         |         94 |          2 |         16 |        112 |
+| c:\Users\MSI\Desktop\STAJ22001\astro-project\server\src\services\RankingService.ts                                | TypeScript         |        157 |          6 |         23 |        186 |
+| c:\Users\MSI\Desktop\STAJ22001\astro-project\server\src\tests\test_gun34_socket.ts                                | TypeScript         |         36 |          2 |         11 |         49 |
+| c:\Users\MSI\Desktop\STAJ22001\astro-project\server\src\utils\canva_oauth_server.ts                               | TypeScript         |         74 |          1 |         16 |         91 |
+| c:\Users\MSI\Desktop\STAJ22001\astro-project\server\src\utils\embeddings.ts                                       | TypeScript         |        364 |         16 |         41 |        421 |
+| c:\Users\MSI\Desktop\STAJ22001\astro-project\server\src\utils\fetch_canva_designs.ts                              | TypeScript         |         22 |          1 |          8 |         31 |
+| c:\Users\MSI\Desktop\STAJ22001\astro-project\server\src\utils\parser.ts                                           | TypeScript         |      1,879 |        134 |        246 |      2,259 |
+| c:\Users\MSI\Desktop\STAJ22001\astro-project\server\test_db.ts                                                    | TypeScript         |         26 |          0 |          5 |         31 |
+| c:\Users\MSI\Desktop\STAJ22001\astro-project\server\tests\fixtures\ground_truth_dataset.ts                        | TypeScript         |        580 |         25 |        143 |        748 |
+| c:\Users\MSI\Desktop\STAJ22001\astro-project\server\tests\generate_chunking_report.ts                             | TypeScript         |         76 |          5 |         23 |        104 |
+| c:\Users\MSI\Desktop\STAJ22001\astro-project\server\tests\verify_baseline_chunking.test.ts                        | TypeScript         |         41 |          0 |          8 |         49 |
+| c:\Users\MSI\Desktop\STAJ22001\astro-project\server\tests\verify_canva_cv_chunking.test.ts                        | TypeScript         |        195 |          9 |         42 |        246 |
+| c:\Users\MSI\Desktop\STAJ22001\astro-project\server\tests\verify_chunking_overhaul.test.ts                        | TypeScript         |         79 |          2 |         18 |         99 |
+| c:\Users\MSI\Desktop\STAJ22001\astro-project\server\tests\verify_gun21.ts                                         | TypeScript         |        105 |          7 |         20 |        132 |
+| c:\Users\MSI\Desktop\STAJ22001\astro-project\server\tests\verify_gun22.ts                                         | TypeScript         |        158 |         15 |         31 |        204 |
+| c:\Users\MSI\Desktop\STAJ22001\astro-project\server\tests\verify_gun23.test.ts                                    | TypeScript         |        264 |         27 |         51 |        342 |
+| c:\Users\MSI\Desktop\STAJ22001\astro-project\server\tests\verify_gun24.test.ts                                    | TypeScript         |        172 |         32 |         37 |        241 |
+| c:\Users\MSI\Desktop\STAJ22001\astro-project\server\tests\verify_gun25.test.ts                                    | TypeScript         |        225 |         30 |         54 |        309 |
+| c:\Users\MSI\Desktop\STAJ22001\astro-project\server\tests\verify_gun26.test.ts                                    | TypeScript         |        322 |         25 |         65 |        412 |
+| c:\Users\MSI\Desktop\STAJ22001\astro-project\server\tests\verify_gun30.ts                                         | TypeScript         |         79 |          4 |         21 |        104 |
+| c:\Users\MSI\Desktop\STAJ22001\astro-project\server\tests\verify_gun31.ts                                         | TypeScript         |         51 |          3 |         13 |         67 |
+| c:\Users\MSI\Desktop\STAJ22001\astro-project\server\tsconfig.json                                                 | JSON with Comments |         20 |          0 |          1 |         21 |
+| c:\Users\MSI\Desktop\STAJ22001\astro-project\skills-lock.json                                                     | JSON               |         11 |          0 |          1 |         12 |
+| c:\Users\MSI\Desktop\STAJ22001\astro-project\src\assets\astro.svg                                                 | XML                |          1 |          0 |          1 |          2 |
+| c:\Users\MSI\Desktop\STAJ22001\astro-project\src\assets\background.svg                                            | XML                |          1 |          0 |          1 |          2 |
+| c:\Users\MSI\Desktop\STAJ22001\astro-project\src\env.d.ts                                                         | TypeScript         |         10 |          1 |          2 |         13 |
+| c:\Users\MSI\Desktop\STAJ22001\astro-project\src\lib\supabase.ts                                                  | TypeScript         |          7 |          0 |          4 |         11 |
+| c:\Users\MSI\Desktop\STAJ22001\astro-project\src\middleware.ts                                                    | TypeScript         |         41 |          7 |         11 |         59 |
+| c:\Users\MSI\Desktop\STAJ22001\astro-project\src\stitch-temp\admin_dashboard.html                                 | HTML               |        447 |          0 |          1 |        448 |
+| c:\Users\MSI\Desktop\STAJ22001\astro-project\src\stitch-temp\candidate_profile.html                               | HTML               |        332 |          0 |          1 |        333 |
+| c:\Users\MSI\Desktop\STAJ22001\astro-project\src\stitch-temp\candidate_search.html                                | HTML               |        327 |          0 |          1 |        328 |
+| c:\Users\MSI\Desktop\STAJ22001\astro-project\src\stitch-temp\reports_dashboard.html                               | HTML               |        446 |          0 |          1 |        447 |
+| c:\Users\MSI\Desktop\STAJ22001\astro-project\src\stitch-temp\system_settings_5a6.html                             | HTML               |        262 |          0 |          1 |        263 |
+| c:\Users\MSI\Desktop\STAJ22001\astro-project\src\stitch-temp\system_settings_f5b.html                             | HTML               |        316 |          0 |          1 |        317 |
+| c:\Users\MSI\Desktop\STAJ22001\astro-project\src\stitch-temp\user_management.html                                 | HTML               |        341 |          0 |          1 |        342 |
+| c:\Users\MSI\Desktop\STAJ22001\astro-project\src\styles\global.css                                                | CSS                |        966 |          0 |         75 |      1,041 |
+| c:\Users\MSI\Desktop\STAJ22001\astro-project\tsconfig.json                                                        | JSON with Comments |          5 |          0 |          1 |          6 |
+| Total                                                                                                             |                    |     25,766 |        511 |      1,557 |     27,834 |
++-------------------------------------------------------------------------------------------------------------------+--------------------+------------+------------+------------+------------+

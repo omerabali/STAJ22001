@@ -1,13 +1,13 @@
 ---
-import AdminLayout from '../../layouts/AdminLayout.astro';
+import UserLayout from '../layouts/UserLayout.astro';
 ---
 
-<AdminLayout title="Beacon - Sistem Ayarları">
+<UserLayout title="Beacon - Ayarlar" headerTitle="Ayarlar">
   <div class="max-w-6xl mx-auto">
     <!-- Header -->
     <header class="mb-8">
       <h2 class="font-headline-md text-headline-md font-bold mb-2 text-[#1b1c1a]">Ayarlar</h2>
-      <p class="font-body-md text-body-md text-[#8a8580]">Hesap ve sistem ayarlarınızı yönetin.</p>
+      <p class="font-body-md text-body-md text-[#8a8580]">Hesap ve güvenlik ayarlarınızı yönetin.</p>
     </header>
 
     <div class="flex flex-col lg:flex-row gap-8">
@@ -44,7 +44,7 @@ import AdminLayout from '../../layouts/AdminLayout.astro';
             <!-- Avatar Section -->
             <div class="flex items-center gap-6">
               <div class="w-20 h-20 rounded-full bg-[#14422f]/10 text-[#14422f] flex items-center justify-center font-bold text-2xl border border-[#ddd9d3] shadow-sm transition-transform duration-200 hover:scale-105 overflow-hidden bg-cover bg-center" id="avatar-preview">
-                A
+                ?
               </div>
               <div>
                 <input type="file" id="avatar-input" accept="image/*" class="hidden" />
@@ -146,6 +146,7 @@ import AdminLayout from '../../layouts/AdminLayout.astro';
           </div>
         </section>
 
+
       </div>
     </div>
   </div>
@@ -210,6 +211,8 @@ import AdminLayout from '../../layouts/AdminLayout.astro';
         });
       });
 
+      // API Interactivity
+      
       // Fetch user profile data via SWR cache
       async function loadUserProfile() {
         const fetcher = async () => {
@@ -328,10 +331,9 @@ import AdminLayout from '../../layouts/AdminLayout.astro';
             if (res.ok) {
               showStatus('profile-status', 'Profil başarıyla güncellendi!');
               
-              // Clear cache entries so headers and dashboards update instantly
+              // Clear cache entries so headers update instantly
               if (window.__swrCache) {
                 window.__swrCache.invalidate('user-profile');
-                window.__swrCache.invalidate('dashboard-stats');
               }
               sessionStorage.removeItem('user-avatar');
               
@@ -341,6 +343,7 @@ import AdminLayout from '../../layouts/AdminLayout.astro';
                   avatarPreview.textContent = (name || email).charAt(0).toUpperCase();
                 }
               }
+              
               // Optionally reload to update header avatar
               setTimeout(() => {
                 window.location.reload();
@@ -414,4 +417,4 @@ import AdminLayout from '../../layouts/AdminLayout.astro';
       }
     });
   </script>
-</AdminLayout>
+</UserLayout>

@@ -16,20 +16,20 @@ const currentPath = Astro.url.pathname;
   
   <!-- Navigation -->
   <div class="flex-1 overflow-y-auto mt-8 px-3 space-y-1">
-    <a class={`flex items-center px-4 py-3 rounded-lg transition-all group ${currentPath.startsWith('/candidate/profile') || currentPath === '/profile' ? 'bg-white text-[#14422f] border-l-3 border-[#14422f] shadow-sm font-semibold' : 'text-[#8a8580] hover:bg-white/40 hover:text-[#1b1c1a]'}`} href="/candidate/profile">
-      <i class="fa-solid fa-cloud-arrow-up w-6 text-center text-[#14422f] group-hover:text-[#14422f] transition-colors"></i>
+    <a class={`flex items-center px-4 py-3 rounded-lg transition-all group ${currentPath === '/profile' ? 'bg-white text-[#14422f] border-l-3 border-[#14422f] shadow-sm font-semibold' : 'text-[#8a8580] hover:bg-white/40 hover:text-[#1b1c1a]'}`} href="/profile">
+      <i class="fa-solid fa-cloud-arrow-up w-6 text-center text-sm group-hover:text-[#14422f] transition-colors"></i>
       <span class="ml-3 text-sm font-medium tracking-wide">CV Yükle & Analiz</span>
     </a>
-    <a class={`flex items-center px-4 py-3 rounded-lg transition-all group ${currentPath.startsWith('/candidate/analyses') || currentPath === '/analyses' ? 'bg-white text-[#14422f] border-l-3 border-[#14422f] shadow-sm font-semibold' : 'text-[#8a8580] hover:bg-white/40 hover:text-[#1b1c1a]'}`} href="/candidate/analyses">
-      <i class="fa-solid fa-chart-pie w-6 text-center text-[#14422f] group-hover:text-[#14422f] transition-colors"></i>
+    <a class={`flex items-center px-4 py-3 rounded-lg transition-all group ${currentPath === '/analyses' ? 'bg-white text-[#14422f] border-l-3 border-[#14422f] shadow-sm font-semibold' : 'text-[#8a8580] hover:bg-white/40 hover:text-[#1b1c1a]'}`} href="/analyses">
+      <i class="fa-solid fa-chart-pie w-6 text-center text-sm group-hover:text-[#14422f] transition-colors"></i>
       <span class="ml-3 text-sm font-medium tracking-wide">Analiz Sonuçlarım</span>
     </a>
   </div>
 
   <!-- Bottom Actions -->
   <div class="px-3 pb-8 space-y-1 mt-auto border-t border-[#ddd9d3] pt-4">
-    <a class={`flex items-center px-4 py-3 rounded-lg transition-all group ${currentPath.startsWith('/candidate/settings') || currentPath === '/settings' ? 'bg-white text-[#14422f] border-l-3 border-[#14422f] shadow-sm font-semibold' : 'text-[#8a8580] hover:bg-white/40 hover:text-[#1b1c1a]'}`} href="/candidate/settings">
-      <i class="fa-solid fa-gear w-6 text-center text-[#14422f] group-hover:text-[#14422f] transition-colors"></i>
+    <a class={`flex items-center px-4 py-3 rounded-lg transition-all group ${currentPath === '/settings' ? 'bg-white text-[#14422f] border-l-3 border-[#14422f] shadow-sm font-semibold' : 'text-[#8a8580] hover:bg-white/40 hover:text-[#1b1c1a]'}`} href="/settings">
+      <i class="fa-solid fa-gear w-6 text-center text-sm group-hover:text-[#14422f] transition-colors"></i>
       <span class="ml-3 text-sm font-medium tracking-wide">Ayarlar</span>
     </a>
     <button onclick="handleUserLogout()" class="flex items-center px-4 py-3 text-[#8a8580] hover:bg-red-50 hover:text-[#ef4444] rounded-lg transition-all group w-full text-left font-sans">

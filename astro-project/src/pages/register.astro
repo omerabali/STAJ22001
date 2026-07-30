@@ -137,11 +137,10 @@ import Layout from '../layouts/Layout.astro';
               <label for="phone" style="display: block; font-size: 12px; letter-spacing: 0.08em; font-weight: 500; color: #414943; text-transform: uppercase; margin-bottom: 8px; font-family: 'IBM Plex Sans', sans-serif;">Telefon</label>
               <div style="position: relative;">
                 <span class="material-symbols-outlined" style="position: absolute; left: 14px; top: 50%; transform: translateY(-50%); color: #717973; font-size: 18px; pointer-events: none;">call</span>
-                <input id="phone" type="tel" placeholder="5xxxxxxxxx" maxlength="10" required class="form-input"
+                <input id="phone" type="tel" placeholder="5xxxxxxxxx" required class="form-input"
                   style="width: 100%; height: 48px; padding: 0 16px 0 42px; background: #fdf8f5; border: 1px solid #c0c9c2; border-radius: 10px; font-size: 14px; color: #1c1b19; outline: none; transition: all 0.2s; box-sizing: border-box; font-family: 'Inter', sans-serif;"
                 />
               </div>
-              <p id="phone-hint" style="margin-top: 4px; font-size: 11px; color: #717973; font-weight: 500; margin-bottom: 0;">5 ile başlayan 10 haneli cep telefonunuz (Örn: 5321234567)</p>
             </div>
 
             <!-- Şifre -->
@@ -215,30 +214,136 @@ import Layout from '../layouts/Layout.astro';
 </Layout>
 
 <script>
-  import { initInputFocusEffects } from '../scripts/register/inputFocusEffects.ts';
-  import { initPhoneValidation } from '../scripts/register/phoneValidation.ts';
-  import { initPasswordStrength } from '../scripts/register/passwordStrength.ts';
-  import { initTogglePassword } from '../scripts/register/togglePassword.ts';
-  import { initButtonHoverEffects } from '../scripts/register/buttonHoverEffects.ts';
-  import { initRegisterFormSubmit } from '../scripts/register/registerFormSubmit.ts';
-
-  document.addEventListener('astro:page-load', () => {
-    initInputFocusEffects();
-    initPhoneValidation();
-    initPasswordStrength();
-    initTogglePassword();
-    initButtonHoverEffects();
-    initRegisterFormSubmit();
+  // Focus styles
+  document.querySelectorAll('.form-input').forEach((el) => {
+    const input = el as HTMLInputElement;
+    input.addEventListener('focus', () => {
+      input.style.borderColor = '#2d5a45';
+      input.style.boxShadow = '0 0 0 4px rgba(45,90,69,0.1)';
+    });
+    input.addEventListener('blur', () => {
+      input.style.borderColor = '#c0c9c2';
+      input.style.boxShadow = 'none';
+    });
   });
 
-  if (document.readyState === 'complete' || document.readyState === 'interactive') {
-    initInputFocusEffects();
-    initPhoneValidation();
-    initPasswordStrength();
-    initTogglePassword();
-    initButtonHoverEffects();
-    initRegisterFormSubmit();
-  }
+  // Password Strength
+  const passwordInput = document.getElementById('password') as HTMLInputElement;
+  const strength1 = document.getElementById('strength-1') as HTMLDivElement;
+  const strength2 = document.getElementById('strength-2') as HTMLDivElement;
+  const strength3 = document.getElementById('strength-3') as HTMLDivElement;
+  const strengthText = document.getElementById('strength-text') as HTMLParagraphElement;
+
+  passwordInput?.addEventListener('input', () => {
+    const val = passwordInput.value;
+    let strength = 0;
+    if (val.length >= 6) strength = 1;
+    if (val.length >= 8 && /[a-z]/.test(val) && /[A-Z]/.test(val) && /\d/.test(val)) strength = 2;
+    if (val.length >= 10 && /[a-z]/.test(val) && /[A-Z]/.test(val) && /\d/.test(val) && /[^A-Za-z0-9]/.test(val)) strength = 3;
+
+    if (val.length === 0) {
+      strength1.style.background = '#fecaca'; strength2.style.background = '#e5e7eb'; strength3.style.background = '#e5e7eb';
+      strengthText.textContent = 'Şifre gücü: Bekleniyor'; strengthText.style.color = '#717973'; return;
+    }
+    if (strength === 1) {
+      strength1.style.background = '#f43f5e'; strength2.style.background = '#e5e7eb'; strength3.style.background = '#e5e7eb';
+      strengthText.textContent = 'Şifre gücü: Zayıf'; strengthText.style.color = '#f43f5e';
+    } else if (strength === 2) {
+      strength1.style.background = '#f59e0b'; strength2.style.background = '#f59e0b'; strength3.style.background = '#e5e7eb';
+      strengthText.textContent = 'Şifre gücü: Orta'; strengthText.style.color = '#f59e0b';
+    } else {
+      strength1.style.background = '#10b981'; strength2.style.background = '#10b981'; strength3.style.background = '#10b981';
+      strengthText.textContent = 'Şifre gücü: Güçlü'; strengthText.style.color = '#10b981';
+    }
+  });
+
+
+
+  // Toggle Password
+  const togglePasswordBtn = document.getElementById('toggle-password');
+  togglePasswordBtn?.addEventListener('click', () => {
+    const isPass = passwordInput.type === 'password';
+    passwordInput.type = isPass ? 'text' : 'password';
+    const icon = togglePasswordBtn.querySelector('span');
+    if (icon) icon.textContent = isPass ? 'visibility_off' : 'visibility';
+  });
+
+  const confirmPasswordInput = document.getElementById('confirm_password') as HTMLInputElement;
+  const toggleConfirmBtn = document.getElementById('toggle-confirm-password');
+  toggleConfirmBtn?.addEventListener('click', () => {
+    const isPass = confirmPasswordInput.type === 'password';
+    confirmPasswordInput.type = isPass ? 'text' : 'password';
+    const icon = toggleConfirmBtn.querySelector('span');
+    if (icon) icon.textContent = isPass ? 'visibility_off' : 'visibility';
+  });
+
+  // Button hover
+  const registerBtn = document.getElementById('register-btn');
+  registerBtn?.addEventListener('mouseover', () => {
+    (registerBtn as HTMLButtonElement).style.background = '#224f3b';
+    (registerBtn as HTMLButtonElement).style.transform = 'translateY(-1px)';
+  });
+  registerBtn?.addEventListener('mouseout', () => {
+    (registerBtn as HTMLButtonElement).style.background = '#2d5a45';
+    (registerBtn as HTMLButtonElement).style.transform = 'translateY(0)';
+  });
+
+  // Handle Submit
+  const form = document.getElementById('register-form') as HTMLFormElement;
+  const errorFeedback = document.getElementById('error-feedback') as HTMLDivElement;
+
+  form?.addEventListener('submit', async (e) => {
+    e.preventDefault();
+    const rawEmail = (document.getElementById('email') as HTMLInputElement).value;
+    const email = rawEmail.trim().toLowerCase();
+    const phone = (document.getElementById('phone') as HTMLInputElement).value.trim();
+    const name = (document.getElementById('fullname') as HTMLInputElement).value.trim();
+    const password = passwordInput.value;
+    const confirmPassword = confirmPasswordInput.value;
+    const termsChecked = (document.getElementById('terms') as HTMLInputElement).checked;
+    const rememberMeChecked = (document.getElementById('remember_me') as HTMLInputElement).checked;
+
+    errorFeedback.style.display = 'none';
+    errorFeedback.textContent = '';
+
+    const nameRegex = /^[a-zA-ZğüşıöçĞÜŞİÖÇ\s]{3,}$/;
+    if (!nameRegex.test(name)) { errorFeedback.style.display = 'block'; errorFeedback.textContent = '[Hata]: Ad Soyad en az 3 karakter olmalı ve yalnızca harflerden oluşmalıdır.'; return; }
+
+    const emailRegex = /^[a-zA-Z0-9._%+-]+@gmail\.com$/;
+    if (!emailRegex.test(email)) { errorFeedback.style.display = 'block'; errorFeedback.textContent = '[Hata]: Yalnızca @gmail.com uzantılı e-posta adresleri kabul edilmektedir.'; return; }
+
+    const phoneRegex = /^5\d{9}$/;
+    if (!phoneRegex.test(phone)) { errorFeedback.style.display = 'block'; errorFeedback.textContent = '[Hata]: Telefon numarası 10 haneli olmalı ve 5 ile başlamalıdır.'; return; }
+
+    if (password.length < 6) { errorFeedback.style.display = 'block'; errorFeedback.textContent = '[Hata]: Şifre en az 6 karakter olmalıdır.'; return; }
+    if (password.includes(' ')) { errorFeedback.style.display = 'block'; errorFeedback.textContent = '[Hata]: Şifre boşluk içeremez.'; return; }
+    if (password !== confirmPassword) { errorFeedback.style.display = 'block'; errorFeedback.textContent = '[Hata]: Şifreler eşleşmiyor.'; return; }
+    if (!termsChecked) { errorFeedback.style.display = 'block'; errorFeedback.textContent = '[Hata]: Lütfen kullanım şartlarını kabul edin.'; return; }
+
+    try {
+      const response = await fetch('/api/auth/register', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email, phone, name, password }),
+        credentials: 'include'
+      });
+
+      let data;
+      const text = await response.text();
+      try {
+        data = text ? JSON.parse(text) : {};
+      } catch (e) {
+        throw new Error('Sunucudan geçersiz yanıt alındı. Lütfen servisin çalıştığından emin olun.');
+      }
+
+      if (!response.ok) throw new Error(data.message || 'Kayıt işlemi başarısız.');
+      if (rememberMeChecked) { localStorage.setItem('remembered_email', email); } else { localStorage.removeItem('remembered_email'); }
+      window.location.href = '/login';
+    } catch (error: any) {
+      errorFeedback.style.display = 'block';
+      errorFeedback.textContent = `[Hata]: ${error.message}`;
+    }
+  });
 </script>
 
 <style>

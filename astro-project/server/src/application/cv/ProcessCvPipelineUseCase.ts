@@ -1,8 +1,8 @@
 import { PrismaClient, AnalysisStatus } from "@prisma/client";
 import { getFileText } from "../../utils/parser";
 import { embedAllChunks } from "../../utils/embeddings";
-import { analyzeCvTextWithOpenAi } from "../../services/OpenAiCvAnalyzer";
-import { emitAnalysisStatus } from "../../services/socketService";
+import { analyzeCvTextWithOpenAi } from "../../infrastructure/ai/OpenAiCvAnalyzer";
+import { emitAnalysisStatus } from "../../infrastructure/websocket/socketService";
 import { ChunkQualityService } from "../../services/ChunkQualityService";
 
 export class ProcessCvPipelineUseCase {

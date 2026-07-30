@@ -1,0 +1,540 @@
+---
+import UserLayout from '../layouts/UserLayout.astro';
+---
+
+<UserLayout title="Beacon - Analiz Sonuçlarım" headerTitle="Analiz Sonuçlarım">
+  <div class="flex gap-6 h-full min-h-[600px] flex-col lg:flex-row">
+    
+    <!-- LEFT COLUMN: CV List (%35) -->
+    <div class="w-full lg:w-[35%] flex flex-col gap-6 min-w-0 shrink-0">
+      <div class="bg-white border border-[#ddd9d3] rounded-[10px] shadow-sm overflow-hidden flex flex-col h-full min-h-[500px]">
+        <!-- Card Header -->
+        <div class="p-6 border-b border-[#ddd9d3] bg-white">
+          <h3 class="font-bold text-lg text-[#1b1c1a] mb-1">Tüm Yüklenen CV'ler</h3>
+          <p class="text-xs text-[#8a8580] font-medium">Analiz görmek için listeden bir özgeçmiş seçin</p>
+        </div>
+
+        <!-- Column Header Row -->
+        <div class="px-8 py-3 bg-[#f5f4f0] border-b border-[#ddd9d3] grid grid-cols-12 text-[10px] font-bold text-[#8a8580] uppercase tracking-wider gap-2 shrink-0">
+          <div class="col-span-5">Belge Adı</div>
+          <div class="col-span-3 pl-2">Yükleme Tarihi</div>
+          <div class="col-span-3">Analiz Durumu</div>
+          <div class="col-span-1 text-right">İşlem</div>
+        </div>
+        
+        <!-- List Items Container -->
+        <div class="p-4 flex flex-col gap-2 overflow-y-auto" id="analyses-cvs-body">
+          <div class="text-center py-8 text-[#8a8580] font-medium text-xs">Yüklemeler sorgulanıyor...</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- RIGHT COLUMN: Detailed Analysis Panel (%65) -->
+    <div class="w-full lg:w-[65%] min-w-0 flex-1">
+      <div class="bg-white border border-[#ddd9d3] rounded-[10px] shadow-sm p-6 h-full flex flex-col min-h-[500px] relative overflow-hidden" id="analysis-detail-card">
+        
+        <!-- ─── EMPTY STATE ─── -->
+        <div class="flex flex-col items-center justify-center h-full py-12 my-auto text-center" id="no-analysis-state">
+          <div class="w-24 h-24 mb-6 rounded-full border border-[#ddd9d3] bg-[#faf9f5] flex items-center justify-center shadow-sm">
+            <span class="material-symbols-outlined text-4xl text-[#14422f]">analytics</span>
+          </div>
+          <div class="w-full max-w-[320px]">
+            <h3 class="text-lg font-bold text-[#1b1c1a] mb-2">Detaylı Analiz Paneli</h3>
+            <p class="text-xs text-[#8a8580] font-medium leading-relaxed">
+              Yandaki listeden bir özgeçmiş seçerek yapay zeka analiz raporunu detaylıca görüntüleyebilirsiniz.
+            </p>
+          </div>
+        </div>
+
+        <!-- ─── ACTIVE ANALYSIS STATE ─── -->
+        <div class="hidden flex-col h-full" id="active-analysis-state">
+          <!-- Top Header info -->
+          <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 pb-6 border-b border-[#ddd9d3] shrink-0">
+            <div>
+              <h2 class="text-lg text-[#1b1c1a] font-bold truncate max-w-[280px]" id="analysis-cv-name">
+                Özgeçmiş Belgesi
+              </h2>
+              <p class="text-xs text-[#8a8580] font-medium mt-1 flex items-center gap-1">
+                <span class="material-symbols-outlined text-[14px]">calendar_today</span>
+                Analiz Raporu
+              </p>
+            </div>
+            <div id="analysis-status-indicator" class="shrink-0">
+              <!-- verified status icon -->
+            </div>
+          </div>
+
+          <!-- Scrollable Content -->
+          <div class="flex-1 overflow-y-auto custom-scrollbar pt-6 pr-2 flex flex-col gap-6" id="analysis-content-area">
+            <!-- Dynamic content injected here -->
+          </div>
+
+          <!-- Bottom Action -->
+          <div class="mt-6 pt-6 border-t border-[#ddd9d3] flex justify-end shrink-0">
+            <button onclick="window.location.href = '/profile';" class="bg-[#14422f] hover:bg-[#0f3223] text-white font-label-md text-sm px-6 py-2.5 rounded-[8px] flex items-center gap-2 transition-colors shadow-sm">
+              <span class="material-symbols-outlined text-sm">add_circle</span>
+              Yeni Analiz Başlat
+            </button>
+          </div>
+        </div>
+
+      </div>
+    </div>
+
+  </div>
+
+  <script is:inline>
+  {
+    let selectedCvId = null;
+    let activeInterval = null;
+
+    // Delete CV handler
+    window.deleteCV = async function(cvId) {
+      if (!confirm('Bu özgeçmişi ve tüm ilişkili verileri silmek istediğinize emin misiniz?')) return;
+      try {
+        const res = await fetch(`/api/cv/${cvId}`, { method: 'DELETE' });
+        if (!res.ok) {
+          const err = await res.json();
+          throw new Error(err.message || 'Silme işlemi başarısız.');
+        }
+        if (selectedCvId === cvId) {
+          selectedCvId = null;
+          document.getElementById('no-analysis-state').classList.remove('hidden');
+          document.getElementById('active-analysis-state').classList.add('hidden');
+        }
+        if (window.__swrCache) {
+          window.__swrCache.invalidate('user-cvs');
+          window.__swrCache.invalidate('user-analyses');
+        }
+        await loadCVList();
+      } catch (err) {
+        console.error(err);
+        alert(err.message);
+      }
+    };
+
+    async function loadCVList() {
+      const fetcher = async () => {
+        const res = await fetch('/api/cv/list');
+        if (!res.ok) throw new Error("Fetch CV list error");
+        return res.json();
+      };
+
+      const render = (data) => {
+        const tbody = document.getElementById('analyses-cvs-body');
+        if (!tbody) return;
+
+        if (!data.cvs || data.cvs.length === 0) {
+          tbody.innerHTML = `
+            <div class="text-center py-12 text-[#8a8580] font-medium text-xs">Henüz yüklenmiş bir CV bulunamadı.</div>
+          `;
+          return;
+        }
+
+        tbody.innerHTML = '';
+        let hasPendingOrProcessing = false;
+
+        data.cvs.forEach(cv => {
+          const latestAnalysis = cv.analyses && cv.analyses[0];
+          const status = latestAnalysis ? latestAnalysis.status : 'PENDING';
+          if (status === 'PENDING' || status === 'PROCESSING') hasPendingOrProcessing = true;
+          const dateStr = new Date(cv.createdAt).toLocaleDateString('tr-TR', { day: 'numeric', month: 'short', year: 'numeric' });
+
+          // Status badge
+          let statusBadge = '';
+          if (status === 'PENDING') {
+            statusBadge = `
+              <span class="inline-flex items-center gap-1 px-2 py-0.5 rounded-[6px] text-[10px] font-semibold bg-amber-50 text-amber-700 border border-amber-200">
+                <span class="w-1.5 h-1.5 rounded-full bg-amber-600 animate-pulse"></span> Sırada
+              </span>
+            `;
+          } else if (status === 'PROCESSING') {
+            statusBadge = `
+              <span class="inline-flex items-center gap-1 px-2 py-0.5 rounded-[6px] text-[10px] font-semibold bg-blue-50 text-blue-700 border border-blue-200">
+                <span class="w-1.5 h-1.5 rounded-full bg-blue-600 animate-spin"></span> İşleniyor
+              </span>
+            `;
+          } else if (status === 'COMPLETED') {
+            statusBadge = `
+              <span class="inline-flex items-center gap-1 px-2 py-0.5 rounded-[6px] text-[10px] font-semibold bg-emerald-50 text-emerald-700 border border-emerald-200">
+                <span class="w-1.5 h-1.5 rounded-full bg-emerald-600"></span> Hazır
+              </span>
+            `;
+          } else {
+            statusBadge = `
+              <span class="inline-flex items-center gap-1 px-2 py-0.5 rounded-[6px] text-[10px] font-semibold bg-rose-50 text-rose-700 border border-rose-200">
+                <span class="w-1.5 h-1.5 rounded-full bg-rose-600"></span> Hata
+              </span>
+            `;
+          }
+
+          const isSelected = selectedCvId === cv.id;
+          const div = document.createElement('div');
+          div.className = `group grid grid-cols-12 items-center p-4 border rounded-[10px] cursor-pointer transition-colors shadow-sm gap-2 ${
+            isSelected
+              ? 'bg-[#14422f]/5 border-[#14422f]'
+              : 'bg-white border-[#ddd9d3] hover:bg-[#faf9f5]'
+          }`;
+
+          div.onclick = () => {
+            selectedCvId = cv.id;
+            // Update highlights
+            const items = tbody.querySelectorAll('.group');
+            items.forEach(item => {
+              item.classList.remove('bg-[#14422f]/5', 'border-[#14422f]');
+              item.classList.add('bg-white', 'border-[#ddd9d3]');
+            });
+            div.classList.add('bg-[#14422f]/5', 'border-[#14422f]');
+            div.classList.remove('bg-white', 'border-[#ddd9d3]');
+            showAnalysisDetails(cv, latestAnalysis);
+          };
+
+          div.innerHTML = `
+            <div class="col-span-5 flex items-center gap-3 min-w-0">
+              <span class="material-symbols-outlined text-red-600 shrink-0">picture_as_pdf</span>
+              <p class="font-bold text-sm text-[#1b1c1a] truncate" title="${cv.fileName}">${cv.fileName}</p>
+            </div>
+            <div class="col-span-3 text-xs text-[#8a8580] font-medium whitespace-nowrap pl-2">
+              ${dateStr}
+            </div>
+            <div class="col-span-3 flex items-center justify-start">
+              ${statusBadge}
+            </div>
+            <div class="col-span-1 flex justify-end" onclick="event.stopPropagation();">
+              <button class="text-[#8a8580] hover:text-red-600 p-1 rounded hover:bg-red-50 transition-colors" onclick="deleteCV('${cv.id}')" title="Sil">
+                <span class="material-symbols-outlined text-[16px]">delete</span>
+              </button>
+            </div>
+          `;
+          tbody.appendChild(div);
+
+          if (selectedCvId === cv.id) showAnalysisDetails(cv, latestAnalysis);
+        });
+
+        if (hasPendingOrProcessing) {
+          if (!activeInterval) activeInterval = setInterval(loadCVList, 3000);
+        } else {
+          if (activeInterval) { clearInterval(activeInterval); activeInterval = null; }
+        }
+      };
+
+      const staleTime = activeInterval ? 0 : 30000;
+
+      if (window.__swrCache) {
+        window.__swrCache.query('user-cvs', fetcher, render, staleTime);
+      } else {
+        fetcher().then(render).catch(err => console.error("CV List load failed:", err));
+      }
+    }
+
+    function showAnalysisDetails(cv, analysis) {
+      const noState = document.getElementById('no-analysis-state');
+      const activeState = document.getElementById('active-analysis-state');
+      if (!noState || !activeState) return;
+
+      noState.classList.add('hidden');
+      activeState.classList.remove('hidden');
+      activeState.classList.add('flex');
+
+      document.getElementById('analysis-cv-name').textContent = cv.fileName;
+
+      const statusIndicator = document.getElementById('analysis-status-indicator');
+      const contentArea = document.getElementById('analysis-content-area');
+
+      if (!analysis) return;
+      const status = analysis.status;
+
+      if (status === 'COMPLETED') {
+        statusIndicator.innerHTML = `<span class="material-symbols-outlined text-emerald-600 text-3xl">verified</span>`;
+
+        if (analysis.atsScore === null) {
+          // Day 13 completed state: text chunks generated but AI scoring not done
+          const skillsHtml = Array.isArray(analysis.skills) && analysis.skills.length > 0
+            ? analysis.skills.map(s => `
+                <span class="px-3 py-1.5 rounded-full bg-white border border-[#ddd9d3] text-[#14422f] text-xs font-semibold shadow-sm cursor-default">${s}</span>
+              `).join('')
+            : `<span class="text-xs text-[#8a8580]">Yetenek kelimeleri çıkarılamadı.</span>`;
+
+          const chunkHtml = cv.chunks && cv.chunks.length > 0
+            ? cv.chunks.map((chunk, idx) => {
+                const firstLB = chunk.chunkText.indexOf('\n');
+                const header = firstLB !== -1 ? chunk.chunkText.substring(0, firstLB) : `PARÇA #${idx + 1}`;
+                const body = firstLB !== -1 ? chunk.chunkText.substring(firstLB + 1) : chunk.chunkText;
+                const wordCount = body.split(/\s+/).filter(w => w.length > 0).length;
+                return `
+                  <div class="bg-[#faf9f5] border border-[#ddd9d3] rounded-[10px] p-5 hover:bg-[#f5f4f0] transition-all text-left">
+                    <div class="flex justify-between items-start mb-2">
+                      <span class="text-[10px] font-bold text-[#14422f] uppercase tracking-wider">${header}</span>
+                      <span class="text-[10px] font-mono text-[#8a8580] bg-white border border-[#ddd9d3] px-2 py-0.5 rounded">${wordCount} kelime</span>
+                    </div>
+                    <p class="text-xs text-[#1b1c1a] leading-relaxed font-sans whitespace-pre-wrap select-all max-h-[120px] overflow-y-auto pr-2 mt-2">${body}</p>
+                  </div>
+                `;
+              }).join('')
+            : `<p class="text-xs text-[#8a8580] text-center py-4">Metin parçaları veritabanında bulunamadı.</p>`;
+
+          contentArea.innerHTML = `
+            <div class="space-y-4 flex flex-col h-full overflow-hidden">
+              <div class="space-y-2 shrink-0">
+                <h4 class="text-[10px] font-bold text-[#8a8580] tracking-widest uppercase px-1">ÖZGEÇMİŞTEN ÇIKARILAN YETENEKLER</h4>
+                <div class="flex flex-wrap gap-2 pt-1">${skillsHtml}</div>
+              </div>
+              <div class="space-y-2 flex-1 flex flex-col overflow-hidden">
+                <h4 class="text-[10px] font-bold text-[#8a8580] tracking-widest uppercase px-1">BÖLÜMLERE GÖRE PARÇALAMA (CHUNKS)</h4>
+                <div class="space-y-4 overflow-y-auto flex-1 pr-2 custom-scrollbar mt-1" style="max-height: 320px;">${chunkHtml}</div>
+              </div>
+            </div>
+          `;
+        } else {
+          // Full AI report
+          const pct = analysis.atsScore;
+          const skillsHtml = Array.isArray(analysis.skills) && analysis.skills.length > 0
+            ? analysis.skills.map(s => `
+                <span class="px-3 py-1.5 rounded-full bg-[#14422f]/10 border border-[#14422f]/20 text-[#14422f] text-xs font-semibold shadow-sm cursor-default">${s}</span>
+              `).join('')
+            : `<span class="text-xs text-[#8a8580]">Yetenek kelimeleri çıkarılamadı.</span>`;
+
+          // Strengths (Güçlü Yönler)
+          const strengths = analysis.strengths || [];
+          const strengthsHtml = strengths.length > 0
+            ? `
+              <div class="space-y-2">
+                ${strengths.map(s => `
+                  <div class="flex items-start gap-2 text-xs text-[#1b1c1a] leading-relaxed bg-emerald-50/80 border border-emerald-200/80 p-3 rounded-lg shadow-2xs">
+                    <span class="material-symbols-outlined text-emerald-600 text-[16px] shrink-0 mt-0.5">check_circle</span>
+                    <span>${s}</span>
+                  </div>
+                `).join('')}
+              </div>
+            `
+            : `<p class="text-xs text-[#8a8580] italic">Güçlü yön verisi bulunamadı.</p>`;
+
+          // Weaknesses (Eksik Yönler)
+          const weaknesses = analysis.weaknesses || analysis.eksik_yonler || analysis.gelisime_acik_yonler || [];
+          const weaknessesHtml = weaknesses.length > 0
+            ? `
+              <div class="space-y-2">
+                ${weaknesses.map(w => `
+                  <div class="flex items-start gap-2 text-xs text-[#1b1c1a] leading-relaxed bg-rose-50/80 border border-rose-200/80 p-3 rounded-lg shadow-2xs">
+                    <span class="material-symbols-outlined text-rose-600 text-[16px] shrink-0 mt-0.5">warning</span>
+                    <span>${w}</span>
+                  </div>
+                `).join('')}
+              </div>
+            `
+            : `<p class="text-xs text-[#8a8580] italic">Eksik yön tespit edilmedi.</p>`;
+
+          // Parse Suggestions (Recommendations & Questions)
+          const rawSuggestions = analysis.suggestions || [];
+          const recList = [];
+          const qList = [];
+
+          rawSuggestions.forEach((item) => {
+            if (typeof item === 'object' && item !== null && item.action) {
+              recList.push({
+                priority: item.priority || 'medium',
+                timeframe: item.timeframe || 'Kısa Vadeli',
+                action: item.action
+              });
+              if (item.question) {
+                qList.push({
+                  priority: item.priority || 'medium',
+                  timeframe: item.timeframe || 'Kısa Vadeli',
+                  question: item.question
+                });
+              }
+            } else if (typeof item === 'string') {
+              let priority = 'medium';
+              if (item.toLowerCase().includes('high') || item.toLowerCase().includes('yüksek')) priority = 'high';
+              else if (item.toLowerCase().includes('low') || item.toLowerCase().includes('düşük')) priority = 'low';
+
+              if (item.includes('❓ Mülakat Sorusu:')) {
+                const parts = item.split('❓ Mülakat Sorusu:');
+                const rec = parts[0].replace('💡 İK Tavsiyesi:', '').trim();
+                const q = parts[1]?.trim() || '';
+                if (rec) recList.push({ priority, timeframe: 'Kısa Vadeli', action: rec });
+                if (q) qList.push({ priority, timeframe: 'Kısa Vadeli', question: q });
+              } else {
+                const rec = item.replace('💡 İK Tavsiyesi:', '').trim();
+                recList.push({ priority, timeframe: 'Kısa Vadeli', action: rec });
+              }
+            }
+          });
+
+          // Recommendations HTML
+          const suggestionsHtml = recList.length > 0
+            ? `
+              <div class="space-y-2">
+                ${recList.map(rec => {
+                  const p = rec.priority || 'medium';
+                  const badgeClass = p === 'high'
+                    ? 'bg-rose-100 text-rose-800 border-rose-200'
+                    : p === 'low'
+                    ? 'bg-blue-100 text-blue-800 border-blue-200'
+                    : 'bg-amber-100 text-amber-800 border-amber-200';
+                  const pLabel = p === 'high' ? 'Yüksek Öncelik' : p === 'low' ? 'Düşük Öncelik' : 'Orta Öncelik';
+
+                  return `
+                    <div class="p-3 rounded-lg border border-[#ddd9d3] bg-[#faf9f5] flex flex-col gap-1.5 shadow-2xs">
+                      <div class="flex items-center justify-between gap-2">
+                        <span class="px-2 py-0.5 rounded-full text-[10px] font-bold border ${badgeClass}">${pLabel}</span>
+                        <span class="text-[10px] text-[#8a8580] font-semibold flex items-center gap-1">
+                          <span class="material-symbols-outlined text-[12px]">schedule</span>
+                          ${rec.timeframe || 'Kısa Vadeli'}
+                        </span>
+                      </div>
+                      <div class="flex items-start gap-2 text-xs text-[#1b1c1a] leading-relaxed">
+                        <span class="material-symbols-outlined text-amber-600 text-[16px] shrink-0 mt-0.5">lightbulb</span>
+                        <span>${rec.action}</span>
+                      </div>
+                    </div>
+                  `;
+                }).join('')}
+              </div>
+            `
+            : `<p class="text-xs text-[#8a8580] italic">Mülakat önerisi bulunamadı.</p>`;
+
+          // Questions HTML
+          const questionsHtml = qList.length > 0
+            ? `
+              <div class="space-y-2">
+                ${qList.map(item => `
+                  <div class="p-3 rounded-lg border border-[#14422f]/20 bg-[#14422f]/5 flex flex-col gap-1.5 shadow-2xs">
+                    <div class="flex items-center justify-between gap-2">
+                      <span class="text-[10px] font-bold text-[#14422f] uppercase tracking-wider flex items-center gap-1">
+                        <span class="material-symbols-outlined text-[12px]">quiz</span> Mülakat Sorusu
+                      </span>
+                      <span class="text-[10px] text-[#14422f]/70 font-semibold">${item.timeframe || 'Görüşme Aşaması'}</span>
+                    </div>
+                    <div class="flex items-start gap-2 text-xs text-[#14422f] font-semibold leading-relaxed italic">
+                      <span class="material-symbols-outlined text-[#14422f] text-[16px] shrink-0 mt-0.5 not-italic">help</span>
+                      <span>${item.question}</span>
+                    </div>
+                  </div>
+                `).join('')}
+              </div>
+            `
+            : `<p class="text-xs text-[#8a8580] italic">Mülakat sorusu bulunamadı.</p>`;
+
+          contentArea.innerHTML = `
+            <div class="space-y-6 flex flex-col h-full overflow-y-auto pr-2 custom-scrollbar">
+              <!-- Score Card -->
+              <div class="flex items-center gap-6 bg-[#faf9f5] p-5 rounded-[10px] border border-[#ddd9d3] shrink-0 text-left">
+                <div class="relative w-20 h-20 flex items-center justify-center shrink-0">
+                  <svg class="w-full h-full transform -rotate-90" viewBox="0 0 36 36">
+                    <path class="text-[#ddd9d3]" d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831" fill="none" stroke="currentColor" stroke-width="3"></path>
+                    <path class="text-emerald-600" d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831" fill="none" stroke="currentColor" stroke-dasharray="${pct}, 100" stroke-linecap="round" stroke-width="3"></path>
+                  </svg>
+                  <span class="absolute text-lg font-bold text-[#1b1c1a]">%${pct}</span>
+                </div>
+                <div>
+                  <span class="text-[10px] text-[#14422f] uppercase font-bold tracking-widest">GENEL UYUM SKORU</span>
+                  <h5 class="text-md font-bold text-[#1b1c1a] mt-1">${analysis.role || 'Özgeçmiş Analizi'}</h5>
+                  <p class="text-xs text-[#8a8580] mt-0.5">Yapay zeka uyumluluk skoru hesaplandı.</p>
+                </div>
+              </div>
+              
+              <!-- Skills -->
+              <div class="space-y-2 text-left">
+                <h4 class="text-[10px] font-bold text-[#8a8580] tracking-widest uppercase px-1">ÖNE ÇIKAN YETENEKLER</h4>
+                <div class="flex flex-wrap gap-2 pt-1">${skillsHtml}</div>
+              </div>
+              
+              <!-- Strengths / Weaknesses / Suggestions / Questions Bento -->
+              <div class="grid grid-cols-1 gap-5 pt-1 shrink-0">
+                <!-- Strengths -->
+                <div class="space-y-2 text-left">
+                  <span class="text-xs text-emerald-800 font-bold flex items-center gap-1.5 uppercase tracking-wide">
+                    <span class="material-symbols-outlined text-emerald-600 text-base">thumb_up</span> GÜÇLÜ YÖNLER
+                  </span>
+                  ${strengthsHtml}
+                </div>
+                
+                <!-- Weaknesses (Eksik Yönler) -->
+                <div class="space-y-2 text-left">
+                  <span class="text-xs text-rose-800 font-bold flex items-center gap-1.5 uppercase tracking-wide">
+                    <span class="material-symbols-outlined text-rose-600 text-base">warning</span> EKSİK YÖNLER
+                  </span>
+                  ${weaknessesHtml}
+                </div>
+
+                <!-- Recommendations (Mülakat Önerileri) -->
+                <div class="space-y-2 text-left">
+                  <span class="text-xs text-amber-800 font-bold flex items-center gap-1.5 uppercase tracking-wide">
+                    <span class="material-symbols-outlined text-amber-600 text-base">tips_and_updates</span> MÜLAKAT ÖNERİLERİ (TAVSİYELER)
+                  </span>
+                  ${suggestionsHtml}
+                </div>
+
+                <!-- Questions (Mülakatta Sorulacak Sorular) -->
+                <div class="space-y-2 text-left">
+                  <span class="text-xs text-[#14422f] font-bold flex items-center gap-1.5 uppercase tracking-wide">
+                    <span class="material-symbols-outlined text-[#14422f] text-base">help_center</span> MÜLAKATTA SORULACAK SORULAR
+                  </span>
+                  ${questionsHtml}
+                </div>
+              </div>
+            </div>
+          `;
+        }
+      } else if (status === 'PENDING') {
+        statusIndicator.innerHTML = `<span class="material-symbols-outlined text-[#8a8580] text-3xl animate-pulse">schedule</span>`;
+        contentArea.innerHTML = `
+          <div class="text-center py-12 text-[#8a8580] flex flex-col items-center justify-center h-full space-y-6 my-auto">
+            <div class="w-24 h-24 rounded-full border border-[#ddd9d3] bg-[#faf9f5] flex items-center justify-center shadow-sm">
+              <span class="material-symbols-outlined text-5xl text-[#8a8580] animate-pulse">schedule</span>
+            </div>
+            <div class="text-center w-full max-w-[320px] px-4 mx-auto">
+              <h3 class="text-lg font-bold text-[#1b1c1a] mb-2">İşlem Sırasında</h3>
+              <p class="text-xs text-[#8a8580] leading-relaxed font-medium">CV dosyası sunucuya ulaştı, metin çıkarma sırasının kendisine gelmesi bekleniyor.</p>
+            </div>
+          </div>`;
+      } else if (status === 'PROCESSING') {
+        statusIndicator.innerHTML = `<span class="material-symbols-outlined text-blue-600 text-3xl animate-spin">progress_activity</span>`;
+        contentArea.innerHTML = `
+          <div class="text-center py-12 text-[#8a8580] flex flex-col items-center justify-center h-full space-y-6 my-auto">
+            <div class="w-24 h-24 rounded-full border border-[#ddd9d3] bg-[#faf9f5] flex items-center justify-center shadow-sm">
+              <span class="material-symbols-outlined text-5xl text-blue-600 animate-spin">progress_activity</span>
+            </div>
+            <div class="text-center w-full max-w-[320px] px-4 mx-auto">
+              <h3 class="text-lg font-bold text-[#1b1c1a] mb-2">Metin Çıkarılıyor...</h3>
+              <p class="text-xs text-[#8a8580] leading-relaxed font-medium">Özgeçmiş PDF belgesinden metinler ayıklanıyor ve semantik arama chunk'larına bölünüyor.</p>
+            </div>
+          </div>`;
+      } else {
+        statusIndicator.innerHTML = `<span class="material-symbols-outlined text-rose-600 text-3xl">error</span>`;
+        contentArea.innerHTML = `
+          <div class="text-center py-12 text-[#8a8580] flex flex-col items-center justify-center h-full space-y-6 my-auto">
+            <div class="w-24 h-24 rounded-full border border-rose-200 bg-rose-50 flex items-center justify-center shadow-sm">
+              <span class="material-symbols-outlined text-5xl text-rose-600">error</span>
+            </div>
+            <div class="text-center w-full max-w-[320px] px-4 mx-auto">
+              <h3 class="text-lg font-bold text-rose-600 mb-2">Ayrıştırma Hatası</h3>
+              <p class="text-xs text-[#8a8580] leading-relaxed font-medium">PDF belgesi parse edilirken sunucu hatası oluştu. Dosyanın şifreli veya bozuk olmadığından emin olun.</p>
+            </div>
+          </div>`;
+      }
+    }
+
+    function initAnalysesPage() {
+      const cvsBody = document.getElementById('analyses-cvs-body');
+      if (cvsBody && !cvsBody.dataset.initialized) {
+        cvsBody.dataset.initialized = "true";
+        loadCVList();
+      }
+    }
+
+    document.addEventListener("astro:page-load", initAnalysesPage);
+
+    if (document.readyState === "complete" || document.readyState === "interactive") {
+      initAnalysesPage();
+    }
+  }
+  </script>
+
+<style>
+  html {
+    zoom: 75%;
+  }
+</style>
+</UserLayout>

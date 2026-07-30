@@ -23,7 +23,7 @@ export const onRequest = defineMiddleware((context, next) => {
 
   // Define route groups
   const isAdminRoute = path.startsWith('/admin');
-  const isCandidateRoute = path.startsWith('/candidate');
+  const isCandidateRoute = path.startsWith('/profile') || path.startsWith('/analyses') || path === '/settings';
   const isAuthRoute = path === '/login' || path === '/register';
 
   // 1. Unauthenticated users trying to access protected routes
@@ -36,7 +36,7 @@ export const onRequest = defineMiddleware((context, next) => {
   if (user) {
     // Prevent CANDIDATE from accessing ADMIN routes
     if (isAdminRoute && user.role !== 'ADMIN') {
-      return context.redirect('/candidate/profile');
+      return context.redirect('/profile');
     }
     
     // Prevent ADMIN from accessing CANDIDATE routes
@@ -49,7 +49,7 @@ export const onRequest = defineMiddleware((context, next) => {
       if (user.role === 'ADMIN') {
         return context.redirect('/admin/dashboard');
       } else {
-        return context.redirect('/candidate/profile');
+        return context.redirect('/profile');
       }
     }
   }

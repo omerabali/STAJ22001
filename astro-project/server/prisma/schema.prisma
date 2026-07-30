@@ -54,18 +54,17 @@ enum AnalysisStatus {
 }
 
 model CVAnalysis {
-  id                  String         @id @default(uuid())
-  cvId                String
-  cv                  CV             @relation(fields: [cvId], references: [id], onDelete: Cascade)
-  status              AnalysisStatus @default(PENDING)
-  atsScore            Int?
-  skills              Json?
-  strengths           Json?
-  weaknesses          Json?
-  suggestions         Json?
-  interviewQuestions   Json?
-  createdAt           DateTime       @default(now())
-  updatedAt           DateTime       @updatedAt
+  id            String         @id @default(uuid())
+  cvId          String
+  cv            CV             @relation(fields: [cvId], references: [id], onDelete: Cascade)
+  status        AnalysisStatus @default(PENDING)
+  atsScore      Int?
+  skills        Json?
+  strengths     Json?
+  weaknesses    Json?
+  suggestions   Json?
+  createdAt     DateTime       @default(now())
+  updatedAt     DateTime       @updatedAt
 
   @@map("cv_analyses")
 }

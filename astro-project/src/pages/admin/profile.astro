@@ -1,4 +1,4 @@
-﻿---
+---
 import AdminLayout from '../../layouts/AdminLayout.astro';
 
 const userId = Astro.url.searchParams.get('userId') || '';
@@ -9,10 +9,10 @@ const userId = Astro.url.searchParams.get('userId') || '';
   <header class="mb-8 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
     <div>
       <a href="/admin/search" class="inline-flex items-center gap-2 text-xs font-bold text-[#8a8580] hover:text-[#14422f] transition-colors mb-3 uppercase tracking-wider">
-        <span class="material-symbols-outlined text-[16px]">arrow_back</span> Aday Arama EkranÄ±na DÃ¶n
+        <span class="material-symbols-outlined text-[16px]">arrow_back</span> Aday Arama Ekranına Dön
       </a>
       <h2 class="font-headline-md text-headline-md font-bold mb-1 text-[#1b1c1a] text-3xl" id="candidate-name-header">Aday Profili</h2>
-      <p class="font-body-sm text-sm text-[#8a8580] font-medium" id="candidate-email-header">YÃ¼kleniyor...</p>
+      <p class="font-body-sm text-sm text-[#8a8580] font-medium" id="candidate-email-header">Yükleniyor...</p>
     </div>
   </header>
 
@@ -25,7 +25,7 @@ const userId = Astro.url.searchParams.get('userId') || '';
       <!-- Personal Info Card -->
       <div class="bg-white border border-[#ddd9d3] rounded-[10px] p-6 shadow-sm relative overflow-hidden">
         <div class="absolute left-0 top-0 bottom-0 w-[4px] bg-[#14422f]"></div>
-        <h3 class="text-xs font-bold text-[#8a8580] uppercase tracking-wider mb-4">ADAY BÄ°LGÄ°LERÄ°</h3>
+        <h3 class="text-xs font-bold text-[#8a8580] uppercase tracking-wider mb-4">ADAY BİLGİLERİ</h3>
         
         <div class="flex flex-col sm:flex-row items-start sm:items-center gap-6">
           <div class="w-16 h-16 rounded-full bg-[#14422f]/10 text-[#14422f] flex items-center justify-center font-bold text-xl border border-[#ddd9d3] shrink-0" id="profile-avatar">
@@ -45,14 +45,14 @@ const userId = Astro.url.searchParams.get('userId') || '';
               <span class="font-semibold text-[#1b1c1a]" id="profile-phone">-</span>
             </div>
             <div>
-              <span class="text-[10px] font-bold text-[#8a8580] uppercase tracking-wider block">KAYIT TARÄ°HÄ°</span>
+              <span class="text-[10px] font-bold text-[#8a8580] uppercase tracking-wider block">KAYIT TARİHİ</span>
               <span class="font-semibold text-[#1b1c1a]" id="profile-date">-</span>
             </div>
           </div>
         </div>
       </div>
 
-      <!-- AI Analiz Ã–zeti (SWOT TarzÄ± Ã‡Ä±ktÄ± Card) -->
+      <!-- AI Analiz Özeti (SWOT Tarzı Çıktı Card) -->
       <div class="bg-white border border-[#ddd9d3] rounded-[10px] p-6 shadow-sm flex flex-col gap-5" id="ai-swot-card">
         <div class="flex justify-between items-center pb-3 border-b border-[#ddd9d3]">
           <div class="flex items-center gap-2.5">
@@ -60,8 +60,8 @@ const userId = Astro.url.searchParams.get('userId') || '';
               <span class="material-symbols-outlined text-[18px]">psychology</span>
             </div>
             <div>
-              <h3 class="text-sm font-bold text-[#1b1c1a]">Yapay Zeka Analiz Ã–zeti</h3>
-              <p class="text-[11px] text-[#8a8580] font-medium" id="swot-cv-name">SeÃ§ilen CV iÃ§in SWOT DeÄŸerlendirmesi</p>
+              <h3 class="text-sm font-bold text-[#1b1c1a]">Yapay Zeka Analiz Özeti</h3>
+              <p class="text-[11px] text-[#8a8580] font-medium" id="swot-cv-name">Seçilen CV için SWOT Değerlendirmesi</p>
             </div>
           </div>
           <div class="flex items-center gap-3">
@@ -89,10 +89,10 @@ const userId = Astro.url.searchParams.get('userId') || '';
         <div class="space-y-2">
           <h4 class="text-xs font-bold text-emerald-800 uppercase tracking-wider flex items-center gap-2">
             <span class="material-symbols-outlined text-emerald-600 text-[16px]">thumb_up</span>
-            GÃ¼Ã§lÃ¼ YÃ¶nler (Strengths)
+            Güçlü Yönler (Strengths)
           </h4>
           <div id="swot-strengths-container" class="text-xs text-[#8a8580] italic">
-            Bir CV seÃ§ildiÄŸinde veya analiz tamamlandÄ±ÄŸÄ±nda detaylar gÃ¶rÃ¼ntÃ¼lenecektir.
+            Bir CV seçildiğinde veya analiz tamamlandığında detaylar görüntülenecektir.
           </div>
         </div>
 
@@ -100,10 +100,10 @@ const userId = Astro.url.searchParams.get('userId') || '';
         <div class="space-y-2">
           <h4 class="text-xs font-bold text-rose-800 uppercase tracking-wider flex items-center gap-2">
             <span class="material-symbols-outlined text-rose-600 text-[16px]">build</span>
-            Eksik YÃ¶nler (Gaps)
+            Eksik Yönler (Gaps)
           </h4>
           <div id="swot-weaknesses-container" class="text-xs text-[#8a8580] italic">
-            Eksik yÃ¶n verisi bekleniyor.
+            Eksik yön verisi bekleniyor.
           </div>
         </div>
 
@@ -111,7 +111,7 @@ const userId = Astro.url.searchParams.get('userId') || '';
         <div class="space-y-2">
           <h4 class="text-xs font-bold text-amber-800 uppercase tracking-wider flex items-center gap-2">
             <span class="material-symbols-outlined text-amber-600 text-[16px]">lightbulb</span>
-            MÃ¼lakat Ã–nerileri (Tavsiyeler)
+            Mülakat Önerileri (Tavsiyeler)
           </h4>
           <div id="swot-suggestions-container" class="text-xs text-[#8a8580] italic">
             Tavsiye verileri bekleniyor.
@@ -122,10 +122,10 @@ const userId = Astro.url.searchParams.get('userId') || '';
         <div class="space-y-2">
           <h4 class="text-xs font-bold text-[#14422f] uppercase tracking-wider flex items-center gap-2">
             <span class="material-symbols-outlined text-[#14422f] text-[16px]">help</span>
-            MÃ¼lakatta Sorulacak Sorular
+            Mülakatta Sorulacak Sorular
           </h4>
           <div id="swot-questions-container" class="text-xs text-[#8a8580] italic">
-            MÃ¼lakat soru verileri bekleniyor.
+            Mülakat soru verileri bekleniyor.
           </div>
         </div>
       </div>
@@ -133,23 +133,23 @@ const userId = Astro.url.searchParams.get('userId') || '';
       <!-- CV List Card -->
       <div class="bg-white border border-[#ddd9d3] rounded-[10px] flex flex-col overflow-hidden shadow-sm">
         <div class="p-5 border-b border-[#ddd9d3] flex justify-between items-center">
-          <h3 class="text-sm font-bold text-[#1b1c1a]">YÃ¼klenen Ã–zgeÃ§miÅŸler</h3>
+          <h3 class="text-sm font-bold text-[#1b1c1a]">Yüklenen Özgeçmişler</h3>
           <span class="text-xs text-[#8a8580] font-medium" id="cv-count-badge">0 Belge</span>
         </div>
         <div class="overflow-x-auto">
           <table class="w-full text-left text-sm whitespace-nowrap">
             <thead class="text-xs text-[#8a8580] uppercase bg-[#f5f4f0] border-b border-[#ddd9d3]">
               <tr>
-                <th class="px-5 py-3 font-semibold">Belge AdÄ±</th>
-                <th class="px-5 py-3 font-semibold">YÃ¼kleme Tarihi</th>
+                <th class="px-5 py-3 font-semibold">Belge Adı</th>
+                <th class="px-5 py-3 font-semibold">Yükleme Tarihi</th>
                 <th class="px-5 py-3 font-semibold">Durum</th>
                 <th class="px-5 py-3 font-semibold text-center">Uyum Skoru</th>
-                <th class="px-5 py-3 font-semibold text-right">Ä°ÅŸlem</th>
+                <th class="px-5 py-3 font-semibold text-right">İşlem</th>
               </tr>
             </thead>
             <tbody class="divide-y divide-[#ddd9d3] text-[#1b1c1a]" id="cvs-table-body">
               <tr>
-                <td colspan="5" class="px-6 py-8 text-center text-[#8a8580] font-medium">YÃ¼klemeler sorgulanÄ±yor...</td>
+                <td colspan="5" class="px-6 py-8 text-center text-[#8a8580] font-medium">Yüklemeler sorgulanıyor...</td>
               </tr>
             </tbody>
           </table>
@@ -166,9 +166,9 @@ const userId = Astro.url.searchParams.get('userId') || '';
         <div class="p-4 border-b border-[#ddd9d3] flex items-center justify-between gap-3 shrink-0 bg-[#faf9f5]">
           <div class="flex items-center gap-2.5 min-w-0">
             <span class="material-symbols-outlined text-[#14422f] text-[20px] shrink-0">description</span>
-            <h3 class="text-sm font-bold text-[#1b1c1a] truncate" id="cv-viewer-title">CV Ä°Ã§eriÄŸi</h3>
+            <h3 class="text-sm font-bold text-[#1b1c1a] truncate" id="cv-viewer-title">CV İçeriği</h3>
           </div>
-          <button id="copy-cv-text-btn" class="hidden items-center gap-1.5 text-xs font-semibold text-[#8a8580] hover:text-[#14422f] px-3 py-1.5 rounded-lg border border-[#ddd9d3] bg-white hover:bg-[#faf9f5] transition-colors shrink-0 cursor-pointer" title="TÃ¼m CV metnini kopyala">
+          <button id="copy-cv-text-btn" class="hidden items-center gap-1.5 text-xs font-semibold text-[#8a8580] hover:text-[#14422f] px-3 py-1.5 rounded-lg border border-[#ddd9d3] bg-white hover:bg-[#faf9f5] transition-colors shrink-0 cursor-pointer" title="Tüm CV metnini kopyala">
             <span class="material-symbols-outlined text-[15px]">content_copy</span>
             <span id="copy-cv-text-label">Metni Kopyala</span>
           </button>
@@ -180,7 +180,7 @@ const userId = Astro.url.searchParams.get('userId') || '';
             <span class="material-symbols-outlined text-[15px]">article</span> Tam Metin
           </button>
           <button id="tab-chunks" class="pb-2 border-b-2 border-transparent hover:text-[#1b1c1a] cursor-pointer flex items-center gap-1.5">
-            <span class="material-symbols-outlined text-[15px]">segment</span> BÃ¶lÃ¼mler (Chunks)
+            <span class="material-symbols-outlined text-[15px]">segment</span> Bölümler (Chunks)
           </button>
         </div>
 
@@ -188,8 +188,8 @@ const userId = Astro.url.searchParams.get('userId') || '';
         <div class="flex flex-col items-center justify-center py-20 text-center px-6 gap-4" id="cv-viewer-placeholder">
           <span class="material-symbols-outlined text-5xl text-[#ddd9d3]">file_open</span>
           <div>
-            <h4 class="font-bold text-[#1b1c1a]">CV Ä°Ã§eriÄŸini GÃ¶rÃ¼ntÃ¼le</h4>
-            <p class="text-xs text-[#8a8580] max-w-[240px] mt-1 leading-relaxed">Sisteme yÃ¼klenen Ã¶zgeÃ§miÅŸin metin ve bÃ¶lÃ¼m detaylarÄ±nÄ± okumak iÃ§in soldaki listeden bir CV seÃ§in.</p>
+            <h4 class="font-bold text-[#1b1c1a]">CV İçeriğini Görüntüle</h4>
+            <p class="text-xs text-[#8a8580] max-w-[240px] mt-1 leading-relaxed">Sisteme yüklenen özgeçmişin metin ve bölüm detaylarını okumak için soldaki listeden bir CV seçin.</p>
           </div>
         </div>
 
@@ -202,20 +202,526 @@ const userId = Astro.url.searchParams.get('userId') || '';
         <!-- Loading Spinner -->
         <div class="hidden flex-col items-center justify-center py-20 gap-4" id="cv-viewer-loading">
           <span class="material-symbols-outlined text-4xl text-[#14422f] animate-spin">progress_activity</span>
-          <p class="text-sm text-[#8a8580] font-medium">CV iÃ§eriÄŸi okunuyor...</p>
+          <p class="text-sm text-[#8a8580] font-medium">CV içeriği okunuyor...</p>
         </div>
       </div>
     </div>
 
   </div>
 
-  <script>
-    import { loadCandidateProfile } from '../../scripts/admin/profile/candidateProfileLoader';
+  <script is:inline data-astro-rerun>
+    let selectedCvId = null;
+    let candidateData = null;
+    let currentViewTab = 'fulltext';
 
-    document.addEventListener('astro:page-load', () => {
-      if (document.getElementById('profile-page-container')) {
-        loadCandidateProfile();
+    async function loadCandidateProfile() {
+      const container = document.getElementById('profile-page-container');
+      const userId = container ? container.getAttribute('data-user-id') : null;
+
+      if (!userId) {
+        document.getElementById('candidate-name-header').textContent = 'Hata: Aday ID eksik';
+        document.getElementById('candidate-email-header').textContent = 'URL parametresi bulunamadı.';
+        return;
       }
-    });
+
+      let decodedUserId;
+      try {
+        decodedUserId = decodeURIComponent(userId).trim();
+      } catch {
+        decodedUserId = userId.trim();
+      }
+
+      if (/^[0-9a-fA-F]{8}\s[0-9a-fA-F]{4}\s[0-9a-fA-F]{4}\s[0-9a-fA-F]{4}\s[0-9a-fA-F]{12}$/.test(decodedUserId)) {
+        decodedUserId = decodedUserId.replace(/\s+/g, '-');
+      }
+
+      if (window.__swrCache) {
+        window.__swrCache.invalidate(`candidate-profile-${decodedUserId}`);
+      }
+
+      const tableBody = document.getElementById('cvs-table-body');
+      if (!tableBody) return;
+
+      const fetcher = async () => {
+        const res = await fetch(`/api/admin/candidates/${decodedUserId}`);
+        if (!res.ok) throw new Error(`API hatası: ${res.status}`);
+        return res.json();
+      };
+
+      const render = (data) => {
+        candidateData = data.candidate;
+        
+        // Header info
+        document.getElementById('candidate-name-header').textContent = candidateData.name || 'İsimsiz Aday';
+        document.getElementById('candidate-email-header').textContent = candidateData.email;
+
+        // Personal Info Card
+        document.getElementById('profile-name').textContent = candidateData.name || '-';
+        document.getElementById('profile-email').textContent = candidateData.email || '-';
+        document.getElementById('profile-phone').textContent = candidateData.phone || '-';
+        document.getElementById('profile-date').textContent = new Date(candidateData.createdAt).toLocaleDateString('tr-TR', { year: 'numeric', month: 'long', day: 'numeric' });
+        
+        // Avatar initials
+        const initials = (candidateData.name || candidateData.email || '??').substring(0, 2).toUpperCase();
+        const avatarEl = document.getElementById('profile-avatar');
+        if (candidateData.avatarUrl) {
+          avatarEl.style.backgroundImage = `url(${candidateData.avatarUrl})`;
+          avatarEl.textContent = '';
+        } else {
+          avatarEl.style.backgroundImage = '';
+          avatarEl.textContent = initials;
+        }
+
+        // CV table list
+        const cvs = candidateData.cvs || [];
+        document.getElementById('cv-count-badge').textContent = `${cvs.length} Belge`;
+
+        if (cvs.length === 0) {
+          tableBody.innerHTML = `
+            <tr>
+              <td colspan="5" class="px-6 py-8 text-center text-[#8a8580] font-medium">Bu adaya ait yüklenmiş özgeçmiş bulunmamaktadır.</td>
+            </tr>
+          `;
+          return;
+        }
+
+        tableBody.innerHTML = '';
+        
+        cvs.forEach((cv, idx) => {
+          const latestAnalysis = cv.analyses && cv.analyses[0];
+          const status = latestAnalysis ? latestAnalysis.status : 'PENDING';
+          const dateStr = new Date(cv.createdAt).toLocaleDateString('tr-TR', { day: 'numeric', month: 'short', year: 'numeric' });
+          
+          let statusBadge = '';
+          if (status === 'PENDING') {
+            statusBadge = `
+              <span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-[6px] text-xs font-semibold bg-amber-50 text-amber-700 border border-amber-200">
+                <span class="w-1.5 h-1.5 rounded-full bg-amber-600 animate-pulse"></span> Sırada
+              </span>
+            `;
+          } else if (status === 'PROCESSING') {
+            statusBadge = `
+              <span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-[6px] text-xs font-semibold bg-blue-50 text-blue-700 border border-blue-200">
+                <span class="w-1.5 h-1.5 rounded-full bg-blue-600 animate-spin"></span> İşleniyor
+              </span>
+            `;
+          } else if (status === 'COMPLETED') {
+            statusBadge = `
+              <span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-[6px] text-xs font-semibold bg-emerald-50 text-emerald-700 border border-emerald-200">
+                <span class="w-1.5 h-1.5 rounded-full bg-emerald-600"></span> Hazır
+              </span>
+            `;
+          } else {
+            statusBadge = `
+              <span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-[6px] text-xs font-semibold bg-rose-50 text-rose-700 border border-rose-200">
+                <span class="w-1.5 h-1.5 rounded-full bg-rose-600"></span> Hata
+              </span>
+            `;
+          }
+
+          const scoreStr = latestAnalysis && latestAnalysis.atsScore !== null 
+            ? `<span class="font-bold text-emerald-700">%${latestAnalysis.atsScore} ATS Skoru</span>` 
+            : `<span class="text-[#8a8580]">-</span>`;
+
+          const isSelected = selectedCvId === cv.id || (!selectedCvId && idx === 0);
+          if (isSelected) {
+            selectedCvId = cv.id;
+          }
+
+          const tr = document.createElement('tr');
+          tr.className = `hover:bg-[#f5f4f0]/60 transition-all group cursor-pointer ${isSelected ? 'bg-[#f5f4f0] font-semibold' : ''}`;
+          tr.onclick = () => {
+            selectedCvId = cv.id;
+            const rows = tableBody.querySelectorAll('tr');
+            rows.forEach(r => r.classList.remove('bg-[#f5f4f0]', 'font-semibold'));
+            tr.classList.add('bg-[#f5f4f0]', 'font-semibold');
+            updateSwotAnalysisCard(cv);
+            showCvContent(cv);
+          };
+
+          tr.innerHTML = `
+            <td class="px-5 py-4">
+              <div class="flex items-center gap-3">
+                <span class="material-symbols-outlined text-red-600 text-[20px] shrink-0">picture_as_pdf</span>
+                <span class="font-bold text-[#1b1c1a] truncate max-w-[180px] text-xs">${cv.fileName}</span>
+              </div>
+            </td>
+            <td class="px-5 py-4 text-[#8a8580] font-medium text-xs">${dateStr}</td>
+            <td class="px-5 py-4">${statusBadge}</td>
+            <td class="px-5 py-4 text-center text-xs font-bold">${scoreStr}</td>
+            <td class="px-5 py-4 text-right" onclick="event.stopPropagation();">
+              <a href="${cv.fileUrl}" target="_blank" class="inline-flex items-center justify-center text-[#8a8580] hover:text-[#14422f] p-1.5 rounded-lg hover:bg-[#14422f]/5 transition-colors" title="Dosyayı İndir / Görüntüle">
+                <span class="material-symbols-outlined text-[18px]">download</span>
+              </a>
+            </td>
+          `;
+          tableBody.appendChild(tr);
+        });
+
+        // Automatically load first CV's analysis and content
+        const firstCv = cvs[0];
+        if (firstCv) {
+          updateSwotAnalysisCard(firstCv);
+          showCvContent(firstCv);
+        }
+      };
+
+      const handleError = (err) => {
+        console.error('[Profile] Yükleme hatası:', err);
+        const tableBody = document.getElementById('cvs-table-body');
+        if (tableBody) tableBody.innerHTML = `<tr><td colspan="5" class="p-8 text-center text-rose-600">Veriler yüklenemedi: ${err.message || 'Bilinmeyen hata'}</td></tr>`;
+        document.getElementById('candidate-name-header').textContent = 'Yükleme Hatası';
+        document.getElementById('candidate-email-header').textContent = err.message || 'Hata oluştu';
+      };
+
+      if (window.__swrCache) {
+        window.__swrCache.query(`candidate-profile-${decodedUserId}`, fetcher, render, 30000, handleError);
+      } else {
+        fetcher().then(render).catch(handleError);
+      }
+    }
+
+    function updateSwotAnalysisCard(cv) {
+      const cvNameEl = document.getElementById('swot-cv-name');
+      const scoreBadgeEl = document.getElementById('swot-score-badge');
+      const progressWrapper = document.getElementById('swot-progress-wrapper');
+      const scorePctEl = document.getElementById('swot-score-pct');
+      const scoreBarEl = document.getElementById('swot-score-bar');
+      const strengthsEl = document.getElementById('swot-strengths-container');
+      const weaknessesEl = document.getElementById('swot-weaknesses-container');
+      const suggestionsEl = document.getElementById('swot-suggestions-container');
+
+      const reanalyzeBtn = document.getElementById('reanalyze-cv-btn');
+      if (reanalyzeBtn) {
+        reanalyzeBtn.classList.remove('hidden');
+        reanalyzeBtn.classList.add('flex');
+        reanalyzeBtn.onclick = async () => {
+          if (!confirm(`${cv.fileName} isimli özgeçmişi yeni Türkçe AI motoru ile yeniden analiz etmek istiyor musunuz?`)) return;
+          reanalyzeBtn.disabled = true;
+          reanalyzeBtn.innerHTML = `<span class="material-symbols-outlined text-[15px] animate-spin">progress_activity</span> Analiz Ediliyor...`;
+          try {
+            const res = await fetch(`/api/cv/${cv.id}/reanalyze`, { method: 'POST' });
+            if (res.ok) {
+              alert("AI Analizi yeniden başlatıldı! 3-5 saniye sonra sayfa otomatik yenileniyor.");
+              setTimeout(() => { window.location.reload(); }, 3000);
+            } else {
+              alert("Yeniden analiz başlatılamadı.");
+              reanalyzeBtn.disabled = false;
+              reanalyzeBtn.innerHTML = `<span class="material-symbols-outlined text-[15px]">refresh</span> Yeniden AI Analiz Et`;
+            }
+          } catch(e) {
+            console.error(e);
+            reanalyzeBtn.disabled = false;
+            reanalyzeBtn.innerHTML = `<span class="material-symbols-outlined text-[15px]">refresh</span> Yeniden AI Analiz Et`;
+          }
+        };
+      }
+
+      if (!cvNameEl) return;
+      cvNameEl.textContent = `${cv.fileName} - Yapay Zeka Değerlendirmesi`;
+
+      const analysis = cv.analyses && cv.analyses[0];
+      if (!analysis) {
+        scoreBadgeEl.innerHTML = `<span class="px-3 py-1 rounded-full text-xs font-bold bg-gray-100 text-gray-700">Analiz Yok</span>`;
+        progressWrapper.classList.add('hidden');
+        strengthsEl.innerHTML = `<p class="text-xs text-[#8a8580] italic">Bu özgeçmiş için henüz yapay zeka analizi oluşturulmamış.</p>`;
+        weaknessesEl.innerHTML = `<p class="text-xs text-[#8a8580] italic">Gelişim alanı verisi yok.</p>`;
+        suggestionsEl.innerHTML = `<p class="text-xs text-[#8a8580] italic">Mülakat önerisi yok.</p>`;
+        return;
+      }
+
+      const score = analysis.atsScore;
+      if (score !== null) {
+        progressWrapper.classList.remove('hidden');
+        scorePctEl.textContent = `%${score}`;
+        scoreBarEl.style.width = `${score}%`;
+
+        const badgeClass = score >= 80 ? 'bg-emerald-50 text-emerald-700 border-emerald-200' : score >= 60 ? 'bg-amber-50 text-amber-700 border-amber-200' : 'bg-rose-50 text-rose-700 border-rose-200';
+        scoreBadgeEl.innerHTML = `<span class="px-3 py-1 rounded-full text-xs font-bold border ${badgeClass}">%${score} ATS Skoru</span>`;
+      } else {
+        progressWrapper.classList.add('hidden');
+        scoreBadgeEl.innerHTML = `<span class="px-3 py-1 rounded-full text-xs font-bold bg-gray-100 text-gray-700">Skor Yok</span>`;
+      }
+
+      // Render Strengths
+      const strengths = analysis.strengths || [];
+      if (strengths.length > 0) {
+        strengthsEl.innerHTML = `
+          <ul class="space-y-1.5">
+            ${strengths.map(s => `
+              <li class="flex items-start gap-2 text-xs text-[#1b1c1a] leading-relaxed bg-emerald-50/70 border border-emerald-100 p-2.5 rounded-lg">
+                <span class="material-symbols-outlined text-emerald-600 text-[15px] shrink-0 mt-0.5">check_circle</span>
+                <span>${s}</span>
+              </li>
+            `).join('')}
+          </ul>
+        `;
+      } else {
+        strengthsEl.innerHTML = `<p class="text-xs text-[#8a8580] italic">Güçlü yön verisi bulunamadı.</p>`;
+      }
+
+      // Render Weaknesses (Eksik Yönler)
+      const weaknesses = analysis.weaknesses || analysis.eksik_yonler || analysis.gelisime_acik_yonler || [];
+      if (weaknesses.length > 0) {
+        weaknessesEl.innerHTML = `
+          <ul class="space-y-1.5">
+            ${weaknesses.map(w => `
+              <li class="flex items-start gap-2 text-xs text-[#1b1c1a] leading-relaxed bg-rose-50/70 border border-rose-100 p-2.5 rounded-lg">
+                <span class="material-symbols-outlined text-rose-600 text-[15px] shrink-0 mt-0.5">warning</span>
+                <span>${w}</span>
+              </li>
+            `).join('')}
+          </ul>
+        `;
+      } else {
+        weaknessesEl.innerHTML = `<p class="text-xs text-[#8a8580] italic">Eksik yön tespit edilmedi.</p>`;
+      }
+
+      // Render Suggestions & Questions in TWO COMPLETELY SEPARATE SECTIONS
+      const rawSuggestions = analysis.suggestions || [];
+      const questionsEl = document.getElementById('swot-questions-container');
+
+      const recList = [];
+      const qList = [];
+
+      rawSuggestions.forEach((item) => {
+        if (typeof item === 'object' && item !== null && item.action) {
+          recList.push({
+            priority: item.priority || 'medium',
+            timeframe: item.timeframe || 'Kısa Vadeli',
+            action: item.action
+          });
+          if (item.question) {
+            qList.push({
+              priority: item.priority || 'medium',
+              timeframe: item.timeframe || 'Kısa Vadeli',
+              question: item.question
+            });
+          }
+        } else if (typeof item === 'string') {
+          let priority = 'medium';
+          if (item.toLowerCase().includes('high') || item.toLowerCase().includes('yüksek')) priority = 'high';
+          else if (item.toLowerCase().includes('low') || item.toLowerCase().includes('düşük')) priority = 'low';
+
+          if (item.includes('❓ Mülakat Sorusu:')) {
+            const parts = item.split('❓ Mülakat Sorusu:');
+            const rec = parts[0].replace('💡 İK Tavsiyesi:', '').trim();
+            const q = parts[1]?.trim() || '';
+            if (rec) recList.push({ priority, timeframe: 'Kısa Vadeli', action: rec });
+            if (q) qList.push({ priority, timeframe: 'Kısa Vadeli', question: q });
+          } else {
+            const rec = item.replace('💡 İK Tavsiyesi:', '').trim();
+            recList.push({ priority, timeframe: 'Kısa Vadeli', action: rec });
+            qList.push({ priority, timeframe: 'Kısa Vadeli', question: '"Adayın bu alandaki geçmiş tecrübelerini ve projelerindeki somut katkılarını mülakatta detaylandırır mısınız?"' });
+          }
+        }
+      });
+
+      // 1. Render Suggestions Section with Priority Badges
+      if (recList.length > 0) {
+        suggestionsEl.innerHTML = `
+          <div class="space-y-2">
+            ${recList.map(rec => {
+              const p = rec.priority || 'medium';
+              const badgeClass = p === 'high'
+                ? 'bg-rose-100 text-rose-800 border-rose-200'
+                : p === 'low'
+                ? 'bg-blue-100 text-blue-800 border-blue-200'
+                : 'bg-amber-100 text-amber-800 border-amber-200';
+              const pLabel = p === 'high' ? 'Yüksek Öncelik' : p === 'low' ? 'Düşük Öncelik' : 'Orta Öncelik';
+
+              return `
+                <div class="p-2.5 rounded-lg border border-[#ddd9d3] bg-[#faf9f5] flex flex-col gap-1.5">
+                  <div class="flex items-center justify-between gap-2">
+                    <span class="px-2 py-0.5 rounded-full text-[10px] font-bold border ${badgeClass}">${pLabel}</span>
+                    <span class="text-[10px] text-[#8a8580] font-semibold flex items-center gap-1">
+                      <span class="material-symbols-outlined text-[12px]">schedule</span>
+                      ${rec.timeframe || 'Kısa Vadeli'}
+                    </span>
+                  </div>
+                  <div class="flex items-start gap-2 text-xs text-[#1b1c1a] leading-relaxed">
+                    <span class="material-symbols-outlined text-amber-600 text-[15px] shrink-0 mt-0.5">lightbulb</span>
+                    <span>${rec.action}</span>
+                  </div>
+                </div>
+              `;
+            }).join('')}
+          </div>
+        `;
+      } else {
+        suggestionsEl.innerHTML = `<p class="text-xs text-[#8a8580] italic">Mülakat önerisi bulunamadı.</p>`;
+      }
+
+      // 2. Render Questions Section
+      if (questionsEl) {
+        if (qList.length > 0) {
+          questionsEl.innerHTML = `
+            <div class="space-y-2">
+              ${qList.map(item => `
+                <div class="p-2.5 rounded-lg border border-[#14422f]/20 bg-[#14422f]/5 flex flex-col gap-1.5">
+                  <div class="flex items-center justify-between gap-2">
+                    <span class="text-[10px] font-bold text-[#14422f] uppercase tracking-wider flex items-center gap-1">
+                      <span class="material-symbols-outlined text-[12px]">quiz</span> Mülakat Sorusu
+                    </span>
+                    <span class="text-[10px] text-[#14422f]/70 font-semibold">${item.timeframe || 'Görüşme Aşaması'}</span>
+                  </div>
+                  <div class="flex items-start gap-2 text-xs text-[#14422f] font-semibold leading-relaxed italic">
+                    <span class="material-symbols-outlined text-[#14422f] text-[15px] shrink-0 mt-0.5 not-italic">help</span>
+                    <span>${item.question}</span>
+                  </div>
+                </div>
+              `).join('')}
+            </div>
+          `;
+        } else {
+          questionsEl.innerHTML = `<p class="text-xs text-[#8a8580] italic">Mülakat sorusu bulunamadı.</p>`;
+        }
+      }
+    }
+
+    const SECTION_COLORS = {
+      'Kişisel Bilgiler': { bg:'bg-blue-50',    border:'border-blue-200',    text:'text-blue-800',    icon:'person' },
+      'Özet':             { bg:'bg-purple-50',  border:'border-purple-200',  text:'text-purple-800',  icon:'format_quote' },
+      'Deneyimler':       { bg:'bg-emerald-50', border:'border-emerald-200', text:'text-emerald-800', icon:'work' },
+      'Eğitim':           { bg:'bg-amber-50',   border:'border-amber-200',   text:'text-amber-800',   icon:'school' },
+      'Yetenekler':       { bg:'bg-orange-50',  border:'border-orange-200',  text:'text-orange-800',  icon:'build' },
+      'Projeler':         { bg:'bg-cyan-50',    border:'border-cyan-200',    text:'text-cyan-800',    icon:'code' },
+      'Sertifikalar':     { bg:'bg-rose-50',    border:'border-rose-200',    text:'text-rose-800',    icon:'workspace_premium' },
+      'Diller':           { bg:'bg-indigo-50',  border:'border-indigo-200',  text:'text-indigo-800',  icon:'language' },
+      'Yayınlar & Patentler': { bg:'bg-teal-50', border:'border-teal-200', text:'text-teal-800',    icon:'article' },
+      'Referanslar':      { bg:'bg-slate-50',   border:'border-slate-200',   text:'text-slate-800',   icon:'contacts' },
+    };
+    const DEF_COLOR = { bg:'bg-gray-50', border:'border-gray-200', text:'text-gray-800', icon:'description' };
+
+    async function showCvContent(cv) {
+      const placeholder = document.getElementById('cv-viewer-placeholder');
+      const tabs        = document.getElementById('cv-view-tabs');
+      const fulltextContent = document.getElementById('cv-fulltext-content');
+      const chunksContent   = document.getElementById('cv-chunks-content');
+      const loading     = document.getElementById('cv-viewer-loading');
+      const title       = document.getElementById('cv-viewer-title');
+      const copyBtn     = document.getElementById('copy-cv-text-btn');
+      if (!placeholder || !fulltextContent || !chunksContent || !loading || !title) return;
+
+      placeholder.classList.add('hidden');
+      fulltextContent.classList.add('hidden'); fulltextContent.classList.remove('flex');
+      chunksContent.classList.add('hidden'); chunksContent.classList.remove('flex');
+      loading.classList.remove('hidden'); loading.classList.add('flex');
+      if (copyBtn) copyBtn.classList.add('hidden');
+      if (tabs) tabs.classList.add('hidden');
+      title.textContent = cv.fileName || 'CV İçeriği';
+
+      try {
+        const res = await fetch(`/api/cv/${cv.id}/chunks`);
+        if (!res.ok) throw new Error();
+        const data = await res.json();
+        const chunks = data.chunks || [];
+
+        loading.classList.add('hidden'); loading.classList.remove('flex');
+
+        if (chunks.length === 0) {
+          fulltextContent.innerHTML = '<div class="text-center py-12 text-sm text-[#8a8580]">Bu CV için henüz içerik oluşturulmamış.</div>';
+          fulltextContent.classList.remove('hidden'); fulltextContent.classList.add('flex');
+          if (copyBtn) copyBtn.classList.add('hidden');
+        } else {
+          // Build full aggregated text
+          const fullText = chunks.map(c => {
+            const sec = (c.metadata && c.metadata.section) || 'Genel';
+            const txt = (c.chunkText || '').replace(/^\[[^\]]+\]\n?/, '').trim();
+            return `--- ${sec.toUpperCase()} ---\n${txt}`;
+          }).join('\n\n');
+
+          window.__currentCvText = fullText;
+          fulltextContent.textContent = fullText;
+
+          // Build chunk cards
+          chunksContent.innerHTML = chunks.map(chunk => {
+            const section = (chunk.metadata && chunk.metadata.section) || 'Genel';
+            const c = SECTION_COLORS[section] || DEF_COLOR;
+            const conf = chunk.metadata && chunk.metadata.confidence != null
+              ? Math.round(chunk.metadata.confidence * 100) + '%' : null;
+            const rawText = (chunk.chunkText || '').replace(/^\[[^\]]+\]\n?/, '').trim();
+            return `
+              <div class="rounded-[10px] border ${c.border} ${c.bg} overflow-hidden shadow-xs">
+                <div class="flex items-center justify-between px-3.5 py-2 border-b ${c.border}">
+                  <div class="flex items-center gap-2">
+                    <span class="material-symbols-outlined text-[15px] ${c.text}">${c.icon}</span>
+                    <span class="text-xs font-bold ${c.text} uppercase tracking-wider">${section}</span>
+                  </div>
+                  ${conf ? `<span class="text-[10px] font-semibold ${c.text} opacity-60">Güven: ${conf}</span>` : ''}
+                </div>
+                <pre class="px-3.5 py-3 text-xs text-[#1b1c1a] leading-relaxed font-sans whitespace-pre-wrap break-words">${rawText}</pre>
+              </div>`;
+          }).join('');
+
+          if (tabs) {
+            tabs.classList.remove('hidden');
+            setupTabSwitching();
+          }
+
+          // Initial view
+          switchCvViewTab('fulltext');
+
+          if (copyBtn) {
+            copyBtn.classList.remove('hidden');
+            copyBtn.classList.add('flex');
+            copyBtn.onclick = () => {
+              if (window.__currentCvText) {
+                navigator.clipboard.writeText(window.__currentCvText);
+                const label = document.getElementById('copy-cv-text-label');
+                if (label) {
+                  label.textContent = 'Kopyalandı! ✅';
+                  setTimeout(() => { label.textContent = 'Metni Kopyala'; }, 2000);
+                }
+              }
+            };
+          }
+        }
+      } catch(e) {
+        loading.classList.add('hidden'); loading.classList.remove('flex');
+        if (copyBtn) copyBtn.classList.add('hidden');
+        fulltextContent.innerHTML = '<div class="text-center py-8 text-rose-600 text-sm">CV içeriği yüklenemedi.</div>';
+        fulltextContent.classList.remove('hidden'); fulltextContent.classList.add('flex');
+      }
+    }
+
+    function setupTabSwitching() {
+      const tabFulltext = document.getElementById('tab-fulltext');
+      const tabChunks = document.getElementById('tab-chunks');
+      if (!tabFulltext || !tabChunks) return;
+
+      tabFulltext.onclick = () => switchCvViewTab('fulltext');
+      tabChunks.onclick = () => switchCvViewTab('chunks');
+    }
+
+    function switchCvViewTab(tab) {
+      currentViewTab = tab;
+      const tabFulltext = document.getElementById('tab-fulltext');
+      const tabChunks = document.getElementById('tab-chunks');
+      const fulltextContent = document.getElementById('cv-fulltext-content');
+      const chunksContent   = document.getElementById('cv-chunks-content');
+
+      if (tab === 'fulltext') {
+        tabFulltext.className = "pb-2 border-b-2 border-[#14422f] text-[#14422f] font-bold cursor-pointer flex items-center gap-1.5";
+        tabChunks.className = "pb-2 border-b-2 border-transparent text-[#8a8580] hover:text-[#1b1c1a] cursor-pointer flex items-center gap-1.5";
+        fulltextContent.classList.remove('hidden'); fulltextContent.classList.add('flex');
+        chunksContent.classList.add('hidden'); chunksContent.classList.remove('flex');
+      } else {
+        tabChunks.className = "pb-2 border-b-2 border-[#14422f] text-[#14422f] font-bold cursor-pointer flex items-center gap-1.5";
+        tabFulltext.className = "pb-2 border-b-2 border-transparent text-[#8a8580] hover:text-[#1b1c1a] cursor-pointer flex items-center gap-1.5";
+        chunksContent.classList.remove('hidden'); chunksContent.classList.add('flex');
+        fulltextContent.classList.add('hidden'); fulltextContent.classList.remove('flex');
+      }
+    }
+
+    if (!window.__profileListenerRegistered) {
+      window.__profileListenerRegistered = true;
+      document.addEventListener('astro:page-load', () => {
+        const container = document.getElementById('profile-page-container');
+        if (container) {
+          loadCandidateProfile();
+        }
+      });
+    }
   </script>
 </AdminLayout>
