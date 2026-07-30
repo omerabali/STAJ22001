@@ -1,21 +1,13 @@
 /**
- * exportCSV.ts -> Excel Export Utility & Timeframe Filter Manager
- * Seçili zaman filtresine (Bu Hafta, Bu Ay, Tüm Zamanlar) göre aday ve analiz verilerini
- * Microsoft Excel (.xls) tablosu olarak indirir ve ekrandaki grafikleri & tabloları günceller.
+ * exportCSV.ts -> Excel Export Utility
+ * Seçili zaman filtresine (Bu Hafta, Bu Ay, Tüm Zamanlar) göre aday ve analiz verilerini Microsoft Excel (.xlsx / .xls) tablosu olarak indirir.
  */
-import { loadRecentAnalyses } from './recentAnalysesLoader';
-import { loadReports } from './reportStatsLoader';
 
 let activeTimeframe: 'week' | 'month' | 'all' = 'week';
 
 export function setReportTimeframe(timeframe: 'week' | 'month' | 'all'): void {
-  console.log(`[Reports] Zaman filtresi değiştirildi: ${timeframe}`);
   activeTimeframe = timeframe;
   updateTimeframeButtonsUI();
-  
-  // Ekrandaki kartları, grafikleri ve tabloyu seçili zamana göre güncelle
-  loadRecentAnalyses(timeframe);
-  loadReports(timeframe);
 }
 
 export function getTimeframeLabel(): string {
@@ -31,139 +23,12 @@ function updateTimeframeButtonsUI(): void {
 
   [btnWeek, btnMonth, btnAll].forEach(btn => {
     if (!btn) return;
-    btn.className = 'px-3 py-1.5 rounded-md text-[#8a8580] hover:text-[#1b1c1a] transition-colors cursor-pointer text-xs font-semibold';
+    btn.className = 'px-3 py-1.5 rounded-md text-[#8a8580] hover:text-[#1b1c1a] transition-colors cursor-pointer';
   });
 
   const activeBtn = activeTimeframe === 'week' ? btnWeek : activeTimeframe === 'month' ? btnMonth : btnAll;
   if (activeBtn) {
-    activeBtn.className = 'px-3 py-1.5 rounded-md bg-white shadow-sm border border-[#ddd9d3] text-[#14422f] font-bold cursor-pointer text-xs';
-  }
-}
-
-export async function executeExportExcel(): Promise<void> {
-  console.log(`[Reports] Excel indirme başlatıldı. Seçili zaman filtresi: ${activeTimeframe}`);
-  try {
-    const res = await fetch('/api/admin/candidates');
-    if (!res.ok) throw new Error('Candidates fetch error');
-    const data = await res.json();
-    const candidates = data.candidates || [];
-
-    const now = new Date();
-    const cutoffDate = new Date();
-
-    if (activeTimeframe === 'week') {
-      cutoffDate.setDate(now.getDate() - 7);
-    } else if (activeTimeframe === 'month') {
-      cutoffDate.setDate(now.getDate() - 30);
-    } else {
-      cutoffDate.setTime(0); // Tüm zamanlar
-    }
-
-    // Filtreye uygun adayları seç
-    const filteredCandidates = candidates.filter((cand: any) => {
-      const dateStr = cand.latestCvDate || cand.createdAt;
-      if (!dateStr) return true;
-      return new Date(dateStr) >= cutoffDate;
-    });
-
-    const filterTitle = getTimeframeLabel();
-    const currentDateStr = new Date().toLocaleString('tr-TR');
-
-    // Microsoft Excel HTML Table (.xls) Formatı
-    let excelHtml = `
-      <html xmlns:o="urn:schemas-microsoft-com:office:office" xmlns:x="urn:schemas-microsoft-com:office:excel" xmlns="http://www.w3.org/TR/REC-html40">
-      <head>
-        <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
-        <!--[if gte mso 9]>
-        <xml>
-          <x:ExcelWorkbook>
-            <x:ExcelWorksheets>
-              <x:ExcelWorksheet>
-                <x:Name>Beacon Raporu</x:Name>
-                <x:WorksheetOptions>
-                  <x:DisplayGridlines/>
-                </x:WorksheetOptions>
-              </x:ExcelWorksheet>
-            </x:ExcelWorksheets>
-          </x:ExcelWorkbook>
-        </xml>
-        <![endif]-->
-        <style>
-          body { font-family: Calibri, Arial, sans-serif; }
-          table { border-collapse: collapse; width: 100%; }
-          th { background-color: #14422f; color: #ffffff; font-weight: bold; border: 1px solid #14422f; padding: 10px; text-align: left; }
-          td { border: 1px solid #ddd9d3; padding: 8px; text-align: left; font-size: 13px; }
-          .title-header { font-size: 16px; font-weight: bold; color: #14422f; }
-          .meta-text { font-size: 11px; color: #555555; }
-        </style>
-      </head>
-      <body>
-        <div class="title-header">Beacon Platformu - CV ve Aday Analiz Raporu</div>
-        <div class="meta-text">Zaman Aralığı Filtresi: <b>${filterTitle}</b> | Rapor Oluşturulma Tarihi: ${currentDateStr}</div>
-        <br/>
-        <table>
-          <thead>
-            <tr>
-              <th>Aday Adı Soyadı</th>
-              <th>E-Posta Adresi</th>
-              <th>Yüklenen CV Dosyası</th>
-              <th>Kayıt / Yükleme Tarihi</th>
-              <th>ATS Başarı Skoru</th>
-              <th>Analiz Durumu</th>
-            </tr>
-          </thead>
-          <tbody>
-    `;
-
-    if (filteredCandidates.length === 0) {
-      excelHtml += `
-        <tr>
-          <td colspan="6" style="text-align: center; color: #888;">Bu zaman aralığına ait kayıt bulunamadı.</td>
-        </tr>
-      `;
-    } else {
-      filteredCandidates.forEach((cand: any) => {
-        const cvName = cand.latestCvName || (cand.cvs && cand.cvs[0]?.fileName) || 'CV Yüklenmedi';
-        const rawDate = cand.latestCvDate || cand.createdAt;
-        const dateStr = rawDate ? new Date(rawDate).toLocaleDateString('tr-TR') : '-';
-        const atsScore = cand.atsScore !== undefined && cand.atsScore !== null ? `%${cand.atsScore}` : '-';
-        const status = cand.analysisStatus || (cand.cvCount > 0 ? 'Analiz Hazır' : 'CV Yok');
-
-        excelHtml += `
-          <tr>
-            <td>${cand.name || '-'}</td>
-            <td>${cand.email || '-'}</td>
-            <td>${cvName}</td>
-            <td>${dateStr}</td>
-            <td><b>${atsScore}</b></td>
-            <td>${status}</td>
-          </tr>
-        `;
-      });
-    }
-
-    excelHtml += `
-          </tbody>
-        </table>
-      </body>
-      </html>
-    `;
-
-    // Excel UTF-8 BOM ile indir
-    const blob = new Blob(['\ufeff', excelHtml], { type: 'application/vnd.ms-excel;charset=utf-8' });
-    const url = URL.createObjectURL(blob);
-    const link = document.createElement('a');
-    link.href = url;
-    const fileNameStr = `Beacon_Aday_Raporu_${filterTitle.replace(/\s+/g, '_')}_${new Date().toISOString().slice(0,10)}.xls`;
-    link.download = fileNameStr;
-    document.body.appendChild(link);
-    link.click();
-    document.body.removeChild(link);
-    URL.revokeObjectURL(url);
-
-  } catch (err) {
-    console.error('Export Excel error:', err);
-    alert('Rapor indirilirken hata oluştu.');
+    activeBtn.className = 'px-3 py-1.5 rounded-md bg-white shadow-sm border border-[#ddd9d3] text-[#14422f] font-bold cursor-pointer';
   }
 }
 
@@ -171,15 +36,121 @@ export function initExportCSV(): void {
   const btnWeek = document.getElementById('filter-week');
   const btnMonth = document.getElementById('filter-month');
   const btnAll = document.getElementById('filter-all');
-  const exportBtn = document.getElementById('export-excel-btn');
 
   btnWeek?.addEventListener('click', () => setReportTimeframe('week'));
   btnMonth?.addEventListener('click', () => setReportTimeframe('month'));
   btnAll?.addEventListener('click', () => setReportTimeframe('all'));
 
-  exportBtn?.addEventListener('click', () => executeExportExcel());
+  (window as any).exportCSV = async function (): Promise<void> {
+    try {
+      const res = await fetch('/api/admin/candidates');
+      if (!res.ok) throw new Error('Candidates fetch error');
+      const data = await res.json();
+      const candidates = data.candidates || [];
 
-  // Global window erişimi
-  (window as any).exportCSV = executeExportExcel;
-  (window as any).setReportTimeframe = setReportTimeframe;
+      const now = new Date();
+      const cutoffDate = new Date();
+
+      if (activeTimeframe === 'week') {
+        cutoffDate.setDate(now.getDate() - 7);
+      } else if (activeTimeframe === 'month') {
+        cutoffDate.setDate(now.getDate() - 30);
+      } else {
+        cutoffDate.setTime(0); // Tüm zamanlar
+      }
+
+      // Filtreye uygun adayları seç
+      const filteredCandidates = candidates.filter((cand: any) => {
+        const cv = cand.latestCv || (cand.cvs && cand.cvs[0]);
+        const date = cv?.createdAt ? new Date(cv.createdAt) : new Date(cand.createdAt);
+        return date >= cutoffDate;
+      });
+
+      const filterTitle = getTimeframeLabel();
+      const currentDateStr = new Date().toLocaleString('tr-TR');
+
+      // Excel HTML Table biçimlendirmesi (Excel hücre boyutları ve başlık stili ile)
+      let excelHtml = `
+        <html xmlns:o="urn:schemas-microsoft-com:office:office" xmlns:x="urn:schemas-microsoft-com:office:excel" xmlns="http://www.w3.org/TR/REC-html40">
+        <head>
+          <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+          <!--[if gte mso 9]>
+          <xml>
+            <x:ExcelWorkbook>
+              <x:ExcelWorksheets>
+                <x:ExcelWorksheet>
+                  <x:Name>Beacon Analiz Raporu</x:Name>
+                  <x:WorksheetOptions>
+                    <x:DisplayGridlines/>
+                  </x:WorksheetOptions>
+                </x:ExcelWorksheet>
+              </x:ExcelWorksheets>
+            </x:ExcelWorkbook>
+          </xml>
+          <![endif]-->
+          <style>
+            body { font-family: Calibri, sans-serif; }
+            table { border-collapse: collapse; width: 100%; }
+            th { background-color: #14422f; color: #ffffff; font-weight: bold; border: 1px solid #14422f; padding: 8px; text-align: left; }
+            td { border: 1px solid #ddd9d3; padding: 6px; text-align: left; }
+            .title-header { font-size: 16px; font-weight: bold; color: #14422f; }
+            .meta-text { font-size: 11px; color: #555555; }
+          </style>
+        </head>
+        <body>
+          <table>
+            <tr><td colspan="5" class="title-header">BEACON HR ANALİTİK VE PERFORMANS RAPORU</td></tr>
+            <tr><td colspan="5" class="meta-text">Zaman Filtresi: <b>${filterTitle}</b> | Rapor Tarihi: ${currentDateStr}</td></tr>
+            <tr><td colspan="5"></td></tr>
+            <thead>
+              <tr>
+                <th>Aday Adı / E-posta</th>
+                <th>CV Dosya Adı</th>
+                <th>Yükleme Tarihi</th>
+                <th>Analiz Durumu</th>
+                <th>ATS Uyum Skoru</th>
+              </tr>
+            </thead>
+            <tbody>
+      `;
+
+      filteredCandidates.forEach((cand: any) => {
+        const candName = cand.name || cand.email || 'Bilinmeyen Aday';
+        const cvName = cand.latestCvName || 'CV Yüklenmedi';
+        const dateStr = cand.createdAt ? new Date(cand.createdAt).toLocaleDateString('tr-TR') : '-';
+        const status = cand.analysisStatus === 'COMPLETED' ? 'Analiz Hazır' : cand.analysisStatus === 'PROCESSING' ? 'İşleniyor' : cand.analysisStatus === 'PENDING' ? 'Sırada' : 'CV Yok';
+        const scoreStr = cand.atsScore !== undefined && cand.atsScore !== null ? `%${cand.atsScore}` : '-';
+
+        excelHtml += `
+          <tr>
+            <td><b>${candName}</b></td>
+            <td>${cvName}</td>
+            <td>${dateStr}</td>
+            <td>${status}</td>
+            <td><b>${scoreStr}</b></td>
+          </tr>
+        `;
+      });
+
+      excelHtml += `
+            </tbody>
+          </table>
+        </body>
+        </html>
+      `;
+
+      const blob = new Blob([excelHtml], { type: 'application/vnd.ms-excel;charset=utf-8' });
+      const url = URL.createObjectURL(blob);
+      const link = document.createElement('a');
+      link.href = url;
+      const fileSlug = activeTimeframe === 'week' ? 'bu_hafta' : activeTimeframe === 'month' ? 'bu_ay' : 'tum_zamanlar';
+      link.download = `beacon_analiz_raporu_${fileSlug}_${new Date().toISOString().slice(0, 10)}.xls`;
+      link.click();
+      URL.revokeObjectURL(url);
+
+    } catch (err: any) {
+      console.error("Excel Export error:", err);
+      alert("Excel raporu dışa aktarılırken bir hata oluştu.");
+    }
+  };
 }

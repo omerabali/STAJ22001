@@ -7,7 +7,7 @@ import AdminLayout from '../../layouts/AdminLayout.astro';
     <!-- Header Navigation & Actions (Modern SaaS Header Layout) -->
     <div class="bg-white border border-[#ddd9d3] rounded-[16px] p-5 shadow-xs flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
       <div class="flex items-center gap-3.5">
-        <a id="profile-back-btn" href="/admin/users" class="w-10 h-10 rounded-xl bg-[#faf9f5] border border-[#ddd9d3] flex items-center justify-center text-[#1b1c1a] hover:bg-[#14422f] hover:text-white hover:border-[#14422f] transition-all shadow-2xs group">
+        <a id="profile-back-btn" href="/admin/search?tab=basic" class="w-10 h-10 rounded-xl bg-[#faf9f5] border border-[#ddd9d3] flex items-center justify-center text-[#1b1c1a] hover:bg-[#14422f] hover:text-white hover:border-[#14422f] transition-all shadow-2xs group" title="Geri Dön">
           <span class="material-symbols-outlined text-xl transition-transform group-hover:-translate-x-0.5">arrow_back</span>
         </a>
         <div>
@@ -30,7 +30,7 @@ import AdminLayout from '../../layouts/AdminLayout.astro';
         </div>
 
         <!-- Primary PDF View Button -->
-        <a id="view-pdf-btn" target="_blank" href="#" class="hidden items-center gap-2 px-3.5 py-2 bg-[#14422f] hover:bg-[#103425] text-white rounded-xl text-xs font-bold transition-all shadow-xs hover:shadow-md active:scale-[0.98] whitespace-nowrap">
+        <a id="view-pdf-btn" target="_blank" href="#" class="hidden items-center gap-2 px-3.5 py-2 bg-[#14422f] hover:bg-[#103425] text-white rounded-xl text-xs font-bold transition-all shadow-xs hover:shadow-md active:scale-[0.98] whitespace-nowrap cursor-pointer">
           <span class="material-symbols-outlined text-base">picture_as_pdf</span>
           CV PDF'ini Görüntüle
         </a>
@@ -70,10 +70,6 @@ import AdminLayout from '../../layouts/AdminLayout.astro';
         </div>
 
         <div class="flex items-center gap-4 w-full md:w-auto justify-between md:justify-end border-t md:border-t-0 border-[#ddd9d3] pt-4 md:pt-0">
-          <a id="card-pdf-btn" target="_blank" href="#" class="hidden items-center gap-2 px-3.5 py-2 bg-[#faf9f5] border border-[#ddd9d3] hover:border-[#14422f] text-[#1b1c1a] hover:text-[#14422f] rounded-xl text-xs font-bold transition-all shadow-2xs">
-            <span class="material-symbols-outlined text-lg text-rose-600">picture_as_pdf</span>
-            PDF Olarak İncele
-          </a>
           <div class="bg-[#faf9f5] border border-[#ddd9d3] p-3.5 rounded-xl text-center min-w-[140px] shadow-2xs">
             <span class="block text-[10px] font-bold text-[#8a8580] uppercase tracking-wider">GPT ATS SKORU</span>
             <span id="profile-ats-score" class="font-display-lg text-2xl font-black text-[#14422f] mt-0.5 block">-%</span>
@@ -93,77 +89,107 @@ import AdminLayout from '../../layouts/AdminLayout.astro';
             </div>
           </div>
           <div class="flex items-center gap-3">
-            <button onclick="reanalyzeActiveCv()" class="flex items-center gap-2 border border-[#ddd9d3] text-[#1b1c1a] hover:bg-[#faf9f5] px-3.5 py-1.5 rounded-[10px] transition-all text-xs font-bold bg-white shadow-2xs">
+            <button onclick="reanalyzeActiveCv()" class="flex items-center gap-2 border border-[#ddd9d3] text-[#1b1c1a] hover:bg-[#faf9f5] px-3.5 py-1.5 rounded-[10px] transition-all text-xs font-bold bg-white shadow-2xs cursor-pointer">
               <span class="material-symbols-outlined text-sm">refresh</span>
               Yeniden AI Analiz Et
             </button>
-            <span id="header-ats-badge" class="px-3 py-1.5 rounded-[10px] bg-amber-50 text-amber-800 border border-amber-200 text-xs font-bold">%0 ATS Skoru</span>
-          </div>
-        </div>
-
-        <!-- ATS Genel Uyum Skoru İlerleme Çubuğu -->
-        <div class="space-y-1.5">
-          <div class="flex justify-between items-center text-xs font-bold text-[#1b1c1a]">
-            <span>ATS Genel Uyum Skoru</span>
-            <span id="progress-ats-text">%0</span>
-          </div>
-          <div class="w-full bg-[#e5e2dc] rounded-full h-2.5 overflow-hidden">
-            <div id="progress-ats-bar" class="bg-[#14422f] h-2.5 rounded-full transition-all duration-500" style="width: 0%"></div>
           </div>
         </div>
 
         <!-- GÜÇLÜ YÖNLER (STRENGTHS) -->
-        <div class="space-y-3 pt-2">
+        <div class="space-y-3">
           <h4 class="text-xs font-bold text-emerald-800 uppercase tracking-wider flex items-center gap-2">
-            <span class="material-symbols-outlined text-base">thumb_up</span>
+            <span class="material-symbols-outlined text-emerald-600 text-lg">thumb_up</span>
             GÜÇLÜ YÖNLER (STRENGTHS)
           </h4>
-          <div id="strengths-container" class="space-y-2.5">
-            <p class="text-xs text-[#8a8580]">Analiz verisi yükleniyor...</p>
+          <div id="strengths-container" class="space-y-2">
+            <p class="text-xs text-[#8a8580] italic">Veri yükleniyor...</p>
           </div>
         </div>
 
         <!-- EKSİK YÖNLER (GAPS) -->
-        <div class="space-y-3 pt-2">
+        <div class="space-y-3">
           <h4 class="text-xs font-bold text-rose-800 uppercase tracking-wider flex items-center gap-2">
-            <span class="material-symbols-outlined text-base">build</span>
+            <span class="material-symbols-outlined text-rose-600 text-lg">warning</span>
             EKSİK YÖNLER (GAPS)
           </h4>
-          <div id="weaknesses-container" class="space-y-2.5">
-            <p class="text-xs text-[#8a8580]">Analiz verisi yükleniyor...</p>
+          <div id="weaknesses-container" class="space-y-2">
+            <p class="text-xs text-[#8a8580] italic">Veri yükleniyor...</p>
           </div>
         </div>
 
         <!-- MÜLAKAT ÖNERİLERİ (TAVSİYELER) -->
-        <div class="space-y-3 pt-2">
-          <h4 class="text-xs font-bold text-amber-800 uppercase tracking-wider flex items-center gap-2">
-            <span class="material-symbols-outlined text-base">lightbulb</span>
+        <div class="space-y-3">
+          <h4 class="text-xs font-bold text-[#14422f] uppercase tracking-wider flex items-center gap-2">
+            <span class="material-symbols-outlined text-[#14422f] text-lg">lightbulb</span>
             MÜLAKAT ÖNERİLERİ (TAVSİYELER)
           </h4>
-          <div id="suggestions-container" class="space-y-2.5">
-            <p class="text-xs text-[#8a8580]">Tavsiyeler yükleniyor...</p>
+          <div id="suggestions-container" class="space-y-2">
+            <p class="text-xs text-[#8a8580] italic">Veri yükleniyor...</p>
           </div>
         </div>
 
-        <!-- MÜLAKATTA SORULACAK SORULAR -->
-        <div class="space-y-3 pt-2">
-          <h4 class="text-xs font-bold text-[#14422f] uppercase tracking-wider flex items-center gap-2">
-            <span class="material-symbols-outlined text-base">help</span>
-            MÜLAKATTA SORULACAK SORULAR
+        <!-- MÜLAKAT SORULARI (RECOMMENDED INTERVIEW QUESTIONS) -->
+        <div class="space-y-3 pt-2 border-t border-[#ddd9d3]">
+          <h4 class="text-xs font-bold text-indigo-800 uppercase tracking-wider flex items-center gap-2">
+            <span class="material-symbols-outlined text-indigo-600 text-lg">forum</span>
+            MÜLAKAT SORULARI (TEKNİK VE YETKİNLİK SORULARI)
           </h4>
-          <div id="questions-container" class="space-y-2.5">
-            <p class="text-xs text-[#8a8580]">Sorular hazırlanıyor...</p>
+          <div id="questions-container" class="space-y-2">
+            <p class="text-xs text-[#8a8580] italic">Mülakat soruları yükleniyor...</p>
           </div>
         </div>
       </div>
     </div>
   </div>
 
-  <!-- Socket.io CDN (harici script, is:inline zorunlu) -->
-  <script is:inline src="https://cdn.socket.io/4.7.5/socket.io.min.js"></script>
-
-  <!-- Modüler candidate-profile script (Astro bundled) -->
   <script>
-    import '../../scripts/admin/candidate-profile/index';
+    import { loadAdminCandidateProfile } from '../../scripts/admin/candidate-profile/profileLoader';
+    import { initReanalyzeCv } from '../../scripts/admin/candidate-profile/reanalyzeCv';
+
+    function setupDynamicBackLink() {
+      const backBtn = document.getElementById('profile-back-btn') as HTMLAnchorElement;
+      if (!backBtn) return;
+
+      const urlParams = new URLSearchParams(window.location.search);
+      const fromSource = urlParams.get('from');
+
+      if (fromSource === 'compare') {
+        backBtn.href = '/admin/compare?from=profile';
+        backBtn.title = 'Aday Karşılaştırma Paneline Dön';
+      } else if (fromSource === 'semantic') {
+        backBtn.href = '/admin/search?tab=semantic&from=profile';
+        backBtn.title = 'Yapay Zeka Semantik Arama Sonuçlarına Dön';
+      } else if (fromSource === 'basic') {
+        backBtn.href = '/admin/search?tab=basic';
+        backBtn.title = 'Genel Aday Listesine Dön';
+      } else if (fromSource === 'users') {
+        backBtn.href = '/admin/users';
+        backBtn.title = 'Kullanıcı Yönetimi Listesine Dön';
+      } else if (fromSource === 'reports') {
+        backBtn.href = '/admin/reports';
+        backBtn.title = 'Raporlar Sayfasına Dön';
+      } else {
+        // Fallback: document.referrer check
+        if (document.referrer.includes('/admin/compare')) {
+          backBtn.href = '/admin/compare?from=profile';
+        } else if (document.referrer.includes('/admin/users')) {
+          backBtn.href = '/admin/users';
+        } else if (document.referrer.includes('/admin/search')) {
+          backBtn.href = '/admin/search?tab=basic';
+        } else {
+          backBtn.href = '/admin/search?tab=basic';
+        }
+      }
+    }
+
+    initReanalyzeCv();
+
+    document.addEventListener('astro:page-load', () => {
+      if (document.getElementById('candidate-profile-container')) {
+        setupDynamicBackLink();
+        loadAdminCandidateProfile();
+      }
+    });
   </script>
 </AdminLayout>

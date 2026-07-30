@@ -14,12 +14,8 @@ export function createAdminCvListLoader(state: {
     const countLabel = document.getElementById('cv-count-label');
     if (!tbody) return;
     try {
-      const token = typeof window !== 'undefined' ? localStorage.getItem('token') : null;
-      const headers: Record<string, string> = { 'Content-Type': 'application/json' };
-      if (token) headers['Authorization'] = `Bearer ${token}`;
-
-      const res = await fetch('/api/cv/list', { headers, credentials: 'include' });
-      if (!res.ok) throw new Error(`HTTP ${res.status}`);
+      const res = await fetch('/api/cv/list');
+      if (!res.ok) throw new Error();
       const data = await res.json();
       const cvs = data.cvs || [];
       if (countLabel) countLabel.textContent = `${cvs.length} kayıt`;

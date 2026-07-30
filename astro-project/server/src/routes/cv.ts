@@ -1,5 +1,5 @@
 import { Router, Request, Response } from "express";
-import { PrismaClient, AnalysisStatus, Prisma } from "@prisma/client";
+import { PrismaClient, AnalysisStatus } from "@prisma/client";
 import { PrismaPg } from "@prisma/adapter-pg";
 import pg from "pg";
 import multer from "multer";
@@ -7,9 +7,16 @@ import crypto from "crypto";
 import path from "path";
 import { authMiddleware } from "../middleware/auth.js";
 import { supabase } from "../lib/supabase.js";
-import { extractTextFromPDF, chunkTextBySections, analyzeWithOpenAI, analyzeWithGemini, extractLocalSkills, detectLanguage, simulateAiAnalysis } from "../utils/parser.js";
-import { embedAllChunks, searchSimilarChunks } from "../utils/embeddings.js";
+import { analyzeWithOpenAI } from "../infrastructure/ai/OpenAiCvAnalyzer.js";
+import { simulateAiAnalysis } from "../infrastructure/ai/LocalRuleAnalyzer.js";
+import { detectLanguage } from "../domain/cv/CvTextPreprocessor.js";
+import { searchSimilarChunks } from "../utils/embeddings.js";
 import { emitAnalysisStatus } from "../index.js";
+import { ProcessCvPipelineUseCase } from "../application/cv/ProcessCvPipelineUseCase.js";
+import { GetCvListUseCase } from "../application/cv/GetCvListUseCase.js";
+import { DeleteCvUseCase } from "../application/cv/DeleteCvUseCase.js";
+import { DownloadCvUseCase } from "../application/cv/DownloadCvUseCase.js";
+import { GetCvChunksUseCase } from "../application/cv/GetCvChunksUseCase.js";
 
 const pool = new pg.Pool({
   connectionString: process.env.DATABASE_URL,
@@ -19,12 +26,11 @@ const prisma = new PrismaClient({ adapter });
 
 const router = Router();
 
-// Configure multer memory storage
 const storage = multer.memoryStorage();
 const upload = multer({
   storage: storage,
-  limits: { fileSize: 5 * 1024 * 1024 }, // 5MB limit
-  fileFilter: (req, file, cb) => {
+  limits: { fileSize: 5 * 1024 * 1024 },
+  fileFilter: (_req, file, cb) => {
     const extname = path.extname(file.originalname).toLowerCase() === ".pdf";
     const mimetype = file.mimetype === "application/pdf";
 
@@ -35,224 +41,12 @@ const upload = multer({
   }
 });
 
-// Single file upload handler
 const uploadMiddleware = upload.single("cv");
 
-// Asynchronous background CV processing pipeline
-async function processCv(cvId: string, analysisId: string, pdfBuffer: Buffer): Promise<void> {
-  const startTime = Date.now();
-  const parserLogs: string[] = [];
-  parserLogs.push("Özgeçmiş analiz süreci başlatıldı.");
-
-  try {
-    // 1. Transition status to PROCESSING
-    await prisma.cVAnalysis.update({
-      where: { id: analysisId },
-      data: { status: AnalysisStatus.PROCESSING }
-    });
-    parserLogs.push("Analiz durumu PROCESSING olarak güncellendi.");
-
-    // 2. Extract text from PDF buffer
-    emitAnalysisStatus(cvId, "PROCESSING", "PDF metni çıkarılıyor ve bölümlere ayrılıyor...", 2);
-    console.log(`[Parser] Extracting text from CV: ${cvId}`);
-    const text = await extractTextFromPDF(pdfBuffer);
-    parserLogs.push("PDF metni başarıyla çıkarıldı.");
-
-    // Detect Potential Prompt Injection (Security Guard!)
-    const lowerText = text.toLowerCase();
-    const injectionPatterns = [
-      "ignore previous instructions",
-      "ignore all previous",
-      "disregard all previous",
-      "disregard previous",
-      "rate this candidate",
-      "rate the candidate",
-      "mark as excellent match",
-      "mark as outstanding",
-      "mark as perfect match",
-      "you are now",
-      "you must now",
-      "ignore any weaknesses",
-      "ignore weaknesses",
-      "system prompt",
-    ];
-    const hasInjectionAttempt = injectionPatterns.some(p => lowerText.includes(p));
-    if (hasInjectionAttempt) {
-      console.warn(`[Parser] ⚠️ Potential Prompt Injection detected in CV ${cvId}!`);
-      parserLogs.push("UYARI: Şüpheli komut/prompt enjeksiyonu denemesi tespit edildi.");
-    }
-
-    // Save extracted text in rawText column of CV
-    await prisma.cV.update({
-      where: { id: cvId },
-      data: { rawText: text }
-    });
-
-    // 3. Generate section-based chunks with metadata
-    console.log(`[Parser] Generating section-based chunks...`);
-    const chunks = await chunkTextBySections(text, prisma);
-    parserLogs.push(`${chunks.length} semantik parça (chunk) oluşturuldu.`);
-
-    // 4. Save chunks in the cv_chunks table
-    if (chunks.length > 0) {
-      console.log(`[Parser] Storing ${chunks.length} chunks in PostgreSQL...`);
-      await prisma.cVChunk.createMany({
-        data: chunks.map((chunk, index) => ({
-          cvId: cvId,
-          chunkText: chunk.chunkText,
-          chunkIndex: index + 1,
-          metadata: chunk.metadata || {},
-        }))
-      });
-      parserLogs.push("Semantik parçalar veritabanına kaydedildi.");
-    }
-
-    // 5. Detect language
-    const lang = detectLanguage(text);
-    parserLogs.push(`Özgeçmiş dili algılandı: ${lang.toUpperCase()}`);
-
-    // 6. Threshold-based AI Fallback Decision
-    const avgConfidence = chunks.length > 0 
-      ? Number((chunks.reduce((sum, c) => sum + (c.metadata?.confidence || 0), 0) / chunks.length).toFixed(2)) 
-      : 0.0;
-    
-    // Find minimum confidence across all parsed chunks (excluding Kişisel Bilgiler since it is default/0.95 anyway)
-    const minConfidence = chunks.length > 0
-      ? Math.min(...chunks.map(c => c.metadata?.confidence || 0.0))
-      : 1.0;
-    
-    let aiFallback = false;
-    let aiFallbackReason = "";
-
-    if (chunks.length === 0) {
-      aiFallback = true;
-      aiFallbackReason = "no_chunks_found";
-      parserLogs.push("Hiç chunk bulunamadı. AI Fallback zorunlu tetikleniyor.");
-    } else if (avgConfidence < 0.70) {
-      aiFallback = true;
-      aiFallbackReason = "low_confidence";
-      parserLogs.push(`Ortalama güven skoru çok düşük (${avgConfidence} < 0.70). AI Fallback tetikleniyor.`);
-    } else if (minConfidence < 0.50) {
-      aiFallback = true;
-      aiFallbackReason = "low_min_confidence";
-      parserLogs.push(`En düşük bölüm güven skoru sınırın altında (${minConfidence} < 0.50). AI Fallback tetikleniyor.`);
-    } else {
-      aiFallback = false;
-      aiFallbackReason = "sufficient_confidence";
-      parserLogs.push(`Ortalama güven skoru yeterli (${avgConfidence} >= 0.70) ve tüm bölümler güvenli. AI Fallback atlandı.`);
-    }
-
-    let aiAnalysis;
-    emitAnalysisStatus(cvId, "PROCESSING", "AI analizi başlatılıyor...", 3);
-    if (process.env.OPENAI_API_KEY) {
-      console.log(`[Parser] 🤖 Running OpenAI ATS & SWOT Analysis for CV: ${cvId}...`);
-      aiAnalysis = await analyzeWithOpenAI(text, lang, prisma);
-      parserLogs.push("OpenAI ATS & SWOT Analizi başarıyla çalıştırıldı.");
-    } else {
-      console.log(`[Parser] No OPENAI_API_KEY found. Running local rule/hybrid analysis.`);
-      aiAnalysis = simulateAiAnalysis(text, lang);
-      parserLogs.push("Kural tabanlı hibrid analiz çalıştırıldı.");
-    }
-
-    // Save parser statistics in CV metadata (detailed report!)
-    const ruleMatches = chunks.filter(c => c.metadata?.source === "RULE").length;
-    const structuralMatches = chunks.filter(c => c.metadata?.source === "STRUCTURAL").length;
-    const processingTimeMs = Date.now() - startTime;
-
-    const parserStats = {
-      chunksCount: chunks.length,
-      language: lang,
-      confidence: avgConfidence,
-      minConfidence: minConfidence,
-      ruleMatches: ruleMatches,
-      structuralMatches: structuralMatches,
-      aiFallback: aiFallback,
-      aiFallbackReason: aiFallbackReason,
-      potentialPromptInjection: hasInjectionAttempt,
-      processingTimeMs: processingTimeMs,
-      parserVersion: "v3.0",
-      role: aiAnalysis.role || "Özgeçmiş Analizi",
-      logs: parserLogs
-    };
-
-    await prisma.cV.update({
-      where: { id: cvId },
-      data: { metadata: parserStats }
-    });
-
-    // 7. Generate & Save Embeddings for all chunks
-    try {
-      // Embedding step is part of AI analysis (step 3), no separate UI step needed
-      const embedResult = await embedAllChunks(cvId, prisma);
-      parserLogs.push(`Semantik vektörler oluşturuldu (Yeni: ${embedResult.embedded}, Cache: ${embedResult.copied}).`);
-    } catch (embedErr: any) {
-      console.error(`[Parser] ❌ Error generating embeddings for CV ${cvId}:`, embedErr);
-      parserLogs.push(`HATA: Embedding oluşturulamadı: ${embedErr.message}`);
-    }
-
-    // Update parserStats logs and metadata
-    await prisma.cV.update({
-      where: { id: cvId },
-      data: { metadata: { ...parserStats, logs: parserLogs } }
-    });
-
-    // 8. Transition status to COMPLETED and save all details in PostgreSQL
-    await prisma.cVAnalysis.update({
-      where: { id: analysisId },
-      data: {
-        status: AnalysisStatus.COMPLETED,
-        atsScore: aiAnalysis.atsScore,
-        skills: aiAnalysis.skills,
-        strengths: aiAnalysis.strengths,
-        weaknesses: aiAnalysis.weaknesses,
-        suggestions: aiAnalysis.suggestions
-      }
-    });
-
-    // 9. Analiz süresini cost_logs tablosuna kaydet
-    const totalDurationMs = Date.now() - startTime;
-    await prisma.costLog.create({
-      data: {
-        cvId,
-        analysisId,
-        operation: "CV_ANALYSIS",
-        durationMs: totalDurationMs,
-        status: "SUCCESS",
-        metadata: {
-          chunksCount: chunks.length,
-          language: lang,
-          atsScore: aiAnalysis.atsScore,
-          aiFallback,
-          processingTimeMs: totalDurationMs
-        }
-      }
-    }).catch(err => console.error("[CostLog] Loglama hatası:", err));
-
-    console.log(`[Parser] ✅ Successfully parsed, analyzed and chunked CV: ${cvId} (${totalDurationMs}ms)`);
-    emitAnalysisStatus(cvId, "COMPLETED", "Analiz başarıyla tamamlandı.", 4);
-
-  } catch (error) {
-    console.error(`[Parser] ❌ Error processing CV ${cvId}:`, error);
-    
-    // Başarısız analiz süresini de logla
-    const failDurationMs = Date.now() - startTime;
-    await prisma.costLog.create({
-      data: {
-        cvId,
-        analysisId,
-        operation: "CV_ANALYSIS",
-        durationMs: failDurationMs,
-        status: "FAILED",
-        metadata: { error: String(error) }
-      }
-    }).catch(err => console.error("[CostLog] Failed log hatası:", err));
-
-    // Set status to FAILED on error
-    await prisma.cVAnalysis.update({
-      where: { id: analysisId },
-      data: { status: AnalysisStatus.FAILED }
-    }).catch(err => console.error("Error setting status to FAILED:", err));
-  }
+function processCv(cvId: string, _analysisId?: string, _pdfBuffer?: Buffer): void {
+  ProcessCvPipelineUseCase.execute(cvId, prisma).catch((err) =>
+    console.error(`[ProcessCvPipeline] Pipeline error for CV ${cvId}:`, err)
+  );
 }
 
 // POST /api/cv/upload
@@ -285,7 +79,6 @@ router.post("/upload", authMiddleware, (req: Request, res: Response): void => {
       const fileName = Buffer.from(rawOriginalName, "latin1").toString("utf8");
       const fileExt = path.extname(fileName).toLowerCase();
       
-      // If admin, allow uploading on behalf of another candidate
       let userId = req.user.id;
       if (req.user.role === "ADMIN" && req.body.targetUserId) {
         userId = req.body.targetUserId;
@@ -297,7 +90,6 @@ router.post("/upload", authMiddleware, (req: Request, res: Response): void => {
       const fileBuffer = req.file.buffer;
       const fileHash = crypto.createHash("sha256").update(fileBuffer).digest("hex");
 
-      // Check if a CV with this hash already exists for this user
       const existingCv = await prisma.cV.findFirst({
         where: {
           userId: userId,
@@ -312,18 +104,14 @@ router.post("/upload", authMiddleware, (req: Request, res: Response): void => {
 
       if (existingCv) {
         console.log(`[Upload] Overwriting existing CV for user ${userId} with hash ${fileHash} to apply parser updates.`);
-        // Delete existing CV (cascade will handle chunks and analyses in DB)
         await prisma.cV.delete({ where: { id: existingCv.id } });
-        // Delete from Supabase Storage
         const oldFilePath = existingCv.fileUrl.split("/public/cv-files/")[1];
         if (oldFilePath) {
           await supabase.storage.from("cv-files").remove([oldFilePath]);
         }
       }
 
-
-      // Upload file to Supabase Storage
-      const { data, error } = await supabase.storage
+      const { error } = await supabase.storage
         .from("cv-files")
         .upload(filePath, fileBuffer, {
           contentType: req.file.mimetype,
@@ -336,7 +124,6 @@ router.post("/upload", authMiddleware, (req: Request, res: Response): void => {
         return;
       }
 
-      // Get public URL of the uploaded file
       const { data: publicUrlData } = supabase.storage
         .from("cv-files")
         .getPublicUrl(filePath);
@@ -348,7 +135,6 @@ router.post("/upload", authMiddleware, (req: Request, res: Response): void => {
 
       const fileUrl = publicUrlData.publicUrl;
 
-      // Save records in the PostgreSQL database using Prisma
       const cv = await prisma.cV.create({
         data: {
           userId: userId,
@@ -370,7 +156,6 @@ router.post("/upload", authMiddleware, (req: Request, res: Response): void => {
         fileName: cv.fileName
       });
 
-      // Asynchronously trigger parsing in the background
       processCv(cv.id, analysis.id, fileBuffer);
 
       res.status(201).json({
@@ -393,46 +178,8 @@ router.get("/list", authMiddleware, async (req: Request, res: Response): Promise
   }
 
   try {
-    const list = await prisma.cV.findMany({
-      where: req.user.role === "ADMIN" ? {} : { userId: req.user.id },
-      include: {
-        analyses: {
-          orderBy: { createdAt: "desc" },
-        },
-        user: {
-          select: {
-            name: true,
-            email: true,
-          }
-        }
-      },
-      orderBy: { createdAt: "desc" },
-    });
-
-    // Generate 1-hour signed URLs for each CV in the private storage
-    const cvsWithSignedUrls = await Promise.all(
-      list.map(async (cv) => {
-        const urlParts = cv.fileUrl.split('/cv-files/');
-        const filePath = urlParts[1];
-
-        if (!filePath) return cv;
-
-        const { data, error } = await supabase.storage
-          .from("cv-files")
-          .createSignedUrl(filePath, 3600); // 1 hour expiration
-
-        if (error) {
-          console.error(`Error generating signed URL for CV ${cv.id}:`, error);
-        }
-
-        return {
-          ...cv,
-          fileUrl: data?.signedUrl || cv.fileUrl
-        };
-      })
-    );
-
-    res.json({ cvs: cvsWithSignedUrls });
+    const cvs = await GetCvListUseCase.execute(req.user.id, req.user.role, prisma);
+    res.json({ cvs });
   } catch (error) {
     console.error("CV listeleme hatası:", error);
     res.status(500).json({ message: "CV listesi alınamadı." });
@@ -449,24 +196,11 @@ router.get("/:id/chunks", authMiddleware, async (req: Request, res: Response): P
   const id = req.params.id as string;
 
   try {
-    const cv = await prisma.cV.findFirst({
-      where: req.user.role === "ADMIN"
-        ? { id }
-        : { id, userId: req.user.id },
-      include: {
-        chunks: { orderBy: { chunkIndex: "asc" } }
-      }
-    });
-
-    if (!cv) {
-      res.status(404).json({ message: "CV bulunamadı veya yetkiniz yok." });
-      return;
-    }
-
-    res.json({ chunks: cv.chunks, fileName: cv.fileName });
-  } catch (error) {
-    console.error("Chunk listeleme hatası:", error);
-    res.status(500).json({ message: "Chunk listesi alınamadı." });
+    const result = await GetCvChunksUseCase.execute(id, { id: req.user.id, role: req.user.role }, prisma);
+    res.json(result);
+  } catch (error: any) {
+    const status = error.statusCode || 500;
+    res.status(status).json({ message: error.message || "Chunk listesi alınamadı." });
   }
 });
 
@@ -477,215 +211,39 @@ router.delete("/:id", authMiddleware, async (req: Request, res: Response): Promi
     return;
   }
 
-  const id = req.params.id as string;
+  const cvId = req.params.id as string;
 
   try {
-    // 1. Find the CV and ensure it belongs to the logged-in user (or user is admin)
-    const cv = await prisma.cV.findFirst({
-      where: req.user.role === "ADMIN"
-        ? { id: id }
-        : { id: id, userId: req.user.id }
-    });
-
-    if (!cv) {
-      res.status(404).json({ message: "CV bulunamadı veya yetkiniz yok." });
-      return;
-    }
-
-    // 2. Extract Supabase Storage file path from fileUrl
-    const urlParts = cv.fileUrl.split('/cv-files/');
-    const filePath = urlParts[1];
-
-    if (filePath) {
-      // Delete file from Supabase Storage
-      const { error: storageError } = await supabase.storage
-        .from("cv-files")
-        .remove([filePath]);
-
-      if (storageError) {
-        console.error(`Supabase Storage dosya silme hatası (CV ID: ${id}):`, storageError);
-      }
-    }
-
-    // 3. Delete from Database (Prisma cascades automatically due to onDelete: Cascade)
-    await prisma.cV.delete({
-      where: { id: id }
-    });
-
-    res.json({ message: "CV başarıyla silindi." });
-  } catch (error) {
-    console.error("CV silme hatası:", error);
-    res.status(500).json({ message: "CV silinemedi." });
-  }
-});
-
-// POST /api/cv/analyze - Standalone CV Analysis endpoint (Admin only)
-router.post("/analyze", authMiddleware, async (req: Request, res: Response): Promise<void> => {
-  if (!req.user || req.user.role !== "ADMIN") {
-    res.status(403).json({ message: "Bu işlem için admin yetkisi gerekiyor." });
-    return;
-  }
-
-  const { cvId } = req.body;
-  if (!cvId) {
-    res.status(400).json({ message: "cvId parametresi zorunludur." });
-    return;
-  }
-
-  try {
-    const cv = await prisma.cV.findUnique({
-      where: { id: cvId },
-      include: {
-        chunks: true,
-        analyses: { orderBy: { createdAt: "desc" } }
-      }
-    });
-
-    if (!cv) {
-      res.status(404).json({ message: "CV bulunamadı." });
-      return;
-    }
-
-    const textToAnalyze = cv.rawText || cv.chunks.map(c => c.chunkText).join("\n");
-    if (!textToAnalyze || textToAnalyze.trim().length === 0) {
-      res.status(400).json({ message: "CV metni boş veya okunamadı." });
-      return;
-    }
-
-    const lang = detectLanguage(textToAnalyze);
-    const aiAnalysis = await analyzeWithOpenAI(textToAnalyze, lang, prisma);
-
-    let analysis = cv.analyses[0];
-    if (analysis) {
-      analysis = await prisma.cVAnalysis.update({
-        where: { id: analysis.id },
-        data: {
-          status: AnalysisStatus.COMPLETED,
-          atsScore: aiAnalysis.atsScore,
-          skills: aiAnalysis.skills,
-          strengths: aiAnalysis.strengths,
-          weaknesses: aiAnalysis.weaknesses,
-          suggestions: aiAnalysis.suggestions
-        }
-      });
-    } else {
-      analysis = await prisma.cVAnalysis.create({
-        data: {
-          cvId: cv.id,
-          status: AnalysisStatus.COMPLETED,
-          atsScore: aiAnalysis.atsScore,
-          skills: aiAnalysis.skills,
-          strengths: aiAnalysis.strengths,
-          weaknesses: aiAnalysis.weaknesses,
-          suggestions: aiAnalysis.suggestions
-        }
-      });
-    }
-
-    res.json({
-      message: "CV analizi başarıyla tamamlandı.",
-      analysis: {
-        guclu_yonler: aiAnalysis.strengths,
-        eksik_yonler: aiAnalysis.weaknesses,
-        gelisim_onerileri: aiAnalysis.suggestions
-      },
-      atsScore: aiAnalysis.atsScore,
-      role: aiAnalysis.role
-    });
+    const result = await DeleteCvUseCase.execute(cvId, req.user.id, prisma);
+    res.json(result);
   } catch (error: any) {
-    console.error("CV analiz endpoint hatası:", error);
-    res.status(500).json({ message: `Analiz hatası: ${error.message}` });
+    const status = error.statusCode || 500;
+    res.status(status).json({ message: error.message || "CV silinemedi." });
   }
 });
 
-// POST /api/cv/:id/reanalyze & /:id/retry
-const handleReanalyze = async (req: Request, res: Response): Promise<void> => {
-  if (!req.user || req.user.role !== "ADMIN") {
-    res.status(403).json({ message: "Bu işlem için admin yetkisi gerekiyor." });
+// GET /api/cv/:id/download
+router.get("/:id/download", authMiddleware, async (req: Request, res: Response): Promise<void> => {
+  if (!req.user) {
+    res.status(401).json({ message: "Yetkisiz erişim." });
     return;
   }
 
-  const id = req.params.id as string;
+  const cvId = req.params.id as string;
 
   try {
-    const cv = await prisma.cV.findUnique({
-      where: { id },
-      include: {
-        analyses: { orderBy: { createdAt: "desc" } }
-      }
-    });
-
-    if (!cv) {
-      res.status(404).json({ message: "CV bulunamadı." });
-      return;
-    }
-
-    const urlParts = cv.fileUrl.split('/cv-files/');
-    const filePath = urlParts[1];
-
-    if (!filePath) {
-      res.status(400).json({ message: "Geçersiz dosya adresi." });
-      return;
-    }
-
-    const { data: fileBlob, error: downloadError } = await supabase.storage
-      .from("cv-files")
-      .download(filePath);
-
-    if (downloadError || !fileBlob) {
-      console.error("Supabase Storage dosya indirme hatası:", downloadError);
-      res.status(500).json({ message: "Dosya depolama sunucusundan indirilemedi." });
-      return;
-    }
-
-    const fileBuffer = Buffer.from(await fileBlob.arrayBuffer());
-
-    let analysis = cv.analyses && cv.analyses[0];
-    if (analysis) {
-      analysis = await prisma.cVAnalysis.update({
-        where: { id: analysis.id },
-        data: {
-          status: AnalysisStatus.PENDING,
-          atsScore: null,
-          skills: Prisma.DbNull,
-          strengths: Prisma.DbNull,
-          weaknesses: Prisma.DbNull,
-          suggestions: Prisma.DbNull,
-          positions: Prisma.DbNull
-        }
-      });
-    } else {
-      analysis = await prisma.cVAnalysis.create({
-        data: {
-          cvId: cv.id,
-          status: AnalysisStatus.PENDING
-        }
-      });
-    }
-
-    // Delete chunks to avoid duplicate chunks on reprocessing
-    await prisma.cVChunk.deleteMany({
-      where: { cvId: cv.id }
-    });
-
-    // Run processing synchronously so reanalyze completes before returning 200 OK
-    await processCv(cv.id, analysis.id, fileBuffer);
-
-    const updatedAnalysis = await prisma.cVAnalysis.findUnique({
-      where: { id: analysis.id }
-    });
-
-    res.json({ message: "Analiz başarıyla tamamlandı.", cv, analysis: updatedAnalysis });
-  } catch (error) {
-    console.error("Yeniden deneme hatası:", error);
-    res.status(500).json({ message: "Analiz yeniden başlatılamadı." });
+    const fileResult = await DownloadCvUseCase.execute(cvId, req.user.id, req.user.role, prisma);
+    
+    res.setHeader("Content-Type", fileResult.contentType);
+    res.setHeader("Content-Disposition", `inline; filename="${encodeURIComponent(fileResult.fileName)}"`);
+    res.send(fileResult.buffer);
+  } catch (error: any) {
+    const status = error.statusCode || 500;
+    res.status(status).json({ message: error.message || "Dosya indirilemedi." });
   }
-};
+});
 
-router.post("/:id/reanalyze", authMiddleware, handleReanalyze);
-router.post("/:id/retry", authMiddleware, handleReanalyze);
-
-// GET /api/cv/search - Semantic Search endpoint
+// GET /api/cv/search
 router.get("/search", authMiddleware, async (req: Request, res: Response): Promise<void> => {
   const query = req.query.q as string;
   const limit = parseInt(req.query.limit as string || "5", 10);
@@ -696,12 +254,84 @@ router.get("/search", authMiddleware, async (req: Request, res: Response): Promi
   }
 
   try {
-    // Pass userId so search is scoped to the requesting user's own embeddings only
     const results = await searchSimilarChunks(query, limit, prisma, undefined, req.user?.id);
     res.json({ results });
   } catch (error: any) {
     console.error("Semantic search endpoint error:", error);
     res.status(500).json({ message: `Arama sırasında hata oluştu: ${error.message}` });
+  }
+});
+
+// POST /api/cv/:id/reanalyze (Yeniden AI Analiz Başlatma)
+router.post("/:id/reanalyze", authMiddleware, async (req: Request, res: Response): Promise<void> => {
+  if (!req.user) {
+    res.status(401).json({ message: "Yetkisiz erişim." });
+    return;
+  }
+
+  const cvId = req.params.id as string;
+
+  try {
+    const cv = await prisma.cV.findUnique({
+      where: { id: cvId },
+      include: { user: true }
+    });
+
+    if (!cv) {
+      res.status(404).json({ message: "CV bulunamadı." });
+      return;
+    }
+
+    // Aday sadece kendi CV'sini, Admin ise herkesin CV'sini reanalyze edebilir
+    if (req.user.role !== "ADMIN" && cv.userId !== req.user.id) {
+      res.status(403).json({ message: "Bu işlem için yetkiniz yok." });
+      return;
+    }
+
+    // Supabase Storage path ayrıştırma (bucket adı: "cv-files")
+    let storagePath = cv.fileUrl;
+    if (storagePath.includes("/cv-files/")) {
+      storagePath = storagePath.split("/cv-files/")[1];
+    } else {
+      storagePath = storagePath.replace(/^.*\/cvs\//, "");
+    }
+
+    // Storage'dan PDF dosyasını indir (bucket: "cv-files")
+    const { data: fileData, error: downloadError } = await supabase.storage
+      .from("cv-files")
+      .download(storagePath);
+
+    if (downloadError || !fileData) {
+      console.error("[Reanalyze] Supabase indirme hatası:", downloadError, "Path:", storagePath);
+      res.status(500).json({ message: `CV dosyası depolamadan alınamadı (${downloadError?.message || 'Bilinmeyen hata'}).` });
+      return;
+    }
+
+    const pdfBuffer = Buffer.from(await fileData.arrayBuffer());
+
+    // Yeni Analysis kaydı oluştur (Prisma Model: cVAnalysis)
+    const analysis = await prisma.cVAnalysis.create({
+      data: {
+        cvId: cv.id,
+        status: AnalysisStatus.PENDING,
+      }
+    });
+
+    emitAnalysisStatus(cv.id, "CV_UPLOADED", "Yeniden analiz başlatıldı.", 1, {
+      cvId: cv.id,
+      fileName: cv.fileName
+    });
+
+    processCv(cv.id, analysis.id, pdfBuffer);
+
+    res.status(200).json({
+      message: "Yeniden analiz başarıyla başlatıldı.",
+      cvId: cv.id,
+      analysisId: analysis.id
+    });
+  } catch (error: any) {
+    console.error("[Reanalyze] Hata:", error);
+    res.status(500).json({ message: error.message || "Yeniden analiz başlatılamadı." });
   }
 });
 

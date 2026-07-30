@@ -2,145 +2,143 @@
 import AdminLayout from '../../layouts/AdminLayout.astro';
 ---
 
-<AdminLayout title="Raporlar | Beacon Admin">
-  <div class="space-y-6 pb-12">
-    <!-- Header Section -->
-    <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 bg-white border border-[#ddd9d3] rounded-[16px] p-6 shadow-xs">
-      <div>
-        <h1 class="text-xl font-extrabold text-[#1b1c1a] tracking-tight">Raporlar</h1>
-        <p class="text-xs text-[#8a8580] font-medium mt-0.5">Platform analitik ve performans raporları.</p>
+<AdminLayout title="Beacon - Raporlar">
+  <!-- Header -->
+  <header class="sticky top-0 z-40 bg-[#faf9f5]/80 backdrop-blur-md border-b border-[#ddd9d3] -mx-8 px-8 py-6 mb-8 flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
+    <div>
+      <h2 class="font-headline-xl text-headline-xl font-bold text-[#1b1c1a] tracking-tight text-3xl">Raporlar</h2>
+      <p class="font-body-sm text-sm text-[#8a8580] mt-1 font-medium">Platform analitik ve performans raporları.</p>
+    </div>
+    <div class="flex items-center gap-4 w-full md:w-auto">
+      <div class="flex items-center gap-1 p-1 bg-[#f5f4f0] border border-[#ddd9d3] rounded-lg text-xs font-semibold">
+        <button class="px-3 py-1.5 rounded-md bg-white shadow-sm border border-[#ddd9d3] text-[#14422f]" id="filter-week">Bu Hafta</button>
+        <button class="px-3 py-1.5 rounded-md text-[#8a8580] hover:text-[#1b1c1a] transition-colors" id="filter-month">Bu Ay</button>
+        <button class="px-3 py-1.5 rounded-md text-[#8a8580] hover:text-[#1b1c1a] transition-colors" id="filter-all">Tüm Zamanlar</button>
       </div>
+      <button onclick="exportCSV()" class="flex items-center gap-2 px-4 py-2 rounded-[8px] bg-[#B87333] hover:opacity-90 text-white font-semibold text-sm transition-opacity shrink-0 shadow-sm">
+        <span class="material-symbols-outlined text-[18px]">download</span>
+        Rapor İndir
+      </button>
+    </div>
+  </header>
 
-      <div class="flex items-center gap-3">
-        <!-- Timeframe Filter Buttons -->
-        <div class="flex items-center bg-[#faf9f5] border border-[#ddd9d3] rounded-xl p-1 shadow-2xs">
-          <button id="filter-week" class="px-3 py-1.5 rounded-md bg-white shadow-sm border border-[#ddd9d3] text-[#14422f] font-bold cursor-pointer text-xs transition-all">Bu Hafta</button>
-          <button id="filter-month" class="px-3 py-1.5 rounded-md text-[#8a8580] hover:text-[#1b1c1a] transition-colors cursor-pointer text-xs font-semibold">Bu Ay</button>
-          <button id="filter-all" class="px-3 py-1.5 rounded-md text-[#8a8580] hover:text-[#1b1c1a] transition-colors cursor-pointer text-xs font-semibold">Tüm Zamanlar</button>
-        </div>
-
-        <!-- Export Report Button (Excel) -->
-        <button id="export-excel-btn" class="flex items-center gap-2 px-4 py-2 bg-[#14422f] hover:bg-[#103425] text-white rounded-xl text-xs font-bold transition-all shadow-xs hover:shadow-md active:scale-[0.98] cursor-pointer">
-          <span class="material-symbols-outlined text-base">download</span>
-          Rapor İndir
-        </button>
+  <!-- Canvas -->
+  <div class="space-y-8">
+    <!-- Stats Row -->
+    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+      <div class="bg-white border border-[#DDD9D3] rounded-[10px] p-6 shadow-sm relative overflow-hidden">
+        <h3 class="font-label-sm text-xs font-bold text-[#8a8580] uppercase tracking-wider mb-2">Toplam CV</h3>
+        <div class="font-display-lg text-4xl font-bold text-[#14422f]" id="r-total-cvs">...</div>
+      </div>
+      <div class="bg-white border border-[#DDD9D3] border-l-[3px] border-l-[#3D7A3B] rounded-[10px] p-6 shadow-sm relative overflow-hidden">
+        <h3 class="font-label-sm text-xs font-bold text-[#8a8580] uppercase tracking-wider mb-2">Analiz Tamamlanan</h3>
+        <div class="font-display-lg text-4xl font-bold text-[#1b1c1a]" id="r-completed">...</div>
+      </div>
+      <div class="bg-white border border-[#DDD9D3] rounded-[10px] p-6 shadow-sm relative overflow-hidden">
+        <h3 class="font-label-sm text-xs font-bold text-[#8a8580] uppercase tracking-wider mb-2">Ortalama Uyum Skoru</h3>
+        <div class="font-display-lg text-4xl font-bold text-[#1b1c1a]" id="r-avg-score">...</div>
+      </div>
+      <div class="bg-white border border-[#DDD9D3] rounded-[10px] p-6 shadow-sm relative overflow-hidden">
+        <h3 class="font-label-sm text-xs font-bold text-[#8a8580] uppercase tracking-wider mb-2">Bu Hafta Yüklenen</h3>
+        <div class="font-display-lg text-4xl font-bold text-[#1b1c1a]" id="r-weekly-uploads">...</div>
       </div>
     </div>
 
-    <!-- Stat Cards Row -->
-    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-      <div class="bg-white border border-[#ddd9d3] rounded-[16px] p-5 shadow-xs hover:border-[#14422f]/30 transition-all">
-        <span class="text-[11px] font-bold text-[#8a8580] uppercase tracking-wider block mb-1">TOPLAM CV</span>
-        <span id="r-total-cvs" class="text-2xl font-extrabold text-[#1b1c1a]">-</span>
-      </div>
-
-      <div class="bg-white border border-[#ddd9d3] rounded-[16px] p-5 shadow-xs border-l-4 border-l-[#14422f] hover:border-[#14422f]/30 transition-all">
-        <span class="text-[11px] font-bold text-[#8a8580] uppercase tracking-wider block mb-1">ANALİZ TAMAMLANAN</span>
-        <span id="r-completed" class="text-2xl font-extrabold text-[#14422f]">-</span>
-      </div>
-
-      <div class="bg-white border border-[#ddd9d3] rounded-[16px] p-5 shadow-xs hover:border-[#14422f]/30 transition-all">
-        <span class="text-[11px] font-bold text-[#8a8580] uppercase tracking-wider block mb-1">ORTALAMA UYUM SKORU</span>
-        <span id="r-avg-score" class="text-2xl font-extrabold text-[#1b1c1a]">-</span>
-      </div>
-
-      <div class="bg-white border border-[#ddd9d3] rounded-[16px] p-5 shadow-xs hover:border-[#14422f]/30 transition-all">
-        <span class="text-[11px] font-bold text-[#8a8580] uppercase tracking-wider block mb-1">BU HAFTA YÜKLENEN</span>
-        <span id="r-weekly-uploads" class="text-2xl font-extrabold text-[#1b1c1a]">-</span>
-      </div>
-    </div>
-
-    <!-- Charts Row -->
-    <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
-      <!-- Weekly CV Upload Bar Chart -->
-      <div class="lg:col-span-2 bg-white border border-[#ddd9d3] rounded-[16px] p-6 shadow-xs flex flex-col justify-between">
-        <div>
-          <h3 class="text-sm font-extrabold text-[#1b1c1a] mb-1">Haftalık CV Yükleme</h3>
-          <p class="text-xs text-[#8a8580] font-medium mb-6">Son 7 gün içerisinde sisteme yüklenen CV sayıları</p>
-        </div>
-
-        <div class="space-y-3">
-          <div class="flex items-end gap-2 h-44 pt-4 border-b border-[#ddd9d3]" id="cv-bars-container">
-            <!-- Dynamic Bars -->
+    <!-- Charts Section -->
+    <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+      <!-- Bar Chart Card -->
+      <div class="bg-white border border-[#DDD9D3] rounded-[10px] p-6 shadow-sm h-[360px] flex flex-col justify-between">
+        <h3 class="font-headline-md text-md font-bold text-[#1b1c1a] mb-2">Haftalık CV Yükleme</h3>
+        
+        <div class="flex-1 relative flex items-end justify-between px-6 pb-6 pt-6 min-h-[180px]">
+          <!-- Grid Lines -->
+          <div class="absolute inset-0 flex flex-col justify-between pt-6 pb-12 px-6 z-0 pointer-events-none">
+            <div class="w-full h-px bg-[#DDD9D3]/40"></div>
+            <div class="w-full h-px bg-[#DDD9D3]/40"></div>
+            <div class="w-full h-px bg-[#DDD9D3]/40"></div>
+            <div class="w-full h-px bg-[#DDD9D3]/40"></div>
+            <div class="w-full h-px bg-[#DDD9D3]/40"></div>
           </div>
-          <div class="flex justify-between px-1 text-xs text-[#8a8580] font-medium" id="cv-bars-labels">
-            <!-- Dynamic Labels -->
+          <!-- Y-Axis Labels -->
+          <div class="absolute left-1 top-6 bottom-12 flex flex-col justify-between text-[10px] font-bold text-[#8a8580] pr-2 text-right">
+            <span id="chart-y-4">20</span>
+            <span id="chart-y-3">15</span>
+            <span id="chart-y-2">10</span>
+            <span id="chart-y-1">5</span>
+            <span>0</span>
+          </div>
+          <!-- Bars Container -->
+          <div class="flex flex-1 items-end justify-around h-full z-10 pl-6" id="cv-bars-container">
+            <!-- Rendered dynamically by JS -->
           </div>
         </div>
+        
+        <!-- X-Axis Labels -->
+        <div class="flex justify-around pl-12 pr-2 mt-1 font-semibold text-[11px] text-[#8a8580]" id="cv-bars-labels">
+          <!-- Rendered dynamically by JS -->
+        </div>
       </div>
 
-      <!-- Analysis Status Donut Chart -->
-      <div class="bg-white border border-[#ddd9d3] rounded-[16px] p-6 shadow-xs flex flex-col justify-between">
-        <div>
-          <h3 class="text-sm font-extrabold text-[#1b1c1a] mb-1">Analiz Durum Dağılımı</h3>
-          <p class="text-xs text-[#8a8580] font-medium mb-6">Sistemdeki tüm CV'lerin analiz oranları</p>
-        </div>
-
-        <div class="flex flex-col items-center justify-center my-auto py-2">
+      <!-- Donut Chart Card -->
+      <div class="bg-white border border-[#DDD9D3] rounded-[10px] p-6 shadow-sm h-[360px] flex flex-col">
+        <h3 class="font-headline-md text-md font-bold text-[#1b1c1a] mb-2">Analiz Durum Dağılımı</h3>
+        <div class="flex-1 flex items-center justify-center relative">
           <!-- SVG Donut Chart -->
-          <div class="relative w-36 h-36">
-            <svg class="w-full h-full transform -rotate-90" viewBox="0 0 36 36">
-              <!-- Background Circle -->
-              <path class="text-[#f5f4f0]" stroke-width="3.5" stroke="currentColor" fill="none" d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831" />
-              <!-- Completed Segment (Emerald) -->
-              <path id="donut-completed" class="text-[#14422f] transition-all duration-1000" stroke-width="3.5" stroke-dasharray="0 100" stroke-linecap="round" stroke="currentColor" fill="none" d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831" />
-              <!-- Processing Segment (Blue) -->
-              <path id="donut-processing" class="text-blue-500 transition-all duration-1000" stroke-width="3.5" stroke-dasharray="0 100" stroke-linecap="round" stroke="currentColor" fill="none" d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831" />
-              <!-- Pending Segment (Amber) -->
-              <path id="donut-pending" class="text-amber-500 transition-all duration-1000" stroke-width="3.5" stroke-dasharray="0 100" stroke-linecap="round" stroke="currentColor" fill="none" d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831" />
-            </svg>
-            <div class="absolute inset-0 flex flex-col items-center justify-center text-center pointer-events-none">
-              <span id="donut-center-total" class="text-xl font-extrabold text-[#1b1c1a]">-</span>
-              <span class="text-[10px] font-bold text-[#8a8580] uppercase">TOPLAM</span>
-            </div>
+          <svg class="w-36 h-36 transform -rotate-90" viewBox="0 0 36 36">
+            <!-- Background circle -->
+            <circle class="text-[#f5f4f0]" cx="18" cy="18" r="15.915" fill="none" stroke="currentColor" stroke-width="3"></circle>
+            <!-- Segments: completed, processing, pending (will set stroke-dasharray dynamically) -->
+            <circle id="donut-completed" class="text-[#3D7A3B] transition-all duration-1000" cx="18" cy="18" r="15.915" fill="none" stroke="currentColor" stroke-width="3" stroke-dasharray="0 100" stroke-dashoffset="0"></circle>
+            <circle id="donut-processing" class="text-[#C17D20] transition-all duration-1000" cx="18" cy="18" r="15.915" fill="none" stroke="currentColor" stroke-width="3" stroke-dasharray="0 100" stroke-dashoffset="0"></circle>
+            <circle id="donut-pending" class="text-[#8A8580] transition-all duration-1000" cx="18" cy="18" r="15.915" fill="none" stroke="currentColor" stroke-width="3" stroke-dasharray="0 100" stroke-dashoffset="0"></circle>
+          </svg>
+          <div class="absolute flex flex-col items-center justify-center">
+            <span class="text-xs text-[#8a8580] font-bold uppercase tracking-wider">TOPLAM</span>
+            <span class="text-2xl font-bold text-[#1b1c1a]" id="donut-center-total">...</span>
           </div>
-
-          <!-- Donut Legend -->
-          <div class="flex items-center gap-4 mt-6 text-xs font-semibold">
-            <div class="flex items-center gap-1.5">
-              <span class="w-2.5 h-2.5 rounded-full bg-[#14422f]"></span>
-              <span class="text-[#1b1c1a]">Analiz Hazır (<span id="legend-completed">0%</span>)</span>
-            </div>
-            <div class="flex items-center gap-1.5">
-              <span class="w-2.5 h-2.5 rounded-full bg-blue-500"></span>
-              <span class="text-[#8a8580]">İşleniyor (<span id="legend-processing">0%</span>)</span>
-            </div>
-            <div class="flex items-center gap-1.5">
-              <span class="w-2.5 h-2.5 rounded-full bg-amber-500"></span>
-              <span class="text-[#8a8580]">Bekliyor (<span id="legend-pending">0%</span>)</span>
-            </div>
+        </div>
+        <div class="mt-4 flex flex-wrap justify-center gap-4 text-xs font-semibold text-[#8a8580]">
+          <div class="flex items-center gap-1.5">
+            <div class="w-2.5 h-2.5 rounded-full bg-[#3D7A3B]"></div>
+            <span>Analiz Hazır (<span id="legend-completed">0%</span>)</span>
+          </div>
+          <div class="flex items-center gap-1.5">
+            <div class="w-2.5 h-2.5 rounded-full bg-[#C17D20]"></div>
+            <span>İşleniyor (<span id="legend-processing">0%</span>)</span>
+          </div>
+          <div class="flex items-center gap-1.5">
+            <div class="w-2.5 h-2.5 rounded-full bg-[#8A8580]"></div>
+            <span>Bekliyor (<span id="legend-pending">0%</span>)</span>
           </div>
         </div>
       </div>
     </div>
 
     <!-- Table Section -->
-    <div class="bg-white border border-[#ddd9d3] rounded-[16px] shadow-xs overflow-hidden">
-      <div class="p-6 border-b border-[#ddd9d3]">
-        <h3 class="text-sm font-extrabold text-[#1b1c1a]">Son Analizler</h3>
+    <div class="bg-white border border-[#DDD9D3] rounded-[10px] shadow-sm overflow-hidden">
+      <div class="p-6 border-b border-[#DDD9D3]">
+        <h3 class="font-headline-md text-md font-bold text-[#1b1c1a]">Son Analizler</h3>
       </div>
-
       <div class="overflow-x-auto">
         <table class="w-full text-left border-collapse">
           <thead>
-            <tr class="bg-[#faf9f5] border-b border-[#ddd9d3] text-[11px] font-bold text-[#8a8580] uppercase tracking-wider">
-              <th class="py-3.5 px-6">ADAY</th>
+            <tr class="bg-[#f5f4f0] border-b border-[#DDD9D3] text-xs font-semibold text-[#8a8580] uppercase">
+              <th class="py-3.5 px-6">Aday</th>
               <th class="py-3.5 px-6">CV</th>
-              <th class="py-3.5 px-6">TARİH</th>
-              <th class="py-3.5 px-6">SKOR</th>
-              <th class="py-3.5 px-6">DURUM</th>
+              <th class="py-3.5 px-6">Tarih</th>
+              <th class="py-3.5 px-6">Skor</th>
+              <th class="py-3.5 px-6">Durum</th>
             </tr>
           </thead>
-          <tbody id="reports-table-body" class="divide-y divide-[#ddd9d3] text-xs text-[#1b1c1a]">
+          <tbody class="divide-y divide-[#DDD9D3] text-sm text-[#1b1c1a]" id="reports-table-body">
             <tr>
               <td colspan="5" class="p-8 text-center text-[#8a8580] font-medium">Analizler yükleniyor...</td>
             </tr>
           </tbody>
         </table>
       </div>
-
       <!-- Table Footer / Expand Button -->
-      <div id="reports-expand-container" class="hidden p-4 border-t border-[#ddd9d3] justify-center items-center bg-[#faf9f5]">
+      <div id="reports-expand-container" class="hidden p-4 border-t border-[#DDD9D3] justify-center items-center bg-[#faf9f5]">
         <button id="reports-expand-btn" class="px-5 py-2 rounded-full border border-[#ddd9d3] bg-white text-xs font-bold text-[#1b1c1a] hover:bg-[#14422f] hover:text-white transition-all shadow-2xs flex items-center gap-1.5 cursor-pointer">
           <span id="reports-expand-text">Daha fazla göster</span>
           <span id="reports-expand-icon" class="material-symbols-outlined text-[16px]">expand_more</span>
@@ -150,19 +148,22 @@ import AdminLayout from '../../layouts/AdminLayout.astro';
   </div>
 
   <script>
-    import { initExportCSV } from '../../scripts/admin/reports/exportCSV';
-    import { loadRecentAnalyses } from '../../scripts/admin/reports/recentAnalysesLoader';
     import { loadReports } from '../../scripts/admin/reports/reportStatsLoader';
+    import { loadRecentAnalyses } from '../../scripts/admin/reports/recentAnalysesLoader';
+    import { initExportCSV } from '../../scripts/admin/reports/exportCSV';
+    import { clearSemanticSearchCache } from '../../scripts/admin/search/semanticSearchEngine';
+    import { clearCompareCache } from '../../scripts/admin/compare/comparePageInit';
 
-    function initReportsPage() {
-      initExportCSV();
-      loadReports('week');
-      loadRecentAnalyses('week');
-    }
+    initExportCSV();
 
-    document.addEventListener('astro:page-load', initReportsPage);
-    if (document.readyState === 'complete' || document.readyState === 'interactive') {
-      initReportsPage();
-    }
+    document.addEventListener('astro:page-load', () => {
+      clearSemanticSearchCache();
+      clearCompareCache();
+      if (document.getElementById('r-total-cvs')) {
+        loadReports();
+        loadRecentAnalyses();
+      }
+    });
   </script>
+
 </AdminLayout>

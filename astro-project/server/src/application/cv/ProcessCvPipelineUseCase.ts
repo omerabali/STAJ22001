@@ -1,9 +1,12 @@
 import { PrismaClient, AnalysisStatus } from "@prisma/client";
-import { getFileText } from "../../utils/parser";
-import { embedAllChunks } from "../../utils/embeddings";
-import { analyzeCvTextWithOpenAi } from "../../infrastructure/ai/OpenAiCvAnalyzer";
-import { emitAnalysisStatus } from "../../infrastructure/websocket/socketService";
-import { ChunkQualityService } from "../../services/ChunkQualityService";
+import { 
+  extractTextFromPDF, 
+  detectLanguage, 
+  splitTextSlidingWindow, 
+  analyzeWithOpenAI 
+} from "../../utils/parser.js";
+import { embedAllChunks } from "../../utils/embeddings.js";
+import { emitAnalysisStatus } from "../../index.js";
 
 export class ProcessCvPipelineUseCase {
   public static async execute(cvId: string, prisma: PrismaClient): Promise<void> {
@@ -46,9 +49,17 @@ export class ProcessCvPipelineUseCase {
 
       if (!text || text.trim().length === 0) {
         console.log(`[Parser] Extracting text for CV ${cvId}...`);
-        const extracted = await getFileText(cv.fileUrl, cv.fileName);
-        text = extracted.text;
-        lang = extracted.language || "tr";
+        let pdfBuffer: Buffer;
+        if (cv.fileUrl.startsWith("http://") || cv.fileUrl.startsWith("https://")) {
+          const res = await fetch(cv.fileUrl);
+          const arrayBuffer = await res.arrayBuffer();
+          pdfBuffer = Buffer.from(arrayBuffer);
+        } else {
+          const fs = await import("fs");
+          pdfBuffer = fs.readFileSync(cv.fileUrl);
+        }
+        text = await extractTextFromPDF(pdfBuffer);
+        lang = detectLanguage(text) || "tr";
 
         // DB'ye ham metni yaz
         await prisma.cV.update({
@@ -64,9 +75,8 @@ export class ProcessCvPipelineUseCase {
       // 4. PARÇALAMA (Chunking) & ESKİ PARÇALARI TEMİZLEME
       await prisma.cVChunk.deleteMany({ where: { cvId } });
 
-      const chunkObjs = ChunkQualityService.chunkText(text, 1000, 200);
-      const chunks = chunkObjs.map(c => c.text);
-      const chunkRecords = chunks.map((chunkText, idx) => ({
+      const chunks = splitTextSlidingWindow(text, 1000, 200);
+      const chunkRecords = chunks.map((chunkText: string, idx: number) => ({
         cvId,
         chunkText,
         chunkIndex: idx,
@@ -79,11 +89,11 @@ export class ProcessCvPipelineUseCase {
 
       console.log(`[Parser] CV ${cvId} split into ${chunks.length} chunks.`);
 
-      // 5. TEK RUNDA ANINDA YAPAY ZEKA ANALİZİ (GPT-4o-mini)
+      // 5. TEK RUNDA ANINDA YAPAY ZEKA ANALİZİ (GPT-4o-mini / OpenAI)
       emitAnalysisStatus(cvId, "PROCESSING", "Yapay zeka CV analizi gerçekleştiriliyor...", 2);
 
       const aiStartTime = Date.now();
-      const { analysis: aiAnalysis, fallback: aiFallback } = await analyzeCvTextWithOpenAi(text);
+      const aiAnalysis = await analyzeWithOpenAI(text, (lang as "tr" | "en") || "tr", prisma);
       const aiDurationMs = Date.now() - aiStartTime;
 
       // 6. ANALİZ SONUCUNU ANINDA DB'YE KAYDET
@@ -98,7 +108,7 @@ export class ProcessCvPipelineUseCase {
           strengths: aiAnalysis.strengths,
           weaknesses: aiAnalysis.weaknesses,
           suggestions: aiAnalysis.suggestions,
-          interviewQuestions: aiAnalysis.interviewQuestions || aiAnalysis.suggestions,
+          interviewQuestions: (aiAnalysis as any).interviewQuestions || aiAnalysis.suggestions,
           updatedAt: new Date()
         }
       });
@@ -123,7 +133,7 @@ export class ProcessCvPipelineUseCase {
         chunksCount: chunks.length,
         language: lang,
         atsScore: aiAnalysis.atsScore,
-        aiFallback,
+        aiFallback: (aiAnalysis as any).aiFallback || false,
         tokensUsed: totalTokensUsed,
         estimatedCostUsd
       };
@@ -150,9 +160,9 @@ export class ProcessCvPipelineUseCase {
       emitAnalysisStatus(cvId, "COMPLETED", "Analiz başarıyla tamamlandı.", 4);
 
       // 9. ARKA PLAN VEKTÖR EMBEDDINGS (Non-blocking Background Task)
-      embedAllChunks(cvId, prisma).then(embedResult => {
+      embedAllChunks(cvId, prisma).then((embedResult: any) => {
         console.log(`[Parser] ⚡ Background Embeddings finished for CV ${cvId}: ${embedResult.embedded} embedded in ${embedResult.totalTimeMs}ms`);
-      }).catch(embedErr => {
+      }).catch((embedErr: any) => {
         console.error(`[Parser] ⚠️ Background embedding error for CV ${cvId}:`, embedErr);
       });
 

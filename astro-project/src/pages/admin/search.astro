@@ -81,7 +81,7 @@ import AdminLayout from '../../layouts/AdminLayout.astro';
         <div class="relative flex items-center mb-6">
           <span class="material-symbols-outlined absolute left-4 text-[#8a8580]">search</span>
           <input 
-            id="search-input"
+            id="candidate-search-input"
             type="text" 
             placeholder="İsim veya e-posta ile ara..." 
             class="w-full bg-[#faf9f5] border border-[#ddd9d3] text-[#1b1c1a] rounded-[10px] pl-12 pr-[120px] py-4 focus:border-[#14422f] focus:ring-1 focus:ring-[#14422f] focus:outline-none font-body-md transition-all"
@@ -104,11 +104,11 @@ import AdminLayout from '../../layouts/AdminLayout.astro';
       <!-- Results Header -->
       <div class="flex justify-between items-center mb-6">
         <h3 class="font-headline-sm text-headline-sm font-bold text-[#1b1c1a]">Genel Sonuçlar</h3>
-        <span id="result-count" class="text-[#8a8580] font-body-sm text-sm font-medium">Yükleniyor...</span>
+        <span id="result-count-badge" class="text-[#8a8580] font-body-sm text-sm font-medium">Adaylar yükleniyor...</span>
       </div>
 
       <!-- Results Grid -->
-      <div id="candidates-grid" class="grid grid-cols-1 md:grid-cols-2 gap-6">
+      <div id="candidates-container" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
         <div class="bg-white border border-[#ddd9d3] rounded-[10px] p-6 animate-pulse h-[200px] shadow-sm"></div>
         <div class="bg-white border border-[#ddd9d3] rounded-[10px] p-6 animate-pulse h-[200px] shadow-sm"></div>
       </div>
@@ -160,680 +160,118 @@ import AdminLayout from '../../layouts/AdminLayout.astro';
     }
   </style>
 
-  <script is:inline>
-    let currentFilter = 'all';
-    let searchTimeout = null;
-    let isSemanticLoading = false;
+  <script>
+    import { deleteSearchLog, fetchSearchLogs } from '../../scripts/admin/search/searchHistoryLogs';
+    import { executeSemanticSearch, restoreCachedSemanticSearch } from '../../scripts/admin/search/semanticSearchEngine';
+    import { renderCandidates } from '../../scripts/admin/search/directorySearch';
+    import { toggleCompareCandidate } from '../../scripts/admin/search/candidateComparison';
+    import { clearCompareCache } from '../../scripts/admin/compare/comparePageInit';
 
-    function getInitials(name, email) {
-      const src = name || email || '??';
-      return src.substring(0, 2).toUpperCase();
-    }
+    const filterState = { currentFilter: 'all' };
+    const isSearchLoadingState = { isSemanticLoading: false };
+    let allUsersData: any[] = [];
 
-    function getScoreBadge(status, score) {
-      if (!status) {
-        return '<div class="flex items-center gap-1 text-[#8a8580] bg-[#faf9f5] border border-[#ddd9d3] px-2 py-1 rounded-[6px] text-xs font-medium">CV Yok</div>';
+    (window as any).deleteSearchLog = (logId: string, e: Event) => deleteSearchLog(logId, e);
+    (window as any).toggleCompareCandidate = toggleCompareCandidate;
+    (window as any).useSearchLogQuery = (queryText: string) => {
+      const input = document.getElementById('semantic-search-input') as HTMLInputElement;
+      if (input) {
+        input.value = queryText;
       }
-      if (status === 'COMPLETED' && score !== null) {
-        const color = score >= 80 ? 'text-emerald-700 bg-emerald-50 border border-emerald-200' : score >= 60 ? 'text-amber-700 bg-amber-50 border border-amber-200' : 'text-rose-700 bg-rose-50 border border-rose-200';
-        const icon = score >= 80 ? 'check_circle' : score >= 60 ? 'warning' : 'error';
-        return `<div class="flex items-center gap-1 ${color} px-2 py-1 rounded-[6px] font-bold text-xs"><span class="material-symbols-outlined text-[14px]">${icon}</span>%${score} ATS Skoru</div>`;
-      }
-      if (status === 'PROCESSING') {
-        return '<div class="flex items-center gap-1 text-blue-700 bg-blue-50 border border-blue-200 px-2 py-1 rounded-[6px] text-xs font-medium"><span class="material-symbols-outlined text-[14px] animate-spin">progress_activity</span>İşleniyor</div>';
-      }
-      return '<div class="flex items-center gap-1 text-[#8a8580] bg-[#faf9f5] border border-[#ddd9d3] px-2 py-1 rounded-[6px] text-xs font-medium"><span class="material-symbols-outlined text-[14px]">schedule</span>Bekliyor</div>';
-    }
+      executeSemanticSearch(isSearchLoadingState);
+    };
 
-    function renderSkills(skills) {
-      if (!skills || !Array.isArray(skills) || skills.length === 0) {
-        return '<span class="text-[#8a8580] text-xs italic font-medium">Henüz analiz yok</span>';
-      }
-      return skills.slice(0, 3).map(s =>
-        `<span class="bg-[#14422f]/10 text-[#14422f] px-2.5 py-1 rounded-[6px] font-semibold text-[11px]">${s}</span>`
-      ).join('');
-    }
-
-    // SECTION 1: AI SEMANTIC SEARCH SCRIPTS
-    async function deleteSearchLog(logId, event) {
-      if (event) {
-        event.stopPropagation();
-        event.preventDefault();
-      }
-
-      // Optimistic UI: Immediately hide and remove the pill from DOM with a smooth transition
-      const pillEl = event ? event.target.closest('.inline-flex') : null;
-      if (pillEl) {
-        pillEl.style.transition = 'all 0.2s ease-out';
-        pillEl.style.opacity = '0';
-        pillEl.style.transform = 'scale(0.95) translateY(2px)';
-        setTimeout(() => {
-          pillEl.remove();
-          // Check if no logs left, show placeholder
-          const logsContainer = document.getElementById('search-logs-list');
-          if (logsContainer && logsContainer.children.length === 0) {
-            logsContainer.innerHTML = '<span class="text-xs text-[#8a8580] italic">Henüz arama geçmişi yok.</span>';
-          }
-        }, 200);
-      }
-
+    async function loadCandidatesData() {
       try {
-        const res = await fetch(`/api/search/logs/${logId}`, { method: 'DELETE' });
+        const res = await fetch('/api/admin/candidates');
         if (!res.ok) throw new Error();
-        // Silinme başarılı ise arka planda taze listeyi çekip senkronize et
-        setTimeout(fetchSearchLogs, 1000); // 1sn sonra sessizce güncelle
-      } catch (err) {
-        console.error("Arama geçmişi silinemedi:", err);
-        // Rollback: Hata durumunda listeyi geri getir
-        fetchSearchLogs();
-      }
-    }
-
-    async function fetchSearchLogs() {
-      const logsContainer = document.getElementById('search-logs-list');
-      if (!logsContainer) return;
-      try {
-        const res = await fetch('/api/search/logs');
-        if (!res.ok) throw new Error("Arama geçmişi alınamadı.");
-        const logs = await res.json();
-
-        // Limit to top 5 recent searches
-        const recentLogs = logs.slice(0, 5);
-
-        if (recentLogs.length === 0) {
-          logsContainer.innerHTML = '<span class="text-xs text-[#8a8580] italic">Henüz arama geçmişi yok.</span>';
-          return;
-        }
-
-        logsContainer.innerHTML = recentLogs.map(log => 
-          `<div class="inline-flex items-center bg-[#faf9f5] hover:bg-[#14422f]/5 border border-[#ddd9d3] rounded-full pl-3 pr-1 py-0.5 gap-1.5 transition-colors group">
-            <button class="flex items-center gap-1 text-[#1b1c1a] text-xs font-semibold select-none hover:text-[#14422f]" onclick="document.getElementById('semantic-search-input').value = \`${log.query.replace(/`/g, '\\`').replace(/'/g, "\\'")}\`; executeSemanticSearch();" title="${log.query}">
-              <span class="material-symbols-outlined text-[12px] text-[#8a8580]">search</span>
-              ${log.query.length > 25 ? log.query.substring(0, 22) + '...' : log.query}
-            </button>
-            <button class="w-4 h-4 rounded-full flex items-center justify-center text-[#8a8580] hover:text-red-600 hover:bg-red-50 transition-colors cursor-pointer" onclick="deleteSearchLog('${log.id}', event)" title="Bu aramayı sil">
-              <span class="material-symbols-outlined text-[10px]">close</span>
-            </button>
-          </div>`
-        ).join('');
-
-      } catch (err) {
-        console.error("Arama logları yüklenirken hata:", err);
-        logsContainer.innerHTML = '<span class="text-xs text-rose-500 italic">Yükleme hatası</span>';
-      }
-    }
-
-    function renderSemanticCandidates(results) {
-      const grid = document.getElementById('semantic-candidates-grid');
-      if (!grid) return;
-
-      if (results.length === 0) {
-        grid.innerHTML = `
-          <div class="col-span-1 bg-white border border-[#ddd9d3] rounded-[10px] p-12 flex flex-col items-center justify-center text-center shadow-sm">
-            <span class="material-symbols-outlined text-5xl text-[#8a8580]/40 mb-4">person_search</span>
-            <p class="text-[#8a8580] font-body-md font-medium">Bu kriterlere uygun hiçbir aday bulunamadı.</p>
-            <p class="text-xs text-[#8a8580] mt-1">Lütfen daha geniş kriterler veya farklı anahtar kelimeler girmeyi deneyin.</p>
-          </div>`;
-        return;
-      }
-
-      grid.innerHTML = results.map(c => {
-        const initials = getInitials(c.candidateName, c.candidateEmail);
-        const score = c.score; // Hybrid Score (0-100)
-        
-        // Progress bar color and badge color classes
-        const colorClass = score >= 80 ? 'bg-emerald-600' : score >= 60 ? 'bg-amber-500' : 'bg-rose-500';
-        const badgeClass = score >= 80 ? 'text-emerald-700 bg-emerald-50 border border-emerald-200' : score >= 60 ? 'text-amber-700 bg-amber-50 border border-amber-200' : 'text-rose-700 bg-rose-50 border border-rose-200';
-        
-        const gptScoreText = c.gptScore !== null ? `%${c.gptScore}` : 'N/A';
-        const vectorScoreText = c.vectorScore !== null ? `%${c.vectorScore}` : 'N/A';
-        
-        // GPT Explanation block or fallback block
-        let matchExplanationHtml = '';
-        if (c.gptScore !== null) {
-          matchExplanationHtml = `
-            <div class="bg-[#faf9f5] border border-[#ddd9d3] rounded-lg p-4 flex gap-3 text-[#1b1c1a] text-sm mt-3 relative overflow-hidden">
-              <span class="material-symbols-outlined text-[18px] text-[#14422f] flex-shrink-0 mt-0.5">psychology_alt</span>
-              <div class="font-body-md flex-1">
-                <p class="italic">"${c.matchExplanation}"</p>
-                <div class="flex gap-4 mt-2 text-[11px] font-semibold text-[#8a8580]">
-                  <span>AI Analiz Skoru: <span class="text-[#14422f]">${gptScoreText}</span></span>
-                  <span>Vektör Eşleşme Skoru: <span class="text-[#14422f]">${vectorScoreText}</span></span>
-                </div>
-              </div>
-            </div>
-          `;
-        } else {
-          matchExplanationHtml = `
-            <div class="bg-amber-50 border border-amber-200 rounded-lg p-4 flex gap-3 text-amber-800 text-xs mt-3">
-              <span class="material-symbols-outlined text-[18px] text-amber-600 flex-shrink-0">warning</span>
-              <p class="font-body-sm font-medium">${c.matchExplanation}</p>
-            </div>
-          `;
-        }
-
-        return `
-          <div class="bg-white border border-[#ddd9d3] rounded-[10px] p-6 hover:shadow-md transition-shadow flex flex-col gap-4 shadow-sm relative overflow-hidden">
-            <div class="flex justify-between items-start">
-              <div class="flex gap-4">
-                ${c.candidateAvatarUrl || c.avatarUrl
-                  ? `<img src="${c.candidateAvatarUrl || c.avatarUrl}" alt="${c.candidateName || 'Aday'}" class="w-12 h-12 rounded-full object-cover shrink-0 border border-[#ddd9d3]" />`
-                  : `<div class="w-12 h-12 rounded-full bg-[#14422f]/10 text-[#14422f] flex items-center justify-center font-bold text-lg flex-shrink-0">${initials}</div>`
-                }
-                <div>
-                  <h4 class="font-bold text-[#1b1c1a]">${c.candidateName || 'İsimsiz'}</h4>
-                  <p class="text-[#8a8580] text-sm mt-0.5 font-medium">${c.candidateEmail}</p>
-                </div>
-              </div>
-              
-              <div class="flex flex-col items-end gap-1">
-                <div class="flex items-center gap-1 ${badgeClass} px-2.5 py-1 rounded-[6px] font-bold text-xs">
-                  <span class="material-symbols-outlined text-[14px]">bolt</span>
-                  %${score} AI Arama Uyumu
-                </div>
-              </div>
-            </div>
-
-            <!-- Visual Progress Bar for Suitability Score -->
-            <div class="w-full bg-[#faf9f5] border border-[#ddd9d3] rounded-full h-2.5 overflow-hidden">
-              <div class="h-full rounded-full ${colorClass}" style="width: ${score}%"></div>
-            </div>
-
-            <!-- AI Summary Box -->
-            ${matchExplanationHtml}
-
-            <!-- Footer with profile links -->
-            <div class="flex justify-between items-center mt-2 pt-4 border-t border-[#ddd9d3]">
-              <div class="flex items-center gap-1.5 text-[#8a8580] text-xs font-semibold">
-                <span class="material-symbols-outlined text-[14px]">pin</span>
-                ID: ${c.cvId.substring(0, 8)}...
-              </div>
-              <div class="flex items-center gap-2">
-                <button 
-                  data-compare-id="${c.userId}"
-                  data-compare-name="${(c.candidateName || 'İsimsiz').replace(/"/g, '&quot;')}"
-                  onclick="toggleCompareCandidate('${c.userId}', \`${(c.candidateName || 'İsimsiz').replace(/`/g, '\\`').replace(/'/g, "\\'")}\`, event)"
-                  class="border border-[#ddd9d3] text-[#1b1c1a] hover:border-[#14422f] hover:text-[#14422f] px-3 py-2 rounded-[8px] text-xs font-semibold transition-colors bg-white flex items-center gap-1 cursor-pointer"
-                >
-                  <span class="material-symbols-outlined text-xs">compare_arrows</span> Karşılaştır
-                </button>
-                <a href="/admin/profile?userId=${c.userId}&from=semantic" class="border border-[#ddd9d3] text-[#1b1c1a] hover:border-[#14422f] hover:text-[#14422f] px-4 py-2 rounded-[8px] text-xs font-bold transition-colors bg-white flex items-center gap-1">
-                  Profili Gör
-                  <span class="material-symbols-outlined text-xs">arrow_forward</span>
-                </a>
-              </div>
-            </div>
-          </div>
-        `;
-      }).join('');
-      updateCompareButtonsUI();
-    }
-
-    function clearSemanticSearch() {
-      const input = document.getElementById('semantic-search-input');
-      if (input) input.value = '';
-
-      // Clear sessionStorage search state
-      sessionStorage.removeItem('beacon_search_semantic_query');
-      sessionStorage.removeItem('beacon_search_semantic_results');
-      sessionStorage.removeItem('beacon_search_semantic_count');
-
-      // Reset count text
-      const countEl = document.getElementById('semantic-result-count');
-      if (countEl) countEl.textContent = 'Arama bekleniyor...';
-
-      // Reset candidates grid to initial placeholder state
-      const grid = document.getElementById('semantic-candidates-grid');
-      if (grid) {
-        grid.innerHTML = `
-          <div class="col-span-1 bg-white border border-[#ddd9d3] rounded-[10px] p-12 flex flex-col items-center justify-center text-center shadow-sm">
-            <span class="material-symbols-outlined text-5xl text-[#14422f]/20 mb-4">search</span>
-            <p class="text-[#8a8580] font-body-md font-medium">Semantik AI aramasını başlatmak için yukarıya bir kriter yazıp "AI Ara" butonuna basın.</p>
-          </div>`;
-      }
-    }
-
-    async function executeSemanticSearch() {
-      const queryText = document.getElementById('semantic-search-input').value.trim();
-      const grid = document.getElementById('semantic-candidates-grid');
-      const countEl = document.getElementById('semantic-result-count');
-
-      if (!queryText) return;
-      if (isSemanticLoading) return;
-
-      isSemanticLoading = true;
-      document.getElementById('semantic-search-btn').disabled = true;
-      document.getElementById('semantic-search-input').disabled = true;
-
-      // Render custom pulsing loading skeletons
-      grid.innerHTML = `
-        <div class="col-span-1 bg-white border border-[#ddd9d3] rounded-[10px] p-6 shadow-sm flex flex-col gap-4">
-          <div class="flex justify-between items-center animate-pulse">
-            <div class="flex items-center gap-4">
-              <div class="w-12 h-12 rounded-full bg-[#14422f]/10"></div>
-              <div class="flex flex-col gap-2">
-                <div class="h-4 w-32 bg-[#ddd9d3] rounded"></div>
-                <div class="h-3 w-48 bg-[#ddd9d3] rounded"></div>
-              </div>
-            </div>
-            <div class="h-7 w-20 bg-[#ddd9d3] rounded"></div>
-          </div>
-          <div class="h-12 w-full bg-[#faf9f5] border border-[#ddd9d3] rounded-lg p-3 flex flex-col gap-2 animate-pulse">
-            <div class="h-3 w-1/3 bg-[#ddd9d3] rounded"></div>
-            <div class="h-3 w-2/3 bg-[#ddd9d3] rounded"></div>
-          </div>
-          <div class="flex justify-between items-center pt-4 border-t border-[#ddd9d3] animate-pulse">
-            <div class="h-3 w-24 bg-[#ddd9d3] rounded"></div>
-            <div class="h-8 w-24 bg-[#ddd9d3] rounded"></div>
-          </div>
-        </div>
-        <div class="col-span-1 bg-white border border-[#ddd9d3] rounded-[10px] p-6 shadow-sm flex flex-col gap-4">
-          <div class="flex justify-between items-center animate-pulse">
-            <div class="flex items-center gap-4">
-              <div class="w-12 h-12 rounded-full bg-[#14422f]/10"></div>
-              <div class="flex flex-col gap-2">
-                <div class="h-4 w-32 bg-[#ddd9d3] rounded"></div>
-                <div class="h-3 w-48 bg-[#ddd9d3] rounded"></div>
-              </div>
-            </div>
-            <div class="h-7 w-20 bg-[#ddd9d3] rounded"></div>
-          </div>
-          <div class="h-12 w-full bg-[#faf9f5] border border-[#ddd9d3] rounded-lg p-3 flex flex-col gap-2 animate-pulse">
-            <div class="h-3 w-1/3 bg-[#ddd9d3] rounded"></div>
-            <div class="h-3 w-2/3 bg-[#ddd9d3] rounded"></div>
-          </div>
-          <div class="flex justify-between items-center pt-4 border-t border-[#ddd9d3] animate-pulse">
-            <div class="h-3 w-24 bg-[#ddd9d3] rounded"></div>
-            <div class="h-8 w-24 bg-[#ddd9d3] rounded"></div>
-          </div>
-        </div>
-      `;
-      countEl.innerHTML = '<span class="flex items-center gap-1.5 text-[#14422f] font-bold"><span class="material-symbols-outlined text-[18px] animate-spin">progress_activity</span>AI Aday Uygunluk Analizi Yapılıyor...</span>';
-
-      try {
-        const res = await fetch('/api/search', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ query: queryText, limit: 10 })
-        });
-
-        if (!res.ok) throw new Error("Arama başarısız.");
         const data = await res.json();
-        const results = data.results || [];
-
-        // Refresh search logs in background
-        fetchSearchLogs();
-
-        const countText = `${results.length} aday eşleşti (Süre: ${data.processingTimeMs}ms)`;
-        countEl.textContent = countText;
-
-        // Save search results state to sessionStorage to save AI cost
-        sessionStorage.setItem('beacon_search_semantic_query', queryText);
-        sessionStorage.setItem('beacon_search_semantic_results', JSON.stringify(results));
-        sessionStorage.setItem('beacon_search_semantic_count', countText);
-
-        renderSemanticCandidates(results);
-
+        allUsersData = data.candidates || [];
+        renderCandidates(allUsersData, filterState);
       } catch (err) {
-        console.error("Semantik arama hatası:", err);
-        grid.innerHTML = `
-          <div class="col-span-1 bg-rose-50 border border-rose-200 rounded-[10px] p-6 text-center text-rose-800 shadow-sm flex flex-col items-center">
-            <span class="material-symbols-outlined text-4xl text-rose-600 mb-2 font-bold">report</span>
-            <p class="font-bold">Arama işlemi sırasında bir sorun oluştu.</p>
-            <p class="text-xs text-rose-600 mt-1">Lütfen daha sonra tekrar deneyin veya sistem yöneticisiyle iletişime geçin.</p>
-          </div>`;
-        countEl.textContent = 'Hata oluştu';
-      } finally {
-        isSemanticLoading = false;
-        document.getElementById('semantic-search-btn').disabled = false;
-        document.getElementById('semantic-search-input').disabled = false;
+        console.error("Aday listesi yüklenemedi:", err);
       }
     }
 
-    // SECTION 2: BASIC CANDIDATE DIRECTORY SCRIPTS
-    function renderCandidates(candidates) {
-      const grid = document.getElementById('candidates-grid');
-      const countEl = document.getElementById('result-count');
-
-      if (candidates.length === 0) {
-        grid.innerHTML = `
-          <div class="col-span-2 bg-white border border-[#ddd9d3] rounded-[10px] p-12 flex flex-col items-center justify-center text-center shadow-sm">
-            <span class="material-symbols-outlined text-5xl text-[#8a8580]/40 mb-4">person_search</span>
-            <p class="text-[#8a8580] font-body-md font-medium">Hiç aday bulunamadı.</p>
-          </div>`;
-        countEl.textContent = '0 aday bulundu';
-        return;
-      }
-
-      countEl.textContent = `${candidates.length} aday bulundu`;
-
-      grid.innerHTML = candidates.map((c, i) => {
-        const initials = getInitials(c.name, c.email);
-        const date = new Date(c.createdAt).toLocaleDateString('tr-TR');
-        const scoreBadge = getScoreBadge(c.analysisStatus, c.atsScore);
-        const skillsHtml = renderSkills(c.skills);
-
-        return `
-          <div class="bg-white border border-[#ddd9d3] rounded-[10px] p-6 hover:shadow-md transition-shadow flex flex-col justify-between min-h-[200px] shadow-sm">
-            <div class="flex justify-between items-start">
-              <div class="flex gap-4">
-                ${c.avatarUrl 
-                  ? `<img src="${c.avatarUrl}" alt="${c.name || 'Aday'}" class="w-12 h-12 rounded-full object-cover shrink-0 border border-[#ddd9d3]" />`
-                  : `<div class="w-12 h-12 rounded-full bg-[#14422f]/10 text-[#14422f] flex items-center justify-center font-bold text-lg flex-shrink-0">${initials}</div>`
-                }
-                <div>
-                  <h4 class="font-bold text-[#1b1c1a]">${c.name || 'İsimsiz'}</h4>
-                  <p class="text-[#8a8580] text-sm mt-0.5 font-medium">${c.email}</p>
-                  <p class="text-[#8a8580] text-xs mt-0.5 font-medium">${c.cvCount} CV yüklendi</p>
-                </div>
-              </div>
-              ${scoreBadge}
-            </div>
-            
-            <div class="flex gap-2 mt-4 flex-wrap">
-              ${skillsHtml}
-            </div>
-
-            <div class="flex justify-between items-center mt-auto pt-4 border-t border-[#ddd9d3]">
-              <div class="flex items-center gap-2 text-[#8a8580] text-xs font-medium">
-                <span class="material-symbols-outlined text-[14px]">calendar_today</span>
-                ${date}
-              </div>
-              <div class="flex items-center gap-2">
-                <button 
-                  data-compare-id="${c.id}"
-                  data-compare-name="${(c.name || 'İsimsiz').replace(/"/g, '&quot;')}"
-                  onclick="toggleCompareCandidate('${c.id}', \`${(c.name || 'İsimsiz').replace(/`/g, '\\`').replace(/'/g, "\\'")}\`, event)"
-                  class="border border-[#ddd9d3] text-[#1b1c1a] hover:border-[#14422f] hover:text-[#14422f] px-3 py-1.5 rounded-[8px] text-xs font-semibold transition-colors bg-white flex items-center gap-1 cursor-pointer"
-                >
-                  <span class="material-symbols-outlined text-xs">compare_arrows</span> Karşılaştır
-                </button>
-                <a href="/admin/profile?userId=${c.id}&from=basic" class="border border-[#ddd9d3] text-[#1b1c1a] hover:border-[#14422f] hover:text-[#14422f] px-4 py-1.5 rounded-[8px] text-xs font-semibold transition-colors bg-white">
-                  Profili Gör
-                </a>
-              </div>
-            </div>
-          </div>
-        `;
-      }).join('');
-      updateCompareButtonsUI();
-    }
-
-    async function fetchCandidates() {
-      const search = document.getElementById('search-input').value.trim();
-      const grid = document.getElementById('candidates-grid');
-      const countEl = document.getElementById('result-count');
-
-      const params = new URLSearchParams({ filter: currentFilter });
-      if (search) params.set('search', search);
-
-      const cacheKey = `candidates-filter-${currentFilter}-search-${search}`;
-
-      const fetcher = async () => {
-        const res = await fetch(`/api/admin/candidates?${params}`);
-        if (!res.ok) throw new Error("Fetch candidates error");
-        return res.json();
-      };
-
-      const render = (data) => {
-        renderCandidates(data.candidates || []);
-      };
-
-      if (window.__swrCache) {
-        window.__swrCache.query(cacheKey, fetcher, render, 30000);
-      } else {
-        grid.innerHTML = `
-          <div class="bg-white border border-[#ddd9d3] rounded-[10px] p-6 animate-pulse h-[200px] shadow-sm"></div>
-          <div class="bg-white border border-[#ddd9d3] rounded-[10px] p-6 animate-pulse h-[200px] shadow-sm"></div>
-        `;
-        countEl.textContent = 'Yükleniyor...';
-        fetcher().then(render).catch(() => {
-          grid.innerHTML = '<div class="col-span-2 p-8 text-center text-red-400">Yükleme hatası</div>';
-        });
-      }
-    }
-
-    // ── Tab Event Handlers & Page Loaded Bindings ──────────────────────────────
-    document.addEventListener('astro:page-load', () => {
+    function initSearchTabs() {
       const tabSemanticBtn = document.getElementById('tab-semantic');
-      if (!tabSemanticBtn) return; // Only run if we are on the candidate search page
-
       const tabBasicBtn = document.getElementById('tab-basic');
       const sectionSemantic = document.getElementById('section-semantic');
       const sectionBasic = document.getElementById('section-basic');
-      const semanticSearchInput = document.getElementById('semantic-search-input');
-      const searchInput = document.getElementById('search-input');
 
-      // 1. Tab toggles with sessionStorage persistence
-      tabSemanticBtn.addEventListener('click', () => {
-        tabSemanticBtn.classList.add('active');
-        tabSemanticBtn.className = tabSemanticBtn.className.replace('border-transparent text-[#8a8580]', 'border-[#14422f] text-[#14422f]');
-        
-        tabBasicBtn.classList.remove('active');
-        tabBasicBtn.className = tabBasicBtn.className.replace('border-[#14422f] text-[#14422f]', 'border-transparent text-[#8a8580]');
-        
-        sectionSemantic.classList.remove('hidden');
-        sectionBasic.classList.add('hidden');
-        sessionStorage.setItem('beacon_search_tab', 'semantic');
+      function switchToBasic() {
+        tabBasicBtn?.classList.add('border-[#14422f]', 'text-[#14422f]');
+        tabBasicBtn?.classList.remove('border-transparent', 'text-[#8a8580]');
+        tabSemanticBtn?.classList.remove('border-[#14422f]', 'text-[#14422f]');
+        tabSemanticBtn?.classList.add('border-transparent', 'text-[#8a8580]');
+        sectionBasic?.classList.remove('hidden');
+        sectionSemantic?.classList.add('hidden');
+        loadCandidatesData();
+      }
+
+      function switchToSemantic() {
+        tabSemanticBtn?.classList.add('border-[#14422f]', 'text-[#14422f]');
+        tabSemanticBtn?.classList.remove('border-transparent', 'text-[#8a8580]');
+        tabBasicBtn?.classList.remove('border-[#14422f]', 'text-[#14422f]');
+        tabBasicBtn?.classList.add('border-transparent', 'text-[#8a8580]');
+        sectionSemantic?.classList.remove('hidden');
+        sectionBasic?.classList.add('hidden');
         fetchSearchLogs();
-      });
-
-      tabBasicBtn.addEventListener('click', () => {
-        tabBasicBtn.classList.add('active');
-        tabBasicBtn.className = tabBasicBtn.className.replace('border-transparent text-[#8a8580]', 'border-[#14422f] text-[#14422f]');
-        
-        tabSemanticBtn.classList.remove('active');
-        tabSemanticBtn.className = tabSemanticBtn.className.replace('border-[#14422f] text-[#14422f]', 'border-transparent text-[#8a8580]');
-        
-        sectionBasic.classList.remove('hidden');
-        sectionSemantic.classList.add('hidden');
-        sessionStorage.setItem('beacon_search_tab', 'basic');
-        fetchCandidates();
-      });
-
-      // 2. Clear cache immediately when user clears the search input
-      if (semanticSearchInput) {
-        semanticSearchInput.addEventListener('input', () => {
-          const val = semanticSearchInput.value.trim();
-          if (!val) {
-            sessionStorage.removeItem('beacon_search_semantic_query');
-            sessionStorage.removeItem('beacon_search_semantic_results');
-            sessionStorage.removeItem('beacon_search_semantic_count');
-            document.getElementById('semantic-candidates-grid').innerHTML = '';
-            document.getElementById('semantic-result-count').textContent = '';
-          }
-        });
+        restoreCachedSemanticSearch();
       }
 
-      if (searchInput) {
-        searchInput.addEventListener('input', () => {
-          const val = searchInput.value.trim();
-          sessionStorage.setItem('beacon_search_basic_query', val);
-          if (!val) {
-            sessionStorage.removeItem('beacon_search_basic_query');
-          }
-        });
-      }
+      tabSemanticBtn?.addEventListener('click', switchToSemantic);
+      tabBasicBtn?.addEventListener('click', switchToBasic);
 
-      // 3. Restore persisted search state on load
-      const savedTab = sessionStorage.getItem('beacon_search_tab') || 'semantic';
-      const savedSemanticQuery = sessionStorage.getItem('beacon_search_semantic_query') || '';
-      const savedSemanticResults = sessionStorage.getItem('beacon_search_semantic_results');
-      const savedSemanticCount = sessionStorage.getItem('beacon_search_semantic_count') || '';
-      
-      const savedBasicQuery = sessionStorage.getItem('beacon_search_basic_query') || '';
-      const savedFilter = sessionStorage.getItem('beacon_search_basic_filter') || 'all';
+      // Check URL query param to activate tabs automatically
+      const urlParams = new URLSearchParams(window.location.search);
+      if (urlParams.get('tab') === 'basic') {
+        switchToBasic();
+      } else if (urlParams.get('tab') === 'semantic') {
+        switchToSemantic();
+      } else {
+        restoreCachedSemanticSearch();
+      }
+    }
 
-      // Set input values
-      if (semanticSearchInput && savedSemanticQuery) {
-        semanticSearchInput.value = savedSemanticQuery;
-      }
-      if (searchInput && savedBasicQuery) {
-        searchInput.value = savedBasicQuery;
-      }
-      
-      // Set basic filter active pill
-      if (savedFilter) {
-        currentFilter = savedFilter;
-        document.querySelectorAll('.filter-pill').forEach(p => {
-          if (p.dataset.filter === currentFilter) {
-            p.classList.add('active');
-            p.className = p.className.replace('border-transparent text-[#8a8580]', 'border-[#14422f] text-[#14422f]');
-          } else {
-            p.classList.remove('active');
-          }
-        });
-      }
-
-      // Initial load for search logs
+    function initSearchPage() {
+      clearCompareCache();
+      initSearchTabs();
       fetchSearchLogs();
+      loadCandidatesData();
+      restoreCachedSemanticSearch();
 
-      // Restore active tab layout & cached content
-      if (savedTab === 'basic') {
-        tabBasicBtn.click();
-      } else {
-        tabSemanticBtn.click();
-        if (savedSemanticResults) {
-          try {
-            const results = JSON.parse(savedSemanticResults);
-            document.getElementById('semantic-result-count').textContent = savedSemanticCount;
-            renderSemanticCandidates(results);
-          } catch (e) {
-            console.error('[Restore] Parse error:', e);
-          }
-        }
-      }
+      const searchBtn = document.getElementById('semantic-search-btn');
+      searchBtn?.addEventListener('click', () => executeSemanticSearch(isSearchLoadingState));
 
-      // 4. Bind action event listeners for semantic search
-      const semanticSearchBtn = document.getElementById('semantic-search-btn');
-      if (semanticSearchBtn) {
-        semanticSearchBtn.addEventListener('click', executeSemanticSearch);
-      }
-
-      if (semanticSearchInput) {
-        semanticSearchInput.addEventListener('keydown', (e) => {
-          if (e.key === 'Enter') executeSemanticSearch();
-        });
-      }
-
-      const clearSemanticBtn = document.getElementById('clear-semantic-search-btn');
-      if (clearSemanticBtn) {
-        clearSemanticBtn.addEventListener('click', clearSemanticSearch);
-      }
-
-      // 5. Bind action event listeners for basic search
-      const filterPills = document.getElementById('filter-pills');
-      if (filterPills) {
-        filterPills.addEventListener('click', (e) => {
-          const btn = e.target.closest('[data-filter]');
-          if (!btn) return;
-          currentFilter = btn.dataset.filter;
-          sessionStorage.setItem('beacon_search_basic_filter', currentFilter);
-          document.querySelectorAll('.filter-pill').forEach(p => p.classList.remove('active'));
-          btn.classList.add('active');
-          fetchCandidates();
-        });
-      }
-
-      const searchBtn = document.getElementById('search-btn');
-      if (searchBtn) {
-        searchBtn.addEventListener('click', fetchCandidates);
-      }
-
-      if (searchInput) {
-        searchInput.addEventListener('keydown', (e) => {
-          if (e.key === 'Enter') fetchCandidates();
-        });
-
-        searchInput.addEventListener('input', () => {
-          clearTimeout(searchTimeout);
-          searchTimeout = setTimeout(fetchCandidates, 500);
-        });
-      }
-
-      // 6. Bind floating comparison bar action event listeners
-      const startCompareBtn = document.getElementById('start-compare-btn');
-      if (startCompareBtn) {
-        startCompareBtn.addEventListener('click', () => {
-          if (selectedCompareCandidates.length === 2) {
-            const id1 = selectedCompareCandidates[0].id;
-            const id2 = selectedCompareCandidates[1].id;
-            window.location.href = `/admin/compare?candidate1=${id1}&candidate2=${id2}`;
-          }
-        });
-      }
-
-      const clearCompareBtn = document.getElementById('clear-compare-btn');
-      if (clearCompareBtn) {
-        clearCompareBtn.addEventListener('click', () => {
-          selectedCompareCandidates = [];
-          updateCompareFloatingBar();
-          updateCompareButtonsUI();
-        });
-      }
-    });
-
-    // CANDIDATE COMPARISON SELECTION STATE & HELPERS
-    let selectedCompareCandidates = []; // Array of { id, name }
-
-    function toggleCompareCandidate(candId, candName, event) {
-      if (event) event.stopPropagation();
-      const existingIdx = selectedCompareCandidates.findIndex(c => c.id === candId);
-
-      if (existingIdx >= 0) {
-        selectedCompareCandidates.splice(existingIdx, 1);
-      } else {
-        if (selectedCompareCandidates.length >= 2) {
-          alert("En fazla 2 aday karşılaştırılabilir. Lütfen önce bir adayın seçimini kaldırın.");
-          return;
-        }
-        selectedCompareCandidates.push({ id: candId, name: candName });
-      }
-
-      updateCompareFloatingBar();
-      updateCompareButtonsUI();
-    }
-
-    function updateCompareFloatingBar() {
-      const bar = document.getElementById('compare-floating-bar');
-      const text = document.getElementById('compare-bar-text');
-      const btn = document.getElementById('start-compare-btn');
-      if (!bar || !text || !btn) return;
-
-      const count = selectedCompareCandidates.length;
-
-      if (count === 0) {
-        bar.classList.add('hidden');
-        bar.classList.remove('flex', 'translate-y-0');
-        bar.classList.add('translate-y-12');
-      } else {
-        bar.classList.remove('hidden', 'translate-y-12');
-        bar.classList.add('flex', 'translate-y-0');
-
-        if (count === 1) {
-          text.textContent = `1/2 Aday Seçildi: ${selectedCompareCandidates[0].name || 'Aday 1'}`;
-          btn.disabled = true;
-        } else if (count === 2) {
-          text.textContent = `2/2 Aday Seçildi: ${selectedCompareCandidates[0].name} vs ${selectedCompareCandidates[1].name}`;
-          btn.disabled = false;
-        }
-      }
-    }
-
-    function updateCompareButtonsUI() {
-      document.querySelectorAll('[data-compare-id]').forEach(btn => {
-        const id = btn.dataset.compareId;
-        const isSelected = selectedCompareCandidates.some(c => c.id === id);
-        if (isSelected) {
-          btn.classList.add('bg-[#14422f]', 'text-white', 'border-[#14422f]');
-          btn.classList.remove('bg-white', 'text-[#1b1c1a]', 'border-[#ddd9d3]');
-          btn.innerHTML = `<span class="material-symbols-outlined text-xs">check</span> Seçildi`;
-        } else {
-          btn.classList.remove('bg-[#14422f]', 'text-white', 'border-[#14422f]');
-          btn.classList.add('bg-white', 'text-[#1b1c1a]', 'border-[#ddd9d3]');
-          btn.innerHTML = `<span class="material-symbols-outlined text-xs">compare_arrows</span> Karşılaştır`;
-        }
+      const input = document.getElementById('semantic-search-input');
+      input?.addEventListener('keydown', (e: any) => {
+        if (e.key === 'Enter') executeSemanticSearch(isSearchLoadingState);
       });
+
+      const candInput = document.getElementById('candidate-search-input');
+      candInput?.addEventListener('input', () => renderCandidates(allUsersData, filterState));
+
+      const basicSearchBtn = document.getElementById('search-btn');
+      basicSearchBtn?.addEventListener('click', () => renderCandidates(allUsersData, filterState));
+
+      document.querySelectorAll('.filter-pill').forEach(btn => {
+        btn.addEventListener('click', (e: any) => {
+          filterState.currentFilter = e.currentTarget.dataset.filter || 'all';
+          document.querySelectorAll('.filter-pill').forEach(b => {
+            b.classList.remove('active', 'bg-[#14422f]', 'text-white');
+            b.classList.add('bg-transparent', 'text-[#8a8580]');
+          });
+          e.currentTarget.classList.add('active', 'bg-[#14422f]', 'text-white');
+          e.currentTarget.classList.remove('bg-transparent', 'text-[#8a8580]');
+          renderCandidates(allUsersData, filterState);
+        });
+      });
+    }
+
+    document.addEventListener('astro:page-load', initSearchPage);
+    if (document.readyState === 'complete' || document.readyState === 'interactive') {
+      initSearchPage();
     }
   </script>
 </AdminLayout>

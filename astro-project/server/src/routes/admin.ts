@@ -1,9 +1,16 @@
 import { Router, Request, Response } from "express";
-import { PrismaClient, Prisma } from "@prisma/client";
+import { PrismaClient } from "@prisma/client";
 import { PrismaPg } from "@prisma/adapter-pg";
 import pg from "pg";
 import { authMiddleware, adminMiddleware } from "../middleware/auth.js";
-import { supabase } from "../lib/supabase.js";
+import { GetDashboardStatsUseCase } from "../application/admin/GetDashboardStatsUseCase.js";
+import { ChangeUserRoleUseCase } from "../application/admin/ChangeUserRoleUseCase.js";
+import { GetCandidateProfileUseCase } from "../application/admin/GetCandidateProfileUseCase.js";
+import { FilterCandidatesUseCase } from "../application/admin/FilterCandidatesUseCase.js";
+import { DeleteCandidateUseCase } from "../application/admin/DeleteCandidateUseCase.js";
+import { GetAdminUsersUseCase } from "../application/admin/GetAdminUsersUseCase.js";
+import { GetPlatformReportStatsUseCase } from "../application/admin/GetPlatformReportStatsUseCase.js";
+import { GetCostReportUseCase } from "../application/admin/GetCostReportUseCase.js";
 
 const pool = new pg.Pool({
   connectionString: process.env.DATABASE_URL,
@@ -13,179 +20,88 @@ const prisma = new PrismaClient({ adapter });
 
 const router = Router();
 
-// Get dashboard stats
-router.get("/stats", authMiddleware, adminMiddleware, async (_req: Request, res: Response) => {
+// GET /api/admin/stats
+router.get("/stats", authMiddleware, adminMiddleware, async (_req: Request, res: Response): Promise<void> => {
   try {
-    const today = new Date();
-    today.setHours(0, 0, 0, 0);
-
-    const [totalCandidates, totalAdmins, newUsersToday] = await Promise.all([
-      prisma.user.count({ where: { role: 'CANDIDATE' } }),
-      prisma.user.count({ where: { role: 'ADMIN' } }),
-      prisma.user.count({ where: { createdAt: { gte: today } } })
-    ]);
-
-    res.json({
-      candidates: totalCandidates,
-      admins: totalAdmins,
-      newUsersToday
-    });
+    const stats = await GetDashboardStatsUseCase.execute(prisma);
+    res.json(stats);
   } catch (error) {
     console.error("Stats alınırken hata:", error);
     res.status(500).json({ message: "Sunucu hatası." });
   }
 });
 
-// Get all users (sadece adaylar + kendi hesabı — diğer adminler gizli)
+// GET /api/admin/users
 router.get("/users", authMiddleware, adminMiddleware, async (req: Request, res: Response): Promise<void> => {
   try {
-    const currentAdminId = req.user?.id;
-
-    const users = await prisma.user.findMany({
-      where: {
-        OR: [
-          { role: "CANDIDATE" },        // Tüm adaylar
-          { id: currentAdminId }         // Sadece kendi hesabı
-        ]
-      },
-      select: {
-        id: true,
-        email: true,
-        name: true,
-        role: true,
-        avatarUrl: true,
-        createdAt: true,
-      },
-      orderBy: {
-        createdAt: 'desc'
-      }
-    });
-    res.json({ users });
+    const currentAdminId = req.user?.id || "";
+    const result = await GetAdminUsersUseCase.execute(currentAdminId, prisma);
+    res.json(result);
   } catch (error) {
     console.error("Kullanıcıları listelerken hata:", error);
     res.status(500).json({ message: "Sunucu hatası." });
   }
 });
 
-// Change user role
+// PUT /api/admin/users/:id/role
 router.put("/users/:id/role", authMiddleware, adminMiddleware, async (req: Request, res: Response): Promise<void> => {
   try {
-    const id = req.params.id as string;
+    const targetUserId = req.params.id as string;
     const { role } = req.body;
 
-    if (!role || (role !== "ADMIN" && role !== "CANDIDATE")) {
-      res.status(400).json({ message: "Geçersiz rol belirtildi." });
-      return;
-    }
+    const updatedUser = await ChangeUserRoleUseCase.execute({
+      targetUserId,
+      newRole: role,
+      requestingAdminId: req.user?.id
+    }, prisma);
 
-    // Don't allow changing your own role to avoid locking yourself out by accident
-    if (req.user?.id === id) {
-      res.status(400).json({ message: "Kendi rolünüzü değiştiremezsiniz." });
-      return;
-    }
-
-    // Yöneticiler aday yapılamaz — ADMIN → CANDIDATE geçişi yasak
-    const targetUser = await prisma.user.findUnique({ where: { id }, select: { role: true } });
-    if (targetUser?.role === "ADMIN" && role === "CANDIDATE") {
-      res.status(403).json({ message: "Yöneticiler aday rolüne düşürülemez." });
-      return;
-    }
-
-    const updatedUser = await prisma.user.update({
-      where: { id },
-      data: { role },
-      select: {
-        id: true,
-        email: true,
-        name: true,
-        role: true,
-      }
+    res.json({
+      message: "Kullanıcı rolü güncellendi.",
+      user: updatedUser
     });
-
-    res.json({ user: updatedUser, message: "Rol başarıyla güncellendi." });
-  } catch (error) {
-    console.error("Kullanıcı rolü güncellenirken hata:", error);
-    res.status(500).json({ message: "Sunucu hatası." });
+  } catch (error: any) {
+    const statusCode = error.statusCode || 400;
+    res.status(statusCode).json({ message: error.message || "Rol güncellenirken hata oluştu." });
   }
 });
 
-// Get all candidates with CV & analysis info
+// GET /api/admin/candidates
 router.get("/candidates", authMiddleware, adminMiddleware, async (req: Request, res: Response) => {
   try {
-    const search = (req.query.search as string) || "";
-    const filter = (req.query.filter as string) || "all"; // all | completed | processing | pending
+    const search = (req.query.search as string) || (req.query.query as string) || "";
+    const filter = (req.query.filter as string) || (req.query.status as string) || "all";
 
-    const users = await prisma.user.findMany({
-      where: {
-        role: "CANDIDATE",
-        ...(search
-          ? {
-              OR: [
-                { name: { contains: search, mode: "insensitive" } },
-                { email: { contains: search, mode: "insensitive" } },
-              ],
-            }
-          : {}),
-      },
-      select: {
-        id: true,
-        email: true,
-        name: true,
-        avatarUrl: true,
-        createdAt: true,
-        cvs: {
-          select: {
-            id: true,
-            fileName: true,
-            createdAt: true,
-            analyses: {
-              select: {
-                id: true,
-                status: true,
-                atsScore: true,
-                skills: true,
-                createdAt: true,
-              },
-              orderBy: { createdAt: "desc" },
-              take: 1,
-            },
-          },
-          orderBy: { createdAt: "desc" },
-          take: 1,
-        },
-      },
-      orderBy: { createdAt: "desc" },
-    });
+    const users = await FilterCandidatesUseCase.execute({
+      query: search,
+      status: filter.toUpperCase(),
+    }, prisma);
 
-    // Flatten and enrich
     const candidates = users.map((u) => {
       const latestCv = u.cvs[0] || null;
       const latestAnalysis = latestCv?.analyses[0] || null;
       return {
         id: u.id,
-        name: u.name || u.email.split('@')[0],
+        name: u.name,
         email: u.email,
         avatarUrl: u.avatarUrl,
         createdAt: u.createdAt,
         cvCount: u.cvs.length,
-        latestCvName: latestCv?.fileName || 'CV Henüz Yüklenmedi',
-        latestCvDate: latestCv?.createdAt || u.createdAt,
-        analysisStatus: latestAnalysis?.status || (u.cvs.length > 0 ? 'COMPLETED' : 'NO_CV'),
-        atsScore: latestAnalysis?.atsScore !== undefined && latestAnalysis?.atsScore !== null ? latestAnalysis.atsScore : (u.cvs.length > 0 ? 85 : null),
+        latestCvName: latestCv?.fileName || null,
+        analysisStatus: latestAnalysis?.status || null,
+        atsScore: latestAnalysis?.atsScore || null,
         skills: latestAnalysis?.skills || [],
       };
     });
 
-    // Apply filter
-    const filtered =
-      filter === "all"
-        ? candidates
-        : candidates.filter((c) => {
-            if (filter === "completed") return c.analysisStatus === "COMPLETED";
-            if (filter === "processing") return c.analysisStatus === "PROCESSING";
-            if (filter === "pending") return c.analysisStatus === "PENDING" || !c.analysisStatus;
-            return true;
-          });
+    const filtered = filter === "all" || filter === "ALL"
+      ? candidates
+      : candidates.filter((c) => {
+          const fLower = filter.toLowerCase();
+          if (fLower === "completed") return c.analysisStatus === "COMPLETED";
+          if (fLower === "processing") return c.analysisStatus === "PROCESSING";
+          if (fLower === "pending") return c.analysisStatus === "PENDING" || !c.analysisStatus;
+          return true;
+        });
 
     res.json({ candidates: filtered, total: filtered.length });
   } catch (error) {
@@ -194,101 +110,11 @@ router.get("/candidates", authMiddleware, adminMiddleware, async (req: Request, 
   }
 });
 
-// Get platform report statistics
+// GET /api/admin/reports/stats
 router.get("/reports/stats", authMiddleware, adminMiddleware, async (_req: Request, res: Response) => {
   try {
-    const [
-      totalUsers,
-      totalCandidates,
-      totalAdmins,
-      totalCVs,
-      totalAnalyses,
-      completedAnalyses,
-      pendingAnalyses,
-      processingAnalyses,
-      avgScoreResult,
-      recentUsers,
-      recentCvs,
-    ] = await Promise.all([
-      prisma.user.count(),
-      prisma.user.count({ where: { role: "CANDIDATE" } }),
-      prisma.user.count({ where: { role: "ADMIN" } }),
-      prisma.cV.count(),
-      prisma.cVAnalysis.count(),
-      prisma.cVAnalysis.count({ where: { status: "COMPLETED" } }),
-      prisma.cVAnalysis.count({ where: { status: "PENDING" } }),
-      prisma.cVAnalysis.count({ where: { status: "PROCESSING" } }),
-      prisma.cVAnalysis.aggregate({
-        _avg: { atsScore: true },
-        where: { status: "COMPLETED", atsScore: { not: null } },
-      }),
-      // Last 7 days new user signups (grouped by day)
-      prisma.$queryRaw<{ day: string; count: bigint }[]>`
-        SELECT DATE_TRUNC('day', "createdAt") AS day, COUNT(*) AS count
-        FROM users
-        WHERE "createdAt" >= NOW() - INTERVAL '7 days'
-        GROUP BY day
-        ORDER BY day ASC
-      `,
-      // Last 7 days CV uploads (grouped by day)
-      prisma.$queryRaw<{ day: string; count: bigint }[]>`
-        SELECT DATE_TRUNC('day', "createdAt") AS day, COUNT(*) AS count
-        FROM cvs
-        WHERE "createdAt" >= NOW() - INTERVAL '7 days'
-        GROUP BY day
-        ORDER BY day ASC
-      `,
-    ]);
-
-    // Top skills from all completed analyses
-    const completedWithSkills = await prisma.cVAnalysis.findMany({
-      where: { status: "COMPLETED", skills: { not: Prisma.DbNull } },
-      select: { skills: true },
-      take: 200,
-    });
-
-    const skillCount: Record<string, number> = {};
-    for (const a of completedWithSkills) {
-      const skills = a.skills as string[] | null;
-      if (Array.isArray(skills)) {
-        for (const s of skills) {
-          const key = String(s).trim();
-          if (key) skillCount[key] = (skillCount[key] || 0) + 1;
-        }
-      }
-    }
-
-    const topSkills = Object.entries(skillCount)
-      .sort((a, b) => b[1] - a[1])
-      .slice(0, 8)
-      .map(([skill, count]) => ({ skill, count }));
-
-    const recentSignups = recentUsers.map((r) => ({
-      day: r.day,
-      count: Number(r.count),
-    }));
-
-    const recentCvUploads = recentCvs.map((r) => ({
-      day: r.day,
-      count: Number(r.count),
-    }));
-
-    res.json({
-      totalUsers,
-      totalCandidates,
-      totalAdmins,
-      totalCVs,
-      totalAnalyses,
-      completedAnalyses,
-      pendingAnalyses,
-      processingAnalyses,
-      avgAtsScore: avgScoreResult._avg.atsScore
-        ? Math.round(Number(avgScoreResult._avg.atsScore))
-        : null,
-      topSkills,
-      recentSignups,
-      recentCvUploads,
-    });
+    const stats = await GetPlatformReportStatsUseCase.execute(prisma);
+    res.json(stats);
   } catch (error) {
     console.error("Rapor istatistikleri alınırken hata:", error);
     res.status(500).json({ message: "Sunucu hatası." });
@@ -297,207 +123,44 @@ router.get("/reports/stats", authMiddleware, adminMiddleware, async (_req: Reque
 
 // GET /api/admin/candidates/:id
 router.get("/candidates/:id", authMiddleware, adminMiddleware, async (req: Request, res: Response): Promise<void> => {
-  let id = req.params.id as string;
-  if (id) {
-    try { id = decodeURIComponent(id).trim(); } catch {}
-    id = id.replace(/\s+/g, '-');
+  let targetUserId = req.params.id as string;
+  if (targetUserId) {
+    try { targetUserId = decodeURIComponent(targetUserId).trim(); } catch {}
+    targetUserId = targetUserId.replace(/\s+/g, '-');
   }
 
   try {
-    const candidate = await prisma.user.findFirst({
-      where: { id: id },
-      select: {
-        id: true,
-        email: true,
-        name: true,
-        phone: true,
-        avatarUrl: true,
-        createdAt: true,
-        cvs: {
-          include: {
-            analyses: {
-              orderBy: { createdAt: "desc" }
-            }
-          },
-          orderBy: { createdAt: "desc" }
-        }
-      }
-    });
+    const candidate = await GetCandidateProfileUseCase.execute(targetUserId, prisma);
+    res.json({ candidate });
+  } catch (error: any) {
+    const status = error.statusCode || 500;
+    res.status(status).json({ message: error.message || "Aday profili alınamadı." });
+  }
+});
 
-    if (!candidate) {
-      res.status(404).json({ message: "Aday bulunamadı." });
-      return;
-    }
+// DELETE /api/admin/candidates/:id
+router.delete("/candidates/:id", authMiddleware, adminMiddleware, async (req: Request, res: Response): Promise<void> => {
+  const targetUserId = req.params.id as string;
+  const requestingAdminId = req.user?.id || "";
 
-    // Generate signed URLs for CVs
-    const cvsWithSignedUrls = await Promise.all(
-      candidate.cvs.map(async (cv) => {
-        try {
-          const urlParts = cv.fileUrl.split('/cv-files/');
-          const filePath = urlParts[1];
-
-          if (!filePath) return cv;
-
-          const { data, error } = await supabase.storage
-            .from("cv-files")
-            .createSignedUrl(filePath, 3600); // 1 hour expiration
-
-          if (error) {
-            console.error(`Error generating signed URL for CV ${cv.id}:`, error);
-          }
-
-          const cvMetadata = cv.metadata as any;
-          const mappedAnalyses = cv.analyses.map((analysis) => ({
-            ...analysis,
-            role: cvMetadata?.role || "Özgeçmiş Analizi"
-          }));
-
-          return {
-            ...cv,
-            fileUrl: data?.signedUrl || cv.fileUrl,
-            analyses: mappedAnalyses
-          };
-        } catch (storageErr) {
-          console.error(`Supabase storage signed URL exception for CV ${cv.id}:`, storageErr);
-          return cv;
-        }
-      })
-    );
-
-    res.json({
-      candidate: {
-        ...candidate,
-        cvs: cvsWithSignedUrls
-      }
-    });
-  } catch (error) {
-    console.error("Aday detayları alınırken hata:", error);
-    res.status(500).json({ message: "Sunucu hatası." });
+  try {
+    const result = await DeleteCandidateUseCase.execute(targetUserId, requestingAdminId, prisma);
+    res.json(result);
+  } catch (error: any) {
+    const status = error.statusCode || 500;
+    res.status(status).json({ message: error.message || "Aday silinemedi." });
   }
 });
 
 // GET /api/admin/cost-report
 router.get("/cost-report", authMiddleware, adminMiddleware, async (_req: Request, res: Response) => {
   try {
-    const report = await prisma.$queryRaw<any[]>`
-      SELECT 
-        COALESCE(SUM(CASE WHEN status = 'SUCCESS' THEN "costUsd" ELSE 0 END), 0)::float as "totalCostUsd",
-        COALESCE(SUM(CASE WHEN status = 'SUCCESS' THEN "tokensIn" ELSE 0 END), 0)::int as "totalTokensIn",
-        COALESCE(SUM(CASE WHEN status = 'SUCCESS' THEN "tokensOut" ELSE 0 END), 0)::int as "totalTokensOut",
-        COALESCE(SUM(CASE WHEN status = 'SUCCESS' THEN "tokensIn" + "tokensOut" ELSE 0 END), 0)::int as "totalTokens",
-        COUNT(CASE WHEN status = 'SUCCESS' THEN 1 END)::int as "successCalls",
-        COUNT(CASE WHEN status = 'FAILED' THEN 1 END)::int as "failedCalls",
-        COUNT(*)::int as "totalCalls"
-      FROM api_calls
-    `;
-
-    const modelStats = await prisma.$queryRaw<any[]>`
-      SELECT 
-        model,
-        endpoint,
-        COUNT(*)::int as "calls",
-        COALESCE(SUM("tokensIn"), 0)::int as "tokensIn",
-        COALESCE(SUM("tokensOut"), 0)::int as "tokensOut",
-        COALESCE(SUM("costUsd"), 0)::float as "costUsd"
-      FROM api_calls
-      WHERE status = 'SUCCESS'
-      GROUP BY model, endpoint
-      ORDER BY "costUsd" DESC
-    `;
-
-    res.json({
-      summary: report[0] || {
-        totalCostUsd: 0,
-        totalTokensIn: 0,
-        totalTokensOut: 0,
-        totalTokens: 0,
-        successCalls: 0,
-        failedCalls: 0,
-        totalCalls: 0
-      },
-      modelStats
-    });
+    const report = await GetCostReportUseCase.execute(prisma);
+    res.json(report);
   } catch (error) {
     console.error("Cost raporu alınırken hata:", error);
     res.status(500).json({ message: "Sunucu hatası." });
   }
 });
 
-// POST /api/admin/candidates/reanalyze - Toplu CV Yeniden Analiz Endpoint'i
-router.post("/candidates/reanalyze", authMiddleware, adminMiddleware, async (req: Request, res: Response): Promise<void> => {
-  try {
-    const { userIds, cvIds } = req.body;
-    let targetCvIds: string[] = [];
-
-    if (Array.isArray(cvIds) && cvIds.length > 0) {
-      targetCvIds = cvIds;
-    } else if (Array.isArray(userIds) && userIds.length > 0) {
-      const userCvs = await prisma.cV.findMany({
-        where: { userId: { in: userIds } },
-        select: { id: true }
-      });
-      targetCvIds = userCvs.map(c => c.id);
-    }
-
-    if (targetCvIds.length === 0) {
-      res.status(400).json({ message: "Analiz edilecek geçerli CV bulunamadı." });
-      return;
-    }
-
-    // Rate Limit Koruması: Eşzamanlı maksimum 2 CV işleme
-    const batchSize = 2;
-    const results: { cvId: string; status: string; message?: string }[] = [];
-
-    for (let i = 0; i < targetCvIds.length; i += batchSize) {
-      const currentBatch = targetCvIds.slice(i, i + batchSize);
-      await Promise.all(
-        currentBatch.map(async (cvId) => {
-          try {
-            // CV analizini tetikle
-            const cv = await prisma.cV.findUnique({ where: { id: cvId } });
-            if (!cv) {
-              results.push({ cvId, status: "FAILED", message: "CV bulunamadı." });
-              return;
-            }
-
-            // Analiz kaydını ekle / güncelle
-            await prisma.cVAnalysis.create({
-              data: {
-                cvId: cv.id,
-                status: "COMPLETED",
-                atsScore: Math.floor(Math.random() * 25) + 70, // 70-95 arası dinamik skor
-                skills: ["Ekip Yönetimi", "Yazılım Mimarisi", "Analitik Düşünme"],
-                strengths: [
-                  "Sektörel deneyim ve liderlik nitelikleri öne çıkmaktadır.",
-                  "Proje bütçe ve zaman yönetiminde yüksek başarı oranı."
-                ],
-                weaknesses: [
-                  "Belli teknik sertifikasyon eksiklikleri giderilebilir."
-                ],
-                suggestions: [
-                  { question: "Mevcut mimari kararlarınızı nasıl belgeliyorsunuz?", priority: "high" }
-                ]
-              }
-            });
-
-            results.push({ cvId, status: "SUCCESS" });
-          } catch (err: any) {
-            results.push({ cvId, status: "FAILED", message: err.message });
-          }
-        })
-      );
-    }
-
-    const successCount = results.filter(r => r.status === "SUCCESS").length;
-    res.json({
-      message: `${successCount}/${results.length} CV analizi başarıyla tamamlandı.`,
-      results
-    });
-  } catch (error: any) {
-    console.error("Bulk reanalyze error:", error);
-    res.status(500).json({ message: "Toplu analiz sırasında sunucu hatası oluştu." });
-  }
-});
-
 export default router;
-

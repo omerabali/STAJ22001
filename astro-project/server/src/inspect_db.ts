@@ -25,7 +25,7 @@ async function check() {
   
   const chunks = await chunkTextBySections(cv.rawText || '', prisma);
   console.log('\n--- NEW PARSED CHUNKS COUNT:', chunks.length);
-  chunks.forEach((c, i) => {
+  chunks.forEach((c: any, i: number) => {
     console.log(`\n--- Chunk ${i + 1} [Section: ${c.metadata.section}]:`);
     console.log(c.chunkText);
   });
