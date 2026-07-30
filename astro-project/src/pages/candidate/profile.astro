@@ -1,0 +1,147 @@
+---
+import UserLayout from "../../layouts/UserLayout.astro";
+---
+
+<UserLayout title="Özgeçmiş Yönetimi & Analiz | Antigravity AI">
+  <div class="p-6 md:p-8 w-full space-y-6">
+    
+    <!-- Top Welcome Card -->
+    <div class="bg-white border border-[#ddd9d3] rounded-[14px] p-5 shadow-xs w-full flex items-center justify-between">
+      <div class="flex items-center gap-4">
+        <div class="w-12 h-12 rounded-full bg-[#14422f]/10 border border-[#14422f]/20 flex items-center justify-center text-[#14422f] font-bold text-lg shrink-0">
+          <span class="material-symbols-outlined text-2xl text-[#14422f]">badge</span>
+        </div>
+        <div>
+          <h2 class="text-lg font-bold text-[#1b1c1a]">Hoş geldin, <span id="welcome-name">Kullanıcı</span>! 👋</h2>
+          <p class="text-xs text-[#8a8580] mt-0.5 font-medium">Özgeçmişinizi yükleyebilir, semantik yapay zeka analizlerini anlık olarak takip edebilirsiniz.</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- Main Grid -->
+    <div class="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start w-full">
+      
+      <!-- Left Column -->
+      <div class="lg:col-span-7 xl:col-span-7 space-y-6 w-full flex flex-col justify-start">
+        
+        <!-- CV Upload Card -->
+        <div class="bg-white border border-[#ddd9d3] rounded-[14px] p-6 shadow-xs space-y-5 w-full">
+          <div class="flex items-center justify-between border-b border-[#ddd9d3]/60 pb-4">
+            <div>
+              <h3 class="text-sm font-bold text-[#1b1c1a]">Yeni CV Yükle</h3>
+              <p class="text-xs text-[#8a8580] mt-0.5 font-medium">Özgeçmişinizi PDF formatında yükleyerek yapay zeka ile sunulan 5 farklı alandaki analizlerinizi anlık olarak takip edebilirsiniz.</p>
+            </div>
+          </div>
+
+          <!-- Drop Zone -->
+          <div id="drop-zone" class="border border-[#ddd9d3] rounded-xl py-10 px-8 text-center transition-all cursor-pointer bg-[#faf9f5]/40 hover:bg-[#14422f]/5 group flex flex-col items-center justify-center min-h-[240px] w-full">
+            <input type="file" id="cv-file-input" accept="application/pdf" class="hidden" />
+            <div class="w-12 h-12 rounded-full bg-white border border-[#ddd9d3] flex items-center justify-center mb-3 shadow-2xs group-hover:scale-105 transition-transform">
+              <span class="material-symbols-outlined text-2xl text-[#8a8580]">lock_open</span>
+            </div>
+            <p class="text-xs font-bold text-[#1b1c1a] mb-1">Dosyayı sürükleyip bırakın veya seçin</p>
+            <p class="text-[11px] text-[#8a8580] mb-4 font-medium">Yalnızca PDF (en fazla: 5 MB)</p>
+            <button type="button" class="px-6 py-2.5 bg-[#14422f] hover:bg-[#103425] text-white text-xs font-bold rounded-lg transition-colors shadow-xs">
+              Dosya Seç
+            </button>
+          </div>
+
+          <!-- Upload Progress Bar -->
+          <div id="upload-progress-container" class="hidden space-y-3 pt-2 w-full">
+            <div class="flex items-center justify-between text-xs">
+              <span class="font-bold text-[#1b1c1a] flex items-center gap-2">
+                <span class="material-symbols-outlined text-[16px] text-[#14422f] animate-spin">sync</span>
+                <span id="upload-file-name">Dosya.pdf</span>
+              </span>
+              <span id="upload-percent" class="font-mono font-bold text-[#14422f]">0%</span>
+            </div>
+
+            <div class="w-full h-2 bg-[#ddd9d3]/40 rounded-full overflow-hidden">
+              <div id="upload-progress-bar" class="h-full bg-[#14422f] transition-all duration-300 rounded-full" style="width: 0%"></div>
+            </div>
+
+            <p id="upload-status-text" class="text-[11px] font-semibold text-[#8a8580]">Dosya işlenmeye hazırlanıyor...</p>
+          </div>
+        </div>
+
+        <!-- History Table Card: Tablo Alanına Sabit Yükseklik ve Scroll Eklendi -->
+        <div class="bg-white border border-[#ddd9d3] rounded-[14px] p-6 shadow-xs space-y-4 w-full">
+          <div class="flex items-center justify-between border-b border-[#ddd9d3]/60 pb-3">
+            <h3 class="text-sm font-bold text-[#1b1c1a]">Son Yüklemeler</h3>
+          </div>
+
+          <!-- max-h-[220px] ve overflow-y-auto eklendi (Yaklaşık 3-4 satırdan fazlası scrolla düşer) -->
+          <div class="overflow-x-auto overflow-y-auto max-h-[220px] w-full pr-1">
+            <table class="w-full text-left border-collapse min-w-[500px]">
+              <thead class="sticky top-0 bg-white z-10">
+                <tr class="border-b border-[#ddd9d3] text-[10px] uppercase font-bold text-[#8a8580] tracking-wider">
+                  <th class="pb-3 px-2 bg-white">DOSYA ADI</th>
+                  <th class="pb-3 px-2 bg-white">YÜKLEME TARİHİ</th>
+                  <th class="pb-3 px-2 bg-white">ANALİZ DURUMU</th>
+                  <th class="pb-3 px-2 text-center bg-white">BAŞARI ORANI</th>
+                  <th class="pb-3 px-2 text-center bg-white">ATS SKORU</th>
+                  <th class="pb-3 px-2 text-right bg-white">İŞLEM</th>
+                </tr>
+              </thead>
+              <tbody id="profile-cvs-body" class="divide-y divide-[#ddd9d3]/40 text-xs font-medium">
+                <tr>
+                  <td colspan="6" class="py-8 text-center text-[#8a8580] animate-pulse">Özgeçmişler yükleniyor...</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+      </div>
+
+      <!-- Right Column: Sabit yükseklik ve kendi içinde Scroll -->
+      <div class="lg:col-span-5 xl:col-span-5 bg-white border border-[#ddd9d3] rounded-[14px] p-6 shadow-xs flex flex-col w-full h-[730px]">
+        
+        <!-- State A: No Selection / Placeholder -->
+        <div id="no-analysis-state" class="flex flex-col items-center justify-center flex-1 text-center py-12 space-y-4 w-full">
+          <div class="w-16 h-16 rounded-full bg-[#14422f]/10 flex items-center justify-center text-[#14422f] shrink-0">
+            <span class="material-symbols-outlined text-3xl">analytics</span>
+          </div>
+          <div class="w-full flex flex-col items-center px-4">
+            <h4 class="text-sm font-bold text-[#1b1c1a]">Analiz Sonucu Bekleniyor</h4>
+            <p class="text-xs text-[#8a8580] mt-2 font-medium leading-relaxed w-full max-w-none text-center">Sol taraftan bir özgeçmiş seçerek veya yeni bir dosya yükleyerek detaylı AI analiz raporunu görüntüleyebilirsiniz.</p>
+          </div>
+        </div>
+
+        <!-- State B: Active Analysis & Stream Panel -->
+        <div id="active-analysis-state" class="hidden flex flex-col flex-1 w-full h-full overflow-hidden">
+          
+          <!-- Sabit Başlık -->
+          <div class="flex items-center justify-between border-b border-[#ddd9d3]/60 pb-4 mb-4 w-full shrink-0">
+            <div class="flex items-center gap-2">
+              <span id="analysis-status-indicator"></span>
+              <div>
+                <h3 class="text-sm font-bold text-[#1b1c1a]" id="analysis-cv-name">Özgeçmiş Analizi</h3>
+                <span class="text-[10px] text-[#8a8580] font-semibold">Semantik Yapay Zeka Raporu</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Kaydırılabilir İçerik -->
+          <div id="analysis-content-area" class="flex-1 overflow-y-auto pr-2 w-full space-y-4 custom-scrollbar">
+            <!-- Dynamic analysis output injected here -->
+          </div>
+        </div>
+
+      </div>
+
+    </div>
+  </div>
+</UserLayout>
+
+<script is:inline src="https://cdn.socket.io/4.7.5/socket.io.min.js"></script>
+
+<script>
+  import { initProfilePage } from '../../scripts/candidate/profile/profilePage';
+
+  document.addEventListener('astro:page-load', initProfilePage);
+
+  if (document.readyState === 'complete' || document.readyState === 'interactive') {
+    initProfilePage();
+  }
+</script>

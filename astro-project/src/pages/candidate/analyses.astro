@@ -1,0 +1,106 @@
+---
+import UserLayout from '../../layouts/UserLayout.astro';
+---
+
+<UserLayout title="Beacon - Analiz Sonuçlarım" headerTitle="Analiz Sonuçlarım">
+  <div class="flex gap-6 h-full min-h-[600px] flex-col lg:flex-row items-start">
+    
+    <!-- LEFT COLUMN: CV List (%35) -->
+    <div class="w-full lg:w-[35%] flex flex-col gap-6 min-w-0 shrink-0">
+      <div class="bg-white border border-[#ddd9d3] rounded-[10px] shadow-sm overflow-hidden flex flex-col h-[700px]">
+        <!-- Card Header -->
+        <div class="p-6 border-b border-[#ddd9d3] bg-white shrink-0">
+          <h3 class="font-bold text-lg text-[#1b1c1a] mb-1">Tüm Yüklenen CV'ler</h3>
+          <p class="text-xs text-[#8a8580] font-medium">Analiz görmek için listeden bir özgeçmiş seçin</p>
+        </div>
+
+        <!-- Column Header Row -->
+        <div class="px-8 py-3 bg-[#f5f4f0] border-b border-[#ddd9d3] grid grid-cols-12 text-[10px] font-bold text-[#8a8580] uppercase tracking-wider gap-2 shrink-0">
+          <div class="col-span-5">Belge Adı</div>
+          <div class="col-span-3 pl-2">Yükleme Tarihi</div>
+          <div class="col-span-3">Analiz Durumu</div>
+          <div class="col-span-1 text-right">İşlem</div>
+        </div>
+        
+        <!-- List Items Container (Sol Liste Kendi İçinde Scroll Olur) -->
+        <div class="p-4 flex flex-col gap-2 overflow-y-auto flex-1 custom-scrollbar" id="analyses-cvs-body">
+          <div class="text-center py-8 text-[#8a8580] font-medium text-xs">Yüklemeler sorgulanıyor...</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- RIGHT COLUMN: Detailed Analysis Panel (%65) -->
+    <div class="w-full lg:w-[65%] min-w-0 flex-1">
+      <div class="bg-white border border-[#ddd9d3] rounded-[10px] shadow-sm p-6 h-[700px] flex flex-col relative overflow-hidden" id="analysis-detail-card">
+        
+        <!-- ─── EMPTY STATE ─── -->
+        <div class="flex flex-col items-center justify-center h-full py-12 my-auto text-center" id="no-analysis-state">
+          <div class="w-24 h-24 mb-6 rounded-full border border-[#ddd9d3] bg-[#faf9f5] flex items-center justify-center shadow-sm">
+            <span class="material-symbols-outlined text-4xl text-[#14422f]">analytics</span>
+          </div>
+          <div class="w-full max-w-[320px]">
+            <h3 class="text-lg font-bold text-[#1b1c1a] mb-2">Detaylı Analiz Paneli</h3>
+            <p class="text-xs text-[#8a8580] font-medium leading-relaxed">
+              Yandaki listeden bir özgeçmiş seçerek yapay zeka analiz raporunu detaylıca görüntüleyebilirsiniz.
+            </p>
+          </div>
+        </div>
+
+        <!-- ─── ACTIVE ANALYSIS STATE ─── -->
+        <div class="hidden flex-col h-full overflow-hidden" id="active-analysis-state">
+          <!-- Top Header info (Sabit Üst Başlık) -->
+          <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 pb-4 border-b border-[#ddd9d3] shrink-0">
+            <div>
+              <h2 class="text-lg text-[#1b1c1a] font-bold truncate max-w-[280px]" id="analysis-cv-name">
+                Özgeçmiş Belgesi
+              </h2>
+              <p class="text-xs text-[#8a8580] font-medium mt-1 flex items-center gap-1">
+                <span class="material-symbols-outlined text-[14px]">calendar_today</span>
+                Analiz Raporu
+              </p>
+            </div>
+            <div id="analysis-status-indicator" class="shrink-0">
+              <!-- verified status icon -->
+            </div>
+          </div>
+
+          <!-- Scrollable Content (Analiz İçeriği Uzasa da Burası Scroll Olur) -->
+          <div class="flex-1 overflow-y-auto custom-scrollbar py-4 pr-2 flex flex-col gap-6" id="analysis-content-area">
+            <!-- Dynamic content injected here -->
+          </div>
+
+          <!-- Bottom Action (Sabit Yeniden Analiz Et Butonu) -->
+          <div class="pt-4 border-t border-[#ddd9d3] flex justify-end shrink-0">
+            <button id="reanalyze-candidate-btn" onclick="reanalyzeSelectedCv()" class="bg-[#14422f] hover:bg-[#0f3223] text-white font-label-md text-sm px-6 py-2.5 rounded-[8px] flex items-center gap-2 transition-colors shadow-sm cursor-pointer">
+              <span class="material-symbols-outlined text-sm">refresh</span>
+              Yeniden Analiz Et
+            </button>
+          </div>
+        </div>
+
+      </div>
+    </div>
+
+  </div>
+</UserLayout>
+
+<script>
+  import { initDeleteCv } from '../../scripts/candidate/analyses/deleteCv';
+  import { initAnalysesPage } from '../../scripts/candidate/analyses/initPage';
+  import { initReanalyzeCandidateCv } from '../../scripts/candidate/analyses/reanalyzeCv';
+
+  initDeleteCv();
+  initReanalyzeCandidateCv();
+  initAnalysesPage();
+</script>
+
+<style>
+  html {
+    zoom: 75%;
+  }
+</style>
+<style>
+  html {
+    zoom: 60%; /* Sadece bu sayfaya özel istediğiniz oranı buraya yazabilirsiniz */
+  }
+</style>

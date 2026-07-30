@@ -7,7 +7,7 @@ import AdminLayout from '../../layouts/AdminLayout.astro';
     <!-- Header Navigation & Actions (Modern SaaS Header Layout) -->
     <div class="bg-white border border-[#ddd9d3] rounded-[16px] p-5 shadow-xs flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
       <div class="flex items-center gap-3.5">
-        <a href="/admin/users" class="w-10 h-10 rounded-xl bg-[#faf9f5] border border-[#ddd9d3] flex items-center justify-center text-[#1b1c1a] hover:bg-[#14422f] hover:text-white hover:border-[#14422f] transition-all shadow-2xs group">
+        <a id="profile-back-btn" href="/admin/search?tab=basic" class="w-10 h-10 rounded-xl bg-[#faf9f5] border border-[#ddd9d3] flex items-center justify-center text-[#1b1c1a] hover:bg-[#14422f] hover:text-white hover:border-[#14422f] transition-all shadow-2xs group" title="Geri Dön">
           <span class="material-symbols-outlined text-xl transition-transform group-hover:-translate-x-0.5">arrow_back</span>
         </a>
         <div>
@@ -30,7 +30,7 @@ import AdminLayout from '../../layouts/AdminLayout.astro';
         </div>
 
         <!-- Primary PDF View Button -->
-        <a id="view-pdf-btn" target="_blank" href="#" class="hidden items-center gap-2 px-3.5 py-2 bg-[#14422f] hover:bg-[#103425] text-white rounded-xl text-xs font-bold transition-all shadow-xs hover:shadow-md active:scale-[0.98] whitespace-nowrap">
+        <a id="view-pdf-btn" target="_blank" href="#" class="hidden items-center gap-2 px-3.5 py-2 bg-[#14422f] hover:bg-[#103425] text-white rounded-xl text-xs font-bold transition-all shadow-xs hover:shadow-md active:scale-[0.98] whitespace-nowrap cursor-pointer">
           <span class="material-symbols-outlined text-base">picture_as_pdf</span>
           CV PDF'ini Görüntüle
         </a>
@@ -70,10 +70,6 @@ import AdminLayout from '../../layouts/AdminLayout.astro';
         </div>
 
         <div class="flex items-center gap-4 w-full md:w-auto justify-between md:justify-end border-t md:border-t-0 border-[#ddd9d3] pt-4 md:pt-0">
-          <a id="card-pdf-btn" target="_blank" href="#" class="hidden items-center gap-2 px-3.5 py-2 bg-[#faf9f5] border border-[#ddd9d3] hover:border-[#14422f] text-[#1b1c1a] hover:text-[#14422f] rounded-xl text-xs font-bold transition-all shadow-2xs">
-            <span class="material-symbols-outlined text-lg text-rose-600">picture_as_pdf</span>
-            PDF Olarak İncele
-          </a>
           <div class="bg-[#faf9f5] border border-[#ddd9d3] p-3.5 rounded-xl text-center min-w-[140px] shadow-2xs">
             <span class="block text-[10px] font-bold text-[#8a8580] uppercase tracking-wider">GPT ATS SKORU</span>
             <span id="profile-ats-score" class="font-display-lg text-2xl font-black text-[#14422f] mt-0.5 block">-%</span>
@@ -93,375 +89,107 @@ import AdminLayout from '../../layouts/AdminLayout.astro';
             </div>
           </div>
           <div class="flex items-center gap-3">
-            <button onclick="reanalyzeActiveCv()" class="flex items-center gap-2 border border-[#ddd9d3] text-[#1b1c1a] hover:bg-[#faf9f5] px-3.5 py-1.5 rounded-[10px] transition-all text-xs font-bold bg-white shadow-2xs">
+            <button onclick="reanalyzeActiveCv()" class="flex items-center gap-2 border border-[#ddd9d3] text-[#1b1c1a] hover:bg-[#faf9f5] px-3.5 py-1.5 rounded-[10px] transition-all text-xs font-bold bg-white shadow-2xs cursor-pointer">
               <span class="material-symbols-outlined text-sm">refresh</span>
               Yeniden AI Analiz Et
             </button>
-            <span id="header-ats-badge" class="px-3 py-1.5 rounded-[10px] bg-amber-50 text-amber-800 border border-amber-200 text-xs font-bold">%0 ATS Skoru</span>
-          </div>
-        </div>
-
-        <!-- ATS Genel Uyum Skoru İlerleme Çubuğu -->
-        <div class="space-y-1.5">
-          <div class="flex justify-between items-center text-xs font-bold text-[#1b1c1a]">
-            <span>ATS Genel Uyum Skoru</span>
-            <span id="progress-ats-text">%0</span>
-          </div>
-          <div class="w-full bg-[#e5e2dc] rounded-full h-2.5 overflow-hidden">
-            <div id="progress-ats-bar" class="bg-[#14422f] h-2.5 rounded-full transition-all duration-500" style="width: 0%"></div>
           </div>
         </div>
 
         <!-- GÜÇLÜ YÖNLER (STRENGTHS) -->
-        <div class="space-y-3 pt-2">
+        <div class="space-y-3">
           <h4 class="text-xs font-bold text-emerald-800 uppercase tracking-wider flex items-center gap-2">
-            <span class="material-symbols-outlined text-base">thumb_up</span>
+            <span class="material-symbols-outlined text-emerald-600 text-lg">thumb_up</span>
             GÜÇLÜ YÖNLER (STRENGTHS)
           </h4>
-          <div id="strengths-container" class="space-y-2.5">
-            <p class="text-xs text-[#8a8580]">Analiz verisi yükleniyor...</p>
+          <div id="strengths-container" class="space-y-2">
+            <p class="text-xs text-[#8a8580] italic">Veri yükleniyor...</p>
           </div>
         </div>
 
         <!-- EKSİK YÖNLER (GAPS) -->
-        <div class="space-y-3 pt-2">
+        <div class="space-y-3">
           <h4 class="text-xs font-bold text-rose-800 uppercase tracking-wider flex items-center gap-2">
-            <span class="material-symbols-outlined text-base">build</span>
+            <span class="material-symbols-outlined text-rose-600 text-lg">warning</span>
             EKSİK YÖNLER (GAPS)
           </h4>
-          <div id="weaknesses-container" class="space-y-2.5">
-            <p class="text-xs text-[#8a8580]">Analiz verisi yükleniyor...</p>
+          <div id="weaknesses-container" class="space-y-2">
+            <p class="text-xs text-[#8a8580] italic">Veri yükleniyor...</p>
           </div>
         </div>
 
         <!-- MÜLAKAT ÖNERİLERİ (TAVSİYELER) -->
-        <div class="space-y-3 pt-2">
-          <h4 class="text-xs font-bold text-amber-800 uppercase tracking-wider flex items-center gap-2">
-            <span class="material-symbols-outlined text-base">lightbulb</span>
+        <div class="space-y-3">
+          <h4 class="text-xs font-bold text-[#14422f] uppercase tracking-wider flex items-center gap-2">
+            <span class="material-symbols-outlined text-[#14422f] text-lg">lightbulb</span>
             MÜLAKAT ÖNERİLERİ (TAVSİYELER)
           </h4>
-          <div id="suggestions-container" class="space-y-2.5">
-            <p class="text-xs text-[#8a8580]">Tavsiyeler yükleniyor...</p>
+          <div id="suggestions-container" class="space-y-2">
+            <p class="text-xs text-[#8a8580] italic">Veri yükleniyor...</p>
           </div>
         </div>
 
-        <!-- MÜLAKATTA SORULACAK SORULAR -->
-        <div class="space-y-3 pt-2">
-          <h4 class="text-xs font-bold text-[#14422f] uppercase tracking-wider flex items-center gap-2">
-            <span class="material-symbols-outlined text-base">help</span>
-            MÜLAKATTA SORULACAK SORULAR
+        <!-- MÜLAKAT SORULARI (RECOMMENDED INTERVIEW QUESTIONS) -->
+        <div class="space-y-3 pt-2 border-t border-[#ddd9d3]">
+          <h4 class="text-xs font-bold text-indigo-800 uppercase tracking-wider flex items-center gap-2">
+            <span class="material-symbols-outlined text-indigo-600 text-lg">forum</span>
+            MÜLAKAT SORULARI (TEKNİK VE YETKİNLİK SORULARI)
           </h4>
-          <div id="questions-container" class="space-y-2.5">
-            <p class="text-xs text-[#8a8580]">Sorular hazırlanıyor...</p>
+          <div id="questions-container" class="space-y-2">
+            <p class="text-xs text-[#8a8580] italic">Mülakat soruları yükleniyor...</p>
           </div>
         </div>
       </div>
     </div>
   </div>
 
-  <!-- Socket.io Script -->
-  <script is:inline src="https://cdn.socket.io/4.7.5/socket.io.min.js"></script>
+  <script>
+    import { loadAdminCandidateProfile } from '../../scripts/admin/candidate-profile/profileLoader';
+    import { initReanalyzeCv } from '../../scripts/admin/candidate-profile/reanalyzeCv';
 
-  <script is:inline>
-    window.candidateCvs = [];
-    window.activeCvId = null;
-    window.candidateUserId = null;
+    function setupDynamicBackLink() {
+      const backBtn = document.getElementById('profile-back-btn') as HTMLAnchorElement;
+      if (!backBtn) return;
 
-    async function loadAdminCandidateProfile() {
       const urlParams = new URLSearchParams(window.location.search);
-      const candidateId = urlParams.get('id') || urlParams.get('userId') || 'd20b6aaa-3f0f-431d-9deb-6ae8e2665b5d';
-      const requestedCvId = urlParams.get('cvId');
+      const fromSource = urlParams.get('from');
 
-      const loadingEl = document.getElementById('profile-loading');
-      const contentEl = document.getElementById('profile-content');
-
-      try {
-        const token = localStorage.getItem('token');
-        const headers = { 'Content-Type': 'application/json' };
-        if (token) headers['Authorization'] = `Bearer ${token}`;
-
-        const res = await fetch(`/api/admin/candidates/${candidateId}`, { headers, credentials: 'include' });
-        if (!res.ok) {
-          if (res.status === 401 || res.status === 403) {
-            if (loadingEl) loadingEl.innerHTML = '<p class="text-rose-600 font-bold text-sm">Erişim Engellendi: Bu sayfayı görüntülemek için Admin yetkisi gereklidir.</p>';
-            return;
-          }
-          throw new Error(`Aday verisi alınamadı (HTTP ${res.status})`);
-        }
-
-        const data = await res.json();
-        const candidate = data.candidate;
-
-        if (!candidate) {
-          if (loadingEl) loadingEl.innerHTML = '<p class="text-rose-600 font-bold text-sm">Aday kaydı bulunamadı.</p>';
-          return;
-        }
-
-        window.candidateUserId = candidate.id;
-        window.candidateCvs = candidate.cvs || [];
-
-        // Header User Info
-        document.getElementById('profile-name').textContent = candidate.name || candidate.email || 'İsimsiz Aday';
-        document.getElementById('profile-email').textContent = candidate.email || '-';
-        document.getElementById('profile-avatar').textContent = (candidate.name || candidate.email || 'AD').substring(0, 2).toUpperCase();
-
-        const rawDate = candidate.createdAt ? new Date(candidate.createdAt) : null;
-        document.getElementById('profile-date').textContent = rawDate ? `Kayıt Tarihi: ${rawDate.toLocaleDateString('tr-TR')}` : 'Kayıt: -';
-
-        // Render Multi-CV Dropdown
-        renderCvDropdown(requestedCvId);
-
-        // Render Selected CV details
-        renderSelectedCvDetails(window.activeCvId);
-
-        if (loadingEl) loadingEl.classList.add('hidden');
-        if (contentEl) contentEl.classList.remove('hidden');
-
-        // Setup Socket.io
-        setupRealtimeSocket(candidate.id);
-      } catch (err) {
-        if (loadingEl) loadingEl.innerHTML = `<p class="text-rose-600 font-bold text-sm">Hata: ${err.message}</p>`;
-      }
-    }
-
-    function renderCvDropdown(preferredCvId) {
-      const container = document.getElementById('cv-selector-container');
-      const dropdown = document.getElementById('cv-selector-dropdown');
-
-      if (!container || !dropdown || window.candidateCvs.length === 0) return;
-
-      container.classList.remove('hidden');
-      
-      const targetId = (preferredCvId && window.candidateCvs.some(c => c.id === preferredCvId)) 
-        ? preferredCvId 
-        : window.candidateCvs[0].id;
-
-      window.activeCvId = targetId;
-
-      dropdown.innerHTML = window.candidateCvs.map((cv, idx) => {
-        const dateStr = cv.createdAt ? new Date(cv.createdAt).toLocaleDateString('tr-TR') : '';
-        const title = cv.fileName ? `${cv.fileName} (${dateStr})` : `CV #${idx + 1} (${dateStr})`;
-        const isSelected = cv.id === targetId;
-        return `<option value="${cv.id}" ${isSelected ? 'selected' : ''}>${title}</option>`;
-      }).join('');
-    }
-
-    function handleCvSelectionChange(newCvId) {
-      if (!newCvId || newCvId === window.activeCvId) return;
-      window.activeCvId = newCvId;
-      renderSelectedCvDetails(newCvId);
-    }
-
-    function renderSelectedCvDetails(cvId) {
-      const selectedCv = window.candidateCvs.find(c => c.id === cvId) || window.candidateCvs[0];
-      const latestAnalysis = selectedCv && selectedCv.analyses && selectedCv.analyses[0];
-
-      const statusEl = document.getElementById('profile-status-badge');
-      const atsEl = document.getElementById('profile-ats-score');
-      const headerAtsBadge = document.getElementById('header-ats-badge');
-      const progressAtsText = document.getElementById('progress-ats-text');
-      const progressAtsBar = document.getElementById('progress-ats-bar');
-      const subtitleEl = document.getElementById('analysis-file-subtitle');
-      const viewPdfBtn = document.getElementById('view-pdf-btn');
-      const cardPdfBtn = document.getElementById('card-pdf-btn');
-
-      // PDF Görüntüleme Linklerini Ayarla
-      if (selectedCv && selectedCv.fileUrl) {
-        if (viewPdfBtn) {
-          viewPdfBtn.href = selectedCv.fileUrl;
-          viewPdfBtn.classList.remove('hidden');
-          viewPdfBtn.classList.add('inline-flex');
-        }
-        if (cardPdfBtn) {
-          cardPdfBtn.href = selectedCv.fileUrl;
-          cardPdfBtn.classList.remove('hidden');
-          cardPdfBtn.classList.add('inline-flex');
-        }
-      }
-
-      if (subtitleEl && selectedCv) {
-        subtitleEl.textContent = `${selectedCv.fileName || 'CV Dokümanı'} - Yapay Zeka Değerlendirmesi`;
-      }
-
-      const status = latestAnalysis ? latestAnalysis.status : (selectedCv ? 'PENDING' : 'NO_CV');
-
-      if (status === 'COMPLETED') {
-        statusEl.className = 'px-2.5 py-0.5 rounded-md text-[11px] font-bold bg-emerald-50 text-emerald-700 border border-emerald-200';
-        statusEl.textContent = 'Hazır';
-      } else if (status === 'PROCESSING') {
-        statusEl.className = 'px-2.5 py-0.5 rounded-md text-[11px] font-bold bg-blue-50 text-blue-700 border border-blue-200';
-        statusEl.textContent = 'İşleniyor';
+      if (fromSource === 'compare') {
+        backBtn.href = '/admin/compare?from=profile';
+        backBtn.title = 'Aday Karşılaştırma Paneline Dön';
+      } else if (fromSource === 'semantic') {
+        backBtn.href = '/admin/search?tab=semantic&from=profile';
+        backBtn.title = 'Yapay Zeka Semantik Arama Sonuçlarına Dön';
+      } else if (fromSource === 'basic') {
+        backBtn.href = '/admin/search?tab=basic';
+        backBtn.title = 'Genel Aday Listesine Dön';
+      } else if (fromSource === 'users') {
+        backBtn.href = '/admin/users';
+        backBtn.title = 'Kullanıcı Yönetimi Listesine Dön';
+      } else if (fromSource === 'reports') {
+        backBtn.href = '/admin/reports';
+        backBtn.title = 'Raporlar Sayfasına Dön';
       } else {
-        statusEl.className = 'px-2.5 py-0.5 rounded-md text-[11px] font-bold bg-amber-50 text-amber-700 border border-amber-200';
-        statusEl.textContent = 'Sırada';
-      }
-
-      // ATS Score & Progress Bar
-      const score = (latestAnalysis && latestAnalysis.atsScore !== undefined && latestAnalysis.atsScore !== null) 
-        ? latestAnalysis.atsScore 
-        : 0;
-
-      if (atsEl) atsEl.textContent = `%${score}`;
-      if (headerAtsBadge) headerAtsBadge.textContent = `%${score} ATS Skoru`;
-      if (progressAtsText) progressAtsText.textContent = `%${score}`;
-      if (progressAtsBar) progressAtsBar.style.width = `${score}%`;
-
-      // 1. GÜÇLÜ YÖNLER (STRENGTHS)
-      const strContainer = document.getElementById('strengths-container');
-      const strengths = latestAnalysis ? latestAnalysis.strengths : [];
-      if (strContainer) {
-        if (Array.isArray(strengths) && strengths.length > 0) {
-          strContainer.innerHTML = strengths.map(s => `
-            <div class="p-3 bg-emerald-50/60 border border-emerald-200/80 rounded-xl flex items-start gap-2.5 text-xs font-medium text-[#1b1c1a] shadow-2xs">
-              <span class="material-symbols-outlined text-emerald-600 text-base shrink-0 mt-0.5">check_circle</span>
-              <span class="leading-relaxed">${s}</span>
-            </div>
-          `).join('');
+        // Fallback: document.referrer check
+        if (document.referrer.includes('/admin/compare')) {
+          backBtn.href = '/admin/compare?from=profile';
+        } else if (document.referrer.includes('/admin/users')) {
+          backBtn.href = '/admin/users';
+        } else if (document.referrer.includes('/admin/search')) {
+          backBtn.href = '/admin/search?tab=basic';
         } else {
-          strContainer.innerHTML = '<p class="text-xs text-[#8a8580] italic">Güçlü yön verisi bulunmuyor.</p>';
-        }
-      }
-
-      // 2. EKSİK YÖNLER (GAPS)
-      const weakContainer = document.getElementById('weaknesses-container');
-      const weaknesses = latestAnalysis ? latestAnalysis.weaknesses : [];
-      if (weakContainer) {
-        if (Array.isArray(weaknesses) && weaknesses.length > 0) {
-          weakContainer.innerHTML = weaknesses.map(w => `
-            <div class="p-3 bg-rose-50/60 border border-rose-200/80 rounded-xl flex items-start gap-2.5 text-xs font-medium text-[#1b1c1a] shadow-2xs">
-              <span class="material-symbols-outlined text-rose-600 text-base shrink-0 mt-0.5">warning</span>
-              <span class="leading-relaxed">${w}</span>
-            </div>
-          `).join('');
-        } else {
-          weakContainer.innerHTML = '<p class="text-xs text-[#8a8580] italic">Gelişim alanı verisi bulunmuyor.</p>';
-        }
-      }
-
-      // 3. MÜLAKAT ÖNERİLERİ (TAVSİYELER)
-      const sugContainer = document.getElementById('suggestions-container');
-      const suggestions = latestAnalysis ? latestAnalysis.suggestions : [];
-      if (sugContainer) {
-        if (Array.isArray(suggestions) && suggestions.length > 0) {
-          sugContainer.innerHTML = suggestions.map((s, idx) => {
-            const actionText = typeof s === 'string' ? s : (s.action || s.question || JSON.stringify(s));
-            const priority = (typeof s === 'object' && s.priority) ? s.priority : (idx === 0 ? 'high' : idx === 1 ? 'medium' : 'low');
-            const timeframe = (typeof s === 'object' && s.timeframe) ? s.timeframe : (idx === 1 ? 'Orta Vadeli' : 'Kısa Vadeli');
-
-            let priorityBadge = '<span class="px-2 py-0.5 rounded text-[10px] font-bold bg-amber-100 text-amber-800 border border-amber-200">Orta Öncelik</span>';
-            if (priority === 'high') priorityBadge = '<span class="px-2 py-0.5 rounded text-[10px] font-bold bg-rose-100 text-rose-800 border border-rose-200">Yüksek Öncelik</span>';
-            if (priority === 'low') priorityBadge = '<span class="px-2 py-0.5 rounded text-[10px] font-bold bg-blue-100 text-blue-800 border border-blue-200">Düşük Öncelik</span>';
-
-            return `
-              <div class="p-3.5 bg-[#faf9f5] border border-[#ddd9d3] rounded-xl space-y-2 shadow-2xs">
-                <div class="flex justify-between items-center">
-                  ${priorityBadge}
-                  <span class="text-[10px] font-bold text-[#8a8580] flex items-center gap-1">
-                    <span class="material-symbols-outlined text-xs">schedule</span>
-                    ${timeframe}
-                  </span>
-                </div>
-                <div class="flex items-start gap-2 text-xs font-semibold text-[#1b1c1a]">
-                  <span class="material-symbols-outlined text-amber-600 text-base shrink-0">lightbulb</span>
-                  <span class="leading-relaxed">${actionText}</span>
-                </div>
-              </div>
-            `;
-          }).join('');
-        } else {
-          sugContainer.innerHTML = '<p class="text-xs text-[#8a8580] italic">Tavsiye verisi bulunmuyor.</p>';
-        }
-      }
-
-      // 4. MÜLAKATTA SORULACAK SORULAR
-      const qContainer = document.getElementById('questions-container');
-      if (qContainer) {
-        if (Array.isArray(suggestions) && suggestions.length > 0) {
-          qContainer.innerHTML = suggestions.map((s, idx) => {
-            const questionText = (typeof s === 'object' && s.question) ? s.question : (typeof s === 'string' ? s : s.action);
-            const timeframe = (typeof s === 'object' && s.timeframe) ? s.timeframe : (idx === 1 ? 'Orta Vadeli' : 'Kısa Vadeli');
-
-            return `
-              <div class="p-3.5 bg-white border border-[#ddd9d3] rounded-xl space-y-1.5 shadow-2xs">
-                <div class="flex justify-between items-center">
-                  <span class="text-[10px] font-extrabold uppercase text-[#14422f] tracking-wider flex items-center gap-1">
-                    <span class="material-symbols-outlined text-xs">quiz</span> MÜLAKAT SORUSU
-                  </span>
-                  <span class="text-[10px] font-bold text-[#8a8580] flex items-center gap-1">
-                    <span class="material-symbols-outlined text-xs">schedule</span> ${timeframe}
-                  </span>
-                </div>
-                <p class="text-xs font-bold text-[#1b1c1a] leading-relaxed">❓ ${questionText}</p>
-              </div>
-            `;
-          }).join('');
-        } else {
-          qContainer.innerHTML = '<p class="text-xs text-[#8a8580] italic">Mülakat sorusu bulunmuyor.</p>';
+          backBtn.href = '/admin/search?tab=basic';
         }
       }
     }
 
-    async function reanalyzeActiveCv() {
-      if (!window.activeCvId) return;
-      if (!confirm("Bu CV'yi yeniden analiz etmek istediğinize emin misiniz?")) return;
+    initReanalyzeCv();
 
-      try {
-        const token = localStorage.getItem('token');
-        const headers = { 'Content-Type': 'application/json' };
-        if (token) headers['Authorization'] = `Bearer ${token}`;
-
-        const res = await fetch(`/api/cv/${window.activeCvId}/reanalyze`, {
-          method: 'POST',
-          headers,
-          credentials: 'include'
-        });
-
-        if (res.ok) {
-          alert("✅ Analiz süreci yeniden başlatıldı.");
-          loadAdminCandidateProfile();
-        } else {
-          alert("❌ Analiz başlatılamadı.");
-        }
-      } catch (e) {
-        alert("❌ Sunucu hatası.");
+    document.addEventListener('astro:page-load', () => {
+      if (document.getElementById('candidate-profile-container')) {
+        setupDynamicBackLink();
+        loadAdminCandidateProfile();
       }
-    }
-
-    function setupRealtimeSocket(userId) {
-      if (typeof io === 'undefined') return;
-
-      try {
-        const socketUrl = window.location.hostname === 'localhost' ? 'http://localhost:5000' : '/';
-        const socket = io(socketUrl, { transports: ['websocket', 'polling'] });
-        const indicator = document.getElementById('live-socket-indicator');
-
-        socket.on('connect', () => {
-          if (indicator) {
-            indicator.classList.remove('hidden');
-            indicator.classList.add('flex');
-          }
-          if (userId) socket.emit('join_user_room', userId);
-        });
-
-        socket.on('cv_status_updated', (data) => {
-          if (data && (data.cvId === window.activeCvId || data.userId === userId)) {
-            loadAdminCandidateProfile();
-          }
-        });
-
-        socket.on('cv_analysis_completed', (data) => {
-          if (data && (data.cvId === window.activeCvId || data.userId === userId)) {
-            loadAdminCandidateProfile();
-          }
-        });
-      } catch (err) {
-        console.log("Socket connection error:", err);
-      }
-    }
-
-    document.addEventListener("astro:page-load", loadAdminCandidateProfile);
-    if (document.readyState === 'complete' || document.readyState === 'interactive') {
-      loadAdminCandidateProfile();
-    }
+    });
   </script>
 </AdminLayout>

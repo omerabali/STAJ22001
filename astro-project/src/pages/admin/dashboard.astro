@@ -79,35 +79,10 @@ import AdminLayout from '../../layouts/AdminLayout.astro';
     </a>
   </div>
 
-  <script is:inline>
-    async function loadStats() {
-      const fetcher = async () => {
-        const res = await fetch('/api/admin/stats');
-        if (!res.ok) throw new Error("Fetch stats error");
-        return res.json();
-      };
-
-      const render = (data) => {
-        document.getElementById('stat-candidates').textContent = data.candidates || 0;
-        document.getElementById('stat-admins').textContent = data.admins || 0;
-        document.getElementById('stat-new-users').textContent = data.newUsersToday || 0;
-      };
-
-      if (window.__swrCache) {
-        window.__swrCache.query('dashboard-stats', fetcher, render, 30000);
-      } else {
-        fetcher().then(render).catch(() => {
-          document.getElementById('stat-candidates').textContent = 'Hata';
-          document.getElementById('stat-admins').textContent = 'Hata';
-          document.getElementById('stat-new-users').textContent = 'Hata';
-        });
-      }
-    }
-
-    document.addEventListener("astro:page-load", () => {
-      if (document.getElementById('stat-candidates')) {
-        loadStats();
-      }
+  <script>
+    import { loadStats } from '../../scripts/admin/dashboard/statsLoader';
+    document.addEventListener('astro:page-load', () => {
+      if (document.getElementById('stat-candidates')) loadStats();
     });
   </script>
 </AdminLayout>

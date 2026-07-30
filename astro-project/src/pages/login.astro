@@ -161,96 +161,15 @@ import Layout from '../layouts/Layout.astro';
 </Layout>
 
 <script>
-  window.addEventListener('DOMContentLoaded', () => {
-    const emailInput = document.getElementById('email') as HTMLInputElement;
-    const rememberedEmail = localStorage.getItem('remembered_email');
-    if (emailInput && rememberedEmail) emailInput.value = rememberedEmail;
-  });
+  import { initRememberMe } from '../scripts/login/rememberMe';
+  import { initInputFocusAndHover } from '../scripts/login/inputFocusAndHover';
+  import { initTogglePassword } from '../scripts/login/togglePassword';
+  import { initLoginFormSubmit } from '../scripts/login/loginFormSubmit';
 
-  // Focus styles
-  document.querySelectorAll('.form-input').forEach((el) => {
-    const input = el as HTMLInputElement;
-    input.addEventListener('focus', () => {
-      input.style.borderColor = '#2d5a45';
-      input.style.boxShadow = '0 0 0 4px rgba(45,90,69,0.1)';
-    });
-    input.addEventListener('blur', () => {
-      input.style.borderColor = '#c0c9c2';
-      input.style.boxShadow = 'none';
-    });
-  });
-
-  // Toggle Password Visibility
-  const togglePasswordBtn = document.getElementById('toggle-password');
-  const passwordInput = document.getElementById('password') as HTMLInputElement;
-  togglePasswordBtn?.addEventListener('click', () => {
-    const isPassword = passwordInput.type === 'password';
-    passwordInput.type = isPassword ? 'text' : 'password';
-    const icon = togglePasswordBtn.querySelector('span');
-    if (icon) icon.textContent = isPassword ? 'visibility_off' : 'visibility';
-  });
-
-  // Hover effect on button
-  const loginBtn = document.getElementById('login-btn');
-  loginBtn?.addEventListener('mouseover', () => {
-    (loginBtn as HTMLButtonElement).style.background = '#224f3b';
-    (loginBtn as HTMLButtonElement).style.transform = 'translateY(-1px)';
-    (loginBtn as HTMLButtonElement).style.boxShadow = '0 6px 20px rgba(45,90,69,0.4)';
-  });
-  loginBtn?.addEventListener('mouseout', () => {
-    (loginBtn as HTMLButtonElement).style.background = '#2d5a45';
-    (loginBtn as HTMLButtonElement).style.transform = 'translateY(0)';
-    (loginBtn as HTMLButtonElement).style.boxShadow = '0 4px 14px rgba(45,90,69,0.3)';
-  });
-
-  // Handle Submit
-  const form = document.getElementById('login-form') as HTMLFormElement;
-  const errorFeedback = document.getElementById('error-feedback') as HTMLDivElement;
-
-  form?.addEventListener('submit', async (e) => {
-    e.preventDefault();
-    const rawEmail = (document.getElementById('email') as HTMLInputElement).value;
-    const email = rawEmail.trim().toLowerCase();
-    const password = (document.getElementById('password') as HTMLInputElement).value;
-
-    errorFeedback.style.display = 'none';
-    errorFeedback.textContent = '';
-
-    const emailRegex = /^[a-zA-Z0-9._%+-]+@gmail\.com$/;
-    if (!emailRegex.test(email)) {
-      errorFeedback.style.display = 'block';
-      errorFeedback.textContent = '[Hata]: Lütfen geçerli bir @gmail.com adresi girin.';
-      return;
-    }
-
-    try {
-      const response = await fetch('/api/auth/login', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ email, password }),
-        credentials: 'include'
-      });
-      
-      let data;
-      const text = await response.text();
-      try {
-        data = text ? JSON.parse(text) : {};
-      } catch (e) {
-        throw new Error('Sunucudan geçersiz yanıt alındı. Lütfen servisin çalıştığından emin olun.');
-      }
-
-      if (!response.ok) throw new Error(data.message || 'Kimlik doğrulama başarısız.');
-      try { sessionStorage.clear(); localStorage.clear(); } catch(e) {}
-      if (data.user && data.user.role === 'ADMIN') {
-        window.location.href = '/admin/dashboard';
-      } else {
-        window.location.href = '/profile';
-      }
-    } catch (error: any) {
-      errorFeedback.style.display = 'block';
-      errorFeedback.textContent = `[Hata]: ${error.message}`;
-    }
-  });
+  initRememberMe();
+  initInputFocusAndHover();
+  initTogglePassword();
+  initLoginFormSubmit();
 </script>
 
 <style>
