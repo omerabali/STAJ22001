@@ -8,8 +8,8 @@ const userId = Astro.url.searchParams.get('userId') || '';
   <!-- Back Button & Header -->
   <header class="mb-8 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
     <div>
-      <a href="/admin/search" class="inline-flex items-center gap-2 text-xs font-bold text-[#8a8580] hover:text-[#14422f] transition-colors mb-3 uppercase tracking-wider">
-        <span class="material-symbols-outlined text-[16px]">arrow_back</span> Aday Arama Ekranına Dön
+      <a id="profile-back-btn" href="/admin/search" class="inline-flex items-center gap-2 text-xs font-bold text-[#8a8580] hover:text-[#14422f] transition-colors mb-3 uppercase tracking-wider">
+        <span class="material-symbols-outlined text-[16px]">arrow_back</span> <span id="profile-back-text">Aday Arama Ekranına Dön</span>
       </a>
       <h2 class="font-headline-md text-headline-md font-bold mb-1 text-[#1b1c1a] text-3xl" id="candidate-name-header">Aday Profili</h2>
       <p class="font-body-sm text-sm text-[#8a8580] font-medium" id="candidate-email-header">Yükleniyor...</p>
@@ -714,9 +714,45 @@ const userId = Astro.url.searchParams.get('userId') || '';
       }
     }
 
+    function setupDynamicBackLink() {
+      const backBtn = document.getElementById('profile-back-btn');
+      const backText = document.getElementById('profile-back-text');
+      if (!backBtn) return;
+
+      const urlParams = new URLSearchParams(window.location.search);
+      const fromSource = urlParams.get('from');
+      const ref = document.referrer || '';
+
+      if (fromSource === 'compare' || ref.includes('/admin/compare')) {
+        backBtn.href = '/admin/compare?from=profile';
+        if (backText) backText.textContent = 'Aday Karşılaştırma Ekranına Dön';
+      } else if (fromSource === 'semantic' || (ref.includes('/admin/search') && ref.includes('semantic'))) {
+        backBtn.href = '/admin/search?tab=semantic';
+        if (backText) backText.textContent = 'Aday Arama Ekranına Dön';
+      } else if (fromSource === 'basic' || (ref.includes('/admin/search') && ref.includes('basic'))) {
+        backBtn.href = '/admin/search?tab=basic';
+        if (backText) backText.textContent = 'Aday Arama Ekranına Dön';
+      } else if (fromSource === 'reports' || ref.includes('/admin/reports')) {
+        backBtn.href = '/admin/reports';
+        if (backText) backText.textContent = 'Raporlar Ekranına Dön';
+      } else if (fromSource === 'users' || ref.includes('/admin/users')) {
+        backBtn.href = '/admin/users';
+        if (backText) backText.textContent = 'Kullanıcı Yönetimi Ekranına Dön';
+      } else if (ref.includes('/admin/search')) {
+        backBtn.href = ref;
+        if (backText) backText.textContent = 'Aday Arama Ekranına Dön';
+      } else {
+        backBtn.href = '/admin/search';
+        if (backText) backText.textContent = 'Aday Arama Ekranına Dön';
+      }
+    }
+
+    setupDynamicBackLink();
+
     if (!window.__profileListenerRegistered) {
       window.__profileListenerRegistered = true;
       document.addEventListener('astro:page-load', () => {
+        setupDynamicBackLink();
         const container = document.getElementById('profile-page-container');
         if (container) {
           loadCandidateProfile();

@@ -261,7 +261,7 @@ const candidate2Id = Astro.url.searchParams.get('candidate2') || '';
           </div>
           <div class="flex items-center justify-between pt-4 border-t border-[#ddd9d3] text-xs text-[#8a8580]">
             <span>Kayıt Tarihi: <strong class="text-[#1b1c1a]">${createdDate}</strong></span>
-            <a href="/admin/profile?userId=${candidate.id}" class="text-[#14422f] hover:underline font-bold inline-flex items-center gap-1">
+            <a href="/admin/profile?userId=${candidate.id}&from=compare" class="text-[#14422f] hover:underline font-bold inline-flex items-center gap-1">
               Tam Profil <span class="material-symbols-outlined text-xs">arrow_forward</span>
             </a>
           </div>

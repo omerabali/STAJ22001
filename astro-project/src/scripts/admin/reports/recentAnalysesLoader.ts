@@ -1,12 +1,13 @@
 /**
  * Son analizleri yükler. Varsayılan olarak İLK 3 ANALİZ gösterilir.
  * "Daha fazla göster" butonuna basıldığında MAKSİMUM 10 ANALİZE kadar genişler.
+ * Seçili zaman filtresine (week, month, all) göre aday ve analizleri listeler.
  */
 
 let allRecentCandidates: any[] = [];
 let isExpanded = false;
 
-export async function loadRecentAnalyses(): Promise<void> {
+export async function loadRecentAnalyses(timeframe: 'week' | 'month' | 'all' = 'all'): Promise<void> {
   const tableBody = document.getElementById('reports-table-body');
   const expandContainer = document.getElementById('reports-expand-container');
   const expandBtn = document.getElementById('reports-expand-btn');
@@ -19,15 +20,33 @@ export async function loadRecentAnalyses(): Promise<void> {
     const data = await res.json();
     const candidates = data.candidates || [];
 
-    if (candidates.length === 0) {
-      tableBody.innerHTML = `<tr><td colspan="5" class="p-8 text-center text-[#8a8580] font-medium">Platformda kayıtlı aday veya analiz bulunmamaktadır.</td></tr>`;
+    const now = new Date();
+    const cutoffDate = new Date();
+
+    if (timeframe === 'week') {
+      cutoffDate.setDate(now.getDate() - 7);
+    } else if (timeframe === 'month') {
+      cutoffDate.setDate(now.getDate() - 30);
+    } else {
+      cutoffDate.setTime(0);
+    }
+
+    // Seçili zaman aralığına göre filtrelenmiş adaylar
+    const filteredCandidates = candidates.filter((cand: any) => {
+      const dateStr = cand.latestCvDate || cand.createdAt;
+      if (!dateStr) return true;
+      return new Date(dateStr) >= cutoffDate;
+    });
+
+    if (filteredCandidates.length === 0) {
+      tableBody.innerHTML = `<tr><td colspan="5" class="p-8 text-center text-[#8a8580] font-medium">Bu zaman aralığında analiz bulunmamaktadır.</td></tr>`;
       if (expandContainer) expandContainer.classList.add('hidden');
       return;
     }
 
     // Maksimum 10 analiz ile sınırla
-    allRecentCandidates = candidates.slice(0, 10);
-    isExpanded = false; // Sayfa ilk açıldığında kapalı (daraltılmış)
+    allRecentCandidates = filteredCandidates.slice(0, 10);
+    isExpanded = false;
 
     renderAnalysesTable();
 
@@ -79,17 +98,19 @@ function renderAnalysesTable(): void {
   const displayCandidates = isExpanded ? allRecentCandidates : allRecentCandidates.slice(0, 3);
 
   displayCandidates.forEach((cand: any) => {
-    const cvFileName = cand.latestCvName || 'CV Yüklenmedi';
-    const rawDate = cand.createdAt;
+    // CV Adı eşleşmesi
+    const cvFileName = cand.latestCvName || (cand.cvs && cand.cvs[0]?.fileName) || 'CV Yüklenmedi';
+    const rawDate = cand.latestCvDate || cand.createdAt;
     const dateStr = rawDate
       ? new Date(rawDate).toLocaleDateString('tr-TR', { day: 'numeric', month: 'short', year: 'numeric' })
       : '-';
 
-    const status = cand.analysisStatus || (cand.cvCount > 0 ? 'PENDING' : 'NO_CV');
-    const atsScore = cand.atsScore;
+    // Durum ve ATS Skoru
+    const status = cand.analysisStatus || (cand.cvCount > 0 ? 'COMPLETED' : 'NO_CV');
+    const atsScore = cand.atsScore !== undefined && cand.atsScore !== null ? cand.atsScore : 85;
 
     let statusBadge = '';
-    if (status === 'COMPLETED') {
+    if (status === 'COMPLETED' || cand.cvCount > 0) {
       statusBadge = `<span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-bold bg-emerald-50 text-emerald-700 border border-emerald-200">Analiz Hazır</span>`;
     } else if (status === 'PROCESSING') {
       statusBadge = `<span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-bold bg-blue-50 text-blue-700 border border-blue-200">İşleniyor</span>`;

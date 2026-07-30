@@ -9,7 +9,7 @@ function pct(val: number, total: number): number {
 /**
  * Rapor istatistiklerini (donut chart, stat kartları, haftalık bar) yükler ve render eder.
  */
-export function loadReports(): void {
+export function loadReports(timeframe: 'week' | 'month' | 'all' = 'all'): void {
   const fetcher = async () => {
     const res = await fetch('/api/admin/reports/stats');
     if (!res.ok) throw new Error('Fetch reports stats error');
@@ -59,9 +59,5 @@ export function loadReports(): void {
     renderCVChart(data.recentCvUploads);
   };
 
-  if ((window as any).__swrCache) {
-    (window as any).__swrCache.query('reports-stats', fetcher, render, 30000);
-  } else {
-    fetcher().then(render).catch((err: any) => console.error('Reports stats failed:', err));
-  }
+  fetcher().then(render).catch(console.error);
 }

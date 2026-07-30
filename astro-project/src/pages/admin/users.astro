@@ -645,7 +645,7 @@ const { user } = Astro.locals;
             <td class="p-4 text-[#8a8580] font-medium">${cand.email || '-'}</td>
             <td class="p-4 text-[#8a8580] font-medium">${dateStr}</td>
             <td class="p-4 text-right">
-              <a href="/admin/candidate-profile?id=${candId}&cvId=${cand.cvId || ''}" class="inline-flex items-center gap-1.5 px-3 py-1.5 border border-[#ddd9d3] rounded-[8px] bg-[#14422f] text-white hover:bg-[#103425] text-xs font-bold transition-all shadow-xs">
+              <a href="/admin/candidate-profile?id=${candId}&cvId=${cand.cvId || ''}&from=users" class="inline-flex items-center gap-1.5 px-3 py-1.5 border border-[#ddd9d3] rounded-[8px] bg-[#14422f] text-white hover:bg-[#103425] text-xs font-bold transition-all shadow-xs">
                 <span class="material-symbols-outlined text-sm">visibility</span>
                 Profili Gör
               </a>
