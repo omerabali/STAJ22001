@@ -1,0 +1,62 @@
+{
+  "scenario": "Sıralı Yükleme (Tek Kullanıcı, Döngü)",
+  "timestamp": "2026-07-31T13:22:46.800Z",
+  "cvCount": 5,
+  "totalDurationMs": 190686,
+  "totalDurationSeconds": "190.69s",
+  "averageCvDurationSeconds": "38.14s",
+  "peakRssMb": 129.3,
+  "peakHeapUsedMb": 28.24,
+  "cvDetails": [
+    {
+      "index": 1,
+      "fileName": "Beyaz Minimalist Pazarlama Müdürü Özgeçmiş.pdf",
+      "cvId": "58fd1f88-eb29-42f5-bdfe-7dc6cc70b91d",
+      "status": "COMPLETED",
+      "durationMs": 51699,
+      "durationSeconds": "51.70s",
+      "chunksCount": 10,
+      "atsScore": 85
+    },
+    {
+      "index": 2,
+      "fileName": "Beyaz Siyah Basit Stilde Bilim ve Mühendislik Özgeçmişi (1).pdf",
+      "cvId": "bffa0154-5b76-48d7-8b9c-08d6d887cffa",
+      "status": "COMPLETED",
+      "durationMs": 34333,
+      "durationSeconds": "34.33s",
+      "chunksCount": 6,
+      "atsScore": 85
+    },
+    {
+      "index": 3,
+      "fileName": "Lila Minimal Profesyonel Yazılım Mühendisi İş Başvurusu CV Özgeçmiş.pdf",
+      "cvId": "16597825-46ce-4754-bdea-a600aa433cfb",
+      "status": "COMPLETED",
+      "durationMs": 35666,
+      "durationSeconds": "35.67s",
+      "chunksCount": 8,
+      "atsScore": 85
+    },
+    {
+      "index": 4,
+      "fileName": "Mavi Açık Mavi Renk Blokları Uçuş Görevlisi CV.pdf",
+      "cvId": "ad1df327-9ae4-4523-ae3a-cc4c7d38ad0f",
+      "status": "COMPLETED",
+      "durationMs": 29186,
+      "durationSeconds": "29.19s",
+      "chunksCount": 5,
+      "atsScore": 85
+    },
+    {
+      "index": 5,
+      "fileName": "Mavi Modern Yalın Profesyonel  Özgeçmiş CV .pdf",
+      "cvId": "7791e29e-70ec-4b2c-83a5-769b4db84fac",
+      "status": "COMPLETED",
+      "durationMs": 38780,
+      "durationSeconds": "38.78s",
+      "chunksCount": 10,
+      "atsScore": 85
+    }
+  ]
+}

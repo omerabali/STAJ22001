@@ -112,9 +112,10 @@ router.get("/candidates", authMiddleware, adminMiddleware, async (req: Request, 
 });
 
 // GET /api/admin/reports/stats
-router.get("/reports/stats", authMiddleware, adminMiddleware, async (_req: Request, res: Response) => {
+router.get("/reports/stats", authMiddleware, adminMiddleware, async (req: Request, res: Response) => {
   try {
-    const stats = await GetPlatformReportStatsUseCase.execute(prisma);
+    const period = (req.query.period as string) || "week";
+    const stats = await GetPlatformReportStatsUseCase.execute(prisma, period);
     res.json(stats);
   } catch (error) {
     console.error("Rapor istatistikleri alınırken hata:", error);

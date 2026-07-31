@@ -1,7 +1,11 @@
 import { Prisma } from "@prisma/client";
 
 export class GetPlatformReportStatsUseCase {
-  public static async execute(prisma: any) {
+  public static async execute(prisma: any, period: string = "week") {
+    let daysInterval = 7;
+    if (period === "month") daysInterval = 30;
+    if (period === "all") daysInterval = 365;
+
     const [
       totalUsers,
       totalCandidates,
@@ -14,6 +18,7 @@ export class GetPlatformReportStatsUseCase {
       avgScoreResult,
       recentUsers,
       recentCvs,
+      weeklyUploadsCount,
     ] = await Promise.all([
       prisma.user.count(),
       prisma.user.count({ where: { role: "CANDIDATE" } }),
@@ -30,23 +35,30 @@ export class GetPlatformReportStatsUseCase {
       prisma.$queryRaw<{ day: string; count: bigint }[]>`
         SELECT DATE_TRUNC('day', "createdAt") AS day, COUNT(*) AS count
         FROM users
-        WHERE "createdAt" >= NOW() - INTERVAL '7 days'
+        WHERE "createdAt" >= NOW() - (${daysInterval} || ' days')::INTERVAL
         GROUP BY day
         ORDER BY day ASC
       `,
       prisma.$queryRaw<{ day: string; count: bigint }[]>`
         SELECT DATE_TRUNC('day', "createdAt") AS day, COUNT(*) AS count
         FROM cvs
-        WHERE "createdAt" >= NOW() - INTERVAL '7 days'
+        WHERE "createdAt" >= NOW() - (${daysInterval} || ' days')::INTERVAL
         GROUP BY day
         ORDER BY day ASC
       `,
+      prisma.cV.count({
+        where: {
+          createdAt: {
+            gte: new Date(Date.now() - daysInterval * 24 * 60 * 60 * 1000),
+          },
+        },
+      }),
     ]);
 
     const completedWithSkills = await prisma.cVAnalysis.findMany({
       where: { status: "COMPLETED", skills: { not: Prisma.DbNull } },
       select: { skills: true },
-      take: 200,
+      take: 300,
     });
 
     const skillCount: Record<string, number> = {};
@@ -76,6 +88,7 @@ export class GetPlatformReportStatsUseCase {
     }));
 
     return {
+      period,
       totalUsers,
       totalCandidates,
       totalAdmins,
@@ -84,6 +97,7 @@ export class GetPlatformReportStatsUseCase {
       completedAnalyses,
       pendingAnalyses,
       processingAnalyses,
+      weeklyUploadsCount,
       avgAtsScore: avgScoreResult._avg.atsScore
         ? Math.round(Number(avgScoreResult._avg.atsScore))
         : 82,

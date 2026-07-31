@@ -117,6 +117,44 @@ graph TD
 
 ---
 
+## ⚡ Worker Pool (BullMQ & Redis) Mimarisi
+
+Sistemimizde CV yüklemelerinde ana HTTP sunucusunu (Express) kilitlenmekten korumak amacıyla BullMQ ve Redis tabanlı asenkron bir **Worker Pool (İşçi Havuzu)** mimarisi uygulanmıştır.
+
+```mermaid
+graph TD
+    A[Kullanıcı CV Yükler - HTTP POST /upload] --> B[Express Main Thread]
+    B --> C[Veritabanında CV Kaydı Oluştur]
+    B --> D[cvQueue.add - Job'ı Redis'e Ekle]
+    B --> E[Kullanıcıya Anında 200 OK Yanıtı Dön]
+    
+    subgraph Worker Pool (Concurrency: 4)
+        F[Worker 1]
+        G[Worker 2]
+        H[Worker 3]
+        I[Worker 4]
+    end
+    
+    D --> |Kuyruktan Job Çek| F
+    D --> |Kuyruktan Job Çek| G
+    D --> |Kuyruktan Job Çek| H
+    D --> |Kuyruktan Job Çek| I
+    
+    F --> J[ProcessCvPipeline - Chunking + OCR + AI]
+    G --> J
+    H --> J
+    I --> J
+    
+    J --> K[Prisma DB'ye Kaydet & Socket.io Bildirimi Gönder]
+```
+
+### Worker Pool Kuralları ve Performansı:
+- **Sabit 4 Worker Thread/Slot (`concurrency: 4`)**: Aynı anda maksimum 4 CV paralel işlenir, 5. CV kuyrukta bekletilir.
+- **Yeniden Deneme (Retry) Politikası**: Hata durumunda 3 kez üst üste katlanarak artan bekleme süresiyle (`exponential backoff: 2s, 4s, 8s`) otomatik tekrar denenir.
+- **Toplu İşleme Başarımı**: 5 Gerçek CV ile yapılan benchmark testinde işlem süresi **190.7 saniyeden 61.8 saniyeye inerek %67.6 performans artışı** elde edilmiştir.
+
+---
+
 ## 🔐 Uygulama Katmanı Güvenlik Denetimi (Manuel Audit — 2026-07-08)
 
 Projenin tek gerçek güvenlik katmanı Express middleware + Prisma `WHERE userId` filtresidir. Aşağıda `cvs`, `cv_chunks` ve `cv_embeddings` tablolarına erişen tüm route'ların denetim sonuçları listelenmiştir:
