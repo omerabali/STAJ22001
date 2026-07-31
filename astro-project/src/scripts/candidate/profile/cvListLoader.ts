@@ -20,10 +20,17 @@ export function createCvListLoader(state: {
       const tbody = document.getElementById('profile-cvs-body');
       if (!tbody) return;
 
-      if (!data.cvs || data.cvs.length === 0) {
+      const THREE_DAYS_MS = 3 * 24 * 60 * 60 * 1000;
+      const now = Date.now();
+      const last3DaysCvs = (data.cvs || []).filter((cv: any) => {
+        const cvDate = new Date(cv.createdAt).getTime();
+        return (now - cvDate) <= THREE_DAYS_MS;
+      });
+
+      if (last3DaysCvs.length === 0) {
         tbody.innerHTML = `
           <tr>
-            <td colspan="6" class="px-6 py-8 text-center text-[#8a8580] font-medium">Henüz CV yüklemediniz. Yukarıdan yeni bir dosya seçebilirsiniz.</td>
+            <td colspan="6" class="px-6 py-8 text-center text-[#8a8580] font-medium">Son 3 gün içerisinde yüklenen CV bulunmamaktadır.</td>
           </tr>
         `;
         return;
@@ -32,7 +39,7 @@ export function createCvListLoader(state: {
       tbody.innerHTML = '';
       let hasPendingOrProcessing = false;
 
-      data.cvs.forEach((cv: any) => {
+      last3DaysCvs.forEach((cv: any) => {
         const latestAnalysis = cv.analyses && cv.analyses[0];
         const status = latestAnalysis ? latestAnalysis.status : 'PENDING';
         if (status === 'PENDING' || status === 'PROCESSING') {
@@ -40,7 +47,7 @@ export function createCvListLoader(state: {
         }
       });
 
-      const cvsToShow = data.cvs.slice(0, 3);
+      const cvsToShow = last3DaysCvs.slice(0, 3);
 
       cvsToShow.forEach((cv: any) => {
         const latestAnalysis = cv.analyses && cv.analyses[0];
@@ -78,7 +85,7 @@ export function createCvListLoader(state: {
           ? `<span class="font-bold text-emerald-700">%${latestAnalysis.atsScore} ATS Skoru</span>` 
           : `<span class="text-[#8a8580]">-</span>`;
 
-        const timeMs = cv.metadata?.processingTimeMs;
+        const timeMs = cv.metadata?.processingTimeMs ?? cv.metadata?.totalTimeMs;
         const timeBadge = timeMs 
           ? `<span class="inline-flex items-center gap-1 px-2.5 py-1 rounded-[6px] text-xs font-mono font-bold bg-[#faf9f5] text-[#14422f] border border-[#ddd9d3]"><span class="material-symbols-outlined text-[13px] text-amber-500">bolt</span>${(timeMs / 1000).toFixed(1)}s</span>` 
           : `<span class="text-xs text-[#8a8580] italic">-</span>`;

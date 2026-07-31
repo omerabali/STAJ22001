@@ -28,8 +28,9 @@ async function runGun34LiveVerification(): Promise<void> {
       testUser = await prisma.user.create({
         data: {
           email: `testworker-${Date.now()}@example.com`,
-          password: "hashedpassword123",
+          passwordHash: "hashedpassword123",
           name: "Worker Test User",
+          phone: "+905555555555",
           role: "ADMIN"
         }
       });

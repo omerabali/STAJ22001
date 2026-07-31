@@ -49,11 +49,12 @@ export function renderCandidates(allUsersData: any[], filterState: { currentFilt
   container.innerHTML = filtered.map(user => {
     const cv = user.latestCv || (user.cvs && user.cvs[0]);
     const analysis = cv?.analysis || (cv?.analyses && cv.analyses[0]);
-    const score = analysis?.atsScore;
-    const skills = analysis?.skills || [];
-    const role = analysis?.role || 'Aday';
+    const score = user.atsScore ?? analysis?.atsScore ?? null;
+    const skills = (Array.isArray(user.skills) && user.skills.length > 0) ? user.skills : (analysis?.skills || []);
+    const role = user.latestCvName || analysis?.role || 'Aday';
     const initials = getInitials(user.name, user.email);
     const avatarUrl = user.avatarUrl;
+    const targetCvId = user.latestCvId || cv?.id;
 
     const avatarHtml = avatarUrl
       ? `<img src="${avatarUrl}" alt="${user.name || user.email}" class="w-10 h-10 rounded-full object-cover shrink-0 border border-[#ddd9d3]" />`
@@ -97,7 +98,7 @@ export function renderCandidates(allUsersData: any[], filterState: { currentFilt
             class="px-3 py-1.5 rounded-[6px] border border-[#ddd9d3] text-xs font-semibold text-[#1b1c1a] hover:bg-[#f5f4f0] transition-colors flex items-center gap-1 cursor-pointer">
             <span class="material-symbols-outlined text-xs">compare_arrows</span> Karşılaştır
           </button>
-          <a href="/admin/candidate-profile?id=${user.id}${cv?.id ? `&cvId=${cv.id}` : ''}&from=basic" class="text-xs font-bold text-[#14422f] hover:underline flex items-center gap-1">
+          <a href="/admin/candidate-profile?id=${user.id}${targetCvId ? `&cvId=${targetCvId}` : ''}&from=basic" class="text-xs font-bold text-[#14422f] hover:underline flex items-center gap-1">
             Profili Gör <span class="material-symbols-outlined text-[14px]">arrow_forward</span>
           </a>
         </div>

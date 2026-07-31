@@ -193,6 +193,21 @@ import AdminLayout from '../../layouts/AdminLayout.astro';
             </tbody>
           </table>
         </div>
+        <!-- Pagination Controls Footer -->
+        <div id="cv-pagination-container" class="hidden px-5 py-3 border-t border-[#ddd9d3] bg-[#faf9f5] flex flex-wrap items-center justify-between gap-3">
+          <span class="text-xs text-[#8a8580] font-medium" id="cv-pagination-info">
+            Gösterilen: <strong id="pagination-start" class="text-[#1b1c1a]">1</strong> - <strong id="pagination-end" class="text-[#1b1c1a]">10</strong> / <strong id="pagination-total" class="text-[#1b1c1a]">0</strong> kayıt
+          </span>
+          <div class="flex items-center gap-2">
+            <button id="btn-prev-page" class="px-3 py-1.5 rounded-[6px] border border-[#ddd9d3] bg-white text-xs font-semibold text-[#1b1c1a] hover:bg-[#f5f4f0] disabled:opacity-40 disabled:cursor-not-allowed transition-colors flex items-center gap-1">
+              <span class="material-symbols-outlined text-xs">chevron_left</span> Önceki
+            </button>
+            <div id="pagination-page-numbers" class="flex items-center gap-1"></div>
+            <button id="btn-next-page" class="px-3 py-1.5 rounded-[6px] border border-[#ddd9d3] bg-white text-xs font-semibold text-[#1b1c1a] hover:bg-[#f5f4f0] disabled:opacity-40 disabled:cursor-not-allowed transition-colors flex items-center gap-1">
+              Sonraki <span class="material-symbols-outlined text-xs">chevron_right</span>
+            </button>
+          </div>
+        </div>
       </div>
 
       <!-- Chunk Viewer -->

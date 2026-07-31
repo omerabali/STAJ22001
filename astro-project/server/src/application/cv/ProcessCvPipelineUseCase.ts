@@ -2,7 +2,7 @@ import { PrismaClient, AnalysisStatus } from "@prisma/client";
 import { 
   extractTextFromPDF, 
   detectLanguage, 
-  splitTextSlidingWindow, 
+  chunkTextBySections, 
   analyzeWithOpenAI 
 } from "../../utils/parser.js";
 import { embedAllChunks } from "../../utils/embeddings.js";
@@ -85,22 +85,22 @@ export class ProcessCvPipelineUseCase {
         throw new Error("CV'den yeterli okunabilir metin çıkarılamadı.");
       }
 
-      // 4. PARÇALAMA (Chunking) & ESKİ PARÇALARI TEMİZLEME
+      // 4. PARÇALAMA (4-Aşamalı Yapay Zeka Chunklama Motoru) & ESKİ PARÇALARI TEMİZLEME
       await prisma.cVChunk.deleteMany({ where: { cvId } });
 
-      const chunks = splitTextSlidingWindow(text, 1000, 200);
-      const chunkRecords = chunks.map((chunkText: string, idx: number) => ({
+      const parsedChunks = await chunkTextBySections(text, prisma);
+      const chunkRecords = parsedChunks.map((chunkObj, idx: number) => ({
         cvId,
-        chunkText,
+        chunkText: chunkObj.chunkText,
         chunkIndex: idx,
-        metadata: { length: chunkText.length }
+        metadata: chunkObj.metadata
       }));
 
       await prisma.cVChunk.createMany({
         data: chunkRecords
       });
 
-      console.log(`[Parser] CV ${cvId} split into ${chunks.length} chunks.`);
+      console.log(`[Parser] CV ${cvId} split into ${parsedChunks.length} multi-layer AI section chunks.`);
 
       // 5. TEK RUNDA ANINDA YAPAY ZEKA ANALİZİ (GPT-4o-mini / OpenAI)
       emitAnalysisStatus(cvId, "PROCESSING", "Yapay zeka CV analizi gerçekleştiriliyor...", 2);
@@ -140,10 +140,11 @@ export class ProcessCvPipelineUseCase {
 
       // 8. COST LOGGING (Maliyet ve Token Verileri ile Birlikte DB'ye Yaz)
       const parserStats = {
+        processingTimeMs: totalDurationMs,
         totalTimeMs: totalDurationMs,
         aiDurationMs,
         textLength: text.length,
-        chunksCount: chunks.length,
+        chunksCount: parsedChunks.length,
         language: lang,
         atsScore: aiAnalysis.atsScore,
         aiFallback: (aiAnalysis as any).aiFallback || false,

@@ -207,19 +207,23 @@ router.post("/logout", (req: Request, res: Response): void => {
 // ─────────────────────────────────────────────
 router.post("/forgot-password-code", async (req: Request, res: Response): Promise<void> => {
   try {
-    const { phone } = req.body;
-    const phoneStr = (phone || "").trim().replace(/^(\+90|0)/, "");
+    const { phone, email } = req.body;
+    const rawVal = (phone || email || "").trim();
 
-    if (!phoneStr) {
-      res.status(400).json({ message: "Telefon numarası zorunludur." });
+    if (!rawVal) {
+      res.status(400).json({ message: "E-posta veya telefon numarası zorunludur." });
       return;
     }
 
-    const user = await prisma.user.findUnique({ where: { phone: phoneStr } });
+    const isEmail = rawVal.includes("@");
+    const searchVal = isEmail ? rawVal.toLowerCase() : rawVal.replace(/^(\+90|0)/, "");
+
+    const user = await prisma.user.findFirst({
+      where: isEmail ? { email: searchVal } : { phone: searchVal }
+    });
+
     if (!user) {
-      // Güvenlik: Kullanıcı bulunamadıysa bile hata detayını belli etmemek için "Gönderildi" diyebiliriz.
-      // Ancak UX için şimdilik net hata dönelim.
-      res.status(404).json({ message: "Bu numaraya ait bir kullanıcı bulunamadı." });
+      res.status(404).json({ message: "Girdiğiniz e-posta veya telefon numarasına ait kullanıcı bulunamadı." });
       return;
     }
 
@@ -232,8 +236,8 @@ router.post("/forgot-password-code", async (req: Request, res: Response): Promis
       data: { resetCode, resetCodeExpires }
     });
 
-    // Simüle SMS
-    console.log(`[SMS SİMÜLASYONU] Telefon: ${phoneStr} | Kod: ${resetCode}`);
+    // Simüle SMS / E-posta
+    console.log(`[DOĞRULAMA KODU SİMÜLASYONU] Alıcı: ${searchVal} | Kod: ${resetCode}`);
 
     res.json({ message: "Doğrulama kodu gönderildi." });
   } catch (error) {
@@ -247,16 +251,22 @@ router.post("/forgot-password-code", async (req: Request, res: Response): Promis
 // ─────────────────────────────────────────────
 router.post("/verify-code", async (req: Request, res: Response): Promise<void> => {
   try {
-    const { phone, code } = req.body;
-    const phoneStr = (phone || "").trim().replace(/^(\+90|0)/, "");
+    const { phone, email, code } = req.body;
+    const rawVal = (phone || email || "").trim();
     const codeStr = (code || "").trim();
 
-    if (!phoneStr || !codeStr) {
-      res.status(400).json({ message: "Telefon numarası ve kod zorunludur." });
+    if (!rawVal || !codeStr) {
+      res.status(400).json({ message: "Kullanıcı bilgisi ve doğrulama kodu zorunludur." });
       return;
     }
 
-    const user = await prisma.user.findUnique({ where: { phone: phoneStr } });
+    const isEmail = rawVal.includes("@");
+    const searchVal = isEmail ? rawVal.toLowerCase() : rawVal.replace(/^(\+90|0)/, "");
+
+    const user = await prisma.user.findFirst({
+      where: isEmail ? { email: searchVal } : { phone: searchVal }
+    });
+
     if (!user) {
       res.status(404).json({ message: "Kullanıcı bulunamadı." });
       return;
@@ -272,10 +282,15 @@ router.post("/verify-code", async (req: Request, res: Response): Promise<void> =
       return;
     }
 
-    // Kod doğru, kodu temizle ve login ol
+    // Kod doğru, yeni şifre varsa güncelle, reset kodunu temizle ve login yap
+    const updateData: any = { resetCode: null, resetCodeExpires: null };
+    if (req.body.newPassword && req.body.newPassword.trim().length >= 6) {
+      updateData.passwordHash = await PasswordHasher.hash(req.body.newPassword.trim());
+    }
+
     await prisma.user.update({
       where: { id: user.id },
-      data: { resetCode: null, resetCodeExpires: null }
+      data: updateData
     });
 
     const token = JwtService.signToken({ id: user.id, email: user.email, role: user.role, name: user.name });

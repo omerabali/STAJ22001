@@ -44,14 +44,13 @@ export class RankingService {
       return [];
     }
 
-    // Slice to top 10 candidates only for GPT evaluation
-    const topCandidates = candidates.slice(0, 10);
-    const remainingCandidates = candidates.slice(10);
+    // Evaluate ALL returned search candidates using GPT evaluation in parallel for 100% fair hybrid ranking
+    const targetCandidates = candidates;
 
     const apiKey = process.env.OPENAI_API_KEY;
     const gptEvaluationsMap = new Map<string, { suitabilityScore: number; matchExplanation: string }>();
 
-    if (apiKey && topCandidates.length > 0) {
+    if (apiKey && targetCandidates.length > 0) {
       // Build hard requirements prompt block if requirements exist (ADIM 4)
       let hardRequirementsBlock = "";
       if (hardRequirements && hardRequirements.length > 0) {
@@ -68,8 +67,8 @@ Sadece CV'de gerçekten yazan bilgiye bak, tahmin/varsayım yapma.
 matchExplanation alanında HANGİ kriterin karşılanıp karşılanmadığını açıkça belirt.`;
       }
 
-      // Evaluate top candidates in parallel using Promise.all for maximum speed and zero result mix-ups
-      await Promise.all(topCandidates.map(async (c) => {
+      // Evaluate candidates in parallel using Promise.all for maximum speed and zero result mix-ups
+      await Promise.all(targetCandidates.map(async (c) => {
         try {
           const candidateText = c.rawText ? c.rawText.substring(0, 3500).replace(/\s+/g, " ") : "";
           const candidateName = c.candidateName || "Aday";
@@ -146,8 +145,8 @@ ${candidateText}`;
       }));
     }
 
-    // Process top candidates (which went through GPT evaluation or fallback)
-    const rankedTopResults: RankedResult[] = topCandidates.map(c => {
+    // Process all candidates with hybrid scoring
+    const allResults: RankedResult[] = targetCandidates.map(c => {
       const vectorScoreNormalized = c.score * 100;
       const gptEval = gptEvaluationsMap.get(c.cvId);
 
@@ -180,25 +179,7 @@ ${candidateText}`;
       };
     });
 
-    // Process remaining candidates beyond top 10 (fallback to pure vector score, no GPT evaluation)
-    const rankedRemainingResults: RankedResult[] = remainingCandidates.map(c => {
-      const vectorScoreNormalized = c.score * 100;
-      return {
-        cvId: c.cvId,
-        userId: c.userId,
-        matchedChunkId: c.matchedChunkId,
-        candidateName: c.candidateName,
-        candidateEmail: c.candidateEmail,
-        candidateAvatarUrl: c.candidateAvatarUrl,
-        score: Math.round(vectorScoreNormalized * 100) / 100,
-        vectorScore: Math.round(vectorScoreNormalized * 100) / 100,
-        gptScore: null,
-        matchExplanation: "İlk 10 aday dışında kaldığı için sadece vektörel arama skoru kullanılmıştır."
-      };
-    });
-
-    // Combine all results and sort by finalScore descending
-    const allResults = [...rankedTopResults, ...rankedRemainingResults];
+    // Sort all candidates by finalScore descending
     allResults.sort((a, b) => b.score - a.score);
 
     return allResults;
