@@ -31,6 +31,8 @@
     "@supabase/supabase-js": "^2.108.2",
     "@tailwindcss/vite": "^4.3.1",
     "astro": "^7.0.2",
+    "bullmq": "^6.0.2",
+    "ioredis": "^5.11.1",
     "tailwindcss": "^4.3.1"
   },
   "devDependencies": {

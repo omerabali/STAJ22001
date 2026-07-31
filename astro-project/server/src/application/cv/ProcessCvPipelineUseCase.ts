@@ -7,6 +7,7 @@ import {
 } from "../../utils/parser.js";
 import { embedAllChunks } from "../../utils/embeddings.js";
 import { emitAnalysisStatus } from "../../index.js";
+import { supabase } from "../../lib/supabase.js";
 
 export class ProcessCvPipelineUseCase {
   public static async execute(cvId: string, prisma: PrismaClient): Promise<void> {
@@ -50,10 +51,22 @@ export class ProcessCvPipelineUseCase {
       if (!text || text.trim().length === 0) {
         console.log(`[Parser] Extracting text for CV ${cvId}...`);
         let pdfBuffer: Buffer;
-        if (cv.fileUrl.startsWith("http://") || cv.fileUrl.startsWith("https://")) {
+        if (cv.fileUrl.includes("/cv-files/")) {
+          const storagePath = cv.fileUrl.split("/cv-files/")[1];
+          const { data: fileData, error: downloadError } = await supabase.storage
+            .from("cv-files")
+            .download(storagePath);
+
+          if (downloadError || !fileData) {
+            console.warn(`[Parser] Supabase storage download warning: ${downloadError?.message}. Falling back to fetch.`);
+            const res = await fetch(cv.fileUrl);
+            pdfBuffer = Buffer.from(await res.arrayBuffer());
+          } else {
+            pdfBuffer = Buffer.from(await fileData.arrayBuffer());
+          }
+        } else if (cv.fileUrl.startsWith("http://") || cv.fileUrl.startsWith("https://")) {
           const res = await fetch(cv.fileUrl);
-          const arrayBuffer = await res.arrayBuffer();
-          pdfBuffer = Buffer.from(arrayBuffer);
+          pdfBuffer = Buffer.from(await res.arrayBuffer());
         } else {
           const fs = await import("fs");
           pdfBuffer = fs.readFileSync(cv.fileUrl);

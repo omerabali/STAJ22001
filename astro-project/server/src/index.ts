@@ -11,6 +11,7 @@ import authRouter from "./routes/auth.js";
 import adminRouter from "./routes/admin.js";
 import cvRouter from "./routes/cv.js";
 import searchRouter from "./routes/search.js";
+import { initCvWorker } from "./infrastructure/queue/cvWorker.js";
 
 const app = express();
 const httpServer = http.createServer(app);
@@ -109,10 +110,15 @@ httpServer.on("error", (err: any) => {
   }
 });
 
-// Sunucuyu başlat
+// Sunucuyu başlat ve Worker Pool'u devreye al
 if (process.env.NODE_ENV !== "test") {
   httpServer.listen(PORT, () => {
     console.log(`✅ Sunucu (Express + Socket.io) http://localhost:${PORT} adresinde çalışıyor`);
+    try {
+      initCvWorker();
+    } catch (err: any) {
+      console.error("[Worker Pool] ❌ Worker başlatılamadı:", err?.message || err);
+    }
   });
 }
 

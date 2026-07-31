@@ -17,6 +17,7 @@ import { GetCvListUseCase } from "../application/cv/GetCvListUseCase.js";
 import { DeleteCvUseCase } from "../application/cv/DeleteCvUseCase.js";
 import { DownloadCvUseCase } from "../application/cv/DownloadCvUseCase.js";
 import { GetCvChunksUseCase } from "../application/cv/GetCvChunksUseCase.js";
+import { cvQueue } from "../infrastructure/queue/cvQueue.js";
 
 const pool = new pg.Pool({
   connectionString: process.env.DATABASE_URL,
@@ -44,9 +45,13 @@ const upload = multer({
 const uploadMiddleware = upload.single("cv");
 
 function processCv(cvId: string, _analysisId?: string, _pdfBuffer?: Buffer): void {
-  ProcessCvPipelineUseCase.execute(cvId, prisma).catch((err) =>
-    console.error(`[ProcessCvPipeline] Pipeline error for CV ${cvId}:`, err)
-  );
+  cvQueue.add("process-cv", { cvId }, { jobId: `cv-${cvId}-${Date.now()}` })
+    .then((job) => {
+      console.log(`[Main Thread] 📥 Job added to cv-processing-queue (Job ID: ${job.id}, CV: ${cvId})`);
+    })
+    .catch((err) => {
+      console.error(`[Main Thread] ❌ Failed to add job to cvQueue for CV ${cvId}:`, err);
+    });
 }
 
 // POST /api/cv/upload
@@ -151,17 +156,18 @@ router.post("/upload", authMiddleware, (req: Request, res: Response): void => {
         }
       });
 
+      await cvQueue.add("process-cv", { cvId: cv.id }, { jobId: `cv-${cv.id}-${Date.now()}` });
+
       emitAnalysisStatus(cv.id, "CV_UPLOADED", "CV başarıyla yüklendi ve işleme sırasına alındı.", 1, {
         cvId: cv.id,
         fileName: cv.fileName
       });
 
-      processCv(cv.id, analysis.id, fileBuffer);
-
       res.status(201).json({
         message: "CV başarıyla yüklendi, analiz sıraya alındı.",
         cv,
         analysis,
+        status: "PENDING"
       });
     } catch (dbError) {
       console.error("Veritabanı kayıt hatası:", dbError);
@@ -317,18 +323,19 @@ router.post("/:id/reanalyze", authMiddleware, async (req: Request, res: Response
       }
     });
 
-    emitAnalysisStatus(cv.id, "CV_UPLOADED", "Yeniden analiz başlatıldı.", 1, {
-      cvId: cv.id,
-      fileName: cv.fileName
-    });
+      await cvQueue.add("process-cv", { cvId: cv.id }, { jobId: `cv-reanalyze-${cv.id}-${Date.now()}` });
 
-    processCv(cv.id, analysis.id, pdfBuffer);
+      emitAnalysisStatus(cv.id, "CV_UPLOADED", "Yeniden analiz sıraya alındı.", 1, {
+        cvId: cv.id,
+        fileName: cv.fileName
+      });
 
-    res.status(200).json({
-      message: "Yeniden analiz başarıyla başlatıldı.",
-      cvId: cv.id,
-      analysisId: analysis.id
-    });
+      res.status(200).json({
+        message: "Yeniden analiz başarıyla başlatıldı, kuyruğa alındı.",
+        cvId: cv.id,
+        analysisId: analysis.id,
+        status: "PENDING"
+      });
   } catch (error: any) {
     console.error("[Reanalyze] Hata:", error);
     res.status(500).json({ message: error.message || "Yeniden analiz başlatılamadı." });
