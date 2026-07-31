@@ -1,6 +1,8 @@
 # Astro & Express Monorepo Projesi
 
-Bu proje, frontend tarafında **Astro**, backend tarafında ise **Express.js (TypeScript & Prisma 7 & Supabase)** kullanan entegre bir yapıdır.
+Bu proje, frontend tarafında **Astro**, backend tarafında ise **Express.js (TypeScript & Prisma 7 & Supabase)** kullanan entegre bir RAG (Retrieval-Augmented Generation) tabanlı yapıdır.
+
+> **Gün 39 Güncellemesi (UI Polish & Mobil Uyumluluk):** Tüm yönetim, arama ve kimlik doğrulama sayfaları Tailwind CSS esnek grid yapılarıyla mobil ve tablet cihazlara tam uyumlu hale getirilmiştir. Tablo kaydırma (overflow-x-auto), duyarlı yan menü (sidebar), dikey ekran boyutu ve otomatik doldurma (autofill) stili iyileştirmeleri entegre edilmiştir.
 
 ---
 
