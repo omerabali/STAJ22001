@@ -71,17 +71,21 @@ app.use(cors({
 app.use(cookieParser());
 app.use(express.json({ limit: '5mb' }));
 
+// Rate Limiting (DDoS & API Cost Safeguard)
+import { globalLimiter, authLimiter, searchLimiter, uploadLimiter } from "./middleware/rateLimiter.js";
+app.use(globalLimiter);
+
 // Auth routes
-app.use("/api/auth", authRouter);
+app.use("/api/auth", authLimiter, authRouter);
 
 // Admin routes
 app.use("/api/admin", adminRouter);
 
 // CV routes
-app.use("/api/cv", cvRouter);
+app.use("/api/cv", uploadLimiter, cvRouter);
 
 // Search routes
-app.use("/api/search", searchRouter);
+app.use("/api/search", searchLimiter, searchRouter);
 
 // GET / — Ana sayfa karşılama mesajı
 app.get("/", (_req, res) => {
