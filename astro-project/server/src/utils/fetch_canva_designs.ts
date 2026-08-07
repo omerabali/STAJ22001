@@ -4,6 +4,7 @@
  * kullanıcının klasör ve tasarım şablonlarını sorgulayan yardımcı araçtır.
  */
 import path from "path";
+import fs from "fs";
 
 const CV_TEST_DIR = path.join(process.cwd(), "tests", "cv_test");
 if (!fs.existsSync(CV_TEST_DIR)) fs.mkdirSync(CV_TEST_DIR, { recursive: true });

@@ -242,7 +242,7 @@ export class RankingService {
               finalScore: 10,
               needsReview: false
             }
-          }).catch(e => console.error("[RankingService] Failed to save RankingAuditLog Layer1:", e));
+          }).catch((e: any) => console.error("[RankingService] Failed to save RankingAuditLog Layer1:", e));
         }
         return;
       }
@@ -397,7 +397,7 @@ ${candidateText}`;
               finalScore: finalGptScore,
               needsReview
             }
-          }).catch(e => console.error("[RankingService] Failed to save RankingAuditLog:", e));
+          }).catch((e: any) => console.error("[RankingService] Failed to save RankingAuditLog:", e));
         }
 
         candidateEvalResults.set(c.cvId, {
