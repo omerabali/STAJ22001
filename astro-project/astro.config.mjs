@@ -3,7 +3,7 @@ import { defineConfig } from 'astro/config';
 
 import tailwindcss from '@tailwindcss/vite';
 
-import node from '@astrojs/node';
+import vercel from '@astrojs/vercel';
 
 // https://astro.build/config
 export default defineConfig({
@@ -19,7 +19,7 @@ export default defineConfig({
       proxy: {
         // /api/* isteklerini Express backend'e yönlendir
         '/api': {
-          target: 'http://localhost:5000',
+          target: process.env.PUBLIC_API_URL || 'http://localhost:5000',
           changeOrigin: true,
           secure: false,
         },
@@ -27,7 +27,5 @@ export default defineConfig({
     },
   },
 
-  adapter: node({
-    mode: 'standalone',
-  }),
+  adapter: vercel(),
 });
