@@ -1,6 +1,7 @@
 /**
- * Son analizleri yükler. Varsayılan olarak İLK 3 ANALİZ gösterilir.
- * "Daha fazla göster" butonuna basıldığında MAKSİMUM 10 ANALİZE kadar genişler.
+ * recentAnalysesLoader.ts (Raporlar Son Analiz Tablo Yöneticisi)
+ * Görevi: Raporlar sayfasında son yapılan CV analizlerini çeker ve tabloya ekler.
+ * Varsayılan olarak ilk 3 analizi gösterir, "Daha fazla göster" butonuna basılınca 10 analize kadar genişletir.
  */
 
 let allRecentCandidates: any[] = [];

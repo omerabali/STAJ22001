@@ -1,7 +1,7 @@
 /**
- * candidate-profile sayfasının ana giriş noktası (entry point).
- * Tüm modülleri import eder, global fonksiyonları window'a bağlar ve
- * sayfa yüklendiğinde profili başlatır.
+ * index.ts (Admin Aday Detay Sayfası Orkestratörü)
+ * Görevi: candidate-profile sayfasının ana giriş noktasıdır.
+ * Geri dön butonunun dinamik akışını (`?from=search`, `?from=users` vs.) kurar ve modülleri başlatır.
  */
 import { loadAdminCandidateProfile } from './profileLoader';
 import { handleCvSelectionChange } from './cvDropdown';

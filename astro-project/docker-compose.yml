@@ -1,18 +1,43 @@
+# Docker Compose servis tanımlamalarının başladığı ana alan
 services:
+  # Servisimizin adı (Ağ içerisinde diğer konteynerler bu isimle erişebilir)
   redis:
+    # Kullanılacak Docker imajı (Hafif ve hızlı olduğu için 7-alpine sürümü seçilmiş)
     image: redis:7-alpine
+
+    # Çalışacak konteynere verilecek özel isim
     container_name: beacon_redis
+
+    # Çalışma politikası: Elle durdurulmadığı sürece (sunucu çökse/başlatılsa bile) otomatik yeniden başlat
     restart: unless-stopped
+
+    # Dış dünya (Host) ve Konteyner arasındaki port yönlendirmesi
     ports:
+      # .env dosyasında REDIS_PORT varsa onu kullanır, yoksa varsayılan olarak 6379 portunu bağlar
       - "${REDIS_PORT:-6379}:6379"
+
+    # Konteyner içindeki verilerin kaybolmaması için kalıcı depolama alanı bağlantısı
     volumes:
+      # Aşağıda tanımlanan redis_data hacmini, Redis'in veri kaydettiği /data klasörüne bağlar
       - redis_data:/data
+
+    # Servisin gerçekten sağlıklı çalışıp çalışmadığını denetleyen mekanizma
     healthcheck:
-      test: ["CMD", "redis-cli", "ping"]
+      # Çalıştırılacak kontrol komutu (Redis sunucusuna "ping" atar, cevap "pong" olmalıdır)
+      test: [ "CMD", "redis-cli", "ping" ]
+
+      # Kontrolün kaç saniyede bir tekrarlanacağı
       interval: 10s
+
+      # Yanıt beklemek için maksimum süre
       timeout: 5s
+
+      # Servisin "sağlıksız" (unhealthy) sayılması için üst üste kaç kez başarısız olması gerektiği
       retries: 5
 
+# Konteynerlar kapansa bile verilerin saklanacağı kalıcı hacimlerin (volumes) tanımlandığı alan
 volumes:
+  # redis_data adında yerel bir kalıcı depolama alanı oluşturur
   redis_data:
+    # Depolama sürücüsü olarak varsayılan yerel (local) diski kullanır
     driver: local

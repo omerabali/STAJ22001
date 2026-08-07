@@ -1,6 +1,7 @@
 /**
- * Durum Mesajı Gösterici
- * Başarı (yeşil) veya hata (kırmızı) mesajlarını ilgili elemente yazar, 5s sonra gizler.
+ * showStatus.ts (Ayarlar Durum Mesajı Göstericisi)
+ * Görevi: Ayarlar sayfasındaki profil veya şifre güncelleme işlemlerinde
+ * yeşil (başarı) veya kırmızı (hata) durum mesajını ekrana yazar, 5 saniye sonra otomatik gizler.
  */
 export function showStatus(elementId: string, message: string, isError = false): void {
   const el = document.getElementById(elementId);

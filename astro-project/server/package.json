@@ -29,9 +29,9 @@
     "test:verify_gun30": "npx tsx -r dotenv/config tests/verify_gun30.ts",
     "test:gun31": "npx tsx -r dotenv/config tests/verify_gun31.ts",
     "test:verify_gun31": "npx tsx -r dotenv/config tests/verify_gun31.ts",
-    "test:verify_redis_connection": "tsx src/tests/verify_redis_connection.ts",
-    "test:verify_queue_job": "tsx src/tests/verify_queue_job.ts",
-    "test:verify_redis_error": "tsx src/tests/verify_redis_error_handling.ts",
+    "test:verify_redis_connection": "tsx tests/verify_redis_connection.ts",
+    "test:verify_queue_job": "tsx tests/verify_queue_job.ts",
+    "test:verify_redis_error": "tsx tests/verify_redis_error_handling.ts",
     "test:jest": "node --experimental-vm-modules node_modules/jest/bin/jest.js --forceExit"
   },
   "keywords": [],

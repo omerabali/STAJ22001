@@ -1,3 +1,7 @@
+/**
+ * ChangeUserRoleUseCase.ts (Kullanıcı Rolü Değiştirme Kullanım Senaryosu)
+ * Görevi: Admin paneli üzerinden hedeflenen kullanıcının rolünü (ADMIN veya CANDIDATE) günceller.
+ */
 import { PrismaClient, Role } from "@prisma/client";
 
 export interface ChangeUserRoleDTO {

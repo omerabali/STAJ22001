@@ -1,7 +1,7 @@
 /**
- * Şifre Göster/Gizle
- * HTML onclick="togglePassVisibility('id', this)" çağrılarını karşılamak için
- * window'a global fonksiyon olarak atanır.
+ * togglePassVisibility.ts (Ayarlar Şifre Göster/Gizle Yöneticisi)
+ * Görevi: Ayarlar sayfasındaki "Mevcut Şifre", "Yeni Şifre" ve "Şifre Tekrarı" kutularının
+ * sağındaki göz butonlarına tıklandığında şifreyi gizler veya gösterir. Global window nesnesine eklenir.
  */
 export function initTogglePassVisibility(): void {
   (window as any).togglePassVisibility = function (inputId: string, btn: HTMLButtonElement): void {

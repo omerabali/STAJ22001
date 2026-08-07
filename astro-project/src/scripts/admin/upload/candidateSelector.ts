@@ -1,6 +1,7 @@
 /**
- * 3. Candidate Selector
- * Aday dropdown'ını sunucudan doldurma ve seçilen adayın bilgilerini karta basma.
+ * candidateSelector.ts (Admin Aday Seçici Menü Yöneticisi)
+ * Görevi: Admin CV yüklerken hangi aday adına dosya yükleyeceğini seçmesi için aday listesini çeker.
+ * Seçilen adayın avatar ve e-posta bilgilerini karta yansıtır.
  */
 let allCandidates: any[] = [];
 

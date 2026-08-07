@@ -1,6 +1,5 @@
-/**
- * Karşılaştırma sayfası — bir aday sütununu render eder (avatar, CV seçici, skor, güçlü/zayıf yönler, yetenekler).
- */
+import { parseSuggestions } from '../../shared/cvAnalysisRenderer';
+
 export function renderCandidateColumn(containerId: string, candidate: any, selectedCvId?: string): void {
   const container = document.getElementById(containerId);
   if (!container || !candidate) return;
@@ -17,7 +16,8 @@ export function renderCandidateColumn(containerId: string, candidate: any, selec
   const score = currentAnalysis && currentAnalysis.atsScore !== null && currentAnalysis.atsScore !== undefined ? currentAnalysis.atsScore : null;
   const strengths = currentAnalysis?.strengths || [];
   const weaknesses = currentAnalysis?.weaknesses || [];
-  const suggestions = currentAnalysis?.suggestions || currentAnalysis?.interviewQuestions || [];
+  const rawSuggestions = currentAnalysis?.suggestions || [];
+  const { recList, qList } = parseSuggestions(rawSuggestions);
 
   const scoreColorClass = score !== null && score >= 80 ? 'bg-emerald-600' : score !== null && score >= 60 ? 'bg-amber-500' : 'bg-rose-500';
   const scoreBadgeClass = score !== null && score >= 80 ? 'bg-emerald-50 text-emerald-700 border-emerald-200' : score !== null && score >= 60 ? 'bg-amber-50 text-amber-700 border-amber-200' : 'bg-rose-50 text-rose-700 border-rose-200';
@@ -108,10 +108,18 @@ export function renderCandidateColumn(containerId: string, candidate: any, selec
         <span class="material-symbols-outlined text-emerald-600 text-[18px]">thumb_up</span> Güçlü Yönler (Strengths)
       </h4>
       ${strengths.length > 0 ? `
-        <ul class="space-y-2">${strengths.map((s: string) => `
-          <li class="flex items-start gap-2 text-xs text-[#1b1c1a] leading-relaxed bg-emerald-50/60 border border-emerald-100 p-2.5 rounded-lg">
-            <span class="material-symbols-outlined text-emerald-600 text-[15px] shrink-0 mt-0.5">check_circle</span><span>${s}</span>
-          </li>`).join('')}</ul>
+        <ul class="space-y-2">${strengths.map((s: any) => {
+          const text = typeof s === 'object' && s !== null ? (s.text || JSON.stringify(s)) : String(s);
+          const confBadge = (typeof s === 'object' && s !== null && s.confidence === 'high')
+            ? `<span class="px-1.5 py-0.5 rounded text-[9px] font-bold bg-emerald-100 text-emerald-800 border border-emerald-300 shrink-0">Yüksek Güven</span>`
+            : '';
+          return `
+            <li class="flex items-start gap-2 text-xs text-[#1b1c1a] leading-relaxed bg-emerald-50/60 border border-emerald-100 p-2.5 rounded-lg">
+              <span class="material-symbols-outlined text-emerald-600 text-[15px] shrink-0 mt-0.5">check_circle</span>
+              <span class="flex-1 font-medium">${text}</span>
+              ${confBadge}
+            </li>`;
+        }).join('')}</ul>
       ` : `<p class="text-xs text-[#8a8580] italic">Güçlü yön verisi bulunamadı.</p>`}
     </div>
 
@@ -121,24 +129,61 @@ export function renderCandidateColumn(containerId: string, candidate: any, selec
         <span class="material-symbols-outlined text-rose-600 text-[18px]">build</span> Gelişime Açık Yönler (Gaps)
       </h4>
       ${weaknesses.length > 0 ? `
-        <ul class="space-y-2">${weaknesses.map((w: string) => `
-          <li class="flex items-start gap-2 text-xs text-[#1b1c1a] leading-relaxed bg-rose-50/60 border border-rose-100 p-2.5 rounded-lg">
-            <span class="material-symbols-outlined text-rose-600 text-[15px] shrink-0 mt-0.5">warning</span><span>${w}</span>
-          </li>`).join('')}</ul>
+        <ul class="space-y-2">${weaknesses.map((w: any) => {
+          const text = typeof w === 'object' && w !== null ? (w.text || JSON.stringify(w)) : String(w);
+          const confBadge = (typeof w === 'object' && w !== null && w.confidence === 'high')
+            ? `<span class="px-1.5 py-0.5 rounded text-[9px] font-bold bg-rose-100 text-rose-800 border border-rose-300 shrink-0">Yüksek Güven</span>`
+            : '';
+          return `
+            <li class="flex items-start gap-2 text-xs text-[#1b1c1a] leading-relaxed bg-rose-50/60 border border-rose-100 p-2.5 rounded-lg">
+              <span class="material-symbols-outlined text-rose-600 text-[15px] shrink-0 mt-0.5">warning</span>
+              <span class="flex-1 font-medium">${text}</span>
+              ${confBadge}
+            </li>`;
+        }).join('')}</ul>
       ` : `<p class="text-xs text-[#8a8580] italic">Gelişim alanı verisi bulunamadı.</p>`}
     </div>
 
     <!-- Suggestions Card -->
     <div class="bg-white border border-[#ddd9d3] rounded-[12px] p-5 shadow-sm flex flex-col gap-3">
       <h4 class="text-xs font-bold text-[#14422f] uppercase tracking-wider flex items-center gap-2">
-        <span class="material-symbols-outlined text-[#14422f] text-[18px]">quiz</span> Mülakat Önerileri & Sorular
+        <span class="material-symbols-outlined text-[#14422f] text-[18px]">lightbulb</span> İK Tavsiyeleri & Öneriler
       </h4>
-      ${suggestions.length > 0 ? `
-        <ul class="space-y-2">${suggestions.map((sug: any) => `
-          <li class="flex items-start gap-2 text-xs text-[#1b1c1a] leading-relaxed bg-[#faf9f5] border border-[#ddd9d3] p-2.5 rounded-lg">
-            <span class="material-symbols-outlined text-[#14422f] text-[15px] shrink-0 mt-0.5">help_outline</span><span>${typeof sug === 'string' ? sug : (sug.question || sug.topic || JSON.stringify(sug))}</span>
+      ${recList.length > 0 ? `
+        <ul class="space-y-2.5">${recList.map((rec: any) => {
+          const p = rec.priority || 'medium';
+          const pBadge = p === 'high'
+            ? '<span class="px-1.5 py-0.5 rounded text-[9px] font-bold bg-rose-100 text-rose-800 border border-rose-200">Yüksek</span>'
+            : p === 'low'
+            ? '<span class="px-1.5 py-0.5 rounded text-[9px] font-bold bg-blue-100 text-blue-800 border border-blue-200">Düşük</span>'
+            : '<span class="px-1.5 py-0.5 rounded text-[9px] font-bold bg-amber-100 text-amber-800 border border-amber-200">Orta</span>';
+          return `
+            <li class="p-3 bg-[#faf9f5] border border-[#ddd9d3] rounded-lg space-y-1">
+              <div class="flex justify-between items-center mb-1">
+                ${pBadge}
+                <span class="text-[9px] font-bold text-[#8a8580]">${rec.timeframe || 'Kısa Vadeli'}</span>
+              </div>
+              <div class="flex items-start gap-2 text-xs text-[#1b1c1a] leading-relaxed">
+                <span class="material-symbols-outlined text-amber-600 text-[16px] shrink-0">lightbulb</span>
+                <span class="font-medium">${rec.action}</span>
+              </div>
+            </li>`;
+        }).join('')}</ul>
+      ` : `<p class="text-xs text-[#8a8580] italic">İK tavsiyesi bulunamadı.</p>`}
+    </div>
+
+    <!-- Questions Card -->
+    <div class="bg-white border border-[#ddd9d3] rounded-[12px] p-5 shadow-sm flex flex-col gap-3">
+      <h4 class="text-xs font-bold text-indigo-800 uppercase tracking-wider flex items-center gap-2">
+        <span class="material-symbols-outlined text-indigo-600 text-[18px]">help_outline</span> Spesifik Mülakat Soruları
+      </h4>
+      ${qList.length > 0 ? `
+        <ul class="space-y-2">${qList.map((q: any, idx: number) => `
+          <li class="flex items-start gap-2 text-xs text-[#1b1c1a] leading-relaxed bg-indigo-50/50 border border-indigo-100 p-2.5 rounded-lg">
+            <span class="material-symbols-outlined text-indigo-600 text-[15px] shrink-0 mt-0.5">quiz</span>
+            <span class="flex-1 font-medium"><strong class="text-indigo-950">Soru #${idx + 1}:</strong> ${q.question}</span>
           </li>`).join('')}</ul>
-      ` : `<p class="text-xs text-[#8a8580] italic">Mülakat önerisi bulunamadı.</p>`}
+      ` : `<p class="text-xs text-[#8a8580] italic">Mülakat sorusu bulunamadı.</p>`}
     </div>
   `;
 }

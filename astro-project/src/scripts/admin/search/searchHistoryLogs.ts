@@ -1,6 +1,7 @@
 /**
- * 2. Search History Logs
- * Son yapılan aramaları sunucudan çekme (fetchSearchLogs) ve silme (deleteSearchLog).
+ * searchHistoryLogs.ts (Arama Geçmişi & Log Yükleyici)
+ * Görevi: Backend'den (`/api/search/logs`) adminlerin daha önce yaptığı doğal dil aramalarını çeker,
+ * arama geçmişi tablosuna ve son arananlar listesine canlı olarak doldurur.
  */
 export async function deleteSearchLog(logId: string, event?: Event): Promise<void> {
   if (event) {

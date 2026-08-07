@@ -1,7 +1,7 @@
 /**
- * ChunkCvTextUseCase.ts
- * Clean Architecture Application Use-Case
- * Orchestrates multi-layer semantic text chunking with AI inspection and rule-based fallbacks.
+ * ChunkCvTextUseCase.ts (CV Metin Bölümleme & Parçalama Kullanım Senaryosu)
+ * Görevi: PDF'ten okunan ham CV metnini mantıksal bölümlere (Eğitim, İş Deneyimi, Yetenekler vb.) parçalar.
+ * Yapay zeka destekli bölüm tespiti (segmentCvWithAI) ve kural tabanlı yedek (LocalRuleBasedChunker) mekanizmaları birleştirir.
  */
 
 import { detectLanguage, normalizeStars } from "../../domain/cv/CvTextPreprocessor.js";
@@ -22,14 +22,14 @@ export async function chunkTextBySections(text: string, prisma?: any): Promise<{
     try {
       const { inspectAndCorrectChunks, retryTargetedChunk } = await import("../../services/ChunkQualityService.js");
 
-      // ── Layer 1: Macro-segmentation ──────────────────────────────────────────
+      //ai a gönderme
       const aiSections = await segmentCvWithAI(text, lang, prisma);
 
       if (aiSections.length > 0) {
         console.log(`[Parser] 🔍 [Katman 2] Inspecting & Scoring ${aiSections.length} chunks (temp: 0)...`);
-        
+
         const normalizedAiSections = aiSections.map((s: any) => ({ ...s, originalTitle: s.originalTitle || "" }));
-        const layer2Chunks = await inspectAndCorrectChunks(normalizedAiSections, text, lang, prisma);
+        const layer2Chunks = await inspectAndCorrectChunks(normalizedAiSections, text, lang, prisma);//ai denetimi
 
         const finalChunks: { chunkText: string; metadata: any }[] = [];
         let sectionOrder = 1;
@@ -148,23 +148,23 @@ export async function chunkTextBySections(text: string, prisma?: any): Promise<{
   const hardWordChunks = splitTextSlidingWindow(text, 250, 40);
   return hardWordChunks.map((wc_text: string, idx: number) => {
     const wordCount = wc_text.split(/\s+/).filter(Boolean).length;
-    const fullText  = `[GENEL İÇERİK (Kısım ${idx + 1})]\n${wc_text}`;
+    const fullText = `[GENEL İÇERİK (Kısım ${idx + 1})]\n${wc_text}`;
     const chunkHash = crypto.createHash("sha256").update(fullText).digest("hex");
     return {
       chunkText: fullText,
       metadata: {
-        section:       "Genel İçerik",
+        section: "Genel İçerik",
         originalTitle: "Genel İçerik",
-        type:          "other",
-        source:        "STRUCTURAL",
-        method:        "hard_fallback",
+        type: "other",
+        source: "STRUCTURAL",
+        method: "hard_fallback",
         extractionMethod: "layout_aware",
-        language:      lang,
-        order:         idx + 1,
+        language: lang,
+        order: idx + 1,
         wordCount,
-        confidence:    0.30,
-        aiFallback:    false,
-        createdAt:     new Date().toISOString(),
+        confidence: 0.30,
+        aiFallback: false,
+        createdAt: new Date().toISOString(),
         parserVersion: "v4.0-ai",
         chunkHash,
       },

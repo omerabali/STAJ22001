@@ -1,6 +1,7 @@
 /**
- * 5. Directory Search
- * Gelişmiş Filtreleme (Hard Requirement) motoru ve aday arama filtresi (renderCandidates).
+ * directorySearch.ts (Klasik Dizin Arama & Sert Kriter Filtresi)
+ * Görevi: Klasik Aday Arama sekmesindeki metin aramasını, deneyim seviyesi,
+ * lokasyon ve minimum ATS skoru filtrelerini (Hard Requirements) canlı olarak uygular.
  */
 import { getInitials, renderSkills } from './helperFunctions.ts';
 

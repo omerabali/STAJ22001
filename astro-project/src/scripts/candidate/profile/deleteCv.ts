@@ -1,6 +1,7 @@
 /**
- * 4. Delete CV
- * CV silme doğrulama dialogu ve API isteği (deleteCV).
+ * deleteCv.ts (Profil CV Silme Yöneticisi)
+ * Görevi: Aday profil sayfasında sil ikonuna tıklandığında onay ister,
+ * `/api/cv/${cvId}` ucuna DELETE isteği atıp CV'yi siler ve önbelleği sıfırlayarak listeyi yeniler.
  */
 export async function deleteCV(cvId: string, options?: {
   onSuccess?: () => void;

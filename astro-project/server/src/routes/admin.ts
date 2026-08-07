@@ -1,3 +1,9 @@
+/**
+ * admin.ts (Admin Paneli & İK Yönetim API Rotaları)
+ * Görevi: Sadece ADMIN yetkili yöneticilerin kullanabileceği panel istatistikleri (`/stats`), aday filtreleme (`/candidates`),
+ * aday detay profili (`/candidate/:id`), aday ve kullanıcı silme/yetkilendirme (`/user/:id/role`), kullanıcı listesi (`/users`)
+ * ve platform OpenAI maliyet analiz raporları (`/reports`, `/cost-report`) uç noktalarını sunar.
+ */
 import { Router, Request, Response } from "express";
 import { PrismaClient } from "@prisma/client";
 import { PrismaPg } from "@prisma/adapter-pg";
@@ -65,7 +71,7 @@ router.put("/users/:id/role", authMiddleware, adminMiddleware, async (req: Reque
   }
 });
 
-// GET /api/admin/candidates
+// GET /api/admin/candidates    aday listesi
 router.get("/candidates", authMiddleware, adminMiddleware, async (req: Request, res: Response) => {
   try {
     const search = (req.query.search as string) || (req.query.query as string) || "";
@@ -97,12 +103,12 @@ router.get("/candidates", authMiddleware, adminMiddleware, async (req: Request, 
     const filtered = filter === "all" || filter === "ALL"
       ? candidates
       : candidates.filter((c) => {
-          const fLower = filter.toLowerCase();
-          if (fLower === "completed") return c.analysisStatus === "COMPLETED";
-          if (fLower === "processing") return c.analysisStatus === "PROCESSING";
-          if (fLower === "pending") return c.analysisStatus === "PENDING" || !c.analysisStatus;
-          return true;
-        });
+        const fLower = filter.toLowerCase();
+        if (fLower === "completed") return c.analysisStatus === "COMPLETED";
+        if (fLower === "processing") return c.analysisStatus === "PROCESSING";
+        if (fLower === "pending") return c.analysisStatus === "PENDING" || !c.analysisStatus;
+        return true;
+      });
 
     res.json({ candidates: filtered, total: filtered.length });
   } catch (error) {
@@ -123,11 +129,11 @@ router.get("/reports/stats", authMiddleware, adminMiddleware, async (req: Reques
   }
 });
 
-// GET /api/admin/candidates/:id
+// GET /api/admin/candidates/:id  seçilen adayı detay sayfası
 router.get("/candidates/:id", authMiddleware, adminMiddleware, async (req: Request, res: Response): Promise<void> => {
   let targetUserId = req.params.id as string;
   if (targetUserId) {
-    try { targetUserId = decodeURIComponent(targetUserId).trim(); } catch {}
+    try { targetUserId = decodeURIComponent(targetUserId).trim(); } catch { }
     targetUserId = targetUserId.replace(/\s+/g, '-');
   }
 
@@ -140,7 +146,7 @@ router.get("/candidates/:id", authMiddleware, adminMiddleware, async (req: Reque
   }
 });
 
-// DELETE /api/admin/candidates/:id
+// DELETE /api/admin/candidates/:id silmesi
 router.delete("/candidates/:id", authMiddleware, adminMiddleware, async (req: Request, res: Response): Promise<void> => {
   const targetUserId = req.params.id as string;
   const requestingAdminId = req.user?.id || "";
@@ -154,7 +160,7 @@ router.delete("/candidates/:id", authMiddleware, adminMiddleware, async (req: Re
   }
 });
 
-// GET /api/admin/cost-report
+// GET /api/admin/cost-report   token maliyeti üreten
 router.get("/cost-report", authMiddleware, adminMiddleware, async (_req: Request, res: Response) => {
   try {
     const report = await GetCostReportUseCase.execute(prisma);
@@ -162,6 +168,61 @@ router.get("/cost-report", authMiddleware, adminMiddleware, async (_req: Request
   } catch (error) {
     console.error("Cost raporu alınırken hata:", error);
     res.status(500).json({ message: "Sunucu hatası." });
+  }
+});
+router.post("/candidates/reanalyze", authMiddleware, adminMiddleware, async (req: Request, res: Response): Promise<void> => {
+  try {
+    const { userIds } = req.body;
+    if (!Array.isArray(userIds) || userIds.length === 0) {
+      res.status(400).json({ message: "Lütfen en az bir kullanıcı seçin." });
+      return;
+    }
+
+    // Dynamic import to prevent circular dependency
+    const { cvQueue } = await import("../infrastructure/queue/cvQueue.js");
+    const { AnalysisStatus } = await import("@prisma/client");
+
+    let queuedCount = 0;
+    const skippedUsers: string[] = [];
+
+    for (const uid of userIds) {
+      // Seçilen kullanıcının yüklediği en son (güncel) CV'yi bul
+      const latestCv = await prisma.cV.findFirst({
+        where: { userId: uid },
+        orderBy: { createdAt: "desc" }
+      });
+
+      if (!latestCv) {
+        skippedUsers.push(uid);
+        continue;
+      }
+
+      // Yeni PENDING analiz kaydı oluştur
+      await prisma.cVAnalysis.create({
+        data: {
+          cvId: latestCv.id,
+          status: AnalysisStatus.PENDING,
+        }
+      });
+
+      // 4 paralel işçili BullMQ Worker Pool kuyruğuna ekle
+      await cvQueue.add(
+        "process-cv",
+        { cvId: latestCv.id },
+        { jobId: `bulk-reanalyze-${latestCv.id}-${Date.now()}` }
+      );
+
+      queuedCount++;
+    }
+
+    res.json({
+      message: `${queuedCount} adet kullanıcının güncel CV'si paralel Worker Pool kuyruğuna aktarıldı.`,
+      queuedCount,
+      skippedCount: skippedUsers.length
+    });
+  } catch (error: any) {
+    console.error("[BulkReanalyze] Hata:", error);
+    res.status(500).json({ message: error.message || "Toplu yeniden analiz başlatılamadı." });
   }
 });
 

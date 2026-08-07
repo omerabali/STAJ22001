@@ -1,3 +1,9 @@
+/**
+ * CvTextPreprocessor.ts (CV Metin Ön İşleme & Yapısal Analiz Motoru)
+ * Görevi: PDF'ten çıkarılan metnin dilini otomatik tespit eder (`detectLanguage`),
+ * iki sütunlu karmaşık düzenleri tek akışa düzeltir (`preprocessTwoColumnText`),
+ * yıldız/derece simgelerini metne döker (`normalizeStars`) ve bölüm güven skorunu (`computeConfidence`) hesaplar.
+ */
 const _TR_M = "ocak|şubat|mart|nisan|mayıs|haziran|temmuz|ağustos|eylül|ekim|kasım|aralık";
 
 const RX_NUM_DATE =

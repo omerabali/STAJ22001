@@ -1,8 +1,9 @@
-import { candProfileState } from './candProfileState';
-
 /**
- * Seçili CV'nin analiz detaylarını render eder — status badge, ATS skor, güçlü/zayıf yönler, öneriler, mülakat soruları.
+ * cvDetailsRenderer.ts (Admin Aday CV Detay Çizici)
+ * Görevi: Admin aday inceleme ekranında seçilen CV'nin ATS uyum skorunu,
+ * yapay zeka SWOT analizini (Güçlü/Eksik yönler), mülakat sorularını ve önerilerini detay paneline çizer.
  */
+import { candProfileState } from './candProfileState';
 export function renderSelectedCvDetails(cvId: string): void {
   const selectedCv = candProfileState.candidateCvs.find((c: any) => c.id === cvId) || candProfileState.candidateCvs[0];
   const latestAnalysis = selectedCv && selectedCv.analyses && selectedCv.analyses[0];
@@ -26,8 +27,8 @@ export function renderSelectedCvDetails(cvId: string): void {
 
   const status = latestAnalysis ? latestAnalysis.status : (selectedCv ? 'PENDING' : 'NO_CV');
 
-  // Canlı bilgi bandı aktif mi kontrolü
-  const isProcessing = status === 'COMPLETED' ? false : (status === 'PROCESSING' || status === 'PENDING' || isBannerActive);
+  const isBannerActive = liveBanner ? !liveBanner.classList.contains('hidden') : false;
+  const isProcessing = status === 'COMPLETED' ? false : (status === 'PROCESSING' || isBannerActive);
 
   if (statusEl) {
     if (isProcessing) {
@@ -57,11 +58,18 @@ export function renderSelectedCvDetails(cvId: string): void {
         </div>`;
     } else {
       strContainer.innerHTML = (Array.isArray(strengths) && strengths.length > 0)
-        ? strengths.map((s: string) => `
-            <div class="p-3 bg-emerald-50/60 border border-emerald-200/80 rounded-xl flex items-start gap-2.5 text-xs font-medium text-[#1b1c1a] shadow-2xs">
-              <span class="material-symbols-outlined text-emerald-600 text-base shrink-0 mt-0.5">check_circle</span>
-              <span class="leading-relaxed">${s}</span>
-            </div>`).join('')
+        ? strengths.map((s: any) => {
+            const text = typeof s === 'object' && s !== null ? (s.text || JSON.stringify(s)) : String(s);
+            const confBadge = (typeof s === 'object' && s !== null && s.confidence === 'high')
+              ? `<span class="px-1.5 py-0.5 rounded text-[9px] font-bold bg-emerald-100 text-emerald-800 border border-emerald-300 shrink-0">Yüksek Güven</span>`
+              : '';
+            return `
+              <div class="p-3 bg-emerald-50/60 border border-emerald-200/80 rounded-xl flex items-start gap-2.5 text-xs font-medium text-[#1b1c1a] shadow-2xs">
+                <span class="material-symbols-outlined text-emerald-600 text-base shrink-0 mt-0.5">check_circle</span>
+                <span class="leading-relaxed flex-1">${text}</span>
+                ${confBadge}
+              </div>`;
+          }).join('')
         : '<p class="text-xs text-[#8a8580] italic">Güçlü yön verisi bulunmuyor.</p>';
     }
   }
@@ -78,11 +86,18 @@ export function renderSelectedCvDetails(cvId: string): void {
         </div>`;
     } else {
       weakContainer.innerHTML = (Array.isArray(weaknesses) && weaknesses.length > 0)
-        ? weaknesses.map((w: string) => `
-            <div class="p-3 bg-rose-50/60 border border-rose-200/80 rounded-xl flex items-start gap-2.5 text-xs font-medium text-[#1b1c1a] shadow-2xs">
-              <span class="material-symbols-outlined text-rose-600 text-base shrink-0 mt-0.5">warning</span>
-              <span class="leading-relaxed">${w}</span>
-            </div>`).join('')
+        ? weaknesses.map((w: any) => {
+            const text = typeof w === 'object' && w !== null ? (w.text || JSON.stringify(w)) : String(w);
+            const confBadge = (typeof w === 'object' && w !== null && w.confidence === 'high')
+              ? `<span class="px-1.5 py-0.5 rounded text-[9px] font-bold bg-rose-100 text-rose-800 border border-rose-300 shrink-0">Yüksek Güven</span>`
+              : '';
+            return `
+              <div class="p-3 bg-rose-50/60 border border-rose-200/80 rounded-xl flex items-start gap-2.5 text-xs font-medium text-[#1b1c1a] shadow-2xs">
+                <span class="material-symbols-outlined text-rose-600 text-base shrink-0 mt-0.5">warning</span>
+                <span class="leading-relaxed flex-1">${text}</span>
+                ${confBadge}
+              </div>`;
+          }).join('')
         : '<p class="text-xs text-[#8a8580] italic">Gelişim alanı verisi bulunmuyor.</p>';
     }
   }

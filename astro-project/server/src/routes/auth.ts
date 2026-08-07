@@ -1,3 +1,9 @@
+/**
+ * auth.ts (Kimlik Doğrulama & Oturum Yönetimi API Rotaları)
+ * Görevi: Kullanıcı kayıt (`/register`), giriş (`/login`), çıkış (`/logout`), profil sorgulama (`/me`)
+ * ve şifre sıfırlama (`/forgot-password`, `/verify-reset-code`) API uç noktalarını sunar.
+ * JWT token'larını tarayıcıya güvenli HttpOnly Cookie olarak yazar.
+ */
 import { Router, Request, Response } from "express";
 import { PrismaClient } from "@prisma/client";
 import { PrismaPg } from "@prisma/adapter-pg";
@@ -8,7 +14,7 @@ import { LoginUserUseCase } from "../application/auth/LoginUserUseCase.js";
 import { PasswordHasher } from "../infrastructure/security/PasswordHasher.js";
 import { JwtService } from "../infrastructure/security/JwtService.js";
 
-const router = Router();
+const router = Router();//ayrı ayrı dosyalara bölmemizi sağlar
 
 const pool = new pg.Pool({ connectionString: process.env.DATABASE_URL });
 const adapter = new PrismaPg(pool);
@@ -16,14 +22,14 @@ const prisma = new PrismaClient({ adapter });
 
 // ─────────────────────────────────────────────
 // POST /api/auth/register
-// ─────────────────────────────────────────────
+//resigter adresinde post şeyi geldiğinde bu tetiklenir async olması işlerin ana planı kilitlememesimidir
 router.post("/register", async (req: Request, res: Response): Promise<void> => {
   try {
-    const { token, user } = await RegisterUserUseCase.execute(req.body, prisma);
+    const { token, user } = await RegisterUserUseCase.execute(req.body, prisma);//bodyden gelen verileri db ye kaydet  ve jwt üret 
 
-    res.cookie("token", token, {
-      httpOnly: true,
-      secure: process.env.NODE_ENV === "production",
+    res.cookie("token", token, {//hemen oturum açılmış sayılsın diye cookie yazıyoruz 
+      httpOnly: true,//xss saldırıları için
+      secure: process.env.NODE_ENV === "production",//sadece güvenli https protokü üzerinden iletilmesini sağlar
       sameSite: "lax",
       maxAge: 7 * 24 * 60 * 60 * 1000,
     });
@@ -41,9 +47,9 @@ router.post("/register", async (req: Request, res: Response): Promise<void> => {
 // ─────────────────────────────────────────────
 // POST /api/auth/login
 // ─────────────────────────────────────────────
-router.post("/login", async (req: Request, res: Response): Promise<void> => {
+router.post("/login", async (req: Request, res: Response): Promise<void> => {//login adreslerini dinle 
   try {
-    const { token, user } = await LoginUserUseCase.execute(req.body, prisma);
+    const { token, user } = await LoginUserUseCase.execute(req.body, prisma);//req body gene içeriği getiriyor
 
     res.cookie("token", token, {
       httpOnly: true,
@@ -65,12 +71,12 @@ router.post("/login", async (req: Request, res: Response): Promise<void> => {
 // ─────────────────────────────────────────────
 // GET /api/auth/me  (korumalı route)
 // ─────────────────────────────────────────────
-router.get("/me", authMiddleware, async (req: Request, res: Response): Promise<void> => {
+router.get("/me", authMiddleware, async (req: Request, res: Response): Promise<void> => {//şu an kim giriş yapmış diye kontrol eder
   try {
     const userId = req.user!.id;
 
     const user = await prisma.user.findUnique({
-      where: { id: userId },
+      where: { id: userId },//verilerin hepsini getirme sadece true olanları getir tamam mı
       select: { id: true, email: true, role: true, name: true, phone: true, avatarUrl: true, createdAt: true },
     });
 
@@ -95,7 +101,7 @@ router.put("/profile", authMiddleware, async (req: Request, res: Response): Prom
     const { name, email, phone, password, currentPassword, avatarUrl } = req.body;
 
     const updateData: any = {};
-    
+
     if (name !== undefined) {
       const nameStr = name.trim();
       const nameRegex = /^[a-zA-ZğüşıöçĞÜŞİÖÇ\s]{3,}$/;
@@ -105,7 +111,7 @@ router.put("/profile", authMiddleware, async (req: Request, res: Response): Prom
       }
       updateData.name = nameStr;
     }
-    
+
     if (email) {
       const trimmedEmail = email.trim().toLowerCase();
       const emailRegex = /^[a-zA-Z0-9._%+-]+@gmail\.com$/;
@@ -170,7 +176,8 @@ router.put("/profile", authMiddleware, async (req: Request, res: Response): Prom
       data: updateData,
       select: { id: true, email: true, role: true, name: true, phone: true, avatarUrl: true }
     });
-
+    //jwt statiktir mesela bir yeri güncelledikten sonra yeni bir token üretmezsek 
+    //eski tokenle giriş yapmaya devam eder ta ki token süresi bitene kadar  o yüzden tekrar giriş yapıyoruz ki güncelleme olsun 
     const token = JwtService.signToken({ id: updatedUser.id, email: updatedUser.email, role: updatedUser.role, name: updatedUser.name });
     res.cookie("token", token, {
       httpOnly: true,

@@ -1,5 +1,7 @@
 /**
- * Şifre göster/gizle toggle — window.togglePassVisibility olarak kayıtlı.
+ * togglePassVisibility.ts (Admin Şifre Göster/Gizle Yöneticisi)
+ * Görevi: Admin Ayarlarındaki şifre alanlarının yanındaki göz butonuna basıldığında şifrenin gizli noktalarını metne dönüştürür.
+ * window.togglePassVisibility olarak kayıtlı.
  * Admin ayarlar sayfası HTML onClick'ten çağrılır.
  */
 export function initTogglePassVisibility(): void {

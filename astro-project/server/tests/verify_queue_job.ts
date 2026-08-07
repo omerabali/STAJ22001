@@ -1,6 +1,10 @@
-import "../load-env.js";
-import { cvQueue } from "../infrastructure/queue/cvQueue.js";
-import { redisConnection } from "../infrastructure/queue/redisClient.js";
+/**
+ * verify_queue_job.ts (BullMQ Kuyruk & Redis Key Doğrulama Testi)
+ * Görevi: Kuyruğa bir iş ekleme ve Redis anahtarlarını kontrol etme işlemlerini doğrular.
+ */
+import "../src/load-env.js";
+import { cvQueue } from "../src/infrastructure/queue/cvQueue.js";
+import { redisConnection } from "../src/infrastructure/queue/redisClient.js";
 
 async function verifyQueueJob(): Promise<void> {
   console.log("\n=======================================================");

@@ -1,14 +1,18 @@
-import "../load-env.js";
+/**
+ * test_gun34_worker_live.ts (Canlı Worker Pool ve CV İşleme Testi)
+ * Görevi: Arka plan worker havuzunu (concurrency: 4) ve PDF yükleme, kuyruk işleme ve Redis doğrulamasını test eder.
+ */
+import "../src/load-env.js";
 import fs from "fs";
 import path from "path";
 import crypto from "crypto";
 import { PrismaClient, AnalysisStatus } from "@prisma/client";
 import { PrismaPg } from "@prisma/adapter-pg";
 import pg from "pg";
-import { supabase } from "../lib/supabase.js";
-import { cvQueue, CV_QUEUE_NAME } from "../infrastructure/queue/cvQueue.js";
-import { initCvWorker } from "../infrastructure/queue/cvWorker.js";
-import { redisConnection } from "../infrastructure/queue/redisClient.js";
+import { supabase } from "../src/lib/supabase.js";
+import { cvQueue, CV_QUEUE_NAME } from "../src/infrastructure/queue/cvQueue.js";
+import { initCvWorker } from "../src/infrastructure/queue/cvWorker.js";
+import { redisConnection } from "../src/infrastructure/queue/redisClient.js";
 
 const pool = new pg.Pool({
   connectionString: process.env.DATABASE_URL,

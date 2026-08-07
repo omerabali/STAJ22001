@@ -1,6 +1,7 @@
 /**
- * 7. Analysis Renderer
- * Seçilen CV'nin ATS Skoru, SWOT Kartları, Tavsiyeleri ve Parçalarını gösterme (showAnalysisDetails).
+ * analysisRenderer.ts (Profil Analiz Sonuç Çizim Yöneticisi)
+ * Görevi: Profil sayfasında seçilen CV'nin yapay zeka ATS skoru, SWOT analizi kartları,
+ * tavsiyeler ve çıkarılan yetenek kelimelerini sağ taraftaki panelde canlı olarak gösterir.
  */
 import { parseSuggestions, renderStrengthsHtml, renderWeaknessesHtml, renderSuggestionsHtml, renderQuestionsHtml } from '../../shared/cvAnalysisRenderer';
 import { showLiveProcessingState } from './liveStateUi.ts';

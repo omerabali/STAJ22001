@@ -1,11 +1,15 @@
-import "../load-env.js";
+/**
+ * test_hard_requirements_verification.ts (Sert Kriter & Arama Doğrulama Testi)
+ * Görevi: Gelişmiş sert kriter (Hard-Requirements) ayrıştırmasını, Zod şema doğrulamasını ve OpenAI fallback mekanizmasını test eder.
+ */
+import "../src/load-env.js";
 import { PrismaClient } from "@prisma/client";
 import { PrismaPg } from "@prisma/adapter-pg";
 import pg from "pg";
-import { ParseQueryIntentUseCase } from "../application/search/ParseQueryIntentUseCase.js";
-import { VerifyHardRequirementsUseCase } from "../application/search/VerifyHardRequirementsUseCase.js";
-import { OpenAIQueryParser } from "../infrastructure/ai/OpenAIQueryParser.js";
-import { ParsedQuerySchema } from "../infrastructure/validation/SearchSchemas.js";
+import { ParseQueryIntentUseCase } from "../src/application/search/ParseQueryIntentUseCase.js";
+import { VerifyHardRequirementsUseCase } from "../src/application/search/VerifyHardRequirementsUseCase.js";
+import { OpenAIQueryParser } from "../src/infrastructure/ai/OpenAIQueryParser.js";
+import { ParsedQuerySchema } from "../src/infrastructure/validation/SearchSchemas.js";
 
 const pool = new pg.Pool({ connectionString: process.env.DATABASE_URL });
 const adapter = new PrismaPg(pool);

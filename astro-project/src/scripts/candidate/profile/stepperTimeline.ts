@@ -1,6 +1,7 @@
 /**
- * 3. Stepper & Timeline
- * 4 adımlı yükleme göstergesini ve canlı zaman çizgisini çizdirme (updateStepUI).
+ * stepperTimeline.ts (Profil İlerleme Adımı & Zaman Çizgisi Yöneticisi)
+ * Görevi: Profil sayfasında 4 adımlı yükleme barını ve canlı aktivite çizelgesini (timeline)
+ * anlık olarak ekranda günceller ve renklerini ayarlar.
  */
 export function updateStepUI(currentStep: number, message: string): void {
   const total = 4;

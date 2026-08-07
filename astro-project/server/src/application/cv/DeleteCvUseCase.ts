@@ -1,3 +1,8 @@
+/**
+ * DeleteCvUseCase.ts (CV Silme Kullanım Senaryosu)
+ * Görevi: Seçilen CV kaydını veritabanından, ona bağlı tüm metin parçalarını (chunks/embeddings),
+ * analiz sonuçlarını ve Supabase Storage'daki fiziksel PDF dosyasını kalıcı olarak siler.
+ */
 import { PrismaClient } from "@prisma/client";
 import { supabase } from "../../lib/supabase.js";
 

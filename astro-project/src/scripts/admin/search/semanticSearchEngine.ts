@@ -1,6 +1,7 @@
 /**
- * 4. Semantic Search Engine
- * /api/search endpoint'ine POST isteği atıp sonuçları getiren ve SessionStorage'a önbellekleyen executeSemanticSearch fonksiyonu.
+ * semanticSearchEngine.ts (Akıllı Semantik Vektör Arama Motoru)
+ * Görevi: Admin doğal dilde arama yazdığında (`text-embedding-3-small` vektör araması)
+ * `POST /api/search` adresine istek atar, en alakalı adayları getirir ve hız için sonuçları sessionStorage'da önbellekler.
  */
 import { renderSemanticCandidates } from './candidateRenderer.ts';
 import { fetchSearchLogs } from './searchHistoryLogs.ts';

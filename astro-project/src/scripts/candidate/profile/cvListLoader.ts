@@ -1,6 +1,7 @@
 /**
- * 5. CV List Loader
- * /api/cv/list endpoint'inden CV'leri çekip tabloya basma ve 3 saniyelik polling (loadCVList).
+ * cvListLoader.ts (Profil CV Listesi Yükleme Yöneticisi)
+ * Görevi: Profil sayfasının alt tarafındaki "Özgeçmişlerim" tablosuna verileri çeker ve doldurur.
+ * İşlemde olan bir CV varsa 3 saniyede bir polling ile durumunu canlı günceller.
  */
 import { deleteCV } from './deleteCv';
 import { showAnalysisDetails } from './analysisRenderer';

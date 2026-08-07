@@ -1,6 +1,7 @@
 /**
- * 4. Delete & Retry
- * CV Silme (deleteCV) ve Başarısız Analizleri Tekrar Deneme (retryCV) fonksiyonları.
+ * deleteAndRetry.ts (Admin CV Silme & Yeniden İşleme Yöneticisi)
+ * Görevi: Yükleme tablosundaki bir CV'yi tamamen silme (deleteAdminCV)
+ * veya hatalı/bekleyen bir CV'yi yeniden işleme sokma (retryAdminCV) işlemlerini yürütür.
  */
 export async function deleteCV(cvId: string, activeCvIdState: { activeCvId: string | null }, loadCVList: () => void): Promise<void> {
   if (!confirm('Bu CV ve tüm ilişkili verileri silmek istediğinize emin misiniz?')) return;

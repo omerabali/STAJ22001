@@ -1,7 +1,7 @@
 /**
- * Profile Sayfası Orkestratörü
- * Tüm profile modüllerini (cvUploader, profile/*) bir araya getirir.
- * Drop zone kurulumu, CV yükleme, kullanıcı oturumu ve liste yönetimini yönetir.
+ * profilePage.ts (Aday Profil Sayfası Ana Orkestratörü)
+ * Görevi: Sürükle-bırak CV yükleme alanını kurar, kullanıcı oturumunu çeker,
+ * WebSocket dinleyicisini başlatır ve CV yükleme durumlarını canlı yönetir.
  */
 import { uploadCV } from '../../shared/cvUploader';
 import { updateStepUI } from '../../shared/stepperTimeline';
@@ -24,10 +24,17 @@ const state: {
 (window as any).deleteCV = (cvId: string) => {
   deleteCV(cvId, {
     onSelectedCvDeleted: () => {
-      if (state.selectedCvId === cvId) {
-        state.selectedCvId = null;
-        document.getElementById('no-analysis-state')?.classList.remove('hidden');
-        document.getElementById('active-analysis-state')?.classList.add('hidden');
+      if (socket && state.selectedCvId) {
+        socket.emit('leave:cv', state.selectedCvId);
+      }
+      state.selectedCvId = null;
+      state.isAnalysisCompleted = false;
+      document.getElementById('no-analysis-state')?.classList.remove('hidden');
+      document.getElementById('active-analysis-state')?.classList.add('hidden');
+      document.getElementById('upload-progress-container')?.classList.add('hidden');
+      const statusIndicator = document.getElementById('analysis-status-indicator');
+      if (statusIndicator) {
+        statusIndicator.innerHTML = '';
       }
     },
     onSuccess: () => loadCVList()

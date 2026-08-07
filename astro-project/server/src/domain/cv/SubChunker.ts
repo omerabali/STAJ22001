@@ -1,3 +1,9 @@
+/**
+ * SubChunker.ts (Sliding Window Kayan Pencere Metin Alt-Parçalayıcı)
+ * Görevi: Çok uzun CV bölümlerini (örneğin 10 yıllık iş deneyimi olan bir adayın deneyim metnini)
+ * OpenAI vektör limitlerine sığdırmak için sliding-window (kayan pencere: 300 kelime, 50 kelime çakışma)
+ * tekniğiyle alt metin parçalarına (`subChunkSection`) böler.
+ */
 import { computeConfidence } from "./CvTextPreprocessor.js";
 
 const _TR_M = "ocak|şubat|mart|nisan|mayıs|haziran|temmuz|ağustos|eylül|ekim|kasım|aralık";

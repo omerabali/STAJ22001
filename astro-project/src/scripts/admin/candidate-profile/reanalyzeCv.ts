@@ -1,3 +1,8 @@
+/**
+ * reanalyzeCv.ts (Admin Aday CV Yeniden AI Analizi Başlatıcı)
+ * Görevi: Admin panelinde bir adayın CV'si için "Yeniden Analiz Et" butonuna basıldığında
+ * yapay zeka analizini baştan tetikler ve canlı süreç ekranını gösterir.
+ */
 import { candProfileState } from './candProfileState';
 
 function showToastNotification(title: string, message: string, type: 'success' | 'error' = 'success'): void {
@@ -108,7 +113,7 @@ export function initReanalyzeCv(): void {
       showToastNotification("AI Analizi Başlatıldı 🚀", "Yapay zeka CV dökümanını analiz etmeye başladı.");
 
       let pollAttempts = 0;
-      const maxPollAttempts = 30; // 30 * 1.5s = 45 saniye maksimum limit
+      const maxPollAttempts = 60; // 60 * 1.5s = 90 saniye maksimum limit (Ağır GPT analizi için yeterli süre)
 
       // Polling mekanizması (Her 1.5 saniyede bir kontrol et)
       const pollInterval = setInterval(async () => {

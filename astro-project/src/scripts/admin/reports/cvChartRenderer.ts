@@ -1,6 +1,7 @@
 /**
- * Haftalık CV Yükleme Bar Grafiği Render
- * Son 7 günün yükleme sayısını dinamik bar olarak çizer.
+ * cvChartRenderer.ts (Raporlar Haftalık Grafik Çizici)
+ * Görevi: Raporlar sayfasındaki son 7 günün CV yükleme sayılarını
+ * dinamik ve görsel bir çubuk grafik (bar chart) halinde ekrana çizer.
  */
 export function renderCVChart(recentCvUploads: any[]): void {
   const chart = document.getElementById('cv-bars-container');

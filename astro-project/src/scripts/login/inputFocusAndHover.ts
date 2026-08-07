@@ -1,5 +1,8 @@
 /**
- * 2. Input Focus/Blur ve Login Butonu Hover Efektleri
+ * inputFocusAndHover.ts (Görsel Efekt Yöneticisi)
+ * Görevi: Giriş sayfasındaki e-posta ve şifre yazma kutularının tıklanınca parlamasını (focus),
+ * odağını kaybedince normale dönmesini (blur) ve "Giriş Yap" butonunun üzerine gelinince
+ * butonun yükselip gölgelenmesini (hover/mouseover) canlı yönetir.
  */
 export function initInputFocusAndHover(): void {
   // Focus styles

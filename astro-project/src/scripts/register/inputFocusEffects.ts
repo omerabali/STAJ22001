@@ -1,5 +1,7 @@
 /**
- * 1. Form Input Focus / Blur Efektleri
+ * inputFocusEffects.ts (Form Giriş Odaklanma Efekt Yöneticisi)
+ * Görevi: Kayıt formundaki metin, e-posta, telefon ve şifre kutularına tıklandığında (focus)
+ * kenarlıkların yeşil renkte parlamasını, odak çıkınca (blur) eski haline dönmesini sağlar.
  */
 export function initInputFocusEffects(): void {
   document.querySelectorAll('.form-input').forEach((el) => {

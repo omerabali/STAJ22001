@@ -1,4 +1,8 @@
-import fs from "fs";
+/**
+ * fetch_canva_designs.ts (Canva Tasarım ve Klasör Çekici)
+ * Görevi: `.canva_token.json` dosyasındaki geçerli token'ı kullanarak Canva REST API üzerinden
+ * kullanıcının klasör ve tasarım şablonlarını sorgulayan yardımcı araçtır.
+ */
 import path from "path";
 
 const CV_TEST_DIR = path.join(process.cwd(), "tests", "cv_test");

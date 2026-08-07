@@ -1,5 +1,7 @@
 /**
- * 3. Şifre Göster/Gizle Butonu (toggle-password)
+ * togglePassword.ts (Şifre Göster/Gizle Yöneticisi)
+ * Görevi: Şifre alanının yanındaki "Göz" ikonuna tıklandığında,
+ * şifrenin gizli noktalarını metne çevirir (type="password" -> type="text") ve göz ikonunu günceller.
  */
 export function initTogglePassword(): void {
   const togglePasswordBtn = document.getElementById('toggle-password');

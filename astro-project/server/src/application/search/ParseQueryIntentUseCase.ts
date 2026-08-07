@@ -1,3 +1,8 @@
+/**
+ * ParseQueryIntentUseCase.ts (Arama Niyeti & Sert Kriter Ayrıştırma Kullanım Senaryosu)
+ * Görevi: Kullanıcının girdiği doğal dildeki arama metnini OpenAI GPT ile analiz eder.
+ * Metindeki zorunlu sert kriterleri (sertifikalar, diller, tecrübe yılları vb.) çıkarır. Hata durumunda sistemin çökmesini önleyen sessiz fallback sunar.
+ */
 import { PrismaClient } from "@prisma/client";
 import { ParsedQuery } from "../../domain/search/HardRequirement.js";
 import { OpenAIQueryParser } from "../../infrastructure/ai/OpenAIQueryParser.js";

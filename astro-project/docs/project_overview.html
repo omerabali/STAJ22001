@@ -1,0 +1,569 @@
+<!DOCTYPE html>
+<html lang="tr" class="dark">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Beacon — Sistem Mimarisi ve Proje Dokümantasyonu</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link
+    href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap"
+    rel="stylesheet">
+  <style>
+    body {
+      font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, sans-serif;
+    }
+
+    code,
+    pre {
+      font-family: 'JetBrains Mono', monospace;
+    }
+  </style>
+</head>
+
+<body class="bg-[#0b0f19] text-slate-200 antialiased min-h-screen selection:bg-sky-500/20 selection:text-sky-300">
+
+  <!-- MAIN CONTAINER -->
+  <div class="max-w-5xl mx-auto px-6 py-12 space-y-16">
+
+    <!-- 1. HEADER / EXECUTIVE SUMMARY -->
+    <header class="space-y-6 border-b border-slate-800/80 pb-10">
+      <div class="flex items-center justify-between">
+        <div class="flex items-center gap-3">
+          <div
+            class="w-10 h-10 rounded-xl bg-sky-500/10 border border-sky-500/20 flex items-center justify-center font-bold text-sky-400 text-xl shadow-inner">
+            B
+          </div>
+          <div>
+            <h1 class="text-2xl font-bold text-slate-100 tracking-tight">Beacon Architectural Overview</h1>
+            <p class="text-xs text-slate-400 font-mono">Staj Projesi Mimarisi ve Teknik Dokümantasyon</p>
+          </div>
+        </div>
+        <span
+          class="px-3 py-1 rounded-full text-xs font-mono font-medium bg-emerald-500/10 text-emerald-400 border border-emerald-500/20">
+          v1.0.0 Stable
+        </span>
+      </div>
+
+      <p class="text-slate-300 text-sm leading-relaxed max-w-3xl font-normal">
+        Beacon; kurumsal ölçekte özgeçmiş (CV) analizi, semantik aday arama ve yetenek yönetimi sağlayan
+        <b>Retrieval-Augmented Generation (RAG)</b> mimarisidir. PDF dökümanları 4 katmanlı akıllı parçalama (deep
+        chunking) boru hattından geçirilerek PostgreSQL <code class="text-sky-300">pgvector HNSW</code> ile indekslenir;
+        arka planda 4 eşzamanlı işçili BullMQ Worker Pool vasıtasıyla kilitlemesiz işlenir ve OpenAI GPT-4o-mini ile
+        değerlendirilir.
+      </p>
+
+      <!-- TECH PILLS -->
+      <div class="flex flex-wrap gap-2 pt-1 font-mono text-xs">
+        <span class="px-2.5 py-1 rounded-md bg-slate-900 border border-slate-800 text-slate-300">Astro 5 (SSR)</span>
+        <span class="px-2.5 py-1 rounded-md bg-slate-900 border border-slate-800 text-slate-300">Express.js &
+          TypeScript</span>
+        <span class="px-2.5 py-1 rounded-md bg-slate-900 border border-slate-800 text-slate-300">Prisma 7 &
+          PostgreSQL</span>
+        <span class="px-2.5 py-1 rounded-md bg-slate-900 border border-slate-800 text-slate-300">pgvector (HNSW
+          Index)</span>
+        <span class="px-2.5 py-1 rounded-md bg-slate-900 border border-slate-800 text-slate-300">BullMQ & Redis
+          Queue</span>
+        <span class="px-2.5 py-1 rounded-md bg-slate-900 border border-slate-800 text-slate-300">OpenAI
+          GPT-4o-mini</span>
+        <span class="px-2.5 py-1 rounded-md bg-slate-900 border border-slate-800 text-slate-300">Socket.io
+          Realtime</span>
+      </div>
+    </header>
+
+    <!-- 2. HIGH LEVEL ARCHITECTURE -->
+    <section class="space-y-6">
+      <div class="space-y-1">
+        <h2 class="text-lg font-semibold text-slate-100 flex items-center gap-2">
+          <span>🏛️</span> Yüksek Seviye Sistem Mimarisi
+        </h2>
+        <p class="text-xs text-slate-400">İstemci isteğinden başlayıp asenkron worker havuzuna ve vektörel arama
+          motoruna uzanan veri akışı.</p>
+      </div>
+
+      <div class="grid grid-cols-1 md:grid-cols-5 gap-3 font-mono text-xs">
+        <div class="bg-slate-900/60 border border-slate-800 rounded-xl p-4 space-y-2">
+          <div class="text-sky-400 font-semibold">1. Client Layer</div>
+          <p class="text-slate-400 text-[11px] font-sans">Astro 5 Islands UI & Vanilla TS Scriptleri</p>
+        </div>
+        <div class="bg-slate-900/60 border border-slate-800 rounded-xl p-4 space-y-2">
+          <div class="text-indigo-400 font-semibold">2. API Gateway</div>
+          <p class="text-slate-400 text-[11px] font-sans">Express REST Controllers & Cookie Auth</p>
+        </div>
+        <div class="bg-slate-900/60 border border-slate-800 rounded-xl p-4 space-y-2">
+          <div class="text-amber-400 font-semibold">3. Task Queue</div>
+          <p class="text-slate-400 text-[11px] font-sans">Redis + BullMQ (Kilitlemesiz İş Kuyruğu)</p>
+        </div>
+        <div class="bg-slate-900/60 border border-slate-800 rounded-xl p-4 space-y-2">
+          <div class="text-emerald-400 font-semibold">4. Worker Pool</div>
+          <p class="text-slate-400 text-[11px] font-sans">4 Eşzamanlı İş parçacığı (Concurrency: 4)</p>
+        </div>
+        <div class="bg-slate-900/60 border border-slate-800 rounded-xl p-4 space-y-2">
+          <div class="text-purple-400 font-semibold">5. AI & Storage</div>
+          <p class="text-slate-400 text-[11px] font-sans">pgvector HNSW + OpenAI Embeddings</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- 3. KULLANICI ETKİLEŞİM AKIŞLARI (USER FLOWS) -->
+    <section class="space-y-6">
+      <div class="space-y-1">
+        <h2 class="text-lg font-semibold text-slate-100 flex items-center gap-2">
+          <span>🔄</span> Kullanıcı Etkileşim Akışları (User Flow)
+        </h2>
+        <p class="text-xs text-slate-400">Aday ve İK Yöneticisi rolleri için sistemdeki temel işlem adımları.</p>
+      </div>
+
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+        <!-- Aday Akışı -->
+        <div class="bg-slate-900/40 border border-slate-800/80 rounded-xl p-5 space-y-4">
+          <h3 class="text-xs font-bold text-emerald-400 uppercase tracking-wider font-mono">Candidate (Aday) Akışı</h3>
+          <ol class="relative border-l border-slate-800 space-y-4 text-xs ml-2 pl-4 text-slate-300">
+            <li><strong class="text-slate-100">1. Oturum Açma:</strong> HttpOnly Cookie ile güvenli giriş yapılır.</li>
+            <li><strong class="text-slate-100">2. CV Yükleme:</strong> PDF dosyası Supabase Storage'a aktarılır, SHA-256
+              hash üretilir.</li>
+            <li><strong class="text-slate-100">3. Asenkron Takip:</strong> Socket.io üzerinden canlı yayın mesajları
+              dinlenir (PENDING ➔ PROCESSING ➔ COMPLETED).</li>
+            <li><strong class="text-slate-100">4. Analiz İnceleme:</strong> Üretilen ATS Skoru, Güçlü/Zayıf yönler ve
+              mülakat soruları görüntülenir.</li>
+          </ol>
+        </div>
+
+        <!-- Admin Akışı -->
+        <div class="bg-slate-900/40 border border-slate-800/80 rounded-xl p-5 space-y-4">
+          <h3 class="text-xs font-bold text-sky-400 uppercase tracking-wider font-mono">Admin (İK Yöneticisi) Akışı</h3>
+          <ol class="relative border-l border-slate-800 space-y-4 text-xs ml-2 pl-4 text-slate-300">
+            <li><strong class="text-slate-100">1. Panel Erişimi:</strong> RBAC Yetki kontrolü (`ROLE: ADMIN`) ile
+              Dashboard açılır.</li>
+            <li><strong class="text-slate-100">2. Semantik Arama:</strong> Doğal dil sorgusu girilir (%40 Vektör + %60
+              GPT Hibrit Skor).</li>
+            <li><strong class="text-slate-100">3. Toplu İşlemler:</strong> Seçilen kullanıcıların güncel CV'leri tek
+              tıkla Worker Pool'a gönderilir.</li>
+            <li><strong class="text-slate-100">4. Maliyet İzleme:</strong> API token harcamaları ve operasyonel maliyet
+              raporları incelenir.</li>
+          </ol>
+        </div>
+      </div>
+    </section>
+
+    <!-- 4. GELİŞTİRME AŞAMALARI -->
+    <section class="space-y-6">
+      <div class="space-y-1">
+        <h2 class="text-lg font-semibold text-slate-100 flex items-center gap-2">
+          <span>📅</span> Proje Geliştirme Aşamaları
+        </h2>
+        <p class="text-xs text-slate-400">Projenin modüler mimari inşa sırası.</p>
+      </div>
+
+      <div class="space-y-3 font-sans text-xs">
+        <div class="bg-slate-900/40 border border-slate-800/80 rounded-lg p-4 flex gap-4 items-start">
+          <span class="font-mono text-sky-400 font-bold">Aşama 1</span>
+          <div>
+            <h4 class="font-semibold text-slate-200">Temel Altyapı, Auth & CV Yükleme</h4>
+            <p class="text-slate-400 mt-0.5">Astro + Express monorepo mimarisi kuruldu. Prisma PostgreSQL veritabanı,
+              JWT HttpOnly Cookie auth ve PDF CV yükleme modülü yazıldı.</p>
+          </div>
+        </div>
+
+        <div class="bg-slate-900/40 border border-slate-800/80 rounded-lg p-4 flex gap-4 items-start">
+          <span class="font-mono text-sky-400 font-bold">Aşama 2</span>
+          <div>
+            <h4 class="font-semibold text-slate-200">PDF Chunking & pgvector Entegrasyonu</h4>
+            <p class="text-slate-400 mt-0.5">4 katmanlı metin parçalama algoritması geliştirildi. OpenAI 1536-dim
+              embedding altyapısı ve PostgreSQL pgvector HNSW endeksi devreye alındı.</p>
+          </div>
+        </div>
+
+        <div class="bg-slate-900/40 border border-slate-800/80 rounded-lg p-4 flex gap-4 items-start">
+          <span class="font-mono text-sky-400 font-bold">Aşama 3</span>
+          <div>
+            <h4 class="font-semibold text-slate-200">Semantik Arama & RAG Hibrit Sıralama (Reranking)</h4>
+            <p class="text-slate-400 mt-0.5">Vektörel benzerlik araması (%40) ve GPT-4o-mini uygunluk değerlendirmesi
+              (%60) birleştirilerek hibrit arama motoru tamamlandı.</p>
+          </div>
+        </div>
+
+        <div class="bg-slate-900/40 border border-slate-800/80 rounded-lg p-4 flex gap-4 items-start">
+          <span class="font-mono text-sky-400 font-bold">Aşama 4</span>
+          <div>
+            <h4 class="font-semibold text-slate-200">AI CV Analiz Motoru & Socket.io Canlı Yayın</h4>
+            <p class="text-slate-400 mt-0.5">5 kriterli ATS skorlama ve SWOT analizi yazıldı. Socket.io ile durum
+              güncellemeleri kullanıcı arayüzüne canlı yansıtıldı.</p>
+          </div>
+        </div>
+
+        <div class="bg-slate-900/40 border border-slate-800/80 rounded-lg p-4 flex gap-4 items-start">
+          <span class="font-mono text-sky-400 font-bold">Aşama 5</span>
+          <div>
+            <h4 class="font-semibold text-slate-200">Asenkron Worker Pool Mimarisi & Benchmark Ölçümleri</h4>
+            <p class="text-slate-400 mt-0.5">Redis ve BullMQ tabanlı 4 paralel işçili (concurrency: 4) Worker Pool
+              kuruldu. Sıralı vs Paralel işleme performans benchmark testleri koşturuldu.</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- 5. VERİTABANI ŞEMASI VE ER İLİŞKİLERİ -->
+    <section class="space-y-6">
+      <div class="space-y-1">
+        <h2 class="text-lg font-semibold text-slate-100 flex items-center gap-2">
+          <span>🗄️</span> Veritabanı Şeması ve ER İlişkileri (8 Tablo)
+        </h2>
+        <p class="text-xs text-slate-400">PostgreSQL ilişkisel veritabanı şeması ve anahtar bağıntıları.</p>
+      </div>
+
+      <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-3 font-mono text-xs">
+        <div class="bg-slate-900/50 border border-slate-800 rounded-xl p-3.5 space-y-2">
+          <div class="text-amber-400 font-bold border-b border-slate-800 pb-1">users</div>
+          <div class="text-[11px] text-slate-400 space-y-1">
+            <div class="text-slate-200">🔑 id (PK)</div>
+            <div>email, phone</div>
+            <div>role, passwordHash</div>
+          </div>
+        </div>
+
+        <div class="bg-slate-900/50 border border-slate-800 rounded-xl p-3.5 space-y-2">
+          <div class="text-sky-400 font-bold border-b border-slate-800 pb-1">cvs</div>
+          <div class="text-[11px] text-slate-400 space-y-1">
+            <div class="text-slate-200">🔑 id (PK)</div>
+            <div class="text-emerald-400">🔗 userId (FK)</div>
+            <div>fileName, fileUrl, hash</div>
+          </div>
+        </div>
+
+        <div class="bg-slate-900/50 border border-slate-800 rounded-xl p-3.5 space-y-2">
+          <div class="text-emerald-400 font-bold border-b border-slate-800 pb-1">cv_chunks</div>
+          <div class="text-[11px] text-slate-400 space-y-1">
+            <div class="text-slate-200">🔑 id (PK)</div>
+            <div class="text-sky-400">🔗 cvId (FK)</div>
+            <div>chunkText, chunkIndex</div>
+          </div>
+        </div>
+
+        <div class="bg-slate-900/50 border border-slate-800 rounded-xl p-3.5 space-y-2">
+          <div class="text-purple-400 font-bold border-b border-slate-800 pb-1">cv_embeddings</div>
+          <div class="text-[11px] text-slate-400 space-y-1">
+            <div class="text-slate-200">🔑 id (PK)</div>
+            <div class="text-emerald-400">🔗 chunkId (FK)</div>
+            <div>vector(1536), model</div>
+          </div>
+        </div>
+
+        <div class="bg-slate-900/50 border border-slate-800 rounded-xl p-3.5 space-y-2">
+          <div class="text-amber-400 font-bold border-b border-slate-800 pb-1">cv_analyses</div>
+          <div class="text-[11px] text-slate-400 space-y-1">
+            <div class="text-slate-200">🔑 id (PK)</div>
+            <div class="text-sky-400">🔗 cvId (FK)</div>
+            <div>status, atsScore, SWOT</div>
+          </div>
+        </div>
+
+        <div class="bg-slate-900/50 border border-slate-800 rounded-xl p-3.5 space-y-2">
+          <div class="text-teal-400 font-bold border-b border-slate-800 pb-1">api_calls</div>
+          <div class="text-[11px] text-slate-400 space-y-1">
+            <div class="text-slate-200">🔑 id (PK)</div>
+            <div>model, tokensIn/Out</div>
+            <div>costUsd</div>
+          </div>
+        </div>
+
+        <div class="bg-slate-900/50 border border-slate-800 rounded-xl p-3.5 space-y-2">
+          <div class="text-teal-400 font-bold border-b border-slate-800 pb-1">cost_logs</div>
+          <div class="text-[11px] text-slate-400 space-y-1">
+            <div class="text-slate-200">🔑 id (PK)</div>
+            <div class="text-sky-400">🔗 cvId? (FK)</div>
+            <div>operation, durationMs</div>
+          </div>
+        </div>
+
+        <div class="bg-slate-900/50 border border-slate-800 rounded-xl p-3.5 space-y-2">
+          <div class="text-indigo-400 font-bold border-b border-slate-800 pb-1">search_logs</div>
+          <div class="text-[11px] text-slate-400 space-y-1">
+            <div class="text-slate-200">🔑 id (PK)</div>
+            <div class="text-amber-400">🔗 userId (FK)</div>
+            <div>query, createdAt</div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- 6. KOD DAĞILIMI & BENCHMARK GRAFİKLERİ -->
+    <section class="grid grid-cols-1 md:grid-cols-2 gap-8">
+      <!-- KOD KATMAN DAĞILIMI -->
+      <div class="space-y-4">
+        <div>
+          <h3 class="text-sm font-semibold text-slate-100 flex items-center gap-2">
+            <span>📊</span> Kod Tabanı Katman Dağılımı (13,094 Satır)
+          </h3>
+          <p class="text-xs text-slate-400 mt-0.5">Mimarideki kod yoğunluğunun modüllere oranı.</p>
+        </div>
+
+        <div class="bg-slate-900/40 border border-slate-800/80 rounded-xl p-5 space-y-3 font-mono text-xs">
+          <div>
+            <div class="flex justify-between mb-1">
+              <span class="text-slate-300">Frontend (Astro + TS)</span>
+              <span class="text-sky-400">9,150 Satır (%69.8)</span>
+            </div>
+            <div class="w-full h-2 bg-slate-800 rounded-full overflow-hidden">
+              <div class="h-full bg-sky-500 w-[69.8%]"></div>
+            </div>
+          </div>
+
+          <div>
+            <div class="flex justify-between mb-1">
+              <span class="text-slate-300">Infrastructure (AI, Queue, PDF)</span>
+              <span class="text-purple-400">1,172 Satır (%9.0)</span>
+            </div>
+            <div class="w-full h-2 bg-slate-800 rounded-full overflow-hidden">
+              <div class="h-full bg-purple-500 w-[9%]"></div>
+            </div>
+          </div>
+
+          <div>
+            <div class="flex justify-between mb-1">
+              <span class="text-slate-300">Application (Use Cases)</span>
+              <span class="text-emerald-400">1,114 Satır (%8.5)</span>
+            </div>
+            <div class="w-full h-2 bg-slate-800 rounded-full overflow-hidden">
+              <div class="h-full bg-emerald-500 w-[8.5%]"></div>
+            </div>
+          </div>
+
+          <div>
+            <div class="flex justify-between mb-1">
+              <span class="text-slate-300">Routes & Controllers</span>
+              <span class="text-indigo-400">839 Satır (%6.4)</span>
+            </div>
+            <div class="w-full h-2 bg-slate-800 rounded-full overflow-hidden">
+              <div class="h-full bg-indigo-500 w-[6.4%]"></div>
+            </div>
+          </div>
+
+          <div>
+            <div class="flex justify-between mb-1">
+              <span class="text-slate-300">Domain Rules & Chunker</span>
+              <span class="text-amber-400">819 Satır (%6.3)</span>
+            </div>
+            <div class="w-full h-2 bg-slate-800 rounded-full overflow-hidden">
+              <div class="h-full bg-amber-500 w-[6.3%]"></div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- WORKER POOL BENCHMARK -->
+      <div class="space-y-4">
+        <div>
+          <h3 class="text-sm font-semibold text-slate-100 flex items-center gap-2">
+            <span>⚡</span> Worker Pool Performans Benchmark
+          </h3>
+          <p class="text-xs text-slate-400 mt-0.5">5 Gerçek PDF CV ile koşturulan test verisi.</p>
+        </div>
+
+        <div class="bg-slate-900/40 border border-slate-800/80 rounded-xl p-5 space-y-4 font-mono text-xs">
+          <div>
+            <div class="flex justify-between mb-1">
+              <span class="text-rose-400">Sıralı İşleme (Tek Tek)</span>
+              <span class="text-rose-400 font-bold">190.69 sn (~3dk 10sn)</span>
+            </div>
+            <div class="w-full h-2 bg-slate-800 rounded-full overflow-hidden">
+              <div class="h-full bg-rose-500 w-full"></div>
+            </div>
+          </div>
+
+          <div>
+            <div class="flex justify-between mb-1">
+              <span class="text-emerald-400">Paralel Worker Pool (Concurrency: 4)</span>
+              <span class="text-emerald-400 font-bold">61.78 sn (~1dk 1sn)</span>
+            </div>
+            <div class="w-full h-2 bg-slate-800 rounded-full overflow-hidden">
+              <div class="h-full bg-emerald-500 w-[32.4%]"></div>
+            </div>
+          </div>
+
+          <div class="pt-2 border-t border-slate-800 text-[11px] text-slate-400 space-y-1 font-sans">
+            <div class="flex justify-between">
+              <span>Zaman Tasarrufu:</span>
+              <strong class="text-emerald-400 font-mono">%67.6 Daha Hızlı (128.9 sn Kazanç)</strong>
+            </div>
+            <div class="flex justify-between">
+              <span>CV Başı İşlem Süresi:</span>
+              <strong class="text-slate-200 font-mono">12.36 sn / CV</strong>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- 7. BACKEND CLEAN ARCHITECTURE FOLDER TREE -->
+    <section class="space-y-4">
+      <div class="space-y-1">
+        <h2 class="text-lg font-semibold text-slate-100 flex items-center gap-2">
+          <span>🌳</span> Backend Clean Architecture Klasör Yapısı
+        </h2>
+        <p class="text-xs text-slate-400">Sorumlulukların ayrıştırıldığı modüler arka plan mimarisi.</p>
+      </div>
+
+      <div
+        class="bg-slate-900/60 border border-slate-800 rounded-xl p-5 font-mono text-xs leading-relaxed text-slate-300 overflow-x-auto">
+        <span class="text-amber-400 font-bold">server/src/</span>
+        ├── <span class="text-amber-400 font-bold">application/</span> <span class="text-slate-500"># Use Case Uygulama
+          Mantığı (GetPlatformStats, ProcessCvPipeline)</span>
+        │ ├── <span class="text-amber-400 font-bold">admin/</span> <span class="text-slate-500"># Admin paneli iş
+          servisleri</span>
+        │ └── <span class="text-amber-400 font-bold">cv/</span> <span class="text-slate-500"># CV işleme ve sorgulama
+          servisleri</span>
+        ├── <span class="text-amber-400 font-bold">domain/</span> <span class="text-slate-500"># İş Kuralları & Pure
+          Domain (Chunker, Preprocessor)</span>
+        │ └── <span class="text-amber-400 font-bold">cv/</span> <span class="text-slate-500"># CvTextPreprocessor,
+          SectionTaxonomy</span>
+        ├── <span class="text-amber-400 font-bold">infrastructure/</span> <span class="text-slate-500"># Dış Servis
+          Bağlantıları (AI, Queue, Storage, PDF)</span>
+        │ ├── <span class="text-amber-400 font-bold">ai/</span> <span class="text-slate-500"># OpenAiCvAnalyzer,
+          LocalRuleAnalyzer</span>
+        │ ├── <span class="text-amber-400 font-bold">pdf/</span> <span class="text-slate-500"># PdfExtractor</span>
+        │ ├── <span class="text-amber-400 font-bold">queue/</span> <span class="text-slate-500"># cvQueue.ts,
+          cvWorker.ts (Concurrency: 4)</span>
+        │ └── <span class="text-amber-400 font-bold">security/</span> <span class="text-slate-500"># JwtService,
+          PasswordHasher</span>
+        ├── <span class="text-amber-400 font-bold">middleware/</span> <span class="text-slate-500"># Express Ara
+          Yazılımlar (authMiddleware, adminMiddleware)</span>
+        └── <span class="text-amber-400 font-bold">routes/</span> <span class="text-slate-500"># REST API Endpoint
+          Rotaları (admin.ts, auth.ts, cv.ts, search.ts)</span>
+      </div>
+    </section>
+
+    <!-- 8. KURULUM REHBERİ -->
+    <section class="space-y-4">
+      <div class="space-y-1">
+        <h2 class="text-lg font-semibold text-slate-100 flex items-center gap-2">
+          <span>🚀</span> Kurulum ve Çalıştırma Adımları
+        </h2>
+        <p class="text-xs text-slate-400">Yerel geliştirme ortamını ayağa kaldırma talimatları.</p>
+      </div>
+
+      <div class="space-y-3 font-mono text-xs">
+        <div class="bg-slate-900/40 border border-slate-800/80 rounded-xl p-4 space-y-2">
+          <div class="text-emerald-400 font-semibold">1. Depoyu Klonlama & Bağımlılıklar</div>
+          <pre class="bg-slate-950 p-3 rounded-lg border border-slate-800 text-sky-300 overflow-x-auto">git clone https://github.com/omerabali/STAJ22001.git
+cd STAJ22001/astro-project
+npm install && cd server && npm install && cd ..</pre>
+        </div>
+
+        <div class="bg-slate-900/40 border border-slate-800/80 rounded-xl p-4 space-y-2">
+          <div class="text-emerald-400 font-semibold">2. Servisleri ve Veritabanını Başlatma</div>
+          <pre class="bg-slate-950 p-3 rounded-lg border border-slate-800 text-sky-300 overflow-x-auto"># Redis Docker Container'ı Başlat
+docker-compose up -d
+
+# Prisma Veritabanı Migrasyonu
+cd server && npx prisma db push && cd ..</pre>
+        </div>
+
+        <div class="bg-slate-900/40 border border-slate-800/80 rounded-xl p-4 space-y-2">
+          <div class="text-emerald-400 font-semibold">3. Geliştirme Sunucularını Çalıştırma</div>
+          <pre class="bg-slate-950 p-3 rounded-lg border border-slate-800 text-sky-300 overflow-x-auto"># Frontend (4321) & Server (5000) Eşzamanlı Çalıştır
+npm run dev:all</pre>
+        </div>
+      </div>
+    </section>
+
+    <!-- 9. UYGULAMA EKRAN GÖRÜNTÜLERİ PLACEHOLDERS -->
+    <section class="space-y-4">
+      <div class="space-y-1">
+        <h2 class="text-lg font-semibold text-slate-100 flex items-center gap-2">
+          <span>📸</span> Uygulama Ekran Görüntüleri
+        </h2>
+        <p class="text-xs text-slate-400">Sistemin öne çıkan arayüz görselleri için hazırlanmış alanlar.</p>
+      </div>
+
+      <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4 font-sans text-xs">
+        <div class="bg-slate-900/40 border border-slate-800/80 rounded-xl p-4 space-y-3">
+          <h4 class="font-semibold text-slate-200 flex justify-between">
+            1. Login & Kayıt
+            <span class="font-mono text-[10px] text-sky-400">/login</span>
+          </h4>
+          <div
+            class="h-32 bg-slate-950/60 border border-dashed border-slate-800 rounded-lg flex items-center justify-center text-slate-500 text-center p-2">
+            HttpOnly Cookie Auth & Rol Yönlendirmesi
+          </div>
+        </div>
+
+        <div class="bg-slate-900/40 border border-slate-800/80 rounded-xl p-4 space-y-3">
+          <h4 class="font-semibold text-slate-200 flex justify-between">
+            2. Semantik Arama
+            <span class="font-mono text-[10px] text-sky-400">/admin/search</span>
+          </h4>
+          <div
+            class="h-32 bg-slate-950/60 border border-dashed border-slate-800 rounded-lg flex items-center justify-center text-slate-500 text-center p-2">
+            %40 Vector + %60 GPT Hibrit Sıralama
+          </div>
+        </div>
+
+        <div class="bg-slate-900/40 border border-slate-800/80 rounded-xl p-4 space-y-3">
+          <h4 class="font-semibold text-slate-200 flex justify-between">
+            3. AI CV SWOT Panel
+            <span class="font-mono text-[10px] text-sky-400">/admin/candidate-profile</span>
+          </h4>
+          <div
+            class="h-32 bg-slate-950/60 border border-dashed border-slate-800 rounded-lg flex items-center justify-center text-slate-500 text-center p-2">
+            ATS Skoru, SWOT Kartları & Sorular
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- 10. ÖĞRENME SÜRECİ VE TEKNİK ZORLUKLAR -->
+    <section class="space-y-4">
+      <div class="space-y-1">
+        <h2 class="text-lg font-semibold text-slate-100 flex items-center gap-2">
+          <span>🎓</span> Öğrenme Süreci ve Teknik Zorluklar
+        </h2>
+        <p class="text-xs text-slate-400">Staj boyunca karşılaşılan gerçek mimari zorluklar ve mühendislik çözümleri.
+        </p>
+      </div>
+
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-4 text-xs">
+        <div class="bg-slate-900/40 border border-slate-800/80 rounded-xl p-5 space-y-2">
+          <h4 class="font-semibold text-amber-400">1. PDF Chunking Mimarisinin Evrimi</h4>
+          <p class="text-slate-300 leading-relaxed font-normal">
+            Sabit karakter uzunluklu metin bölme yönteminin anlamsal kayıplara yol açması nedeniyle Türkçe/İngilizce
+            başlık matrislerine dayalı 4 katmanlı akıllı parçalama (Chunking) pipeline'ı geliştirildi.
+          </p>
+        </div>
+
+        <div class="bg-slate-900/40 border border-slate-800/80 rounded-xl p-5 space-y-2">
+          <h4 class="font-semibold text-amber-400">2. Senkron İstek Kilitlenmesi & Worker Pool</h4>
+          <p class="text-slate-300 leading-relaxed font-normal">
+            CV analizinin senkron yapılması HTTP zaman aşımı yarattığı için Redis + BullMQ tabanlı 4 paralel işçili
+            (concurrency: 4) asenkron Worker Pool mimarisine geçilerek sistem kilitlemesiz hale getirildi.
+          </p>
+        </div>
+
+        <div class="bg-slate-900/40 border border-slate-800/80 rounded-xl p-5 space-y-2">
+          <h4 class="font-semibold text-amber-400">3. Vektörel Arama & RAG Geçişi</h4>
+          <p class="text-slate-300 leading-relaxed font-normal">
+            Klasik SQL <code class="text-sky-300 font-mono">LIKE %keyword%</code> sorgularının yetersizliği üzerine
+            OpenAI <code class="text-sky-300 font-mono">text-embedding-3-small</code> ve PostgreSQL <code
+              class="text-sky-300 font-mono">pgvector HNSW</code> indeksi entegre edildi.
+          </p>
+        </div>
+
+        <div class="bg-slate-900/40 border border-slate-800/80 rounded-xl p-5 space-y-2">
+          <h4 class="font-semibold text-amber-400">4. Prompt Injection ve Şema Doğrulama</h4>
+          <p class="text-slate-300 leading-relaxed font-normal">
+            LLM çıktılarının tutarsızlığı ve CV içine gizlenebilecek prompt injection manipülasyonlarına karşı <code
+              class="text-sky-300 font-mono">PromptInjectionGuard.ts</code> ve Zod şema doğrulama katmanı yazıldı.
+          </p>
+        </div>
+      </div>
+    </section>
+
+    <!-- FOOTER -->
+    <footer class="border-t border-slate-800/80 pt-8 text-center text-xs text-slate-500 font-mono">
+      Beacon Architectural Overview • Designed for Clean Engineering & Production Readiness
+    </footer>
+
+  </div>
+</body>
+
+</html>

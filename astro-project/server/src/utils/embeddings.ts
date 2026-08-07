@@ -1,3 +1,8 @@
+/**
+ * embeddings.ts (Yapay Zeka Vektör Doğrulama & Önbellek Yöneticisi)
+ * Görevi: OpenAI `text-embedding-3-small` modelinden üretilen 1536 boyutlu vektörlerin
+ * format doğruluğunu denetler (`validateEmbedding`). Vektörleri veritabanı (pgvector) ve önbelleğe (dual cache) yazar.
+ */
 import { PrismaClient } from "@prisma/client";
 import crypto from "crypto";
 import { EmbeddingService } from "../services/EmbeddingService.js";
@@ -372,6 +377,8 @@ export async function searchSimilarCVs(
         c."cvId",
         c.id as "chunkId",
         cv."rawText" as "rawText",
+        cv."structuredData" as "structuredData",
+        cv."needsReview" as "needsReview",
         cv."userId" as "userId",
         u.name as "candidateName",
         u.email as "candidateEmail",
@@ -391,6 +398,8 @@ export async function searchSimilarCVs(
         "userId",
         "chunkId" as "matchedChunkId",
         "rawText",
+        "structuredData",
+        "needsReview",
         "candidateName",
         "candidateEmail",
         "candidateAvatarUrl",
@@ -404,6 +413,8 @@ export async function searchSimilarCVs(
       "userId",
       "matchedChunkId",
       "rawText",
+      "structuredData",
+      "needsReview",
       "candidateName",
       "candidateEmail",
       "candidateAvatarUrl",

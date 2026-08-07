@@ -1,9 +1,16 @@
+/**
+ * ProcessCvPipelineUseCase.ts (CV Analiz Boru Hattı Kullanım Senaryosu)
+ * Görevi: Arka planda çalışan ana CV işleme motorudur.
+ * PDF metnini okur -> Dilini tespit eder -> Mantıksal parçalara (chunks) böler -> 
+ * 1536-boyutlu vektörleri çıkarıp pgvector'e yazar -> OpenAI GPT-4o ile ATS Skoru ve SWOT analizi üretir -> 
+ * Canlı durumu WebSocket (Socket.io) ile ön yüze aktarır.
+ */
 import { PrismaClient, AnalysisStatus } from "@prisma/client";
-import { 
-  extractTextFromPDF, 
-  detectLanguage, 
-  chunkTextBySections, 
-  analyzeWithOpenAI 
+import {
+  extractTextFromPDF,
+  detectLanguage,
+  chunkTextBySections,
+  analyzeWithOpenAI
 } from "../../utils/parser.js";
 import { embedAllChunks } from "../../utils/embeddings.js";
 import { emitAnalysisStatus } from "../../index.js";
@@ -26,7 +33,7 @@ export class ProcessCvPipelineUseCase {
     }
 
     // 2. cVAnalysis kaydını oluştur veya getir
-    let analysis = await prisma.cVAnalysis.findFirst({
+    let analysis = await prisma.cVAnalysis.findFirst({//findfirst ilk bulunanı getir
       where: { cvId, status: AnalysisStatus.PROCESSING }
     });
 
@@ -47,7 +54,8 @@ export class ProcessCvPipelineUseCase {
       // 3. METİN ÇIKARMA (Parser)
       let text = cv.rawText;
       let lang = "tr";
-
+      //CV dosyasının (PDF) saklandığı yeri tespit edip dosyanın kendisini
+      //(Buffer olarak) indiriyor ve ardından içerikteki ham metni (rawText) çıkarıyor.
       if (!text || text.trim().length === 0) {
         console.log(`[Parser] Extracting text for CV ${cvId}...`);
         let pdfBuffer: Buffer;
@@ -85,6 +93,25 @@ export class ProcessCvPipelineUseCase {
         throw new Error("CV'den yeterli okunabilir metin çıkarılamadı.");
       }
 
+      // 3.5 2-AŞAMALI YAPILANDIRILMIŞ VERİ ÇIKARMA VE DOĞRULAMA (Producer / Checker Engine)
+      const apiKey = process.env.OPENAI_API_KEY;
+      if (apiKey) {
+        console.log(`[Parser] 🧬 Running 2-Pass Structured Extraction for CV ${cvId}...`);
+        const { StructuredCvExtractor } = await import("../../infrastructure/ai/StructuredCvExtractor.js");
+        const structuredResult = await StructuredCvExtractor.executePipeline(text, apiKey);
+
+        await prisma.cV.update({
+          where: { id: cvId },
+          data: {
+            structuredData: structuredResult.structuredData as any,
+            needsReview: structuredResult.needsReview,
+            extractionConfidence: structuredResult.confidence
+          }
+        });
+
+        console.log(`[Parser] ✅ Structured data saved. Confidence: ${structuredResult.confidence} | NeedsReview: ${structuredResult.needsReview}`);
+      }
+
       // 4. PARÇALAMA (4-Aşamalı Yapay Zeka Chunklama Motoru) & ESKİ PARÇALARI TEMİZLEME
       await prisma.cVChunk.deleteMany({ where: { cvId } });
 
@@ -106,7 +133,7 @@ export class ProcessCvPipelineUseCase {
       emitAnalysisStatus(cvId, "PROCESSING", "Yapay zeka CV analizi gerçekleştiriliyor...", 2);
 
       const aiStartTime = Date.now();
-      const aiAnalysis = await analyzeWithOpenAI(text, (lang as "tr" | "en") || "tr", prisma);
+      const aiAnalysis = await analyzeWithOpenAI(text, (lang as "tr" | "en") || "tr", prisma, cvId);
       const aiDurationMs = Date.now() - aiStartTime;
 
       // 6. ANALİZ SONUCUNU ANINDA DB'YE KAYDET

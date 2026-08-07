@@ -1,6 +1,6 @@
 /**
- * Analyses Sayfa Init Modülü
- * CV listesini ilk kez yükler ve astro:page-load event'ini dinler.
+ * initPage.ts (Analizler Sayfası Başlatıcı)
+ * Görevi: Analizler sayfası açıldığında (`astro:page-load`) CV listesini ilk kez yüklemek için loadCVList'i çağırır.
  */
 import { loadCVList } from './cvListLoader';
 

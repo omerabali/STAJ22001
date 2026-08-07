@@ -1,7 +1,7 @@
 /**
- * CV Silme Modülü
- * window.deleteCV global fonksiyonunu oluşturur.
- * HTML'deki onclick="deleteCV('id')" çağrılarını karşılar.
+ * deleteCv.ts (Aday CV Silme Yöneticisi)
+ * Görevi: Çöp kutusu butonuna tıklandığında onay alır ve `/api/cv/${cvId}` adresine DELETE isteği atarak
+ * CV dosyasını ve ilişkili tüm analiz verilerini veritabanından kalıcı olarak siler.
  */
 import { analysesState } from './analysesState';
 import { loadCVList } from './cvListLoader';

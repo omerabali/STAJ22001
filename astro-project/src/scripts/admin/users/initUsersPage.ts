@@ -1,11 +1,12 @@
-import { usersState } from './usersState';
-import { renderInitialUsersView, renderUsersPage, initToggleLoadMore } from './userPagination';
-import { initToggleSelectAllUsers, executeBulkReanalyze } from './bulkReanalyze';
-import { applyCandidateFilters, initCandidateFilterGlobals } from './candidateFilter';
-
 /**
- * Rol değiştirme — admin/candidate toggle.
+ * initUsersPage.ts (Kullanıcı Yönetimi Sayfa Başlatıcı & Rol Değiştirici)
+ * Görevi: Kullanıcı Yönetimi sayfasında tüm kullanıcıları (`/api/admin/users`) yükler,
+ * rol değiştirme (`ADMIN` <-> `CANDIDATE`) ve kullanıcı silme işlemlerini backend'e bildirir.
  */
+import { usersState } from './usersState';
+import { initToggleSelectAllUsers, executeBulkReanalyze } from './bulkReanalyze';
+import { initToggleLoadMore, renderUsersPage, renderInitialUsersView } from './userPagination';
+import { initCandidateFilterGlobals, applyCandidateFilters } from './candidateFilter';
 async function changeRole(userId: string, newRole: string): Promise<void> {
   if (!confirm(`Kullanıcı rolünü ${newRole} olarak değiştirmek istediğinize emin misiniz?`)) return;
   try {
@@ -18,6 +19,30 @@ async function changeRole(userId: string, newRole: string): Promise<void> {
     if (res.ok) { alert('Rol başarıyla güncellendi!'); fetchUsers(); }
     else { alert('Hata: ' + (data.message || 'Bilinmeyen bir hata oluştu.')); }
   } catch { alert('Sunucuya bağlanılamadı.'); }
+}
+
+async function deleteCandidate(userId: string, name: string): Promise<void> {
+  if (!confirm(`"${name}" adlı aday hesabı ve ilişkili tüm CV verileri kalıcı olarak silinecek. Onaylıyor musunuz?`)) return;
+  try {
+    const token = localStorage.getItem('token');
+    const headers: Record<string, string> = { 'Content-Type': 'application/json' };
+    if (token) headers['Authorization'] = `Bearer ${token}`;
+
+    const res = await fetch(`/api/admin/candidates/${userId}`, {
+      method: 'DELETE',
+      headers,
+      credentials: 'include'
+    });
+    const data = await res.json();
+    if (res.ok) {
+      alert(data.message || 'Aday başarıyla silindi!');
+      fetchUsers();
+    } else {
+      alert('Hata: ' + (data.message || 'Aday silinemedi.'));
+    }
+  } catch {
+    alert('Sunucuya bağlanılamadı.');
+  }
 }
 
 /**
@@ -102,7 +127,7 @@ export async function fetchUsers(): Promise<void> {
     const set = (id: string, val: any) => { const el = document.getElementById(id); if (el) el.textContent = String(val); };
     set('stat-candidates', candidatesCount);
     set('stat-admins', adminsCount);
-    set('stat-new-users', todaySignups || 3);
+    set('stat-new-users', todaySignups);
     set('total-text', `Toplam ${users.length} kullanıcı`);
 
     if (usersState.isExpandedUserView) renderUsersPage(usersState.userCurrentPage);
@@ -120,6 +145,7 @@ export async function fetchUsers(): Promise<void> {
 export function initUsersPage(): void {
   // Global fonksiyonları kaydet (HTML onclick'ten çağrılıyor)
   (window as any).changeRole = changeRole;
+  (window as any).deleteCandidate = deleteCandidate;
   (window as any).handleUserSearch = handleUserSearch;
   (window as any).executeBulkReanalyze = () => executeBulkReanalyze(fetchUsers);
 

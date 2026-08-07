@@ -1,9 +1,9 @@
-import { usersState } from './usersState';
-import { renderInitialUsersView, renderUsersPage } from './userPagination';
-
 /**
- * Aday filtreleme tablosu render — min ATS, isim, email, tarih sıralaması.
+ * candidateFilter.ts (Kullanıcı Yönetimi Filtreleme Yöneticisi)
+ * Görevi: Kullanıcı listesini isim/e-posta araması, rol süzgeci (ADMIN / CANDIDATE),
+ * minimum ATS skoru slider'ı ve tarih sıralamasına (En yeni / En eski) göre canlı filtreler.
  */
+import { usersState } from './usersState';
 export function applyCandidateFilters(page = 1): void {
   const tbody = document.getElementById('candidate-filter-tbody');
   const tableContainer = document.getElementById('candidate-filter-table-container');

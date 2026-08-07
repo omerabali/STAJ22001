@@ -1,8 +1,9 @@
-import { usersState } from './usersState';
-
 /**
- * Toplu seçim & yeniden analiz UI kontrolü.
+ * bulkReanalyze.ts (Kullanıcı Yönetimi Toplu Seçim ve Yeniden AI Analizi Yöneticisi)
+ * Görevi: Kullanıcı listesindeki onay kutuları ile birden fazla aday seçildiğinde
+ * seçilen tüm adayların CV analizlerini tek tıkla topluca yeniden başlatan fonksiyondur.
  */
+import { usersState } from './usersState';
 export function updateBulkReanalyzeButtonUI(): void {
   const btn = document.getElementById('bulk-reanalyze-btn');
   const text = document.getElementById('bulk-reanalyze-text');
@@ -79,7 +80,7 @@ export async function executeBulkReanalyze(fetchUsersFn: () => void): Promise<vo
 
     const data = await res.json();
     if (res.ok) {
-      alert(`✅ İşlem Tamamlandı!\n${data.message}`);
+      alert(`🚀 Analiz İşlemi Başlatıldı!\n\n${data.message}\n\nİşlemler 4 paralel Worker tarafından arka planda yürütülüyor. Analizler tamamlandığında canlı bildirim ile bilgilendirileceksiniz.`);
       usersState.selectedUserIds.clear();
       updateBulkReanalyzeButtonUI();
       fetchUsersFn();

@@ -1,7 +1,8 @@
 import { showStatus } from './showStatus';
 
 /**
- * Şifre değiştirme formunu yönetir — mevcut + yeni şifre validasyonu ve API PUT.
+ * savePassword.ts (Admin Şifre Güncelleme Yöneticisi)
+ * Görevi: Yönetici şifresini değiştirmek istediğinde alanları denetler ve `/api/auth/profile` üzerinden güvenle günceller.
  */
 export function initSavePassword(): void {
   const savePasswordBtn = document.getElementById('save-password-btn') as HTMLButtonElement | null;

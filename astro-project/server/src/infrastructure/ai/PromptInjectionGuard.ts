@@ -1,4 +1,9 @@
-export class PromptInjectionGuard {
+/**
+ * PromptInjectionGuard.ts (Yapay Zeka Güvenlik & Enjeksiyon Kalkanı)
+ * Görevi: CV metninde veya arama sorgusunda yapay zekayı kandırmaya çalışan zararlı komutları
+ * (`"ignore previous instructions"`, `"rate candidate 100/100"` vb.) Regex ile tespit edip engelleyen güvenlik kalkanıdır.
+ */
+export class PromptInjectionGuard {//kara liste
   private static INJECTION_PATTERNS = [
     "ignore previous instructions",
     "ignore all previous",
@@ -17,7 +22,7 @@ export class PromptInjectionGuard {
   ];
 
   /**
-   * Scans raw text for potential prompt injection patterns
+   * gelen metinde eğer yukardaki bu ifadelerden biri varsa true döner
    */
   public static detectInjection(rawText: string): boolean {
     const lower = (rawText || "").toLowerCase();

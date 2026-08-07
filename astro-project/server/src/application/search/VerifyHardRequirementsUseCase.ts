@@ -1,3 +1,10 @@
+/**
+ * VerifyHardRequirementsUseCase.ts (Uçtan Uca Semantik Arama & Sert Kriter Doğrulama Kullanım Senaryosu)
+ * Görevi: Tüm yapay zeka arama sürecini uçtan uca yürütür:
+ * 1. Niyet ve sert kriterleri ayrıştırır (ParseQueryIntent).
+ * 2. `text-embedding-3-small` ile sorgunun vektörünü çıkarıp pgvector veritabanında arama yapar.
+ * 3. `RankingService` ile GPT-4o-mini hibrit sıralaması uygulayıp nihai aday listesini döndürür.
+ */
 import { PrismaClient } from "@prisma/client";
 import { ParseQueryIntentUseCase } from "./ParseQueryIntentUseCase.js";
 import { searchSimilarCVs } from "../../utils/embeddings.js";

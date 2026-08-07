@@ -1,3 +1,8 @@
+/**
+ * GetPlatformReportStatsUseCase.ts (Platform Genel Analiz Raporu Kullanım Senaryosu)
+ * Görevi: Admin paneli raporlar sayfası için en çok aranan yetenekler, ortalama aday skor dağılımı,
+ * aylık CV yükleme trendleri ve sistem kullanım metriklerini detaylı grafik verisi olarak hazırlar.
+ */
 import { Prisma } from "@prisma/client";
 
 export class GetPlatformReportStatsUseCase {

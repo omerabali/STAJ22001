@@ -1,3 +1,8 @@
+/**
+ * FilterCandidatesUseCase.ts (Aday Filtreleme & Arama Kullanım Senaryosu)
+ * Görevi: İK Admin paneli aday havuzunda isim, e-posta, min/maks ATS skoru, yetenekler
+ * ve tarih aralıklarına göre gelişmiş filtreleme ve sayfalama (pagination) yapar.
+ */
 import { PrismaClient, Prisma } from "@prisma/client";
 
 export interface CandidateFilterDTO {

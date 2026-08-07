@@ -1,3 +1,9 @@
+/**
+ * search.ts (Semantik Yapay Zeka Aday Arama API Rotası)
+ * Görevi: Sadece ADMIN yetkili kullanıcıların erişebildiği doğal dilde aday arama uç noktasıdır (`POST /api/search`).
+ * Doğal dildeki sorgudan zorunlu sert kriterleri söker (Hard Requirements), pgvector ile 1536-boyutlu vektörel arama yapar,
+ * en uygun adayları GPT-4o-mini ile yeniden sıralar (Reranking) ve sonuçları nedenleriyle birlikte döndürür.
+ */
 import { Router, Request, Response } from "express";
 import { PrismaClient } from "@prisma/client";
 import { PrismaPg } from "@prisma/adapter-pg";
@@ -34,13 +40,13 @@ router.post("/", authMiddleware, adminMiddleware, async (req: Request, res: Resp
     return;
   }
 
-  const searchLimit = typeof limit === "number" && limit > 0 ? limit : 30;
+  const searchLimit = typeof limit === "number" && limit > 0 ? limit : 30;//limit verilmediyse varsayılan 30 
 
   try {
     // 2. Delegate search pipeline to VerifyHardRequirementsUseCase
-    const { results, parsedQuery } = await VerifyHardRequirementsUseCase.execute(query, searchLimit, prisma);
+    const { results, parsedQuery } = await VerifyHardRequirementsUseCase.execute(query, searchLimit, prisma);//filtreden geçen cvler
 
-    // 3. Log the search query in SearchLog table
+    // arama geçmişini kaydet
     if (req.user) {
       await prisma.searchLog.create({
         data: {
@@ -55,9 +61,9 @@ router.post("/", authMiddleware, adminMiddleware, async (req: Request, res: Resp
     console.log(`[SearchRoute] Semantic search for "${query}" completed in ${duration}ms. Hard Requirements Count: ${parsedQuery.hardRequirements.length}`);
 
     res.json({
-      results,
+      results,//uygun adaylar
       parsedQuery,
-      processingTimeMs: duration
+      processingTimeMs: duration//kaç sn sürdüğü
     });
   } catch (error: any) {
     console.error("[SearchRoute] Error during semantic search:", error);

@@ -1,6 +1,7 @@
 /**
- * stepperTimeline.ts
- * Manages the 4-step upload progress stepper & vertical live activity timeline DOM updates.
+ * stepperTimeline.ts (Ortak 4 Adımlı Yükleme ve Canlı Zaman Çizelgesi Yöneticisi)
+ * Görevi: CV yüklenirken ve analiz edilirken ekrandaki 4 adımlı ilerleme çubuğunu (Yüklendi -> İşleniyor -> AI Analiz -> Hazır)
+ * ve sağ taraftaki saatli canlı aktivite akışını (timeline) canlı olarak günceller.
  */
 
 export function updateStepUI(currentStep: number, message: string): void {

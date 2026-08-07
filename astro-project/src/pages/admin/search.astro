@@ -162,7 +162,7 @@ import AdminLayout from '../../layouts/AdminLayout.astro';
 
   <script>
     import { deleteSearchLog, fetchSearchLogs } from '../../scripts/admin/search/searchHistoryLogs';
-    import { executeSemanticSearch, restoreCachedSemanticSearch } from '../../scripts/admin/search/semanticSearchEngine';
+    import { executeSemanticSearch, restoreCachedSemanticSearch, clearSemanticSearchCache } from '../../scripts/admin/search/semanticSearchEngine';
     import { renderCandidates } from '../../scripts/admin/search/directorySearch';
     import { toggleCompareCandidate } from '../../scripts/admin/search/candidateComparison';
     import { clearCompareCache } from '../../scripts/admin/compare/comparePageInit';
@@ -244,9 +244,33 @@ import AdminLayout from '../../layouts/AdminLayout.astro';
       const searchBtn = document.getElementById('semantic-search-btn');
       searchBtn?.addEventListener('click', () => executeSemanticSearch(isSearchLoadingState));
 
-      const input = document.getElementById('semantic-search-input');
+      const input = document.getElementById('semantic-search-input') as HTMLInputElement | null;
       input?.addEventListener('keydown', (e: any) => {
         if (e.key === 'Enter') executeSemanticSearch(isSearchLoadingState);
+      });
+
+      const clearBtn = document.getElementById('clear-semantic-search-btn');
+      const resetSearchState = () => {
+        if (input) input.value = '';
+        clearSemanticSearchCache();
+        const resultsCountEl = document.getElementById('semantic-result-count');
+        if (resultsCountEl) resultsCountEl.textContent = 'Arama bekleniyor...';
+        const grid = document.getElementById('semantic-candidates-grid');
+        if (grid) {
+          grid.innerHTML = `
+            <div class="bg-white border border-[#ddd9d3] rounded-[10px] p-12 flex flex-col items-center justify-center text-center shadow-sm">
+              <span class="material-symbols-outlined text-5xl text-[#14422f]/20 mb-4">search</span>
+              <p class="text-[#8a8580] font-body-md font-medium">Semantik AI aramasını başlatmak için yukarıya bir kriter yazıp "AI Ara" butonuna basın.</p>
+            </div>`;
+        }
+      };
+
+      clearBtn?.addEventListener('click', resetSearchState);
+
+      input?.addEventListener('input', () => {
+        if (input.value.trim() === '') {
+          resetSearchState();
+        }
       });
 
       const candInput = document.getElementById('candidate-search-input');

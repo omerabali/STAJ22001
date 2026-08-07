@@ -1,5 +1,6 @@
 /**
- * Admin ayarlar sayfası için durum mesajı göstericisi.
+ * showStatus.ts (Admin Ayarlar Durum Mesajı Göstericisi)
+ * Görevi: Admin profil ve şifre güncellemelerinde yeşil/kırmızı mesaj kutularını 5 saniyeliğine ekrana yansıtır.
  */
 export function showStatus(elementId: string, message: string, isError = false): void {
   const el = document.getElementById(elementId);

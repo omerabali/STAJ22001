@@ -1,3 +1,8 @@
+/**
+ * DeleteCandidateUseCase.ts (Aday Hesabı Silme Kullanım Senaryosu)
+ * Görevi: Admin paneli üzerinden seçilen aday hesabını, o adaya ait tüm CV dosyalarını,
+ * Supabase depolamadaki PDF'leri ve veritabanı analiz kayıtlarını sistemden kalıcı olarak siler.
+ */
 import { PrismaClient, Role } from "@prisma/client";
 
 export class DeleteCandidateUseCase {

@@ -1,8 +1,5 @@
-/**
- * Analiz Detay Renderer
- * Bir CV ve analiz verisini alarak sağ paneli doldurur.
- * COMPLETED / PENDING / PROCESSING / FAILED durumlarını karşılar.
- */
+import { parseSuggestions, renderStrengthsHtml, renderWeaknessesHtml, renderSuggestionsHtml, renderQuestionsHtml } from '../../shared/cvAnalysisRenderer';
+
 export function showAnalysisDetails(cv: any, analysis: any): void {
   const noState = document.getElementById('no-analysis-state');
   const activeState = document.getElementById('active-analysis-state');
@@ -71,25 +68,11 @@ export function showAnalysisDetails(cv: any, analysis: any): void {
           `).join('')
         : `<span class="text-xs text-[#8a8580]">Yetenek kelimeleri çıkarılamadı.</span>`;
 
-      const strengths: string[] = analysis.strengths || [];
-      const strengthsHtml = strengths.length > 0
-        ? `<div class="space-y-2">${strengths.map(s => `
-            <div class="flex items-start gap-2 text-xs text-[#1b1c1a] leading-relaxed bg-emerald-50/80 border border-emerald-200/80 p-3 rounded-lg shadow-2xs">
-              <span class="material-symbols-outlined text-emerald-600 text-[16px] shrink-0 mt-0.5">check_circle</span>
-              <span>${s}</span>
-            </div>
-          `).join('')}</div>`
-        : `<p class="text-xs text-[#8a8580] italic">Güçlü yön verisi bulunamadı.</p>`;
+      const strengths = analysis.strengths || [];
+      const strengthsHtml = renderStrengthsHtml(strengths);
 
-      const weaknesses: string[] = analysis.weaknesses || analysis.eksik_yonler || analysis.gelisime_acik_yonler || [];
-      const weaknessesHtml = weaknesses.length > 0
-        ? `<div class="space-y-2">${weaknesses.map(w => `
-            <div class="flex items-start gap-2 text-xs text-[#1b1c1a] leading-relaxed bg-rose-50/80 border border-rose-200/80 p-3 rounded-lg shadow-2xs">
-              <span class="material-symbols-outlined text-rose-600 text-[16px] shrink-0 mt-0.5">warning</span>
-              <span>${w}</span>
-            </div>
-          `).join('')}</div>`
-        : `<p class="text-xs text-[#8a8580] italic">Eksik yön tespit edilmedi.</p>`;
+      const weaknesses = analysis.weaknesses || analysis.eksik_yonler || analysis.gelisime_acik_yonler || [];
+      const weaknessesHtml = renderWeaknessesHtml(weaknesses);
 
       const rawSuggestions: any[] = analysis.suggestions || [];
       const recList: any[] = [];

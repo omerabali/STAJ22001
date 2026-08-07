@@ -1,6 +1,7 @@
 /**
- * 5. Chunk Viewer
- * Bir CV'ye tıklandığında veritabanından parçaları çekip gösteren kod (showChunks).
+ * chunkViewer.ts (Admin CV Parça ve Metin İnceleme Modal Yöneticisi)
+ * Görevi: Tablodaki bir CV için "Parçaları Gör" butonuna tıklandığında açılan modal ekranında
+ * yapay zekanın parçalara ayırdığı CV metinlerini ve vektör parçalarını gösterir.
  */
 function escapeHtml(str: string): string {
   return String(str).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');

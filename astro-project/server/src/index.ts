@@ -1,3 +1,10 @@
+/**
+ * sistem başladığı an ilk bu çalışır
+ * index.ts (Backend Ana Sunucu & Giriş Noktası - Main Application Entrypoint)
+ * Görevi: Node.js + Express HTTP sunucusunu (Port 5000) başlatır, canlı WebSocket (Socket.io) yayınını kurar,
+ * CORS/Cookie/JSON ara yazılımlarını bağlar, tüm API rotalarını (/api/auth, /api/cv, /api/search, /api/admin) dinlemeye alır
+ * ve arka planda CV işleyen Worker Pool kuyruğunu (initCvWorker) devreye sokar.
+ */
 import "./load-env.js";
 import express from "express";
 import http from "http";
@@ -25,7 +32,7 @@ const io = new Server(httpServer, {
 
 io.on("connection", (socket) => {
   console.log(`[Socket.io] 🔌 Client connected: ${socket.id}`);
-  
+
   socket.on("join:cv", (cvId: string) => {
     socket.join(`cv:${cvId}`);
     console.log(`[Socket.io] 📥 Client ${socket.id} joined room cv:${cvId}`);

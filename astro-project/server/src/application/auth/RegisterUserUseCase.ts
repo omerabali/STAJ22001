@@ -1,3 +1,8 @@
+/**
+ * RegisterUserUseCase.ts (Yeni Kullanıcı Kaydı Kullanım Senaryosu)
+ * Görevi: Yeni aday kaydı talebini işler. E-posta ve telefon numarasının benzersizliğini doğrular,
+ * şifreyi Bcrypt ile güvenli şekilde hash'ler, kullanıcıyı oluşturur ve JWT jetonunu döner.
+ */
 import { PrismaClient } from "@prisma/client";
 import { PasswordHasher } from "../../infrastructure/security/PasswordHasher.js";
 import { JwtService } from "../../infrastructure/security/JwtService.js";
@@ -69,14 +74,14 @@ export class RegisterUserUseCase {
     }
 
     // Hash password & assign role
-    const passwordHash = await PasswordHasher.hash(passwordStr);
-    const role = trimmedEmail.startsWith("admin") ? "ADMIN" : "CANDIDATE";
+    const passwordHash = await PasswordHasher.hash(passwordStr);//hashleme kısmı
+    const role = trimmedEmail.startsWith("admin") ? "ADMIN" : "CANDIDATE";//kayıtın admin mi yoksa aday mı olduğunu kontrol ediyor.
 
     const user = await prisma.user.create({
       data: { email: trimmedEmail, phone: phoneStr, name: nameStr, passwordHash, role }
     });
 
-    const token = JwtService.signToken({ id: user.id, email: user.email, role: user.role, name: user.name });
+    const token = JwtService.signToken({ id: user.id, email: user.email, role: user.role, name: user.name });//şifreleme
 
     return {
       token,

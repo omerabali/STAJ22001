@@ -1,6 +1,7 @@
 /**
- * 7. Single Upload Logic
- * Tekli dosya yükleme olaylarını dinleme ve uploadCV modülüne iletme (setupSingleUpload).
+ * singleUploadLogic.ts (Admin Tekli CV Yükleme Yöneticisi)
+ * Görevi: Seçilen tek bir aday için PDF formatında CV yükleme sürükle-bırak (drop-zone)
+ * alanını yönetir, ilerleme yüzdesini (%0 - %100) canlı olarak çizer ve sunucuya gönderir.
  */
 import { uploadCV } from '../../shared/cvUploader';
 

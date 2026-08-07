@@ -1,6 +1,7 @@
 /**
- * 1. Socket.io Logic
- * Sunucudan gelen canlı analiz olaylarını (analysis:status) dinleme ve UI güncelleme.
+ * socketLogic.ts (Canlı WebSocket / Socket.io Dinleyici Yöneticisi)
+ * Görevi: Backend sunucusundan gelen anlık `analysis:status` olaylarını dinler.
+ * CV işlenme adımlarını (1. Yüklendi, 2. İşleniyor, 3. AI Analiz, 4. Hazır) canlı olarak ekrana yansıtır.
  */
 import { updateStepUI } from '../../shared/stepperTimeline';
 import { showProfileToast } from './toastNotification';
@@ -38,6 +39,10 @@ export function initAnalysisSocketListener(state: {
       if (data.status === 'COMPLETED' || stepNum >= 4) {
         state.isAnalysisCompleted = true;
         showProfileToast('✅ Analiz Tamamlandı!', 'Sonuçlarınız hazır — aşağıdaki listeden görüntüleyebilirsiniz.');
+        const statusIndicator = document.getElementById('analysis-status-indicator');
+        if (statusIndicator) {
+          statusIndicator.innerHTML = `<span class="material-symbols-outlined text-emerald-600 text-3xl">check_circle</span>`;
+        }
       }
 
       if ((window as any).__swrCache) {

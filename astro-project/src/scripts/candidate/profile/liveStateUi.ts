@@ -1,6 +1,7 @@
 /**
- * 6. Live State UI
- * CV yüklenirken sağ paneli canlı akış moduna geçirme (showLiveProcessingState).
+ * liveStateUi.ts (Canlı İşlem Akışı Arayüz Yöneticisi)
+ * Görevi: Yeni CV yüklendiği anda sağ paneli "Canlı İşlem Akışı" moduna geçirir.
+ * Adım göstergelerini (Adım 1/4) ve canlı zaman çizelgesi (timeline) alanını ekranda hazırlar.
  */
 export function showLiveProcessingState(fileName: string): void {
   const noState = document.getElementById('no-analysis-state');

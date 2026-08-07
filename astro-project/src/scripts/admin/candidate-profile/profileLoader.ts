@@ -1,11 +1,12 @@
+/**
+ * profileLoader.ts (Admin Aday Profil Yükleyici)
+ * Görevi: URL parametrelerinden aday ID'sini (`?id=xxx`) çeker.
+ * Backend'den (`/api/admin/users/${id}`) adayın tüm bilgilerini ve CV analizlerini yükleyip sayfaya doldurur.
+ */
 import { candProfileState } from './candProfileState';
 import { renderCvDropdown, handleCvSelectionChange } from './cvDropdown';
 import { renderSelectedCvDetails } from './cvDetailsRenderer';
 import { setupRealtimeSocket } from './socketSetup';
-
-/**
- * Ana profil yükleyici — URL'den candidateId alır, API'den çeker, tüm bileşenleri başlatır.
- */
 export async function loadAdminCandidateProfile(): Promise<void> {
   const urlParams = new URLSearchParams(window.location.search);
   const candidateId = urlParams.get('id') || urlParams.get('userId') || '';
@@ -41,6 +42,11 @@ export async function loadAdminCandidateProfile(): Promise<void> {
       return;
     }
 
+    // Reset previous candidate state if switching candidates
+    if (candProfileState.candidateUserId !== candidate.id) {
+      candProfileState.activeCvId = null;
+    }
+
     candProfileState.candidateUserId = candidate.id;
     candProfileState.candidateCvs = candidate.cvs || [];
 
@@ -53,7 +59,12 @@ export async function loadAdminCandidateProfile(): Promise<void> {
     const rawDate = candidate.createdAt ? new Date(candidate.createdAt) : null;
     set('profile-date', rawDate ? `Kayıt Tarihi: ${rawDate.toLocaleDateString('tr-TR')}` : 'Kayıt: -');
 
-    renderCvDropdown(requestedCvId);
+    // Priority: If URL contains cvId, force use requestedCvId. Otherwise fallback to current active or first CV.
+    if (requestedCvId) {
+      candProfileState.activeCvId = requestedCvId;
+    }
+    const targetCvId = requestedCvId || candProfileState.activeCvId;
+    renderCvDropdown(targetCvId);
     if (candProfileState.activeCvId) renderSelectedCvDetails(candProfileState.activeCvId);
 
     if (loadingEl) loadingEl.classList.add('hidden');

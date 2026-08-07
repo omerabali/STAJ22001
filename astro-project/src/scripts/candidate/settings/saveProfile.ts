@@ -1,7 +1,7 @@
 /**
- * Profil Kaydetme Modülü
- * Avatar seçme (FileReader + base64) ve kaydet butonunu yönetir.
- * Ad/e-posta/telefon validasyonu yapar, /api/auth/profile PUT atar.
+ * saveProfile.ts (Aday Profil Güncelleme & Avatar Yöneticisi)
+ * Görevi: Profil fotoğrafı seçildiğinde FileReader (Base64) ile önizleme yapar.
+ * Ad Soyad, E-posta ve Telefon validasyonunu geçtikten sonra /api/auth/profile adresine PUT isteği ile güncellemeleri kaydeder.
  */
 import { showStatus } from './showStatus';
 
@@ -79,6 +79,11 @@ export function initSaveProfile(): void {
         showStatus('profile-status', 'Profil başarıyla güncellendi!');
         if ((window as any).__swrCache) (window as any).__swrCache.invalidate('user-profile');
         sessionStorage.removeItem('user-avatar');
+
+        // Eğer kullanıcı daha önce "Beni Hatırla" dediyse, localStorage'daki e-postayı da yeni e-posta ile senkronize et
+        if (localStorage.getItem('remembered_email')) {
+          localStorage.setItem('remembered_email', email.trim());
+        }
 
         const avatarPreview = document.getElementById('avatar-preview') as HTMLElement;
         if (avatarPreview && !currentAvatarBase64 && (name || email)) {

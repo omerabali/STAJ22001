@@ -1,6 +1,7 @@
 /**
- * 6. Candidate Comparison
- * Adayları karşılaştırma listesine ekleme/çıkarma ve Compare sayfasına yönlendirme mantığı.
+ * candidateComparison.ts (Arama Seçim & Karşılaştırma Kutusu Yöneticisi)
+ * Görevi: Akıllı Arama sonuç listesinden 2 aday seçildiğinde ekranın altında çıkan
+ * "Adayları Karşılaştır" barını yönetir. Tıklanınca aday ID'leri ile `/admin/compare` sayfasına yönlendirir.
  */
 export interface CompareCandidate {
   id: string;

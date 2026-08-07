@@ -1,3 +1,13 @@
+/**
+ * ChunkQualityService.ts (3-Katmanlı CV Parçalama & Metin İyileştirme Servisi)
+ * Görevi: PDF'ten çıkarılan ham metnin parçalama kalitesini 3 aşamalı güvenilirlik boru hattından (Pipeline) geçirir.
+ * 
+ * 💡 Neden Çok Kritik?:
+ * Bozuk düzenli PDF'lerin (örneğin iki sütunlu Canva CV'leri) yanlış parçalanmasını önler:
+ * - Layer 1 (Kaba Bölümleme): Kural tabanlı başlık eşleştirme ve güven skoru hesabı yaparlar.
+ * - Layer 2 (AI Düzeltme): Karışmış veya belirsiz bölümleri GPT modelleriyle doğru kategoriye (Eğitim, Deneyim vb.) tamir eder.
+ * - Layer 3 (Kalite İzleme & Trace Log): Yapılan tüm düzeltmeleri ve değişim geçmişini izlenebilir log formatına dönüştürür.
+ */
 export interface Layer1Chunk {
 
   sectionKey: string;

@@ -1,3 +1,8 @@
+/**
+ * LocalRuleAnalyzer.ts (Yerel Kurallı CV Analiz Simülatörü)
+ * Görevi: OpenAI API kotası bittiğinde veya çevrimdışı (offline) test modunda yerel Regex ve kural setleriyle
+ * CV'den ATS skoru, temel yetenekler ve Türkçe/İngilizce taslak SWOT analizi üreten yedek analizör.
+ */
 import { extractLocalSkills } from "../../domain/cv/HeadingMatcher.js";
 
 export function simulateAiAnalysis(text: string, lang: "tr" | "en") {

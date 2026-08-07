@@ -1,5 +1,7 @@
 /**
- * 4. Şifre Göster/Gizle göz ikon butonları (toggle-password & toggle-confirm-password)
+ * togglePassword.ts (Şifre Göster/Gizle Yöneticisi)
+ * Görevi: Hem "Şifre" hem de "Şifre Tekrarı" alanlarının yanındaki "Göz" ikonlarına tıklandığında,
+ * ilgili şifre alanlarının görünürlüğünü (type="password" <-> type="text") ve göz ikonlarını günceller.
  */
 export function initTogglePassword(): void {
   const passwordInput = document.getElementById('password') as HTMLInputElement;

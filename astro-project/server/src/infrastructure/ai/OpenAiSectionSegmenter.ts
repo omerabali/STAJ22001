@@ -1,3 +1,8 @@
+/**
+ * OpenAiSectionSegmenter.ts (OpenAI Destekli CV Bölümleme & Sınıflandırıcı)
+ * Görevi: Karışık veya bozuk düzenli CV metinlerini GPT-4o-mini'ye göndererek
+ * metni kesin sınırlar ve güven skorlarıyla mantıksal CV bölümlerine (`personal`, `experience`, `education`, `skills` vb.) ayırır.
+ */
 import { SECTION_LABELS } from "../../domain/cv/SectionTaxonomy.js";
 
 const OPENAI_SECTION_KEYS = Object.keys(SECTION_LABELS).join(" | ");
@@ -136,7 +141,7 @@ export async function segmentCvWithAI(
     return [];
   }
 }
-
+//başlıksız bir kısım gördü mesela onu ai gönder ve bu kısmın ne olduğunu bul diyoruz 
 export async function classifySectionWithAI(
   sectionText: string,
   currentKey: string,

@@ -1,7 +1,7 @@
 /**
- * CV Listesini Yükleme Modülü
- * API'den CV + analiz verisi çeker, sol paneli render eder.
- * PENDING/PROCESSING durumlarında 3 saniyelik otomatik yenileme yapar.
+ * cvListLoader.ts (Aday CV Listesi Yükleme Yöneticisi)
+ * Görevi: Backend'den (`/api/cv/list`) kullanıcının tüm yüklediği CV'leri çeker, sol taraftaki listeye çizer.
+ * Henüz işlenen (PENDING/PROCESSING) CV varsa 3 saniyede bir otomatik yenileyerek canlı takip sağlar.
  */
 import { analysesState } from './analysesState';
 import { showAnalysisDetails } from './analysisRenderer';

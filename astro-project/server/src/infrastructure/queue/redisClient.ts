@@ -1,3 +1,8 @@
+/**
+ * redisClient.ts (Redis Bağlantı Yöneticisi)
+ * Görevi: `ioredis` kütüphanesini kullanarak Redis veritabanı ile tekil (Singleton) bağlantı kurar.
+ * BullMQ iş kuyruğunun ve vektör/önbellek sistemlerinin Redis iletişimini yürütür.
+ */
 import { Redis } from "ioredis";
 
 const redisUrl = process.env.REDIS_URL;

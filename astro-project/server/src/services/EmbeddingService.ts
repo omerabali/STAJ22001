@@ -1,3 +1,13 @@
+/**
+ * EmbeddingService.ts (OpenAI Vektör Dönüştürme Motoru)
+ * Görevi: Düz metinleri (CV parçaları veya Arama Sorguları) OpenAI `text-embedding-3-small` modeline göndererek
+ * 1536 elemanlı sayısal vektör dizilerine (float array) dönüştürür.
+ * 
+ * 💡 Neden Çok Kritik?:
+ * Yapay zeka arama motorumuzun temelidir. Metinleri anlam boyutunda haritalandırır.
+ * 1. Otomatik Hata Yönetimi (Retry Policy): Ağ kesintilerinde 4 defaya kadar üstel bekleme (exponential backoff) ile tekrar dener.
+ * 2. Sayaç & Maliyet Takibi: API çağrı sayısını ve harcanan token maliyetlerini kaydeder.
+ */
 import OpenAI from "openai";
 
 export class EmbeddingService {
@@ -35,7 +45,7 @@ export class EmbeddingService {
     const client = this.getClient();
 
     let attempt = 0;
-    const maxAttempts = 4;
+    const maxAttempts = 4;//deneme sayısı
     let delay = 1000; // Start with 1 second
 
     while (attempt < maxAttempts) {
@@ -44,7 +54,7 @@ export class EmbeddingService {
         const response = await client.embeddings.create({
           model: "text-embedding-3-small",
           input: text,
-        }, { timeout: 30000 }); // 30-second timeout
+        }, { timeout: 30000 }); // isteğe 30 sn süre
 
         if (!response.data || response.data.length === 0) {
           throw new Error("Received empty data array from OpenAI API.");

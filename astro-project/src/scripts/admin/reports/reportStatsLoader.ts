@@ -1,3 +1,8 @@
+/**
+ * reportStatsLoader.ts (Raporlar Genel İstatistik Yükleyici)
+ * Görevi: Backend'den (`/api/admin/reports`) detaylı sistem analitiğini (ortalama ATS skoru,
+ * toplam yüklenen CV sayısı, aktif aday yüzdeleri) çeker ve ekrandaki sayaçları günceller.
+ */
 import { renderCVChart } from './cvChartRenderer';
 import { reportsState } from './reportsState';
 

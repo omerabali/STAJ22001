@@ -1,8 +1,9 @@
-import { candProfileState } from './candProfileState';
-
 /**
- * CV dropdown — multi-CV seçici render eder.
+ * cvDropdown.ts (Aday Çoklu CV Açılır Menü Yöneticisi)
+ * Görevi: Bir adayın birden fazla yüklenmiş CV'si varsa, Admin'in üst kısımdaki açılır menüden
+ * (dropdown) dilediği CV'yi seçerek o CV'nin analiz raporuna geçmesini sağlar.
  */
+import { candProfileState } from './candProfileState';
 export function renderCvDropdown(preferredCvId: string | null): void {
   const container = document.getElementById('cv-selector-container');
   const dropdown = document.getElementById('cv-selector-dropdown') as HTMLSelectElement | null;
@@ -26,6 +27,12 @@ export function renderCvDropdown(preferredCvId: string | null): void {
 export function handleCvSelectionChange(newCvId: string): void {
   if (!newCvId || newCvId === candProfileState.activeCvId) return;
   candProfileState.activeCvId = newCvId;
+
+  // Update URL search query without reloading page
+  const url = new URL(window.location.href);
+  url.searchParams.set('cvId', newCvId);
+  window.history.replaceState({}, '', url.toString());
+
   // Import renderSelectedCvDetails lazily to avoid circular deps
   import('./cvDetailsRenderer').then(m => m.renderSelectedCvDetails(newCvId));
 }

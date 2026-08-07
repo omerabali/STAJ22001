@@ -1,3 +1,8 @@
+/**
+ * LoginUserUseCase.ts (Kullanıcı Girişi Kullanım Senaryosu)
+ * Görevi: E-posta ve şifre ile giriş isteğini karşılar. Kullanıcıyı veritabanında arar,
+ * Bcrypt ile şifre doğrulamasını yapar ve başarılıysa JWT oturum jetonu üretir.
+ */
 import { PrismaClient } from "@prisma/client";
 import { PasswordHasher } from "../../infrastructure/security/PasswordHasher.js";
 import { JwtService } from "../../infrastructure/security/JwtService.js";

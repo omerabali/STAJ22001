@@ -1,3 +1,9 @@
+/**
+ * cv.ts (CV Yükleme, İşleme ve Analiz API Rotaları)
+ * Görevi: PDF formatındaki özgeçmişlerin yüklenmesini (`/upload`), Supabase Storage'a kaydedilmesini,
+ * BullMQ arka plan iş kuyruğuna atılmasını, aday CV listesinin (`/list`), analiz detaylarının (`/:id`),
+ * indirme bağlantılarının (`/download/:id`) ve metin parçalarının (`/:id/chunks`) sunulmasını sağlar.
+ */
 import { Router, Request, Response } from "express";
 import { PrismaClient, AnalysisStatus } from "@prisma/client";
 import { PrismaPg } from "@prisma/adapter-pg";
@@ -27,11 +33,11 @@ const prisma = new PrismaClient({ adapter });
 
 const router = Router();
 
-const storage = multer.memoryStorage();
+const storage = multer.memoryStorage();//geçici belleğe tutma kısmı
 const upload = multer({
   storage: storage,
-  limits: { fileSize: 5 * 1024 * 1024 },
-  fileFilter: (_req, file, cb) => {
+  limits: { fileSize: 5 * 1024 * 1024 },//dosya boyutu
+  fileFilter: (_req, file, cb) => {//iki tane doğrulaması var aşağı tarafta bunların ikisinide kabul olmaları gerekiyor 
     const extname = path.extname(file.originalname).toLowerCase() === ".pdf";
     const mimetype = file.mimetype === "application/pdf";
 
@@ -44,8 +50,8 @@ const upload = multer({
 
 const uploadMiddleware = upload.single("cv");
 
-function processCv(cvId: string, _analysisId?: string, _pdfBuffer?: Buffer): void {
-  cvQueue.add("process-cv", { cvId }, { jobId: `cv-${cvId}-${Date.now()}` })
+function processCv(cvId: string, _analysisId?: string, _pdfBuffer?: Buffer): void {//bullmq fırlat
+  cvQueue.add("process-cv", { cvId }, { jobId: `cv-${cvId}-${Date.now()}` })//kuyruğa ekleme
     .then((job) => {
       console.log(`[Main Thread] 📥 Job added to cv-processing-queue (Job ID: ${job.id}, CV: ${cvId})`);
     })
@@ -81,15 +87,16 @@ router.post("/upload", authMiddleware, (req: Request, res: Response): void => {
 
     try {
       const rawOriginalName = req.file.originalname;
-      const fileName = Buffer.from(rawOriginalName, "latin1").toString("utf8");
+      const fileName = Buffer.from(rawOriginalName, "latin1").toString("utf8");//karekter düzeltmesi
       const fileExt = path.extname(fileName).toLowerCase();
-      
+
       let userId = req.user.id;
       if (req.user.role === "ADMIN" && req.body.targetUserId) {
         userId = req.body.targetUserId;
       }
-      
-      const fileUuid = crypto.randomUUID();
+
+      const fileUuid = crypto.randomUUID();//dosyaay ait benzersiz bir hash üretir eğer dosya adı değişmiş ve sonra tekrar
+      //yükleme olsa bile bu hash ile eşleşir anladın mı beni 
       const filePath = `cvs/${userId}/${fileUuid}${fileExt}`;
 
       const fileBuffer = req.file.buffer;
@@ -112,7 +119,7 @@ router.post("/upload", authMiddleware, (req: Request, res: Response): void => {
         await prisma.cV.delete({ where: { id: existingCv.id } });
         const oldFilePath = existingCv.fileUrl.split("/public/cv-files/")[1];
         if (oldFilePath) {
-          await supabase.storage.from("cv-files").remove([oldFilePath]);
+          await supabase.storage.from("cv-files").remove([oldFilePath]);//eğer varsa eski cv siler storage den de kaldırır yeniden analiz için
         }
       }
 
@@ -140,7 +147,7 @@ router.post("/upload", authMiddleware, (req: Request, res: Response): void => {
 
       const fileUrl = publicUrlData.publicUrl;
 
-      const cv = await prisma.cV.create({
+      const cv = await prisma.cV.create({//db ye yazılır
         data: {
           userId: userId,
           fileName: fileName,
@@ -149,19 +156,19 @@ router.post("/upload", authMiddleware, (req: Request, res: Response): void => {
         }
       });
 
-      const analysis = await prisma.cVAnalysis.create({
+      const analysis = await prisma.cVAnalysis.create({//başlanmamış bir analiz varsa pending durumuna getir
         data: {
           cvId: cv.id,
           status: AnalysisStatus.PENDING,
         }
       });
 
-      await cvQueue.add("process-cv", { cvId: cv.id }, { jobId: `cv-${cv.id}-${Date.now()}` });
+      await cvQueue.add("process-cv", { cvId: cv.id }, { jobId: `cv-${cv.id}-${Date.now()}` });//redise fırlat
 
       emitAnalysisStatus(cv.id, "CV_UPLOADED", "CV başarıyla yüklendi ve işleme sırasına alındı.", 1, {
         cvId: cv.id,
         fileName: cv.fileName
-      });
+      });//önyüze bildirimi gönder
 
       res.status(201).json({
         message: "CV başarıyla yüklendi, analiz sıraya alındı.",
@@ -239,7 +246,7 @@ router.get("/:id/download", authMiddleware, async (req: Request, res: Response):
 
   try {
     const fileResult = await DownloadCvUseCase.execute(cvId, req.user.id, req.user.role, prisma);
-    
+
     res.setHeader("Content-Type", fileResult.contentType);
     res.setHeader("Content-Disposition", `inline; filename="${encodeURIComponent(fileResult.fileName)}"`);
     res.send(fileResult.buffer);
@@ -323,19 +330,19 @@ router.post("/:id/reanalyze", authMiddleware, async (req: Request, res: Response
       }
     });
 
-      await cvQueue.add("process-cv", { cvId: cv.id }, { jobId: `cv-reanalyze-${cv.id}-${Date.now()}` });
+    await cvQueue.add("process-cv", { cvId: cv.id }, { jobId: `cv-reanalyze-${cv.id}-${Date.now()}` });
 
-      emitAnalysisStatus(cv.id, "CV_UPLOADED", "Yeniden analiz sıraya alındı.", 1, {
-        cvId: cv.id,
-        fileName: cv.fileName
-      });
+    emitAnalysisStatus(cv.id, "CV_UPLOADED", "Yeniden analiz sıraya alındı.", 1, {
+      cvId: cv.id,
+      fileName: cv.fileName
+    });
 
-      res.status(200).json({
-        message: "Yeniden analiz başarıyla başlatıldı, kuyruğa alındı.",
-        cvId: cv.id,
-        analysisId: analysis.id,
-        status: "PENDING"
-      });
+    res.status(200).json({
+      message: "Yeniden analiz başarıyla başlatıldı, kuyruğa alındı.",
+      cvId: cv.id,
+      analysisId: analysis.id,
+      status: "PENDING"
+    });
   } catch (error: any) {
     console.error("[Reanalyze] Hata:", error);
     res.status(500).json({ message: error.message || "Yeniden analiz başlatılamadı." });

@@ -1,6 +1,7 @@
 /**
- * searchLogger.ts
- * Manages background fetching & optimistic deletion of search history pills.
+ * searchLogger.ts (Arama Kaydedici & Sorgu Kaydı Yöneticisi)
+ * Görevi: Admin bir doğal dil araması yaptığında (örneğin "En az 3 yıl React bilen senior mühendis")
+ * bu sorguyu ve dönen sonuç sayısını veritabanına log olarak kaydeder (`POST /api/search/logs`).
  */
 
 export async function fetchSearchLogs(containerId: string = 'search-logs-list', onPillClick?: (query: string) => void): Promise<void> {

@@ -1,6 +1,7 @@
 /**
- * searchRenderer.ts
- * Helper utilities for AI Semantic Candidate Search and Card Rendering
+ * searchRenderer.ts (Arama Kartı HTML Şablon Çizici)
+ * Görevi: Arama sonuçlarında listelenen her bir adayın kartını, profil fotoğrafını,
+ * eşleşme rozetini, son deneyimlerini ve eylem butonlarını (Detay Gör, Karşılaştır) üreten HTML şablon motorudur.
  */
 
 export interface CandidateSearchResult {

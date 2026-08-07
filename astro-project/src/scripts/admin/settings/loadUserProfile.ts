@@ -1,5 +1,6 @@
 /**
- * Mevcut kullanıcı profilini /api/auth/me'den çeker ve formu doldurur.
+ * loadUserProfile.ts (Admin Profil Bilgileri Yükleyicisi)
+ * Görevi: Admin ayarlar sayfası açıldığında `/api/auth/me` adresinden yönetici profil verilerini çeker ve alanlara yükler.
  */
 export async function loadUserProfile(): Promise<void> {
   const fetcher = async () => {

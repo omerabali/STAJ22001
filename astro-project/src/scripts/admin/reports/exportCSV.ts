@@ -1,6 +1,7 @@
 /**
- * exportCSV.ts -> Excel Export Utility
- * Seçili zaman filtresine (Bu Hafta, Bu Ay, Tüm Zamanlar) göre aday ve analiz verilerini Microsoft Excel (.xlsx / .xls) tablosu olarak indirir.
+ * exportCSV.ts (Raporlar Excel / CSV Dışa Aktarma Yöneticisi)
+ * Görevi: Seçilen zaman filtresine göre (Bu Hafta, Bu Ay, Tüm Zamanlar)
+ * sistemdeki tüm aday ve CV analiz raporlarını Microsoft Excel (.xlsx/.csv) dosyası olarak bilgisayara indirir.
  */
 
 let activeTimeframe: 'week' | 'month' | 'all' = 'week';

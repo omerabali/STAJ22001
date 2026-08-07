@@ -1,3 +1,8 @@
+/**
+ * GetDashboardStatsUseCase.ts (Dashboard Özet İstatistikleri Kullanım Senaryosu)
+ * Görevi: İK Admin paneli ana sayfasındaki sayaç kartları için toplam aday,
+ * yüklenen CV sayısı, tamamlanan analizler ve ortalama ATS skoru istatistiklerini hesaplar.
+ */
 import { PrismaClient } from "@prisma/client";
 
 export interface DashboardStatsResponse {

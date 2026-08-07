@@ -1,9 +1,10 @@
+/**
+ * userPagination.ts (Kullanıcı Sayfalama & Görünüm Yöneticisi)
+ * Görevi: Kullanıcı listesinde "Daha Fazla Göster" ve sayfalama (pagination) adımlarını yönetir.
+ * İlk başta özet 3 kullanıcı gösterip "Tümünü Gör" denilince tam listeye geçilmesini sağlar.
+ */
 import { usersState } from './usersState';
 import { renderUserRows } from './userRowRenderer';
-
-/**
- * İlk 3 kullanıcıyı gösteren compact view.
- */
 export function renderInitialUsersView(): void {
   const list = usersState.filteredUsersList;
   const admins = list.filter((u: any) => u.role === 'ADMIN');

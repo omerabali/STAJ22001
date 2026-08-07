@@ -1,3 +1,8 @@
+/**
+ * HeadingMatcher.ts (Başlık Eşleştirme & Metin İçi Yetenek Çıkarıcı)
+ * Görevi: Metin içindeki başlıkları temizler (`normalizeHeading`), başlığın hangi CV bölümüne
+ * (Eğitim, Deneyim vb.) denk geldiğini eşleştirir (`matchHeading`) ve metin içindeki yazılım yeteneklerini yakalar (`extractLocalSkills`).
+ */
 import { HEADINGS_TR, HEADINGS_EN, COMMON_SKILLS, SKILL_NORM_MAP } from "./SectionTaxonomy.js";
 
 // Skill matchers

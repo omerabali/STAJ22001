@@ -1,6 +1,7 @@
 /**
- * 6. Admin CV List
- * Admin için tüm CV'leri çekme, 10'arlı sayfalama (pagination), sıralama ve tabloya yerleştirme.
+ * adminCvList.ts (Admin CV Yükleme Tablo Yöneticisi)
+ * Görevi: Admin paneli CV yükleme sayfasındaki "Son Yüklenen CV'ler" tablosunu çeker ve günceller.
+ * 3 saniyelik polling ile işlenme aşamasındaki CV'lerin durumunu canlı takip eder.
  */
 import { showChunks } from './chunkViewer.ts';
 

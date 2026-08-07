@@ -1,6 +1,7 @@
 /**
- * toastNotifier.ts
- * Displays floating toast notifications at the bottom-right corner.
+ * toastNotifier.ts (Ortak Bildirim Balonu Yöneticisi)
+ * Görevi: Ekranın sağ alt köşesinde kayarak çıkan (slide-up) estetik yeşil/kırmızı canlı bilgi ve başarı bildirim balonlarını (Toast) oluşturur.
+ * 4.5 saniye sonra bildirimi kendiliğinden ekrandan kaldırır.
  */
 
 export function showProfileToast(title: string, desc: string): void {

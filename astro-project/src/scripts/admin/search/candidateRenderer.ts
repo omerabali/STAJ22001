@@ -1,6 +1,7 @@
 /**
- * 3. Candidate Renderer
- * searchRenderer.ts üzerinden aday kartlarını ekrana basan renderSemanticCandidates fonksiyonu.
+ * candidateRenderer.ts (Vektörel Semantik Arama Sonuç Çizici)
+ * Görevi: Yapay zeka vektör aramasından (pgvector) dönen aday sonuçlarını
+ * eşleşme yüzdeleri (%95 Uyum vb.) ve rezonans kartları ile ekrana çizer.
  */
 import { renderCandidateCardHtml } from './searchRenderer';
 

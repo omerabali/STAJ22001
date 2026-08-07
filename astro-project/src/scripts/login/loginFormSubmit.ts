@@ -1,5 +1,8 @@
 /**
- * 4. Login Form Submit - API isteği ve yönlendirme
+ * loginFormSubmit.ts (Giriş Yapma & API Gönderim Merkezi)
+ * Görevi: "Giriş Yap" butonuna basıldığında form verilerini alır, e-posta formatını doğrular,
+ * fetch('/api/auth/login') ile Node.js backend sunucusuna isteği iletir.
+ * Giriş başarılıysa kullanıcının rolüne göre (ADMIN -> /admin/dashboard, CANDIDATE -> /candidate/profile) yönlendirir.
  */
 export function initLoginFormSubmit(): void {
   const form = document.getElementById('login-form') as HTMLFormElement;

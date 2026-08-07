@@ -1,5 +1,10 @@
 import { PrismaClient } from "@prisma/client";
 
+/**
+ * GetCandidateProfileUseCase.ts (Aday Profil Detayı Getirme Kullanım Senaryosu)
+ * Görevi: Admin paneli üzerinden hedeflenen tek bir adayın iletişim bilgilerini, yüklediği CV'leri
+ * ve yapay zeka tarafından çıkarılan SWOT analiz detaylarını getirir.
+ */
 export class GetCandidateProfileUseCase {
   public static async execute(targetUserId: string, prisma: PrismaClient) {
     const user = await prisma.user.findUnique({

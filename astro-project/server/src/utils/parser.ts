@@ -1,6 +1,7 @@
 /**
- * parser.ts — Clean Architecture Facade Entrypoint
- * Aggregates PDF text extraction, section taxonomy, AI analyzers, and chunking use-cases.
+ * parser.ts (CV Metin Parçalama & Ayrıştırma Facade Giriş Kapısı)
+ * Görevi: PDF metin çıkarma, bölüm başlığı algılama, dil tespiti, yetenek çıkarma,
+ * sliding-window parçalama ve yapay zeka bölümleme servislerini tek bir noktadan dışarı aktaran (Facade) ana giriş kapısıdır.
  */
 
 // Domain Taxonomies & Matchers

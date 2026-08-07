@@ -1,7 +1,8 @@
 /**
- * SECTION TAXONOMY & DICTIONARIES
- * Clean Architecture Domain Component
- * Pure business taxonomy definitions for CV section classification and skill normalization.
+ * SectionTaxonomy.ts (CV Bölüm Sözlüğü & Taksonomi Alanı)
+ * Görevi: CV ayrıştırma ve sınıflandırma mantığında kullanılan temel alan sözlükleridir.
+ * Türkçe ve İngilizce başlık etiketlerini (SECTION_LABELS, HEADINGS_TR, HEADINGS_EN) ve
+ * yetenek normalizasyon haritasını (COMMON_SKILLS, SKILL_NORM_MAP) tutar.
  */
 
 export const SECTION_LABELS: Record<string, string> = {

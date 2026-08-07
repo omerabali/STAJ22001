@@ -1,6 +1,7 @@
 /**
- * 1. Socket.io Admin
- * Admin tarafında tüm CV'lerin canlı analiz durumlarını izleme (analysis:status).
+ * socketAdmin.ts (Admin Yükleme Sayfası Canlı WebSocket Dinleyici)
+ * Görevi: Backend sunucusundan gelen canlı `admin:cv_status` ve `admin:batch_status` olaylarını dinler.
+ * Toplu yüklenen CV'lerin işlenme durumlarını sayfayı yenilemeye gerek kalmadan canlı günceller.
  */
 export function initAdminSocket(loadCVList: () => void) {
   let socket: any = null;

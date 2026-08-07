@@ -1,3 +1,8 @@
+/**
+ * PdfExtractor.ts (PDF Metin Çıkarma Yardımcı Sınıfı)
+ * Görevi: `pdfjs-dist` ve `pdf-parse` kütüphanelerini kullanarak PDF tamponundaki (Buffer)
+ * ham metni çıkartır, boşlukları ve karakter kaymalarını düzeltir.
+ */
 export class PdfExtractor {
   /**
    * Extracts clean text content from a PDF Buffer using pdfjs-dist coordinates & font sizes,

@@ -1,5 +1,7 @@
 /**
- * 5. Kayıt Ol Butonu Hover ve Animasyon Efektleri
+ * buttonHoverEffects.ts (Kayıt Butonu Görsel Efekt Yöneticisi)
+ * Görevi: Kayıt Ol sayfasındaki "Kayıt Ol" butonunun üzerine fareyle gelindiğinde (mouseover)
+ * renk koyulaştırma ve yükselme (translateY) görsel animasyon efektlerini yönetir.
  */
 export function initButtonHoverEffects(): void {
   const registerBtn = document.getElementById('register-btn');

@@ -1,6 +1,7 @@
 /**
- * Dashboard İstatistik Yükleyici
- * /api/admin/stats endpoint'inden admin stat kartlarını çeker.
+ * statsLoader.ts (Admin Dashboard İstatistik Yükleyicisi)
+ * Görevi: Admin kontrol panelindeki (Dashboard) Özet Kart verilerini (/api/admin/stats) çeker.
+ * Toplam aday sayısı, admin sayısı ve bugün katılan yeni kullanıcı sayılarını canlı gösterir.
  */
 export function loadStats(): void {
   const fetcher = async () => {

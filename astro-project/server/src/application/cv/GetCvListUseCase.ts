@@ -1,3 +1,8 @@
+/**
+ * GetCvListUseCase.ts (CV Listeleme Kullanım Senaryosu)
+ * Görevi: Giriş yapmış kullanıcının kendi CV'lerini (veya ADMIN ise tüm platform CV'lerini)
+ * son analiz durumları ve oluşturulma tarihlerine göre sıralı şekilde getirir.
+ */
 import { PrismaClient } from "@prisma/client";
 
 export class GetCvListUseCase {
@@ -7,7 +12,7 @@ export class GetCvListUseCase {
 
     const cvs = await prisma.cV.findMany({
       where: whereCondition,
-      orderBy: { createdAt: "desc" },
+      orderBy: { createdAt: "desc" },//en son yüklenen en önce listele mantığı
       include: {
         user: {
           select: {
@@ -19,7 +24,7 @@ export class GetCvListUseCase {
         },
         analyses: {
           orderBy: { createdAt: "desc" },
-          take: 1,
+          take: 1,//cv ye yapılmış en son aı analiz sonucunu cv nin yanına ekler
         },
       },
     });

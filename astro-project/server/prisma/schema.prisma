@@ -37,6 +37,9 @@ model CV {
   rawText      String?
   hash         String?
   metadata     Json?
+  structuredData Json?
+  needsReview  Boolean      @default(false)
+  extractionConfidence Float?
   extractionMethod String   @default("layout_aware")
   createdAt    DateTime     @default(now())
   updatedAt    DateTime     @updatedAt
@@ -131,4 +134,33 @@ model CostLog {
   createdAt       DateTime @default(now())
 
   @@map("cost_logs")
+}
+
+model RankingAuditLog {
+  id                String   @id @default(uuid())
+  cvId              String
+  searchQueryId     String?
+  layer1_hardFilter Json?    // Hangi kriterler kod ile elendi
+  layer2_gptScore   Int
+  layer2_explanation String
+  layer4_gptScore   Int      // İkinci bağımsız çağrı sonucu
+  layer5_agreement  Boolean  // İki çağrı uyuştu mu
+  finalScore        Int
+  needsReview       Boolean  @default(false)
+  createdAt         DateTime @default(now())
+
+  @@map("ranking_audit_logs")
+}
+
+model AnalysisAuditLog {
+  id              String   @id @default(uuid())
+  cvId            String
+  pass1_atsScore  Int
+  pass2_atsScore  Int
+  scoreDelta      Int
+  finalScore      Int
+  usedThirdPass   Boolean  @default(false)
+  createdAt       DateTime @default(now())
+
+  @@map("analysis_audit_logs")
 }

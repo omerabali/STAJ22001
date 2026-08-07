@@ -1,3 +1,7 @@
+/**
+ * verify_redis_error_handling.ts (Redis Hata Yakalama Testi)
+ * Görevi: Redis bağlantısının koptuğu veya geçersiz porta istek atıldığı durumlarda sistemin çökmediğini doğrular.
+ */
 import { Redis } from "ioredis";
 
 async function verifyWrongPortErrorHandling(): Promise<void> {

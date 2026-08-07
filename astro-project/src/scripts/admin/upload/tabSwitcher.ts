@@ -1,6 +1,8 @@
 /**
- * 2. Tab Switcher
- * Tekli / Toplu yükleme sekmeleri arasında geçiş yapma (switchTab).
+ * tabSwitcher.ts (Admin Yükleme Tipi Sekme Yöneticisi)
+ * Görevi: Admin CV Yükleme ekranındaki "Tekli CV Yükle" ve "Toplu / Klasör Yükle" sekmeleri
+ * arasında canlı geçiş yapar ve ilgili yükleme alanını görüntüler.
+ * yükleme ekranında sekmeler arası geçişi sağlar
  */
 export function switchTab(tabName: string): void {
   const tabs = document.querySelectorAll('.upload-tab');

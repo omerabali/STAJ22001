@@ -1,6 +1,7 @@
 /**
- * 1. Helper Functions
- * İsimden baş harf çıkarma (getInitials), ATS rozet rengi ve Yetenek etiketleri render fonksiyonları.
+ * helperFunctions.ts (Arama Ortak Yardımcı Metotları)
+ * Görevi: İsimden baş harfleri türetme (getInitials), yetenek etiketlerini HTML olarak çizme (renderSkills)
+ * ve tarih formatlama gibi ortak küçük yardımcı fonksiyonları içerir.
  */
 export function getInitials(name: string, email: string): string {
   if (name && name.trim()) {

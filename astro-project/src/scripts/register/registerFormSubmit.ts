@@ -1,5 +1,8 @@
 /**
- * 6. /api/auth/register POST Form Gönderimi, Hata Yakalama ve Yönlendirme
+ * registerFormSubmit.ts (Kayıt Olma & API Gönderim Merkezi)
+ * Görevi: "Kayıt Ol" butonuna basıldığında Ad Soyad, E-posta (@gmail.com), Telefon (5 ile başlayan 10 hane),
+ * Şifre eşleşmesi ve Kullanım Şartları onayını istemci tarafında sıkı denetler.
+ * Başarılıysa fetch('/api/auth/register') ile backend'e kayıt isteği atar ve adayı kendi profiline yönlendirir.
  */
 export function initRegisterFormSubmit(): void {
   const form = document.getElementById('register-form') as HTMLFormElement;

@@ -1,5 +1,6 @@
 /**
- * Admin ayarlar sayfası sekme (tab) switcher.
+ * tabSwitcher.ts (Admin Ayarlar Sekme Yöneticisi)
+ * Görevi: Admin Ayarlar sayfasındaki "Profil" ve "Güvenlik" sekmeleri arasında tıklanınca canlı görünüm geçişini sağlar.
  * .tab-btn tıklamalarını dinler, .settings-section görünürlüğünü kontrol eder.
  */
 export function initTabSwitcher(): void {

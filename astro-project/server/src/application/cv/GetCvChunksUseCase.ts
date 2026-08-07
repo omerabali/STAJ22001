@@ -1,3 +1,8 @@
+/**
+ * GetCvChunksUseCase.ts (CV Metin Parçalarını Getirme Kullanım Senaryosu)
+ * Görevi: Seçilen CV'ye ait mantıksal metin parçalarını (Eğitim, Deneyim vb. sıralı chunks)
+ * yetki kontrolü (sahibi veya ADMIN) yaparak getirir.
+ */
 export class GetCvChunksUseCase {
   public static async execute(id: string, requestingUser: { id: string; role: string }, prisma: any) {
     const cv = await prisma.cV.findFirst({

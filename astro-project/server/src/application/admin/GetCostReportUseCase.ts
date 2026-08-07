@@ -1,3 +1,10 @@
+/**
+ * GetCostReportUseCase.ts (OpenAI Maliyet & Jeton Raporu Kullanım Senaryosu)
+ * Görevi: OpenAI API harcamalarını, harcanan token (giriş/çıkış) miktarlarını ve
+ * USD cinsinden toplam maliyet analizini modeller bazında hesaplayıp raporlar.
+ */
+import { PrismaClient } from "@prisma/client";
+
 export class GetCostReportUseCase {
   public static async execute(prisma: any) {
     const report = await prisma.$queryRaw<any[]>`

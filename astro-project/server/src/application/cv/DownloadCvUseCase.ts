@@ -1,3 +1,8 @@
+/**
+ * DownloadCvUseCase.ts (CV İndirme Bağlantısı Kullanım Senaryosu)
+ * Görevi: Kullanıcı yetkisini (sahibi veya ADMIN) doğruladıktan sonra Supabase Storage'daki
+ * orijinal PDF dosyası için zaman sınırlı güvenli indirme bağlantısı (Signed URL) üretir.
+ */
 import { PrismaClient } from "@prisma/client";
 import { supabase } from "../../lib/supabase.js";
 

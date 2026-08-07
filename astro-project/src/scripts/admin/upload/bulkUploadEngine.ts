@@ -1,6 +1,7 @@
 /**
- * 8. Bulk Upload Engine
- * Toplu Dosya Adından Aday İsmi Çıkarma regex motoru ve toplu yükleme kuyruğu (setupBulkUpload).
+ * bulkUploadEngine.ts (Admin Çoklu / Toplu CV Yükleme Motoru)
+ * Görevi: Klasör halinde birden fazla PDF dosyası sürüklendiğinde topluca backend'e yükleme motorudur.
+ * Dosyaları sırayla kuyruğa alır ve yükleme yüzdelerini tek tek canlı günceller.
  */
 import { uploadCV } from '../../shared/cvUploader';
 import { getAllCandidates } from './candidateSelector.ts';

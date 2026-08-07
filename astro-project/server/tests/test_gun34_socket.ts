@@ -1,3 +1,7 @@
+/**
+ * test_gun34_socket.ts (Socket.io Bağlantı Kesilme Testi)
+ * Görevi: Canlı analiz akışı sırasında WebSocket bağlantısının kopma ve yeniden bağlanma durumunu test eder.
+ */
 import { io } from "socket.io-client";
 
 async function testSocketDisconnectScenario() {

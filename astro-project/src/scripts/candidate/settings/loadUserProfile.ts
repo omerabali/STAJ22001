@@ -1,7 +1,8 @@
 /**
- * Kullanıcı Profil Bilgilerini Yükleme
- * /api/auth/me endpoint'inden kullanıcı verisini çeker, form alanlarını doldurur.
- * SWR cache varsa kullanır, yoksa doğrudan fetch atar.
+ * loadUserProfile.ts (Aday Profil Bilgilerini Yükleme Yöneticisi)
+ * Görevi: Ayarlar sayfası açıldığında /api/auth/me endpoint'ine istek atarak adayın
+ * ad soyad, e-posta, telefon ve avatar resmini çeker, form kutularını otomatik doldurur.
+ * SWR cache mekanizmasını kullanarak anında yükleme sağlar.
  */
 export async function loadUserProfile(): Promise<void> {
   const fetcher = async () => {

@@ -1,3 +1,9 @@
+/**
+ * LocalRuleBasedChunker.ts (Yerel Kural Tabanlı CV Parçalayıcı Motor)
+ * Görevi: OpenAI bağımlılığı olmadan yerel kural ve regEx kalipları kullanarak CV metnini satır satır analiz eder.
+ * Bölüm başlıklarını tespit eder, güvenilirlik skoru %75'in (AI_FALLBACK_THRESHOLD) altına düşen karmaşık bölümler için
+ * OpenAI bölümleyicisini yardıma çağırır ve parçaları döner.
+ */
 import crypto from "crypto";
 import { SECTION_LABELS } from "./SectionTaxonomy.js";
 import { matchHeading } from "./HeadingMatcher.js";

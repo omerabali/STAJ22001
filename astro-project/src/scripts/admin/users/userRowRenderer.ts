@@ -1,8 +1,9 @@
-import { usersState } from './usersState';
-
 /**
- * Kullanıcı satırlarını tbody içine render eder.
+ * userRowRenderer.ts (Kullanıcı Tablo Satır Çizicisi)
+ * Görevi: Kullanıcı yönetimi tablosundaki her bir satırı (kullanıcı adı, e-posta, rol rozeti,
+ * kayıt tarihi, onay kutusu ve sil/düzenle eylem butonları) HTML olarak çizer.
  */
+import { usersState } from './usersState';
 export function renderUserRows(users: any[]): void {
   const tbody = document.getElementById('users-tbody');
   if (!tbody) return;
@@ -46,7 +47,12 @@ export function renderUserRows(users: any[]): void {
             ? '<span class="text-[#8a8580] text-xs font-medium">Yetki değiştirilemez</span>'
             : user.role === 'ADMIN'
               ? '<span class="text-[#8a8580] text-xs font-medium italic flex items-center gap-1 justify-end"><span class="material-symbols-outlined text-sm">lock</span>Yönetici korumalı</span>'
-              : `<button onclick="changeRole('${user.id}', 'ADMIN')" class="px-3 py-1.5 border border-[#ddd9d3] rounded-[8px] bg-white text-[#1b1c1a] hover:border-[#14422f] hover:text-[#14422f] text-xs font-semibold transition-all shadow-sm">Yönetici Yap</button>`
+              : `<div class="flex items-center justify-end gap-2">
+                   <button onclick="deleteCandidate('${user.id}', '${user.name || user.email}')" title="Adayı Sil" class="p-1.5 border border-rose-200 rounded-[8px] bg-rose-50 text-rose-600 hover:bg-rose-100 hover:border-rose-300 transition-all shadow-sm flex items-center justify-center">
+                     <span class="material-symbols-outlined text-base">delete</span>
+                   </button>
+                   <button onclick="changeRole('${user.id}', 'ADMIN')" class="px-3 py-1.5 border border-[#ddd9d3] rounded-[8px] bg-white text-[#1b1c1a] hover:border-[#14422f] hover:text-[#14422f] text-xs font-semibold transition-all shadow-sm">Yönetici Yap</button>
+                 </div>`
           }
         </td>
       </tr>

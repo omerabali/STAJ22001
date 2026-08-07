@@ -1,4 +1,10 @@
 ---
+<!-- 
+  Input.astro (Form Giriş Kutusu Bileşeni)
+  Görevi: Giriş, Kayıt ve Profil sayfalarındaki metin, e-posta veya şifre yazma kutularını standartlaştırır.
+  - Otomatik olarak başlık etiketi (label) ve zorunlu alanlarda kırmızı bir yıldız (*) koyar.
+  - Tıklandığında kenarlıkların parlaması (focus effect) gibi görsel detayları otomatik halleder.
+-->
 interface Props {
   type?: "text" | "email" | "password" | "number";
   id?: string;

@@ -1,5 +1,8 @@
 /**
- * 3. Canlı Şifre Gücü Ölçer (strength-1, strength-2, strength-3)
+ * passwordStrength.ts (Canlı Şifre Gücü Ölçer Yöneticisi)
+ * Görevi: Kullanıcı şifre alanına karakter girdikçe canlı olarak şifrenin uzunluğu,
+ * büyük/küçük harf, rakam ve özel karakter durumlarını analiz eder.
+ * Şifre gücünü "Çok Zayıf", "Zayıf", "Orta" ve "Güçlü" olarak renkli barlar ile ekranda günceller.
  */
 export function initPasswordStrength(): void {
   const passwordInput = document.getElementById('password') as HTMLInputElement;

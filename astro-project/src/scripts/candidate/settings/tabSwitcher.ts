@@ -1,7 +1,7 @@
 /**
- * Sekme Geçiş Mantığı (Tab Switcher)
- * Profil / Güvenlik / Bildirimler sekmeleri arasında geçiş yapar.
- * .tab-btn data-target özelliğini kullanır.
+ * tabSwitcher.ts (Ayarlar Sekme Geçiş Yöneticisi)
+ * Görevi: Ayarlar sayfasındaki "Profil", "Güvenlik" ve "Bildirimler" sekmeleri (.tab-btn)
+ * arasında tıklanınca canlı içerik geçişi sağlar, aktif sekmeyi renklendirir.
  */
 export function initTabSwitcher(): void {
   const tabs = document.querySelectorAll('.tab-btn');

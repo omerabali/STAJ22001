@@ -1,6 +1,7 @@
 /**
- * 9. Page Init
- * Sayfa yüklendiğinde tüm dinleyicileri başlatan init fonksiyonu.
+ * pageInit.ts (Admin CV Yükleme Sayfası Başlatıcısı)
+ * Görevi: Admin CV Yükleme sayfası açıldığında tekli/toplu yükleme sürükle-bırak alanlarını,
+ * aday listesini ve WebSocket olaylarını başlatan ana kurucu değişkendir.
  */
 import { loadCandidates, updateSelectedCard } from './candidateSelector.ts';
 import { setupSingleUpload } from './singleUploadLogic.ts';

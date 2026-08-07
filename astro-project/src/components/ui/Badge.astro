@@ -1,4 +1,12 @@
 ---
+<!-- 
+  Badge.astro (Durum Rozeti Bileşeni)
+  Görevi: Sitedeki durum ve etiket göstergeleridir.
+  - success: Yeşil rozet (Örn: "CV Başarıyla İşlendi")
+  - warning: Sarı rozet (Örn: "İşlem Bekliyor")
+  - error: Kırmızı rozet (Örn: "Analiz Başarısız")
+  - primary: Mavi rozet (Örn: "Admin")
+-->
 interface Props {
   variant?: "primary" | "secondary" | "success" | "warning" | "error" | "default";
   class?: string;

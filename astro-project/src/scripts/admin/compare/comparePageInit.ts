@@ -1,3 +1,8 @@
+/**
+ * comparePageInit.ts (Aday Karşılaştırma Sayfa Başlatıcısı)
+ * Görevi: URL parametrelerinden (?c1=id&c2=id) iki adayın bilgilerini çeker,
+ * iki sütun halinde yan yana getirerek yapay zeka analiz ve skor karşılaştırmalarını başlatır.
+ */
 import { renderCandidateColumn } from './candidateColumnRenderer';
 
 let candidate1Data: any = null;

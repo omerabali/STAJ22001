@@ -1,5 +1,7 @@
 /**
- * 2. Telefon Numarası Real-time Regex Filtresi ve İpucu Uyarısı
+ * phoneValidation.ts (Canlı Telefon Numarası Doğrulama Yöneticisi)
+ * Görevi: Telefon numarası girilirken harf veya özel karakter yazılmasını engeller (sadece rakam).
+ * Numara uzunluğunu 10 hane ile sınırlar ve 5 ile başlamayan numaralarda anında kırmızı uyarı basar.
  */
 export function initPhoneValidation(): void {
   const phoneInput = document.getElementById('phone') as HTMLInputElement;

@@ -1,6 +1,7 @@
 /**
- * 2. Toast Notification
- * Sayfanın sağ altında çıkan bildirim baloncukları (showProfileToast).
+ * toastNotification.ts (Profil Bildirim Balonu Yöneticisi)
+ * Görevi: Aday profil sayfasında CV başarıyla işlendiğinde veya adım tamamlandığında
+ * sağ alt köşede canlı bildirim baloncuğu (Toast) gösterir.
  */
 export function showProfileToast(title: string, desc: string): void {
   let toast = document.getElementById('profile-toast');

@@ -1,5 +1,9 @@
-import "../load-env.js";
-import { redisConnection } from "../infrastructure/queue/redisClient.js";
+/**
+ * verify_redis_connection.ts (Redis Bağlantı & SET/GET Doğrulama Testi)
+ * Görevi: Redis veritabanına doğrudan okuma/yazma (SET/GET) işlemi yaparak bağlantıyı test eder.
+ */
+import "../src/load-env.js";
+import { redisConnection } from "../src/infrastructure/queue/redisClient.js";
 
 async function testRedisConnection(): Promise<void> {
   console.log("\n=======================================================");

@@ -1,6 +1,7 @@
 /**
- * cvUploader.ts
- * Client-side file upload utility with XHR progress handling & validation.
+ * cvUploader.ts (Ortak CV Yükleme ve İlerleme Yöneticisi)
+ * Görevi: İstemci tarafında PDF uzantı ve 5MB boyut kontrolünü yapar.
+ * XHR (XMLHttpRequest) kullanarak CV dosyasını backend'e (`/api/cv/upload`) yükler ve yükleme yüzdesini (%0 - %100) canlı hesaplar.
  */
 
 export interface UploadOptions {

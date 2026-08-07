@@ -1,3 +1,8 @@
+/**
+ * canva_oauth_server.ts (Canva OAuth2 Kimlik Doğrulama Sunucusu)
+ * Görevi: Canva entegrasyonu için OAuth 2.0 PKCE (S256) akışını başlatır.
+ * Port 3000 üzerinde dinleme yaparak Canva'dan dönen yetkilendirme kodunu (code) yakalar ve erişim jetonuna (access_token) çevirir.
+ */
 import http from "http";
 import url from "url";
 import fs from "fs";

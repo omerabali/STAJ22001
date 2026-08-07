@@ -1,9 +1,10 @@
+/**
+ * reanalyzeCv.ts (Yeniden AI Analizi Başlatma Yöneticisi)
+ * Görevi: "Yeniden Analiz Et" butonuna basıldığında `/api/cv/${cvId}/reanalyze` ucuna istek atarak
+ * seçili CV için yapay zeka analizini baştan başlatır ve canlı durum güncellemelerini ekrana yansıtır.
+ */
 import { analysesState } from './analysesState';
 import { loadCVList } from './cvListLoader';
-
-/**
- * Seçili CV'yi anında canlı olarak yeniden AI ile analiz etme fonksiyonu.
- */
 export function initReanalyzeCandidateCv(): void {
   (window as any).reanalyzeSelectedCv = async function (): Promise<void> {
     const cvId = analysesState.selectedCvId;

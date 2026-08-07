@@ -1,7 +1,7 @@
 /**
- * Şifre Güncelleme Modülü
- * Mevcut şifre + yeni şifre + onay validasyonu yapar.
- * /api/auth/profile PUT ile şifreyi günceller.
+ * savePassword.ts (Aday Şifre Güncelleme Yöneticisi)
+ * Görevi: Mevcut şifre, yeni şifre ve şifre tekrarı alanlarını denetler.
+ * Uyumluysa /api/auth/profile adresine PUT isteği atarak kullanıcının şifresini güvenle günceller.
  */
 import { showStatus } from './showStatus';
 

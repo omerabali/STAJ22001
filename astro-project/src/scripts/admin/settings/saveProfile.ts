@@ -1,7 +1,8 @@
 import { showStatus } from './showStatus';
 
 /**
- * Profil formu kaydetme — avatar upload, ad/email/telefon validasyonu ve API PUT.
+ * saveProfile.ts (Admin Profil Güncelleme & Avatar Yöneticisi)
+ * Görevi: Yönetici profil resmi yüklemesini (Base64) ve isim/telefon güncellemelerini `/api/auth/profile` ucuna kaydeder.
  * Admin dashboard-stats cache'ini de geçersiz kılar (candidate'den farkı budur).
  */
 export function initSaveProfile(): void {

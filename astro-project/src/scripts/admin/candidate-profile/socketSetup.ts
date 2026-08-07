@@ -1,8 +1,9 @@
-import { candProfileState } from './candProfileState';
-
 /**
- * Socket.io bağlantısı — CV durumu ve analiz tamamlanma event'leri dinler.
+ * socketSetup.ts (Admin Canlı WebSocket Olay Yöneticisi)
+ * Görevi: İncelenen adayın CV durumlarını (cv_status_updated, cv_analysis_completed) canlı dinler.
+ * Analiz tamamlandığında sayfayı yenilemeden verileri canlı günceller.
  */
+import { candProfileState } from './candProfileState';
 export function setupRealtimeSocket(userId: string, reloadFn: () => void): void {
   if (typeof (window as any).io === 'undefined') return;
 

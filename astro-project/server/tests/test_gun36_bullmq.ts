@@ -1,5 +1,9 @@
-import { cvQueue, CV_QUEUE_NAME } from "../infrastructure/queue/cvQueue.js";
-import { redisConnection } from "../infrastructure/queue/redisClient.js";
+/**
+ * test_gun36_bullmq.ts (BullMQ & Redis Kuyruk Yapılandırması Testi)
+ * Görevi: Redis PING bağlantısını, BullMQ iş ekleme ve otomatik deneme (retry) politikalarını doğrular.
+ */
+import { cvQueue, CV_QUEUE_NAME } from "../src/infrastructure/queue/cvQueue.js";
+import { redisConnection } from "../src/infrastructure/queue/redisClient.js";
 
 async function verifyGun33BullMQ(): Promise<void> {
   console.log("\n=======================================================");

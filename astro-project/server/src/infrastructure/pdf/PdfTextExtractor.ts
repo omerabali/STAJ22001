@@ -1,9 +1,15 @@
+/**
+ * PdfTextExtractor.ts (Gelişmiş PDF Metin Okuma & Sütun Ayrıştırma Motoru)
+ * Görevi: Yüklenen PDF dosyasının ham metnini okur. İki veya üç sütunlu CV tasarımlarını (Canva vb.)
+ * düşey izdüşüm analizi (Projection Profile Analysis) ile tespit ederek doğru okuma sırasına sokar.
+ */
 import { PDFParse } from "pdf-parse";
 import { preprocessTwoColumnText } from "../../domain/cv/CvTextPreprocessor.js";
 
 /**
- * Dynamically detects vertical column boundaries on a page using Projection Profile Analysis.
- * Scans vertical projection of character boundaries and finds low-density zones (gutters).
+ * 1. ADIM: SÜTUN TESPİTİ (detectColumns)
+ * Görevi: Sayfadaki harflerin X (yatay) konumlarını analiz eder.
+ * Harflerin olmadığı en az 25 piksel genişliğindeki dikey boşluğu (Gutter / Sütun Çizgisi) bulur.
  */
 function detectColumns(
   items: { x: number; y: number; text: string }[],
@@ -12,12 +18,12 @@ function detectColumns(
 ): number[] {
   const steps = Math.floor(pageWidth);
   const profile = new Array(steps).fill(0);
-  const charWidth = 4.0; // conservative character width estimate in points
+  const charWidth = 4.0; // Tahmini karakter genişliği (piksel)
 
-  // Filter out top 16% (header) and bottom 10% (footer) to get columns profile
+  // Sayfanın en üst %16 (Header) ve en alt %10 (Footer) kısımlarını hariç tut (Sadece gövdeye bak)
   const bodyItems = items.filter((i) => i.y > pageHeight * 0.10 && i.y < pageHeight * 0.84);
 
-  // Project item bounding boxes onto the x-axis
+  // Harflerin yatay kapsama alanını (X eksenini) haritalandır
   for (const item of bodyItems) {
     const startX = Math.max(0, Math.floor(item.x));
     const endX = Math.min(steps - 1, Math.floor(item.x + item.text.length * charWidth));
@@ -27,8 +33,8 @@ function detectColumns(
   }
 
   const boundaries: number[] = [];
-  const minGutterWidth = 25; // minimum width of vertical empty space to call it a column gap
-  const maxIntersects = 1;   // strictly tolerate minor overlaps in body
+  const minGutterWidth = 25; // En az 25px dikey boşluk varsa orayı sütun çizgisi kabul et
+  const maxIntersects = 1;
 
   let gutterStart = -1;
   for (let x = Math.floor(pageWidth * 0.15); x < Math.floor(pageWidth * 0.85); x++) {
@@ -41,10 +47,10 @@ function detectColumns(
         const gutterWidth = x - gutterStart;
         if (gutterWidth >= minGutterWidth) {
           const boundary = Math.floor((gutterStart + x) / 2);
-          // Verify both sides have meaningful text content
+          // Çizginin hem solunda hem sağında en az 4 harf/kelime var mı kontrol et
           const leftCount = items.filter((i) => i.x < boundary).length;
           const rightCount = items.filter((i) => i.x >= boundary).length;
-          
+
           if (leftCount >= 4 && rightCount >= 4) {
             boundaries.push(boundary);
           }
@@ -71,9 +77,9 @@ function detectColumns(
 }
 
 /**
- * Groups pdfjs text items into lines based on y-coordinate proximity.
- * Returns a single string with newline-separated lines.
- * Items may carry an optional `fontSize` field for accurate gap detection.
+ * 2. ADIM: METİNLERİ SATIRA DÖNÜŞTÜRME & BOŞLUK HESABI (groupItemsIntoText)
+ * Görevi: Y koordinatı yakın olan kelimeleri aynı satırda birleştirir.
+ * Font boyutuna göre kelimelerin birleşik mi yoksa ayrı mı olduğunu anlar.
  */
 function groupItemsIntoText(
   items: { x: number; y: number; text: string; fontSize?: number }[],
@@ -84,6 +90,7 @@ function groupItemsIntoText(
   type Line = { y: number; parts: { x: number; text: string; fontSize: number }[] };
   const lines: Line[] = [];
 
+  // Y yükseklik farkı 6px'den az olan kelimeleri aynı satır grubuna al
   for (const item of items) {
     const existing = lines.find((l) => Math.abs(l.y - item.y) <= yTolerance);
     const fs = item.fontSize ?? 10;
@@ -94,11 +101,12 @@ function groupItemsIntoText(
     }
   }
 
-  // Sort lines top-to-bottom
+  // Satırları yukarıdan aşağıya (b.y - a.y) doğru sırala
   lines.sort((a, b) => b.y - a.y);
 
   return lines
     .map((line) => {
+      // Satır içindeki kelimeleri soldan sağa (a.x - b.x) doğru sırala
       const sorted = line.parts.sort((a, b) => a.x - b.x);
       let mergedText = "";
       for (let i = 0; i < sorted.length; i++) {
@@ -107,10 +115,11 @@ function groupItemsIntoText(
           mergedText = curr.text;
         } else {
           const prev = sorted[i - 1];
-          // Use font-size-aware char width: 0.55 * fontSize, min 3.6pt
+          // Font boyutuna göre harf genişliği hesabı
           const prevCharWidth = Math.max(3.6, prev.fontSize * 0.55);
           const prevEndPos = prev.x + (prev.text.length * prevCharWidth);
-          
+
+          // İki kelime arası mesafe 2px'den azsa birleştir, çoksa boşluk koy
           if (curr.x - prevEndPos < 2.0) {
             mergedText += curr.text;
           } else {
@@ -125,22 +134,12 @@ function groupItemsIntoText(
 }
 
 /**
- * Extracts raw text from a PDF buffer using pdfjs-dist with coordinate awareness.
- *
- * Strategy:
- * 1. For each page, collect all text items with their (x, y) coordinates.
- * 2. Detect whether the page has a 2-column layout by checking if significant
- *    text mass exists on both sides of the page midpoint.
- * 3. If 2-column: emit left column lines first (top→bottom), then right column
- *    lines — preserving correct reading order for section headings and content.
- * 4. If single column: emit all items sorted top→bottom, left→right.
- * 5. Apply the existing preprocessTwoColumnText post-processor.
- *
- * Falls back to the legacy pdf-parse extractor on any error.
+ * 3. ADIM: ANA PDF OKUMA VE SÜTUN YENİDEN YAPILANDIRMA (extractTextFromPDF)
+ * Görevi: PDF dosyasını okur, üst/alt sayfa numarası çöplerini temizler,
+ * 2 sütunlu tasarımlarda önce sol sütunu sonra sağ sütunu birleştirip metin çıktısı üretir.
  */
 export async function extractTextFromPDF(pdfBuffer: Buffer): Promise<string> {
   try {
-    // Use the legacy build as recommended for Node.js environments
     const pdfjs = await import("pdfjs-dist/legacy/build/pdf.mjs");
 
     const uint8 = new Uint8Array(pdfBuffer);
@@ -150,12 +149,13 @@ export async function extractTextFromPDF(pdfBuffer: Buffer): Promise<string> {
       isEvalSupported: false,
       useSystemFonts: true,
       disableFontFace: true,
-      disableWorker: true,   // Run in same thread — no separate worker needed
+      disableWorker: true,
     });
 
     const pdf = await loadingTask.promise;
     const pageTexts: string[] = [];
 
+    // PDF'in tüm sayfalarını sırayla gez
     for (let pageNum = 1; pageNum <= pdf.numPages; pageNum++) {
       const page = await pdf.getPage(pageNum);
       const viewport = page.getViewport({ scale: 1.0 });
@@ -163,28 +163,25 @@ export async function extractTextFromPDF(pdfBuffer: Buffer): Promise<string> {
       const pageHeight = viewport.height;
       const textContent = await page.getTextContent();
 
-      // Page boundary cleaning: filter out page numbers, headers, and footers
+      // En üst %6 (Header) ve en alt %6 (Footer / Sayfa no) sınırları
       const topBoundary = pageHeight * 0.94;
       const bottomBoundary = pageHeight * 0.06;
-      
-      // Store font size alongside items — pdfjs provides it in the transform matrix
-      // transform = [scaleX, skewX, skewY, scaleY, translateX, translateY]
-      // Font size ≈ Math.abs(transform[3]) (scaleY)
+
       const allItems: { x: number; y: number; text: string; fontSize: number }[] = [];
       for (const item of textContent.items as any[]) {
         if (item.str && item.str.trim()) {
           const x = item.transform[4];
           const y = item.transform[5];
-          const fontSize = Math.abs(item.transform[3]) || 10; // fallback 10pt
+          const fontSize = Math.abs(item.transform[3]) || 10;
           const txt = item.str.trim();
-          
-          // Skip typical page numbers/footers at boundaries
+
+          // Çöp sayfa numaralarını ve alt/üst bilgileri atla
           const isAtBoundary = y > topBoundary || y < bottomBoundary;
           const isPageNumPattern = /^(?:page|sayfa)?\s*\d+\s*(?:\/|of|-)?\s*\d*\s*$/i.test(txt) || /^--\s*\d+\s*of\s*\d+\s*--$/i.test(txt);
           if (isAtBoundary && isPageNumPattern) {
             continue;
           }
-          
+
           allItems.push({ x, y, text: item.str, fontSize });
         }
       }
@@ -194,7 +191,7 @@ export async function extractTextFromPDF(pdfBuffer: Buffer): Promise<string> {
         continue;
       }
 
-      // Group items into lines — carry font size per item
+      // Kelimeleri aynı yükseklikteki satırlara topla
       const yTolerance = 6;
       type LineItem = { x: number; text: string; fontSize: number };
       type Line = { y: number; items: LineItem[] };
@@ -209,16 +206,16 @@ export async function extractTextFromPDF(pdfBuffer: Buffer): Promise<string> {
         }
       }
 
-      // Sort lines top-to-bottom
+      // Satırları yukarıdan aşağıya diz
       lines.sort((a, b) => b.y - a.y);
       for (const line of lines) {
         line.items.sort((a, b) => a.x - b.x);
       }
 
-      // Dynamic Column Detection
+      // Otomatik Sütun Boşluğu Tespiti (Örn: Sol sütun ile Sağ sütun arası çizgi)
       let boundaries = detectColumns(allItems, pageWidth, pageHeight);
 
-      // Post-process boundaries to keep at most 1 boundary (typically sidebar vs main body separator)
+      // Birden fazla sınır varsa en mantıklı ana sütun ayrımını seç
       if (boundaries.length > 1) {
         const leftSidebarBoundary = boundaries.find(b => b >= pageWidth * 0.18 && b <= pageWidth * 0.44);
         const rightSidebarBoundary = [...boundaries].reverse().find(b => b >= pageWidth * 0.56 && b <= pageWidth * 0.82);
@@ -228,7 +225,6 @@ export async function extractTextFromPDF(pdfBuffer: Buffer): Promise<string> {
         } else if (rightSidebarBoundary !== undefined) {
           boundaries = [rightSidebarBoundary];
         } else {
-          // Keep the one closest to a typical 30% width sidebar
           const target = pageWidth * 0.30;
           let best = boundaries[0];
           let minDiff = Math.abs(best - target);
@@ -241,16 +237,15 @@ export async function extractTextFromPDF(pdfBuffer: Buffer): Promise<string> {
           }
           boundaries = [best];
         }
-        console.log(`[PDF] Filtered multiple column boundaries. Kept: ${boundaries[0]} from original: [${boundaries.join(", ")}]`);
       }
 
       let pageText: string;
       if (boundaries.length > 0) {
-        // Multi-column reconstruction with full-width spanning lines (headers/footers) support
+        // ÇOKLU SÜTUN YENİDEN YAPILANDIRMASI
         type ColItem = { x: number; y: number; text: string; fontSize: number };
-        type PageBlock = 
-          | { type: "spanning"; text: string }
-          | { type: "columns"; cols: ColItem[][] };
+        type PageBlock =
+          | { type: "spanning"; text: string } // Tüm genişliği kaplayan ana başlıklar
+          | { type: "columns"; cols: ColItem[][] }; // Sütun içerikleri
 
         const blocks: PageBlock[] = [];
         let currentCols: ColItem[][] = Array.from({ length: boundaries.length + 1 }, () => []);
@@ -266,17 +261,15 @@ export async function extractTextFromPDF(pdfBuffer: Buffer): Promise<string> {
         for (const line of lines) {
           if (line.items.length === 0) continue;
 
-          // Compute average font size for this line — large font = name/title = spanning
           const avgFontSize = line.items.reduce((sum, i) => sum + i.fontSize, 0) / line.items.length;
 
-          // Rule 1: Top 20% of page OR large font — but ONLY if items don't straddle a column boundary.
-          const allOnOneSide = boundaries.every(b => 
+          // Büyük punto ana başlıklar (Aday adı vb.) sütunları böler, tam genişlik kabul edilir
+          const allOnOneSide = boundaries.every(b =>
             line.items.every(i => i.x < b) || line.items.every(i => i.x >= b)
           );
           let isSpanning = allOnOneSide && (line.y > pageHeight * 0.80 || avgFontSize >= 14);
 
           if (!isSpanning) {
-            // Rule 3: Check if any single item physically crosses a column boundary
             for (const item of line.items) {
               const startX = item.x;
               const itemCharWidth = Math.max(3.6, item.fontSize * 0.55);
@@ -291,39 +284,16 @@ export async function extractTextFromPDF(pdfBuffer: Buffer): Promise<string> {
             }
           }
 
-          // Rule 4: If not spanning, check if there is a gap at boundaries on this line
-          if (!isSpanning) {
-            for (const b of boundaries) {
-              const leftItems = line.items.filter((item) => item.x < b);
-              const rightItems = line.items.filter((item) => item.x >= b);
-              
-              if (leftItems.length > 0 && rightItems.length > 0) {
-                const rightmostLeft = leftItems[leftItems.length - 1];
-                const leftmostRight = rightItems[0];
-                const leftCharWidth = Math.max(3.6, rightmostLeft.fontSize * 0.55);
-                const leftEnd = rightmostLeft.x + rightmostLeft.text.length * leftCharWidth;
-                const rightStart = leftmostRight.x;
-                
-                const gap = rightStart - leftEnd;
-                if (gap < 20) { // Gutter is too small on this line -> treat line as spanning/full-width
-                  isSpanning = true;
-                  break;
-                }
-              }
-            }
-          }
-
           if (isSpanning) {
             flushColumns();
-            // Pass fontSize through so groupItemsIntoText can use accurate gap detection
             const mappedItems = line.items.map(i => ({ x: i.x, y: line.y, text: i.text, fontSize: i.fontSize }));
             blocks.push({ type: "spanning", text: groupItemsIntoText(mappedItems) });
           } else {
-            // Split line parts into respective columns
+            // Kelimeleri ait oldukları sütunlara dağıt
             for (let c = 0; c <= boundaries.length; c++) {
               const prevBound = c === 0 ? 0 : boundaries[c - 1];
               const nextBound = c < boundaries.length ? boundaries[c] : pageWidth;
-              
+
               const colItems = line.items.filter((item) => item.x >= prevBound && item.x < nextBound);
               if (colItems.length > 0) {
                 const mappedColItems = colItems.map(i => ({ x: i.x, y: line.y, text: i.text, fontSize: i.fontSize }));
@@ -334,7 +304,7 @@ export async function extractTextFromPDF(pdfBuffer: Buffer): Promise<string> {
         }
         flushColumns();
 
-        // Assemble page block text
+        // ÖNCE SOL SÜTUNU, SONRA SAĞ SÜTUNU BAŞTAN SONA BİRLEŞTİR
         const assembledBlocks: string[] = [];
         for (const block of blocks) {
           if (block.type === "spanning") {
@@ -347,8 +317,8 @@ export async function extractTextFromPDF(pdfBuffer: Buffer): Promise<string> {
           }
         }
         pageText = assembledBlocks.join("\n");
-        console.log(`[PDF] Page ${pageNum}: Block reconstructed multi-column (Columns: ${boundaries.length + 1}, boundaries: ${boundaries.join(", ")})`);
       } else {
+        // Tek sütunlu standart CV ise doğrudan yukarıdan aşağıya oku
         pageText = groupItemsIntoText(allItems);
       }
 
@@ -356,12 +326,13 @@ export async function extractTextFromPDF(pdfBuffer: Buffer): Promise<string> {
       if (pageText.trim()) pageTexts.push(pageText.trim());
     }
 
+    // Temizlenen metni son Türkçe/İngilizce çift sütun preprocessor'ına gönder
     return preprocessTwoColumnText(pageTexts.join("\n\n"));
 
   } catch (err) {
     console.warn("[PDF] pdfjs-dist extraction failed, falling back to pdf-parse:", (err as Error).message);
 
-    // Legacy fallback
+    // Hata durumunda 2. Yedek Motor (pdf-parse) devreye girer
     const parser = new PDFParse({ data: pdfBuffer });
     try {
       const result = await parser.getText();
