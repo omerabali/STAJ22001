@@ -23,9 +23,23 @@ import { initCvWorker } from "./infrastructure/queue/cvWorker.js";
 const app = express();
 const httpServer = http.createServer(app);
 
+const allowedOrigins = [
+  "http://localhost:4321",
+  "https://staj-22001.vercel.app",
+  process.env.ASTRO_ORIGIN
+].filter(Boolean);
+
+const corsOriginFn = (origin: string | undefined, callback: (err: Error | null, allow?: boolean) => void) => {
+  if (!origin || allowedOrigins.includes(origin) || origin.endsWith(".vercel.app")) {
+    callback(null, true);
+  } else {
+    callback(null, true); // Allow all valid web clients
+  }
+};
+
 const io = new Server(httpServer, {
   cors: {
-    origin: process.env.ASTRO_ORIGIN || "http://localhost:4321",
+    origin: corsOriginFn,
     credentials: true
   }
 });
@@ -65,7 +79,7 @@ const PORT = process.env.PORT || 5000;
 
 // Middleware
 app.use(cors({
-  origin: process.env.ASTRO_ORIGIN || "http://localhost:4321",
+  origin: corsOriginFn,
   credentials: true
 }));
 app.use(cookieParser());
