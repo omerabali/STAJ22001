@@ -94,20 +94,3 @@ Bu çalışmada uygulanan SSR + cookie guard + API endpoint + React island kombi
 
 ---
 
-## Staj Defteri Yazısı
-
----
-
-**Tarih:** 25 / 06 / 2026
-**Staj Konusu:** Astro Web Framework — Sunucu Taraflı İşleme, API Geliştirme ve React Entegrasyonu
-**Staj Günü:** 3. Gün
-
-### Yapılan Çalışmalar
-
-Astro öğrenme sürecinin üçüncü gününde, önceki iki günde oluşturulan statik portfolyo ve dinamik blog sistemi altyapısının üzerine sunucu taraflı işleme (SSR) katmanı eklenerek giriş formu ve korumalı panel sayfasından oluşan bir kimlik doğrulama uygulaması geliştirilmiştir.
-
-Çalışmaya Astro'nun statik derleme modunun sunucu taraflı moda geçirilmesiyle başlanmıştır. Bu yapılandırmayla birlikte her HTTP isteğinde sayfanın sunucu üzerinde üretildiği ve oturum kontrolü gibi dinamik senaryoların mümkün hale geldiği gözlemlenmiştir. pages/api/ dizini altında TypeScript tabanlı login, logout ve me olmak üzere üç API endpoint'i oluşturulmuş; giriş endpoint'i hem form verisi hem de JSON formatındaki gönderileri işleyecek biçimde tasarlanmıştır.
-
-Hassas verilerin kaynak koddan ayrıştırılması amacıyla kullanıcı adı, parola ve oturum imzalama anahtarı ortam değişkenleri aracılığıyla yönetilmiştir. React entegrasyonu eklenerek AuthStatus bileşeni, yalnızca tarayıcı tarafında hydrate olacak biçimde panel sayfasına gömülmüş; bu yöntemle sunucu taraflı render ile istemci taraflı React island'ının aynı sayfa üzerinde bir arada çalışabildiği somut olarak incelenmiştir.
-
-Geliştirme sürecinin sonunda giriş akışı, yönlendirmeler ve oturum koruma mekanizması test edilmiş; kimlik doğrulama akışının uçtan uca beklenen biçimde çalıştığı doğrulanmıştır.
