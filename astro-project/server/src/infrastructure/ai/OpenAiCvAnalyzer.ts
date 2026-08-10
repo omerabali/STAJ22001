@@ -95,8 +95,8 @@ async function runSingleGptPass(
           },
           role: { type: "string", description: "Birincil mesleki unvan" },
           skills: { type: "array", items: { type: "string" } },
-          strengths: { type: "array", items: { type: "string" }, description: "Adayın güçlü yönleri (%100 Profesyonel Türkçe dilinde, gerekçeli)" },
-          eksik_yonler: { type: "array", items: { type: "string" }, description: "Adayın eksik veya gelişime açık alanları (%100 Profesyonel Türkçe dilinde, gerekçeli)" },
+          strengths: { type: "array", items: { type: "string" }, minItems: 3, maxItems: 5, description: "Adayın 3 ile 5 adet güçlü yönü (%100 Profesyonel Türkçe dilinde, gerekçeli)" },
+          eksik_yonler: { type: "array", items: { type: "string" }, minItems: 3, maxItems: 5, description: "Adayın 3 ile 5 adet eksik veya gelişime açık alanı (%100 Profesyonel Türkçe dilinde, gerekçeli)" },
           suggestions: {
             type: "array",
             items: {
