@@ -1,0 +1,8 @@
+{
+  "rewrites": [
+    {
+      "source": "/api/:path*",
+      "destination": "https://cv-parser-backend-38di.onrender.com/api/:path*"
+    }
+  ]
+}
