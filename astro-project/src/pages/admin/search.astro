@@ -237,9 +237,19 @@ import AdminLayout from '../../layouts/AdminLayout.astro';
     function initSearchPage() {
       clearCompareCache();
       initSearchTabs();
+
+      // Restoring cached semantic search
+      const urlParams = new URLSearchParams(window.location.search);
+      const fromParam = urlParams.get('from');
+      const restored = restoreCachedSemanticSearch();
+
+      if (restored || fromParam === 'profile') {
+        const tabSemantic = document.getElementById('tab-semantic');
+        if (tabSemantic) tabSemantic.click();
+      }
+
       fetchSearchLogs();
       loadCandidatesData();
-      restoreCachedSemanticSearch();
 
       const searchBtn = document.getElementById('semantic-search-btn');
       searchBtn?.addEventListener('click', () => executeSemanticSearch(isSearchLoadingState));
@@ -253,7 +263,7 @@ import AdminLayout from '../../layouts/AdminLayout.astro';
       const resetSearchState = () => {
         if (input) input.value = '';
         clearSemanticSearchCache();
-        const resultsCountEl = document.getElementById('semantic-result-count');
+        const resultsCountEl = document.getElementById('semantic-results-count') || document.getElementById('semantic-result-count');
         if (resultsCountEl) resultsCountEl.textContent = 'Arama bekleniyor...';
         const grid = document.getElementById('semantic-candidates-grid');
         if (grid) {

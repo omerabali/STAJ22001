@@ -23,24 +23,28 @@ export function renderSelectedCvDetails(cvId: string): void {
     }
   }
 
-  if (subtitleEl && selectedCv) subtitleEl.textContent = `${selectedCv.fileName || 'CV Dokümanı'} - Yapay Zeka Değerlendirmesi`;
-
-  const status = latestAnalysis ? latestAnalysis.status : (selectedCv ? 'PENDING' : 'NO_CV');
-
-  const isBannerActive = liveBanner ? !liveBanner.classList.contains('hidden') : false;
-  const isProcessing = status === 'COMPLETED' ? false : (status === 'PROCESSING' || isBannerActive);
-
-  if (statusEl) {
-    if (isProcessing) {
-      statusEl.className = 'px-2.5 py-0.5 rounded-md text-[11px] font-bold bg-blue-50 text-blue-700 border border-blue-200 animate-pulse';
-      statusEl.textContent = 'Analiz Ediliyor';
-    } else if (status === 'COMPLETED') {
-      statusEl.className = 'px-2.5 py-0.5 rounded-md text-[11px] font-bold bg-emerald-50 text-emerald-700 border border-emerald-200';
-      statusEl.textContent = 'Hazır';
-    } else {
-      statusEl.className = 'px-2.5 py-0.5 rounded-md text-[11px] font-bold bg-amber-50 text-amber-700 border border-amber-200';
-      statusEl.textContent = 'Sırada';
+  if (!selectedCv) {
+    if (subtitleEl) subtitleEl.textContent = 'Özgeçmiş Bulunmuyor';
+    if (statusEl) {
+      statusEl.className = 'px-2.5 py-0.5 rounded-md text-[11px] font-bold bg-gray-100 text-gray-600 border border-gray-200';
+      statusEl.textContent = 'CV Yok';
     }
+    if (atsEl) atsEl.textContent = '-%';
+
+    const noCvHtml = `
+      <div class="p-6 bg-amber-50/60 border border-amber-200/80 rounded-xl text-center space-y-2">
+        <span class="material-symbols-outlined text-amber-600 text-3xl">info</span>
+        <h4 class="text-xs font-bold text-amber-900">Adayın Henüz Yüklenmiş Bir CV'si Bulunmuyor</h4>
+        <p class="text-[11px] text-amber-700 font-medium">Bu aday henüz sistemlerimize özgeçmiş yüklememiştir. Analiz yapılabilmesi için adayın öncelikle CV yüklemesi gereklidir.</p>
+      </div>`;
+
+    const strContainer = document.getElementById('strengths-container');
+    const weakContainer = document.getElementById('weaknesses-container');
+    const sugContainer = document.getElementById('suggestions-container');
+    if (strContainer) strContainer.innerHTML = noCvHtml;
+    if (weakContainer) weakContainer.innerHTML = noCvHtml;
+    if (sugContainer) sugContainer.innerHTML = noCvHtml;
+    return;
   }
 
   const score = (latestAnalysis && latestAnalysis.atsScore !== undefined && latestAnalysis.atsScore !== null) ? latestAnalysis.atsScore : 0;
