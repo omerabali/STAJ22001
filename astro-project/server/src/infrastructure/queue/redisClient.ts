@@ -14,6 +14,7 @@ export const redisConnection = redisUrl
   ? new Redis(redisUrl, {
       maxRetriesPerRequest: null,
       enableReadyCheck: false,
+      tls: redisUrl.startsWith("rediss://") ? { rejectUnauthorized: false } : undefined,
     })
   : new Redis({
       host: redisHost,
