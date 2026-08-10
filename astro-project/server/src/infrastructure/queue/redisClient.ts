@@ -12,24 +12,13 @@ const redisPassword = process.env.REDIS_PASSWORD || undefined;
 
 function createRedisInstance() {
   if (redisUrl) {
-    try {
-      const parsed = new URL(redisUrl);
-      const isSecure = parsed.protocol === "rediss:";
-      return new Redis({
-        host: parsed.hostname,
-        port: parseInt(parsed.port || "6379", 10),
-        password: decodeURIComponent(parsed.password || parsed.username || ""),
-        tls: isSecure ? { rejectUnauthorized: false } : undefined,
-        maxRetriesPerRequest: null,
-        enableReadyCheck: false,
-      });
-    } catch (e) {
-      return new Redis(redisUrl, {
-        maxRetriesPerRequest: null,
-        enableReadyCheck: false,
-        tls: redisUrl.startsWith("rediss://") ? { rejectUnauthorized: false } : undefined,
-      });
-    }
+    const isRediss = redisUrl.startsWith("rediss://");
+    return new Redis(redisUrl, {
+      maxRetriesPerRequest: null,
+      enableReadyCheck: false,
+      tls: isRediss ? { rejectUnauthorized: false } : undefined,
+      reconnectOnError: () => false, // Don't reconnect on auth error
+    });
   }
 
   return new Redis({
