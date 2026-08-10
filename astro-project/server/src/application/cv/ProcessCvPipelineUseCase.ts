@@ -54,10 +54,10 @@ export class ProcessCvPipelineUseCase {
       // 3. METİN ÇIKARMA (Parser)
       let text = cv.rawText;
       let lang = "tr";
-      //CV dosyasının (PDF) saklandığı yeri tespit edip dosyanın kendisini
-      //(Buffer olarak) indiriyor ve ardından içerikteki ham metni (rawText) çıkarıyor.
-      if (!text || text.trim().length === 0) {
-        console.log(`[Parser] Extracting text for CV ${cvId}...`);
+      // CV dosyasının (PDF) saklandığı yeri tespit edip dosyanın kendisini
+      // (Buffer olarak) indiriyor ve ardından içerikteki ham metni (rawText) çıkarıyor.
+      if (!text || text.trim().length < 50) {
+        console.log(`[Parser] Extracting fresh text for CV ${cvId}...`);
         let pdfBuffer: Buffer;
         if (cv.fileUrl.includes("/cv-files/")) {
           const storagePath = cv.fileUrl.split("/cv-files/")[1];
@@ -81,6 +81,8 @@ export class ProcessCvPipelineUseCase {
         }
         text = await extractTextFromPDF(pdfBuffer);
         lang = detectLanguage(text) || "tr";
+
+        console.log(`[Parser] Extracted ${text.length} chars of text for CV ${cvId}`);
 
         // DB'ye ham metni yaz
         await prisma.cV.update({
