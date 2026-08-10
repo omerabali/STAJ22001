@@ -8,7 +8,7 @@ export function setupRealtimeSocket(userId: string, reloadFn: () => void): void 
   if (typeof (window as any).io === 'undefined') return;
 
   try {
-    const socketUrl = window.location.hostname === 'localhost' ? 'http://localhost:5000' : '/';
+    const socketUrl = window.location.hostname === 'localhost' ? 'http://localhost:5000' : 'https://cv-parser-backend-38di.onrender.com';
     const socket = (window as any).io(socketUrl, { transports: ['websocket', 'polling'] });
     const indicator = document.getElementById('live-socket-indicator');
 

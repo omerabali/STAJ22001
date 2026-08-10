@@ -12,7 +12,7 @@ export function initAnalysisSocketListener(state: {
 }, loadCVList: () => void) {
   let socket: any = null;
   try {
-    const socketUrl = window.location.hostname === 'localhost' ? 'http://localhost:5000' : window.location.origin;
+    const socketUrl = window.location.hostname === 'localhost' ? 'http://localhost:5000' : 'https://cv-parser-backend-38di.onrender.com';
     socket = (window as any).io ? (window as any).io(socketUrl, { withCredentials: true }) : null;
 
     if (!socket) return null;
