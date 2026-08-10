@@ -81,7 +81,9 @@ const bottomItems = [
         } catch (err) {
             console.error("Çıkış yapılırken hata oluştu:", err);
         }
+        document.cookie = 'token=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;';
+        document.cookie = 'token=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/; domain=' + window.location.hostname + ';';
         try { sessionStorage.clear(); localStorage.clear(); } catch(e) {}
-        window.location.href = '/';
+        window.location.href = '/login';
     }
 </script>
