@@ -27,10 +27,10 @@ router.post("/register", async (req: Request, res: Response): Promise<void> => {
   try {
     const { token, user } = await RegisterUserUseCase.execute(req.body, prisma);//bodyden gelen verileri db ye kaydet  ve jwt üret 
 
-    res.cookie("token", token, {//hemen oturum açılmış sayılsın diye cookie yazıyoruz 
-      httpOnly: true,//xss saldırıları için
-      secure: process.env.NODE_ENV === "production",//sadece güvenli https protokü üzerinden iletilmesini sağlar
-      sameSite: "lax",
+    res.cookie("token", token, {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === "production",
+      sameSite: process.env.NODE_ENV === "production" ? "none" : "lax",
       maxAge: 7 * 24 * 60 * 60 * 1000,
     });
 
@@ -54,7 +54,7 @@ router.post("/login", async (req: Request, res: Response): Promise<void> => {//l
     res.cookie("token", token, {
       httpOnly: true,
       secure: process.env.NODE_ENV === "production",
-      sameSite: "lax",
+      sameSite: process.env.NODE_ENV === "production" ? "none" : "lax",
       maxAge: 7 * 24 * 60 * 60 * 1000,
     });
 
@@ -317,6 +317,18 @@ router.post("/verify-code", async (req: Request, res: Response): Promise<void> =
     console.error("Verify code hatası:", error);
     res.status(500).json({ message: "Sunucu hatası." });
   }
+});
+
+// ─────────────────────────────────────────────
+// POST /api/auth/logout
+// ─────────────────────────────────────────────
+router.post("/logout", (_req: Request, res: Response): void => {
+  res.clearCookie("token", {
+    httpOnly: true,
+    secure: process.env.NODE_ENV === "production",
+    sameSite: process.env.NODE_ENV === "production" ? "none" : "lax"
+  });
+  res.json({ message: "Başarıyla çıkış yapıldı." });
 });
 
 export default router;
