@@ -31,6 +31,7 @@ router.post("/register", async (req: Request, res: Response): Promise<void> => {
       httpOnly: true,
       secure: process.env.NODE_ENV === "production",
       sameSite: process.env.NODE_ENV === "production" ? "none" : "lax",
+      path: "/",
       maxAge: 7 * 24 * 60 * 60 * 1000,
     });
 
@@ -55,6 +56,7 @@ router.post("/login", async (req: Request, res: Response): Promise<void> => {//l
       httpOnly: true,
       secure: process.env.NODE_ENV === "production",
       sameSite: process.env.NODE_ENV === "production" ? "none" : "lax",
+      path: "/",
       maxAge: 7 * 24 * 60 * 60 * 1000,
     });
 
@@ -326,7 +328,8 @@ router.post("/logout", (_req: Request, res: Response): void => {
   res.clearCookie("token", {
     httpOnly: true,
     secure: process.env.NODE_ENV === "production",
-    sameSite: process.env.NODE_ENV === "production" ? "none" : "lax"
+    sameSite: process.env.NODE_ENV === "production" ? "none" : "lax",
+    path: "/"
   });
   res.json({ message: "Başarıyla çıkış yapıldı." });
 });
