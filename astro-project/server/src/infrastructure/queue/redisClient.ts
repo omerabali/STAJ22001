@@ -10,19 +10,38 @@ const redisHost = process.env.REDIS_HOST || "localhost";
 const redisPort = parseInt(process.env.REDIS_PORT || "6379", 10);
 const redisPassword = process.env.REDIS_PASSWORD || undefined;
 
-export const redisConnection = redisUrl
-  ? new Redis(redisUrl, {
-      maxRetriesPerRequest: null,
-      enableReadyCheck: false,
-      tls: redisUrl.startsWith("rediss://") ? { rejectUnauthorized: false } : undefined,
-    })
-  : new Redis({
-      host: redisHost,
-      port: redisPort,
-      password: redisPassword,
-      maxRetriesPerRequest: null,
-      enableReadyCheck: false,
-    });
+function createRedisInstance() {
+  if (redisUrl) {
+    try {
+      const parsed = new URL(redisUrl);
+      const isSecure = parsed.protocol === "rediss:";
+      return new Redis({
+        host: parsed.hostname,
+        port: parseInt(parsed.port || "6379", 10),
+        password: decodeURIComponent(parsed.password || parsed.username || ""),
+        tls: isSecure ? { rejectUnauthorized: false } : undefined,
+        maxRetriesPerRequest: null,
+        enableReadyCheck: false,
+      });
+    } catch (e) {
+      return new Redis(redisUrl, {
+        maxRetriesPerRequest: null,
+        enableReadyCheck: false,
+        tls: redisUrl.startsWith("rediss://") ? { rejectUnauthorized: false } : undefined,
+      });
+    }
+  }
+
+  return new Redis({
+    host: redisHost,
+    port: redisPort,
+    password: redisPassword,
+    maxRetriesPerRequest: null,
+    enableReadyCheck: false,
+  });
+}
+
+export const redisConnection = createRedisInstance();
 
 redisConnection.on("connect", () => {
   console.log(`[Redis] 🟢 Connected to Redis at ${redisUrl || `${redisHost}:${redisPort}`}`);
