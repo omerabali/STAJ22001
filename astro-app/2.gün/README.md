@@ -69,17 +69,6 @@ npm run build
 ```
 
 ---
-
-## Staj Defteri
-
-**Tarih:** … / … / 2026
-**Staj Konusu:** Astro Web Framework — Dinamik İçerik, Content Collections ve Blog Sistemi
-**Staj Günü:** …
-
-### Yapılan Çalışmalar
-
-Staj programının Astro eğitim bölümünün ikinci gününde, birinci günde oluşturulan statik portfolyo projesine dinamik içerik katmanı eklenerek bir blog sistemi geliştirilmiştir. Çalışmaya içerik koleksiyonu yapısının kurulmasıyla başlanmış; blog yazılarının başlık, açıklama, tarih ve kategori alanları şema doğrulamasıyla tip güvenli biçimde tanımlanmıştır. Koleksiyon kapsamında Markdown ve MDX formatlarında içerik dosyaları hazırlanmış, MDX formatında Astro bileşeninin doğrudan yazı gövdesine gömülebildiği gözlemlenerek iki format arasındaki fark karşılaştırılmıştır. Blog listesi sayfasında koleksiyondaki yazılar tarihe göre sıralanarak kart bileşenleriyle listelenmiştir. Yazı detay sayfası dinamik route yapısıyla oluşturulmuş; derleme sırasında her içerik dosyası için otomatik olarak ayrı bir statik HTML sayfası üretilmiştir. Kategori filtreleme için ikinci bir dinamik route tanımlanmış ve her kategori için ayrı statik sayfalar oluşturulmuştur. Ayrıca harici bir API'den derleme sırasında veri çekilerek sayfaya yansıtılması sağlanmış; bu yöntemle Astro'nun build-time veri getirme yaklaşımı uygulamalı olarak incelenmiştir. Geliştirme sürecinin sonunda tüm sayfalar ve navigasyon bağlantıları test edilmiş, üretim derlemesi alınarak dinamik içeriklerin statik dosyalara başarıyla dönüştürüldüğü doğrulanmıştır.
-
 ---
 
 *Portfolyo sitesindeki örnek içerikler ve iletişim bilgileri kişisel verilerle güncellenmelidir.*
