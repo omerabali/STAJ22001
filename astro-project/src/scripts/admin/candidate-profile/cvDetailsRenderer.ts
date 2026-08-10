@@ -47,6 +47,25 @@ export function renderSelectedCvDetails(cvId: string): void {
     return;
   }
 
+  if (subtitleEl && selectedCv) subtitleEl.textContent = `${selectedCv.fileName || 'CV Dokümanı'} - Yapay Zeka Değerlendirmesi`;
+
+  const status = latestAnalysis ? latestAnalysis.status : (selectedCv ? 'PENDING' : 'NO_CV');
+  const isBannerActive = liveBanner ? !liveBanner.classList.contains('hidden') : false;
+  const isProcessing = status === 'COMPLETED' ? false : (status === 'PROCESSING' || isBannerActive);
+
+  if (statusEl) {
+    if (isProcessing) {
+      statusEl.className = 'px-2.5 py-0.5 rounded-md text-[11px] font-bold bg-blue-50 text-blue-700 border border-blue-200 animate-pulse';
+      statusEl.textContent = 'Analiz Ediliyor';
+    } else if (status === 'COMPLETED') {
+      statusEl.className = 'px-2.5 py-0.5 rounded-md text-[11px] font-bold bg-emerald-50 text-emerald-700 border border-emerald-200';
+      statusEl.textContent = 'Hazır';
+    } else {
+      statusEl.className = 'px-2.5 py-0.5 rounded-md text-[11px] font-bold bg-amber-50 text-amber-700 border border-amber-200';
+      statusEl.textContent = 'Sırada';
+    }
+  }
+
   const score = (latestAnalysis && latestAnalysis.atsScore !== undefined && latestAnalysis.atsScore !== null) ? latestAnalysis.atsScore : 0;
   if (atsEl) atsEl.textContent = isProcessing ? '...' : `%${score}`;
 
