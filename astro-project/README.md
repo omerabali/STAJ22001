@@ -1,6 +1,6 @@
-<div align="center">
 
-<img src="public/mixboard-image.png" alt="Beacon Logo" width="160" />
+<div align="center">
+    <img src="public/mixboard-image.png" alt="Beacon Logo" width="160" />
 
 # Beacon
 
@@ -16,6 +16,11 @@
 [![Node](https://img.shields.io/badge/Node.js-22.x-339933?style=for-the-badge&logo=node.js)](https://nodejs.org)
 [![TypeScript](https://img.shields.io/badge/TypeScript-5.x-3178C6?style=for-the-badge&logo=typescript)](https://www.typescriptlang.org)
 [![Docker](https://img.shields.io/badge/Docker-Redis_7-2496ED?style=for-the-badge&logo=docker)](https://www.docker.com)
+
+    
+</div>
+
+
 
 <br/>
 
@@ -39,7 +44,7 @@ sonuçları değerlendiren kurumsal düzeyde bir İK (İnsan Kaynakları) platfo
 
 </div>
 
-**Beacon**, 8 haftalık (39 iş günü) bir staj sürecinde sıfırdan tasarlanıp geliştirilen, **RAG (Retrieval-Augmented Generation)** mimarisine dayanan kurumsal bir CV analiz ve aday arama platformudur. Proje, modern web geliştirme, yapay zeka entegrasyonu, veritabanı tasarımı ve DevOps konularında kapsamlı bir öğrenme süreci içermektedir.
+**Beacon**, 8 haftalık (40 iş günü) bir staj sürecinde sıfırdan tasarlanıp geliştirilen, **RAG (Retrieval-Augmented Generation)** mimarisine dayanan kurumsal bir CV analiz ve aday arama platformudur. Proje, modern web geliştirme, yapay zeka entegrasyonu, veritabanı tasarımı ve DevOps konularında kapsamlı bir öğrenme süreci içermektedir.
 
 ### Çözdüğü Problem
 
@@ -47,18 +52,18 @@ Geleneksel aday tarama süreçlerinde İK uzmanları yüzlerce CV'yi manuel olar
 
 1. **CV'leri otomatik analiz eder**: PDF'ten metin çıkarma, akıllı bölümleme ve GPT-4o-mini ile SWOT analizi.
 2. **Semantik arama yapar**: Doğal dilde "React bilen, 3 yıl deneyimli frontend geliştirici" gibi sorgularla vektörel aday eşleştirme.
-3. **Hibrit sıralama uygular**: Vektör benzerliği (%40) + GPT uygunluk değerlendirmesi (%60) ile en doğru sonuçları üretir.
+3. **Hibrit sıralama uygular**: Vektör benzerliği (%20) + GPT uygunluk değerlendirmesi (%80) ile en doğru sonuçları üretir.
 4. **Gerçek zamanlı işleme sunar**: BullMQ worker pool ile paralel CV işleme ve Socket.io ile canlı ilerleme bildirimleri.
 
 ### Proje Kapsamı
 
 | Metrik | Değer |
 |:-------|:------|
-| **Toplam Geliştirme Süresi** | 8 Hafta (39 İş Günü) |
+| **Toplam Geliştirme Süresi** | 8 Hafta (40 İş Günü) |
 | **Frontend Sayfa Sayısı** | 15+ Astro sayfası |
 | **Backend Endpoint Sayısı** | 20+ REST API endpoint |
-| **Veritabanı Tablo Sayısı** | 8 tablo (PostgreSQL + pgvector) |
-| **AI Entegrasyon Noktası** | 4 farklı OpenAI kullanım noktası |
+| **Veritabanı Tablo Sayısı** | 10 tablo (PostgreSQL + pgvector) |
+| **AI Entegrasyon Noktası** | 6 farklı OpenAI kullanım noktası |
 | **TypeScript Dosya Sayısı** | 80+ frontend + backend modülü |
 | **Mimari Desen** | Clean Architecture (Domain, Infrastructure, Application) |
 
@@ -191,70 +196,6 @@ Bu staj süreci boyunca aşağıdaki teknik ve profesyonel yetkinlikler kazanıl
 
 <br/>
 
-<div align="center">
-
-## Sistem Mimarisi
-
-</div>
-
-Aşağıdaki diyagram sistemin genel mimarisini ve veri akışını göstermektedir:
-
-```mermaid
-graph TB
-    subgraph Client["Frontend - Astro SSR"]
-        A[Login ve Register] --> B[Admin Paneli]
-        A --> C[Aday Paneli]
-        B --> D[CV Yukleme]
-        B --> E[Semantik Arama]
-        B --> F[Raporlar]
-        B --> G[Kullanici Yonetimi]
-        C --> H[Profilim ve CVlerim]
-    end
-    
-    subgraph Server["Backend - Express.js"]
-        I[REST API Routes] --> J[JWT Auth Middleware]
-        J --> K[CV Route]
-        J --> L[Search Route]
-        J --> M[Admin Route]
-        J --> N[Auth Route]
-    end
-    
-    subgraph Processing["Asenkron Isleme"]
-        O[BullMQ Queue] --> P[Worker Pool x4]
-        P --> Q[PDF Text Extraction]
-        Q --> R[3 Katmanli Chunking]
-        R --> S[OpenAI Embedding]
-        S --> T[pgvector Kayit]
-    end
-    
-    subgraph Data["Veri Katmani"]
-        U[(PostgreSQL + pgvector)]
-        V[(Redis)]
-        W[(Supabase Storage)]
-    end
-    
-    subgraph AIServices["AI Servisleri"]
-        X[GPT-4o-mini SWOT Analiz]
-        Y[GPT-4o-mini Reranking]
-        Z[text-embedding-3-small]
-        AA[Query Intent Parser]
-    end
-    
-    D -->|HTTP POST| K
-    K -->|Job Ekle| O
-    P -->|Socket.io| D
-    E -->|Dogal Dil Sorgusu| L
-    L --> AA
-    L --> Z
-    L -->|Cosine Similarity| U
-    L --> Y
-    K --> X
-    O --> V
-    S --> Z
-    T --> U
-    K --> W
-```
-
 ### Mimari Tasarım Kararları
 
 | Karar | Gerekçesi |
@@ -318,9 +259,9 @@ Bu sistem, farklı formatlardaki CV'lerin (tek sütunlu, çok sütunlu, Canva ş
 
 | Bileşen | Ağırlık | Açıklama |
 |:--------|:-------:|:---------|
-| **Vektör Skoru** | %40 | pgvector cosine similarity sonucu |
-| **GPT Skoru** | %60 | GPT-4o-mini aday uygunluk değerlendirmesi (0-100) |
-| **Final Skor** | %100 | (Vektör x 0.40) + (GPT x 0.60) |
+| **Vektör Skoru** | %20 | pgvector cosine similarity sonucu |
+| **GPT Skoru** | %80 | GPT-4o-mini aday uygunluk değerlendirmesi (0-100) |
+| **Final Skor** | %100 | (Vektör x 0.20) + (GPT x 0.80) |
 
 Her aday için Türkçe eşleştirme açıklaması üretilir ve API token kullanımı USD cinsinden takip edilir.
 
@@ -392,7 +333,7 @@ graph TD
 |:--------|:----------------------------------|:-------------------|
 | Arama Yöntemi | Tam metin eşleştirme (LIKE, ILIKE) | Vektörel benzerlik (cosine similarity) |
 | Anlam Anlama | Yok, sadece kelime eşleştirme | Var, semantik anlam yakalama |
-| Sıralama | Basit frekans tabanlı | Hibrit (vektör %40 + GPT %60) |
+| Sıralama | Basit frekans tabanlı | Hibrit (vektör %20 + GPT %80) |
 | Kriter Ayrıştırma | Manuel filtre | GPT ile otomatik niyet analizi |
 | Çok Dilli Destek | Sınırlı | Embedding modeli ile doğal destek |
 
@@ -404,7 +345,7 @@ graph TD
 
 </div>
 
-Projede 8 tablo bulunmaktadır. Aşağıda tablolar ve ilişkileri gösterilmektedir:
+Projede 10 tablo bulunmaktadır. Aşağıda tablolar ve ilişkileri gösterilmektedir:
 
 ```mermaid
 erDiagram
@@ -412,6 +353,8 @@ erDiagram
     User ||--o{ SearchLog : arar
     CV ||--o{ CVAnalysis : analiz_edilir
     CV ||--o{ CVChunk : bolumlenir
+    CV ||--o{ RankingAuditLog : denetlenir
+    CV ||--o{ AnalysisAuditLog : denetlenir
     CVChunk ||--o{ CVEmbedding : vektorlestirilir
 
     User {
@@ -501,6 +444,31 @@ erDiagram
         string query
         datetime createdAt
     }
+
+    RankingAuditLog {
+        uuid id PK
+        uuid cvId FK
+        string searchQueryId
+        json layer1_hardFilter
+        int layer2_gptScore
+        string layer2_explanation
+        int layer4_gptScore
+        boolean layer5_agreement
+        int finalScore
+        boolean needsReview
+        datetime createdAt
+    }
+
+    AnalysisAuditLog {
+        uuid id PK
+        uuid cvId FK
+        int pass1_atsScore
+        int pass2_atsScore
+        int scoreDelta
+        int finalScore
+        boolean usedThirdPass
+        datetime createdAt
+    }
 ```
 
 ### Tablo Açıklamaları
@@ -515,6 +483,8 @@ erDiagram
 | **APICall** | Çok (on binler) | OpenAI API çağrı kayıtları ve maliyet takibi |
 | **CostLog** | Çok (on binler) | İşlem süresi, token kullanımı ve USD maliyet kayıtları |
 | **SearchLog** | Orta (binler) | Kullanıcı arama geçmişi |
+| **RankingAuditLog** | Orta (binler) | GPT Reranker uyuşmazlık ve bağımsız denetim logları |
+| **AnalysisAuditLog** | Orta (binler) | Double-pass ATS skorlama sapma ve denetim kayıtları |
 
 <br/>
 
@@ -606,7 +576,7 @@ Sorgu metni text-embedding-3-small ile 1536 boyutlu vektöre dönüştürülür.
 
 **Aşama 3: Hibrit Reranking**
 
-İlk aday listesi GPT-4o-mini'ye gönderilir, her aday 0-100 arasında puanlanır. Türkçe eşleştirme açıklaması üretilir. Final skor vektör skoru (%40) ve GPT skoru (%60) ile hesaplanır.
+İlk aday listesi GPT-4o-mini'ye gönderilir, her aday 0-100 arasında puanlanır. Türkçe eşleştirme açıklaması üretilir. Final skor vektör skoru (%20) ve GPT skoru (%80) ile hesaplanır.
 
 <br/>
 
@@ -1112,40 +1082,11 @@ Staj süreci boyunca karşılaşılan temel teknik zorluklar ve uygulanan çöz�
 
 <div align="center">
 
-## Geliştirme Süreci Grafikleri
+## Geliştirive Süreci Grafikleri
 
 </div>
 
-### Haftalık İş Dağılımı
 
-```mermaid
-gantt
-    title Beacon Geliştirme Takvimi (8 Hafta)
-    dateFormat YYYY-MM-DD
-    axisFormat %d %b
-
-    section Altyapi
-    Proje Kurulumu ve Arastirma           :done, w1, 2025-06-16, 5d
-    Express + Prisma + Supabase           :done, w2, 2025-06-23, 5d
-
-    section Frontend
-    Login Register Dashboard UI           :done, w3, 2025-06-30, 5d
-    CV Yukleme ve Toplu Isleme UI         :done, w4a, 2025-07-07, 5d
-    Aday Profil ve Karsilastirma UI       :done, w5a, 2025-07-14, 3d
-    Mobil Uyumluluk ve UI Polish          :done, w8, 2025-08-04, 5d
-
-    section Backend
-    CV Isleme Pipeline                    :done, w4b, 2025-07-07, 5d
-    AI Analiz ve Semantik Arama           :done, w5b, 2025-07-14, 5d
-    Clean Architecture Refaktoru          :done, w6a, 2025-07-21, 3d
-
-    section DevOps
-    Docker Redis BullMQ Kurulumu          :done, w6b, 2025-07-23, 3d
-    Benchmark ve Performans Testi         :done, w7, 2025-07-28, 5d
-
-    section Dokumantasyon
-    README ve Proje Teslimi               :done, w8b, 2025-08-06, 3d
-```
 
 ### Teknoloji Dağılımı
 
@@ -1172,172 +1113,7 @@ pie title Ozellik Kategorileri Dagilimi
     "DevOps ve Altyapi" : 5
 ```
 
-### Backend Katman Yapısı
 
-```mermaid
-graph TB
-    subgraph Presentation["Sunum Katmani (Routes)"]
-        R1[auth.ts]
-        R2[cv.ts]
-        R3[search.ts]
-        R4[admin.ts]
-    end
-
-    subgraph Application["Uygulama Katmani (Services)"]
-        S1[ChunkQualityService]
-        S2[EmbeddingService]
-        S3[RankingService]
-    end
-
-    subgraph Domain["Domain Katmani"]
-        D1[CvTextPreprocessor]
-        D2[HeadingMatcher]
-        D3[LocalRuleBasedChunker]
-        D4[SectionTaxonomy]
-        D5[SubChunker]
-        D6[HardRequirement]
-    end
-
-    subgraph Infrastructure["Altyapi Katmani"]
-        I1[OpenAiCvAnalyzer]
-        I2[OpenAIQueryParser]
-        I3[OpenAiSectionSegmenter]
-        I4[PdfExtractor]
-        I5[cvQueue + cvWorker]
-        I6[JwtService]
-        I7[PasswordHasher]
-        I8[PromptInjectionGuard]
-    end
-
-    subgraph External["Dis Servisler"]
-        E1[(PostgreSQL + pgvector)]
-        E2[(Redis)]
-        E3[OpenAI API]
-        E4[(Supabase Storage)]
-    end
-
-    R1 --> S1
-    R2 --> S1
-    R2 --> S2
-    R3 --> S3
-    R3 --> S2
-    R4 --> S1
-
-    S1 --> D1
-    S1 --> D2
-    S1 --> D3
-    S1 --> D4
-    S1 --> D5
-    S2 --> I1
-    S3 --> I2
-    S3 --> D6
-
-    I1 --> E3
-    I2 --> E3
-    I3 --> E3
-    I4 --> E4
-    I5 --> E2
-    S2 --> E1
-    S1 --> E1
-```
-
-### Veri Akış Grafiği
-
-```mermaid
-graph LR
-    subgraph Giris["Veri Girisi"]
-        A[PDF Dosyasi]
-        B[Kullanici Bilgileri]
-        C[Arama Sorgusu]
-    end
-
-    subgraph Isleme["Veri Isleme"]
-        D[PDF Parser]
-        E[3 Katmanli Chunker]
-        F[Embedding Generator]
-        G[SWOT Analyzer]
-        H[Query Intent Parser]
-        I[Reranker]
-    end
-
-    subgraph Depolama["Veri Depolama"]
-        J[(Users Tablosu)]
-        K[(CVs Tablosu)]
-        L[(CVChunks Tablosu)]
-        M[(CVEmbeddings Tablosu)]
-        N[(CVAnalysis Tablosu)]
-        O[(APICall Tablosu)]
-        P[(CostLog Tablosu)]
-        Q[(SearchLog Tablosu)]
-    end
-
-    subgraph Cikis["Veri Cikisi"]
-        R[Aday Listesi]
-        S[SWOT Raporu]
-        T[Dashboard Istatistikleri]
-        U[CSV Rapor]
-    end
-
-    A --> D --> E --> F --> M
-    E --> L
-    D --> K
-    B --> J
-    F --> G --> N
-    C --> H --> F
-    M --> I --> R
-    N --> S
-    K --> T
-    N --> U
-    F --> O
-    G --> O
-    G --> P
-```
-
-### Sayfa Yapısı Haritası
-
-```mermaid
-graph TD
-    subgraph Public["Herkese Acik Sayfalar"]
-        LP[index.astro - Landing Page]
-        LG[login.astro - Giris]
-        RG[register.astro - Kayit]
-        FP[forgot-password.astro - Sifre Sifirlama]
-    end
-
-    subgraph AdminPanel["Admin Paneli (8 Sayfa)"]
-        AD[dashboard.astro - Istatistikler]
-        AU[upload.astro - CV Yukleme]
-        AS[search.astro - Semantik Arama]
-        AUS[users.astro - Kullanici Yonetimi]
-        AR[reports.astro - Raporlar]
-        AC[compare.astro - Aday Karsilastirma]
-        ACP[candidate-profile.astro - Aday Detay]
-        AST[settings.astro - Ayarlar]
-    end
-
-    subgraph CandidatePanel["Aday Paneli (3 Sayfa)"]
-        CP[profile.astro - Profil ve CVler]
-        CA[analyses.astro - Analiz Sonuclari]
-        CS[settings.astro - Hesap Ayarlari]
-    end
-
-    LP --> LG
-    LP --> RG
-    LG --> FP
-    LG -->|Admin Girisi| AD
-    LG -->|Aday Girisi| CP
-
-    AD --> AU
-    AD --> AS
-    AD --> AUS
-    AD --> AR
-    AS --> ACP
-    AS --> AC
-    AD --> AST
-
-    CP --> CA
-    CP --> CS
-```
 
 ### OpenAI API Kullanım Noktaları
 
@@ -1362,7 +1138,7 @@ Projede OpenAI API 6 farklı noktada kullanılmaktadır:
 
 | Bilgi | Değer |
 |:------|:------|
-| **Staj Dönemi** | 2025, 8 Hafta (39 İş Günü) |
+| **Staj Dönemi** | 2025, 8 Hafta (40 İş Günü) |
 | **GitHub** | [@omerabali](https://github.com/omerabali) |
 | **Proje Deposu** | [STAJ22001](https://github.com/omerabali/STAJ22001) |
 
@@ -1373,3 +1149,21 @@ Projede OpenAI API 6 farklı noktada kullanılmaktadır:
 *Bu proje bir staj çalışması olarak geliştirilmiştir.*
 
 </div>
+
+<img width="1919" height="912" alt="image" src="https://github.com/user-attachments/assets/a23fb7b2-18df-41ab-a3ac-b5672c47db45" />
+<img width="1919" height="913" alt="image" src="https://github.com/user-attachments/assets/81a180a5-9426-4711-a7de-8af949b3fedf" />
+<img width="1918" height="910" alt="image" src="https://github.com/user-attachments/assets/edbe49be-1d11-46a3-b1e2-6631ed5c8db0" />
+<img width="1901" height="906" alt="image" src="https://github.com/user-attachments/assets/0b3b5b48-7899-43ba-b5ba-6eeda8c240cd" />
+<img width="1903" height="910" alt="image" src="https://github.com/user-attachments/assets/a7a72b67-8a5d-4d73-a0c3-691a69057c07" />
+<img width="1902" height="907" alt="image" src="https://github.com/user-attachments/assets/f66eace1-4a38-46ad-98f3-76099da39fe8" />
+<img width="1902" height="910" alt="image" src="https://github.com/user-attachments/assets/a80a83ab-6e90-493a-b94f-d1b12193dd27" />
+<img width="1919" height="911" alt="image" src="https://github.com/user-attachments/assets/f2abb4c7-413d-4fa9-810d-d9161aa46bc5" />
+<img width="1919" height="913" alt="image" src="https://github.com/user-attachments/assets/cb5df233-9a19-4be4-a4e4-d8d0e2401535" />
+<img width="1902" height="909" alt="image" src="https://github.com/user-attachments/assets/35308202-b464-4ea8-89c5-97a03cbda256" />
+
+
+
+
+
+
+
